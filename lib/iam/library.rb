@@ -8,38 +8,38 @@ module Iam
 
     class<<self
       def load_and_create(library, options={})
-         begin
-          if (library.is_a?(Symbol) || library.is_a?(String)) && Iam.base_object.respond_to?(library)
-            Iam.base_object.send(library)
-            return create_loaded_library(library, :method)
-          end
+        begin
+        if (library.is_a?(Symbol) || library.is_a?(String)) && Iam.base_object.respond_to?(library)
+          Iam.base_object.send(library)
+          return create_loaded_library(library, :method)
+        end
 
-          if library.is_a?(Module) || (module_library = Util.constantize(library))
-            library = module_library if module_library
-            library.send(:init) if library.respond_to?(:init)
-            Iam.base_object.extend(library)
-            create_loaded_library(Util.underscore(library), :module, :module=>library)
-          #td: eval in base_object without having to intrude with extend
-          else
-            #try gem
-            begin
-              require "libraries/#{library}"
-              object_methods = Object.methods
-              if (gem_module = Util.constantize("iam/libraries/#{library}"))
-                gem_module.send(:init) if gem_module.respond_to?(:init)
-                Iam.base_object.extend(gem_module)
-                library_hash = {:module=>gem_module}
-              else
-                require library.to_s
-                library_hash = {}
-              end
-              return create_loaded_library(library, :gem, library_hash.merge(:commands=>(Object.methods - object_methods)))
-            rescue
-              puts "Failed to load gem library"
-              puts caller.slice(0,5).join("\n")
+        if library.is_a?(Module) || (module_library = Util.constantize(library))
+          library = module_library if module_library
+          library.send(:init) if library.respond_to?(:init)
+          Iam.base_object.extend(library)
+          create_loaded_library(Util.underscore(library), :module, :module=>library)
+        #td: eval in base_object without having to intrude with extend
+        else
+          #try gem
+          begin
+            safe_require "libraries/#{library}"
+            object_methods = Object.methods
+            if (gem_module = Util.constantize("iam/libraries/#{library}"))
+              gem_module.send(:init) if gem_module.respond_to?(:init)
+              Iam.base_object.extend(gem_module)
+              library_hash = {:module=>gem_module}
+            else
+              safe_require library.to_s
+              library_hash = {}
             end
-            puts "Library '#{library}' not found"
+            return create_loaded_library(library, :gem, library_hash.merge(:commands=>(Object.methods - object_methods)))
+          rescue
+            puts "Failed to load gem library"
+            puts caller.slice(0,5).join("\n")
           end
+          puts "Library '#{library}' not found"
+        end
         rescue LoadError
           puts "Failed to load '#{library}'"
         rescue Exception
@@ -47,7 +47,15 @@ module Iam
           puts "Reason: #{$!}"
           puts caller.slice(0,5).join("\n")
         end
-     end
+      end
+
+      def safe_require(lib)
+        begin
+          require lib
+        rescue LoadError
+          false
+        end
+      end
 
       def create_loaded_library(name, library_type, lib_hash={})
         create(name, library_type, lib_hash.merge(:loaded=>true))
