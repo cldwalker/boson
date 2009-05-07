@@ -1,53 +1,14 @@
 module Iam
-  module Library
+  class Library < ::Hash
     extend Config
+    def initialize(hash)
+      super
+      replace(hash)
+    end
+
     class<<self
-      def create_libraries(libraries, options={})
-        libraries.each {|e|
-          create_and_load_library(e, options)
-        }
-        library_names = Iam.libraries.map {|e| e[:name]}
-        config[:libraries].each do |name, lib|
-          unless library_names.include?(name)
-            Iam.libraries << create_library(name)
-          end
-        end
-      end
-
-      def create_aliases
-        aliases_hash = {}
-        Iam.commands.each do |e|
-          if e[:alias]
-            if ((lib = Iam.libraries.detect {|l| l[:name] == e[:lib]}) && !lib[:module]) || !lib
-              puts "No lib module for #{e[:name]} when aliasing"
-              next
-            end
-            aliases_hash[lib[:module].to_s] ||= {}
-            aliases_hash[lib[:module].to_s][e[:name]] = e[:alias]
-          end
-        end
-        Alias.init {|c| c.instance_method = aliases_hash}
-      end
-
-      def create_and_load_library(*args)
-        if (lib = load_library(*args)) && lib.is_a?(Hash)
-          Iam.libraries << lib
-        end
-      end
-
-      def create_or_update_library(*args)
-        if (lib = load_library(*args)) && lib.is_a?(Hash)
-          if (existing_lib = Iam.libraries.find {|e| e[:name] == lib[:name]})
-            existing_lib.merge!(lib)
-          else
-            Iam.libraries << lib
-          end
-          puts "Loaded library #{lib[:name]}"
-        end
-      end
-
-      def load_library(library, options={})
-        begin
+      def load_and_create(library, options={})
+         begin
           if (library.is_a?(Symbol) || library.is_a?(String)) && Iam.base_object.respond_to?(library)
             Iam.base_object.send(library)
             return create_loaded_library(library, :method)
@@ -86,21 +47,19 @@ module Iam
           puts "Reason: #{$!}"
           puts caller.slice(0,5).join("\n")
         end
-      end
+     end
 
       def create_loaded_library(name, library_type, lib_hash={})
-        create_library(name, library_type, lib_hash.merge(:loaded=>true))
+        create(name, library_type, lib_hash.merge(:loaded=>true))
       end
 
-      def create_library(name, library_type=nil, lib_hash={})
+      # attributes: name, type, loaded, commands
+      def create(name, library_type=nil, lib_hash={})
         library_obj = {:loaded=>false, :name=>name.to_s}.merge(config[:libraries][name.to_s] || {}).merge(lib_hash)
         library_obj[:type] = library_type if library_type
         set_library_commands(library_obj)
-        if library_obj[:loaded]
-          library_obj[:commands].each {|e| Iam.commands << create_command(e, name)}
-        end
         puts "Loaded #{library_type} library '#{name}'" if $DEBUG
-        library_obj
+        new(library_obj)
       end
 
       def set_library_commands(library_obj)
@@ -111,10 +70,6 @@ module Iam
           }.compact
           library_obj[:commands] += (library_obj[:module].instance_methods - aliases)
         end
-      end
-
-      def create_command(name, library=nil)
-        (config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
       end
     end
   end

@@ -3,6 +3,7 @@ require 'hirb'
 require 'alias'
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 require 'iam/config'
+require 'iam/manager'
 require 'iam/library'
 require 'iam/util'
 require 'iam/commands'
@@ -26,8 +27,8 @@ module Iam
       init(options)
       @base_object = options[:with] || @base_object || Object.new
       @base_object.send :extend, Iam::Libraries
-      Iam::Library.create_libraries(args, options)
-      Iam::Library.create_aliases
+      Iam::Manager.create_libraries(args, options)
+      Iam::Manager.create_aliases
     end
   end  
 end

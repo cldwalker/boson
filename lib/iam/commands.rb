@@ -9,7 +9,7 @@ module Iam
     end
     
     def load_library(*args)
-      Iam.create_or_update_library(*args)
+      Iam::Manager.create_or_update_library(*args)
     end
   end
 end
