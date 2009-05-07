@@ -2,6 +2,14 @@
 Irb's Awesome/Awful/Audacious/Asinine Manager for managing your irb features and commands.
 For my irb libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
 
+== Features
+* Manages libraries and commands. Libraries can be as simple as a group of snippets to a set of
+  methods wrapped around any gem.
+* Commands are just methods that are extended by the default irb object, main.
+* Commands can be configured to have aliases.
+* Libraries can be configured to be loaded/unloaded at startup.
+* Libraries can be loaded within irb.
+
 == Setup
 * Define a base directory for your irb commands and config, defaults to ~/.irb.
 * Define a config file in :base_directory/iam.yml.
@@ -12,7 +20,7 @@ TODO: Explain library format
 
 
 == Examples
-By default you get commands for listing and searching commands:
+By default you get commands for listing/searching commands and libraries:
 
   irb >> libraries
   +----------------------+--------+--------+
@@ -68,7 +76,10 @@ By default you get commands for listing and searching commands:
   19 rows in set
 
 == Todo
+* put snippets under one library 
+* gemify
 * Refactor + tests!
 * Search libraries + commands
 * Add descriptions + tags to libraries + commands
 * better support for loading libraries within irb
+* binary to wrap around irb to easily load groups of libraries
