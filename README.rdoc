@@ -1,0 +1,74 @@
+== Description
+Irb's Awesome/Awful/Audacious/Asinine Manager for managing your irb features and commands.
+For my irb libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
+
+== Setup
+* Define a base directory for your irb commands and config, defaults to ~/.irb.
+* Define a config file in :base_directory/iam.yml.
+* Drop your libraries under :base_directory/libraries. For quick snippets drop them under
+  :base_directory/libraries.rb as methods.
+
+TODO: Explain library format
+
+
+== Examples
+By default you get commands for listing and searching commands:
+
+  irb >> libraries
+  +----------------------+--------+--------+
+  | name                 | type   | loaded |
+  +----------------------+--------+--------+
+  | irb_options          | method | true   |
+  | railsrc              | method | true   |
+  | aliases              | method | true   |
+  | history              | method | true   |
+  | local_gem            | method | true   |
+  | core_extensions      | method | true   |
+  | wirble               | gem    | true   |
+  | duration             | method | true   |
+  | utility_belt         | gem    | true   |
+  | history_commands     | gem    | true   |
+  | tree_commands        | gem    | true   |
+  | iam/commands         | module | true   |
+  | hirb/console         | module | true   |
+  | pp                   | gem    | false  |
+  | method_lister        | gem    | false  |
+  | what_methods         | gem    | false  |
+  | print_object_methods | module | false  |
+  | and_and              | gem    | false  |
+  | rake_commands        | module | false  |
+  +----------------------+--------+--------+
+  19 rows in set
+  => nil
+
+  >> commands
+  +------------------+------------------+-------+
+  | name             | lib              | alias |
+  +------------------+------------------+-------+
+  | not              | utility_belt     |       |
+  | v                | utility_belt     |       |
+  | quiet            | utility_belt     |       |
+  | grep_methods     | utility_belt     |       |
+  | q                | utility_belt     |       |
+  | verbose          | utility_belt     |       |
+  | grep_classes     | utility_belt     |       |
+  | clipboard_copy   | utility_belt     | pbc   |
+  | clipboard_paste  | utility_belt     | pbp   |
+  | edit_history     | history_commands | eh    |
+  | print_history    | history_commands | ph    |
+  | eval_history     | history_commands |       |
+  | inheritance_tree | tree_commands    | itree |
+  | nested_tree      | tree_commands    | ntree |
+  | commands         | iam/commands     | com   |
+  | libraries        | iam/commands     | lib   |
+  | load_library     | iam/commands     | ll    |
+  | table            | hirb/console     |       |
+  | view             | hirb/console     |       |
+  +------------------+------------------+-------+
+  19 rows in set
+
+== Todo
+* Refactor + tests!
+* Search libraries + commands
+* Add descriptions + tags to libraries + commands
+* better support for loading libraries within irb
