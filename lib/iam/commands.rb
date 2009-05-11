@@ -1,7 +1,7 @@
 module Iam
   module Commands
     def commands
-      puts Hirb::Helpers::Table.render(Iam.commands, :fields=>[:name, :lib, :alias])
+      puts Hirb::Helpers::Table.render(Iam.commands, :fields=>[:name, :lib, :alias, :description])
     end
 
     def libraries

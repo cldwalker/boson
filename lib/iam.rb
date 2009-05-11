@@ -9,9 +9,9 @@ require 'iam/util'
 require 'iam/commands'
 
 module Iam
+  extend Config
   module Libraries; end
   class <<self
-    extend Config
     attr_reader :base_dir, :libraries, :base_object, :commands
     def init(options={})
       @libraries ||= []
