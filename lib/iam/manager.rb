@@ -2,18 +2,27 @@ module Iam
   class Manager
     extend Config
     class<<self
-      def create_libraries(libraries, options={})
-        libraries.each {|e|
-          create_or_update_library(e, options)
-        }
+      def load_libraries(libraries, options={})
+        libraries.each {|e| load_library(e, options) }
       end
 
       def create_config_libraries
-        library_names = Iam.libraries.map {|e| e[:name]}
         config[:libraries].each do |name, lib|
-          unless library_names.include?(name)
-            Iam.libraries << create_library(name)
-          end
+          add_library(create_library(name))
+        end
+      end
+
+      def create_library(*args)
+        lib = Library.create(*args)
+        add_lib_commands(lib)
+        lib
+      end
+
+      def load_library(library, options={})
+        if (lib = Library.load_and_create(library, options)) && lib.is_a?(Library)
+          add_library(lib)
+          add_lib_commands(lib)
+          puts "Loaded library #{lib[:name]}"
         end
       end
 
@@ -29,22 +38,12 @@ module Iam
         Alias.manager.create_aliases(:instance_method, aliases_hash)
       end
 
-      def create_or_update_library(*args)
-        if (lib = load_library(*args)) && lib.is_a?(Library)
-          puts "Loaded library #{lib[:name]}"
-        end
-      end
-
-      def load_library(library, options={})
-        lib = Library.load_and_create(library, options)
+      def add_library(lib)
         if (existing_lib = Iam.libraries.find {|e| e[:name] == lib[:name]})
           existing_lib.merge!(lib)
         else
           Iam.libraries << lib
         end
-
-        add_lib_commands(lib)
-        lib
       end
 
       def add_lib_commands(lib)
@@ -60,12 +59,6 @@ module Iam
             end
           end
         end
-      end
-
-      def create_library(*args)
-        lib = Library.create(*args)
-        add_lib_commands(lib)
-        lib
       end
 
       def create_command(name, library=nil)

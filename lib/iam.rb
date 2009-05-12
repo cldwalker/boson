@@ -34,14 +34,14 @@ module Iam
     def create_default_libraries(options)
       defaults = [Iam::Commands]
       defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
-      Manager.create_libraries(defaults, options)
+      Manager.load_libraries(defaults, options)
     end
 
     # can only be run once b/c of alias and extend
     def register(*args)
       options = args[-1].is_a?(Hash) ? args.pop : {}
       init(options) unless init_called?
-      Manager.create_libraries(args, options)
+      Manager.load_libraries(args, options)
     end
   end  
 end
