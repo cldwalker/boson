@@ -14,6 +14,9 @@ module Iam
   module Libraries; end
   class <<self
     attr_reader :base_dir, :libraries, :base_object, :commands
+    
+    def init_called?; @init_called || false; end
+
     def init(options={})
       @libraries ||= SearchableArray.new
       @commands ||= SearchableArray.new
@@ -22,7 +25,10 @@ module Iam
       load File.join(@base_dir, 'libraries.rb') if File.exists?(File.join(@base_dir, 'libraries.rb'))
       @base_object = options[:with] || @base_object || Object.new
       @base_object.send :extend, Iam::Libraries
+      Alias.init
       create_default_libraries(options)
+      Manager.create_config_libraries
+      @init_called = true
     end
 
     def create_default_libraries(options)
@@ -34,10 +40,8 @@ module Iam
     # can only be run once b/c of alias and extend
     def register(*args)
       options = args[-1].is_a?(Hash) ? args.pop : {}
-      init(options)
+      init(options) unless init_called?
       Manager.create_libraries(args, options)
-      Manager.create_config_libraries
-      Manager.create_aliases
     end
   end  
 end

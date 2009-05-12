@@ -4,7 +4,7 @@ module Iam
     class<<self
       def create_libraries(libraries, options={})
         libraries.each {|e|
-          create_and_load_library(e, options)
+          create_or_update_library(e, options)
         }
       end
 
@@ -17,49 +17,50 @@ module Iam
         end
       end
 
-      def create_aliases
+      def create_lib_aliases(commands, lib_module)
         aliases_hash = {}
-        Iam.commands.each do |e|
+        select_commands = Iam.commands.select {|e| commands.include?(e[:name])}
+        select_commands.each do |e|
           if e[:alias]
-            if ((lib = Iam.libraries.detect {|l| l[:name] == e[:lib]}) && !lib[:module]) || !lib
-              puts "No lib module for #{e[:name]} when aliasing"
-              next
-            end
-            aliases_hash[lib[:module].to_s] ||= {}
-            aliases_hash[lib[:module].to_s][e[:name]] = e[:alias]
+            aliases_hash[lib_module.to_s] ||= {}
+            aliases_hash[lib_module.to_s][e[:name]] = e[:alias]
           end
         end
-        Alias.init {|c| c.instance_method = aliases_hash}
-      end
-
-      def create_and_load_library(*args)
-        if (lib = load_library(*args)) && lib.is_a?(Library)
-          Iam.libraries << lib
-        end
+        Alias.manager.create_aliases(:instance_method, aliases_hash)
       end
 
       def create_or_update_library(*args)
         if (lib = load_library(*args)) && lib.is_a?(Library)
-          if (existing_lib = Iam.libraries.find {|e| e[:name] == lib[:name]})
-            existing_lib.merge!(lib)
-          else
-            Iam.libraries << lib
-          end
           puts "Loaded library #{lib[:name]}"
         end
       end
 
       def load_library(library, options={})
         lib = Library.load_and_create(library, options)
+        if (existing_lib = Iam.libraries.find {|e| e[:name] == lib[:name]})
+          existing_lib.merge!(lib)
+        else
+          Iam.libraries << lib
+        end
+
         add_lib_commands(lib)
         lib
       end
 
-     def add_lib_commands(lib)
+      def add_lib_commands(lib)
         if lib[:loaded]
           lib[:commands].each {|e| Iam.commands << create_command(e, lib[:name])}
+          if lib[:commands].size > 0
+            if lib[:module]
+              create_lib_aliases(lib[:commands], lib[:module])
+            else
+              if (commands = Iam.commands.select {|e| lib[:commands].include?(e[:name])}) && commands.find {|e| e[:alias]}
+                puts "No aliases created for lib #{lib[:name]} because there is no lib module"
+              end
+            end
+          end
         end
-     end
+      end
 
       def create_library(*args)
         lib = Library.create(*args)
