@@ -6,6 +6,9 @@ module Iam
         libraries.each {|e|
           create_and_load_library(e, options)
         }
+      end
+
+      def create_config_libraries
         library_names = Iam.libraries.map {|e| e[:name]}
         config[:libraries].each do |name, lib|
           unless library_names.include?(name)

@@ -9,7 +9,7 @@ module Iam
     class<<self
       def load_and_create(library, options={})
         begin
-        if (library.is_a?(Symbol) || library.is_a?(String)) && Iam.base_object.respond_to?(library)
+        if (library.is_a?(Symbol) || library.is_a?(String)) && Iam.base_object.respond_to?(library, true)
           Iam.base_object.send(library)
           return create_loaded_library(library, :method)
         end
