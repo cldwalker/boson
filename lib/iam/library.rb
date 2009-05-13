@@ -16,24 +16,21 @@ module Iam
 
         if library.is_a?(Module) || (module_library = Util.constantize(library))
           library = module_library if module_library
-          library.send(:init) if library.respond_to?(:init)
-          Iam.base_object.extend(library)
-          create_loaded_library(Util.underscore(library), :module, :module=>library)
+          added_methods = detect_added_methods { initialize_library_module(library) }
+          create_loaded_library(Util.underscore(library), :module, :module=>library, :commands=>added_methods)
         #td: eval in base_object without having to intrude with extend
         else
           #try gem
           begin
-            safe_require "libraries/#{library}"
-            object_methods = Object.methods
+            added_methods = detect_added_methods { safe_require "libraries/#{library}"}
             if (gem_module = Util.constantize("iam/libraries/#{library}"))
-              gem_module.send(:init) if gem_module.respond_to?(:init)
-              Iam.base_object.extend(gem_module)
+              added_methods += detect_added_methods { initialize_library_module(gem_module) }
               library_hash = {:module=>gem_module}
             else
-              safe_require library.to_s
+              added_methods += detect_added_methods { safe_require library.to_s }
               library_hash = {}
             end
-            return create_loaded_library(library, :gem, library_hash.merge(:commands=>(Object.methods - object_methods)))
+            return create_loaded_library(library, :gem, library_hash.merge(:commands=>added_methods))
           rescue
             puts "Failed to load gem library"
             puts caller.slice(0,5).join("\n")
@@ -47,6 +44,20 @@ module Iam
           puts "Reason: #{$!}"
           puts caller.slice(0,5).join("\n")
         end
+      end
+
+      def detect_added_methods
+        original_object_methods = Object.methods
+        original_instance_methods = Iam.base_object.instance_eval("class<<self;self;end").instance_methods
+        yield
+        Object.methods - original_object_methods
+        # return (Object.methods - original_object_methods + Iam.base_object.instance_eval("class<<self;self;end").instance_methods - 
+        #   original_instance_methods).uniq
+      end
+
+      def initialize_library_module(lib_module)
+        lib_module.send(:init) if lib_module.respond_to?(:init)
+        Iam.base_object.extend(lib_module)
       end
 
       def safe_require(lib)
@@ -76,8 +87,9 @@ module Iam
           aliases = library_obj[:module].instance_methods.map {|e|
             config[:commands][e][:alias] rescue nil
           }.compact
-          library_obj[:commands] += (library_obj[:module].instance_methods - aliases)
+          library_obj[:commands] = (library_obj[:commands] + library_obj[:module].instance_methods).uniq - aliases
         end
+        # library_obj[:commands].uniq!
       end
     end
   end

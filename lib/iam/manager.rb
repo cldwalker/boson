@@ -48,6 +48,10 @@ module Iam
 
       def add_lib_commands(lib)
         if lib[:loaded]
+          if lib[:except]
+            lib[:commands] -= lib[:except]
+            lib[:except].each {|e| Iam.base_object.instance_eval("class<<self;self;end").send :undef_method, e }
+          end
           lib[:commands].each {|e| Iam.commands << create_command(e, lib[:name])}
           if lib[:commands].size > 0
             if lib[:module]
