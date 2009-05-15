@@ -28,13 +28,19 @@ module Iam
       Alias.init
       create_default_libraries(options)
       Manager.create_config_libraries
+      load_default_libraries(options)
       @init_called = true
     end
 
-    def create_default_libraries(options)
+    def load_default_libraries(options)
       defaults = [Iam::Commands]
       defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
       Manager.load_libraries(defaults, options)
+    end
+
+    def create_default_libraries(options)
+      detected_libraries = Dir[File.join(Iam.base_dir, 'libraries', '**/*.rb')].map {|e| e.gsub(/.*libraries\//,'').gsub('.rb','') }
+      Manager.create_libraries(detected_libraries, options)
     end
 
     # can only be run once b/c of alias and extend

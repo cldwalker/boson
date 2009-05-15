@@ -6,6 +6,10 @@ module Iam
         libraries.each {|e| load_library(e, options) }
       end
 
+      def create_libraries(libraries, options={})
+        libraries.each {|e| add_library(create_library(e, :module)) }
+      end
+
       def create_config_libraries
         config[:libraries].each do |name, lib|
           add_library(create_library(name))
