@@ -5,7 +5,8 @@ module Iam
     end
 
     def libraries(*args)
-      puts Hirb::Helpers::Table.render(Iam.libraries.search(*args), :fields=>[:name, :type, :loaded])
+      puts Hirb::Helpers::Table.render(Iam.libraries.search(*args), :fields=>[:name, :loaded, :commands, :gems],
+        :filters=>{:gems=>lambda {|e| e.join(',')}, :commands=>:size} )
     end
     
     def load_library(*args)

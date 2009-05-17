@@ -7,7 +7,7 @@ module Iam
       end
 
       def create_libraries(libraries, options={})
-        libraries.each {|e| add_library(create_library(e, :module)) }
+        libraries.each {|e| add_library(create_library(e)) }
       end
 
       def create_config_libraries
