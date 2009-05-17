@@ -8,30 +8,34 @@ module Iam
 
     class<<self
       def library_config(library=nil)
-        @library_config ||= {:detect_methods=>true}.merge!(config[:libraries][library.to_s] || {})
+        @library_config ||= {:detect_methods=>true, :name=>library.to_s}.merge!(config[:libraries][library.to_s] || {})
+      end
+
+      def set_library_config(library)
+        if library.is_a?(Module)
+          library_config(Util.underscore(library)).merge!(:module=>library)
+        else
+          library_config(library)
+        end
       end
 
       def load_and_create(library, options={})
+        set_library_config(library)
         begin
         if library.is_a?(Module)
-          library_name = Util.underscore(library)
-          library_config(library_name)
           added_methods = detect_added_methods { initialize_library_module(library) }
-          create_loaded_library(library_name, :module, :module=>library, :commands=>added_methods)
-        #td: eval in base_object without having to intrude with extend
+          create_loaded_library(library_config[:name], :module, :commands=>added_methods)
         else
-          library_config(library) #set lib config
           #try gem
           begin
             added_methods = detect_added_methods { safe_require "libraries/#{library}"}
             if (gem_module = Util.constantize("iam/libraries/#{library}"))
               added_methods += detect_added_methods { initialize_library_module(gem_module) }
-              library_hash = {:module=>gem_module}
+              library_config.merge!(:module=>gem_module)
             else
               added_methods += detect_added_methods { safe_require library.to_s }
-              library_hash = {}
             end
-            return create_loaded_library(library, :gem, library_hash.merge(:commands=>added_methods))
+            return create_loaded_library(library, :gem, :commands=>added_methods)
           rescue
             puts "Failed to load gem library #{library}"
             puts caller.slice(0,5).join("\n")
@@ -59,6 +63,7 @@ module Iam
       def initialize_library_module(lib_module)
         lib_module.send(:init) if lib_module.respond_to?(:init)
         Iam.base_object.extend(lib_module)
+        #td: eval in base_object without having to intrude with extend
         (library_config[:load] || []).each do |m|
           Iam.base_object.send m
         end
