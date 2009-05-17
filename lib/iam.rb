@@ -22,9 +22,7 @@ module Iam
       @commands ||= SearchableArray.new
       @base_dir = options[:base_dir] || (File.exists?("#{ENV['HOME']}/.irb") ? "#{ENV['HOME']}/.irb" : '.irb')
       $:.unshift @base_dir unless $:.include? File.expand_path(@base_dir)
-      load File.join(@base_dir, 'libraries.rb') if File.exists?(File.join(@base_dir, 'libraries.rb'))
       @base_object = options[:with] || @base_object || Object.new
-      @base_object.send :extend, Iam::Libraries
       Alias.init
       create_default_libraries(options)
       Manager.create_config_libraries
