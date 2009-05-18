@@ -51,6 +51,16 @@ module Iam
         Alias.manager.create_aliases(:instance_method, aliases_hash)
       end
 
+      def create_lib_aliases_or_warn(lib)
+        if lib[:module]
+          create_lib_aliases(lib[:commands], lib[:module])
+        else
+          if (commands = Iam.commands.select {|e| lib[:commands].include?(e[:name])}) && commands.find {|e| e[:alias]}
+            puts "No aliases created for lib #{lib[:name]} because there is no lib module"
+          end
+        end
+      end
+
       def library_loaded?(lib_name)
         ((lib = Iam.libraries.find {|e| e[:name] == lib_name}) && lib[:loaded]) ? true : false
       end
@@ -63,6 +73,14 @@ module Iam
         end
       end
 
+      def add_object_command(obj_command)
+        if (lib = Iam.libraries.find {|e| e[:module] == Iam::ObjectCommands})
+          lib[:commands] << obj_command
+          Iam.commands << create_command(obj_command, lib[:name])
+          create_lib_aliases_or_warn(lib)
+        end
+      end
+
       def add_lib_commands(lib)
         if lib[:loaded]
           if lib[:except]
@@ -71,13 +89,7 @@ module Iam
           end
           lib[:commands].each {|e| Iam.commands << create_command(e, lib[:name])}
           if lib[:commands].size > 0
-            if lib[:module]
-              create_lib_aliases(lib[:commands], lib[:module])
-            else
-              if (commands = Iam.commands.select {|e| lib[:commands].include?(e[:name])}) && commands.find {|e| e[:alias]}
-                puts "No aliases created for lib #{lib[:name]} because there is no lib module"
-              end
-            end
+            create_lib_aliases_or_warn(lib)
           end
         end
       end

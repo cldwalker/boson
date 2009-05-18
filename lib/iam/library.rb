@@ -102,11 +102,34 @@ module Iam
 
       def initialize_library_module(lib_module)
         lib_module.send(:init) if lib_module.respond_to?(:init)
-        Iam.base_object.extend(lib_module)
+        if library_config[:object_command]
+          create_object_command(lib_module)
+        else
+          Iam.base_object.extend(lib_module)
+        end
         #td: eval in base_object without having to intrude with extend
         library_config[:call_methods].each do |m|
           Iam.base_object.send m
         end
+      end
+
+      def create_object_command(lib_module)
+        ObjectCommands.module_eval %[
+          def #{library_config[:name]}
+            @#{library_config[:name]} ||= begin
+              obj = Object.new.extend(#{lib_module})
+              def obj.commands
+                #{lib_module}.instance_methods
+              end
+              private
+              def obj.method_missing(method, *args, &block)
+                Iam.base_object.send(method, *args, &block)
+              end
+              obj
+            end
+          end
+        ]
+        Manager.add_object_command(library_config[:name])
       end
 
       def safe_require(lib)
@@ -126,12 +149,11 @@ module Iam
       end
 
       def set_library_commands(library_obj)
-        if library_obj[:module]
-          aliases = library_obj[:module].instance_methods.map {|e|
-            config[:commands][e][:alias] rescue nil
-          }.compact
-          library_obj[:commands] = (library_obj[:commands] + library_obj[:module].instance_methods).uniq - aliases
-        end
+        aliases = library_obj[:commands].map {|e|
+          config[:commands][e][:alias] rescue nil
+        }.compact
+        library_obj[:commands] -= aliases
+        library_obj[:commands].delete(library_obj[:name]) if library_obj[:object_command]
       end
     end
   end

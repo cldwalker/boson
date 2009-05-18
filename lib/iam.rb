@@ -12,6 +12,7 @@ require 'iam/searchable_array'
 module Iam
   extend Config
   module Libraries; end
+  module ObjectCommands; end
   class <<self
     attr_reader :base_dir, :libraries, :base_object, :commands
     
@@ -31,7 +32,7 @@ module Iam
     end
 
     def load_default_libraries(options)
-      defaults = [Iam::Commands]
+      defaults = [Iam::Commands, Iam::ObjectCommands]
       defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
       Manager.load_libraries(defaults, options)
     end
