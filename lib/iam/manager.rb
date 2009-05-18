@@ -26,7 +26,9 @@ module Iam
         if (lib = Library.load_and_create(library, options)) && lib.is_a?(Library)
           add_library(lib)
           add_lib_commands(lib)
-          puts "Loaded library #{lib[:name]}"
+          puts "Loaded library #{lib[:name]}."
+        else
+          puts "Library #{library} not found."
         end
       end
 

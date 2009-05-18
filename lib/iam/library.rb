@@ -7,8 +7,12 @@ module Iam
     end
 
     class<<self
+      def default_library
+        {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[]}
+      end
+
       def library_config(library=nil)
-        @library_config ||= {:loaded=>false, :detect_methods=>true, :name=>library.to_s, :gems=>[]}.merge!(config[:libraries][library.to_s] || {})
+        @library_config ||= default_library.merge(:name=>library.to_s).merge!(config[:libraries][library.to_s] || {})
       end
 
       def set_library_config(library)
@@ -23,36 +27,39 @@ module Iam
         library_config.merge! :gems=>(library_config[:gems] + gems)
       end
 
+      def add_commands_to_library_config(commands)
+        library_config.merge! :commands=>(library_config[:commands] + commands)
+      end
+
       def load_and_create(library, options={})
         set_library_config(library)
-        begin
+        load(library, options) && create(library_config[:name], :loaded=>true)
+      end
+
+      def load(library, options={})
         if library.is_a?(Module)
           added_methods = detect_added_methods { initialize_library_module(library) }
-          create_loaded_library(library_config[:name], :commands=>added_methods)
+          add_commands_to_library_config(added_methods)
         else
-          #try gem
-          begin
-            added_methods = detect_added_methods { safe_require "libraries/#{library}"}
-            if (gem_module = Util.constantize("iam/libraries/#{library}"))
-              added_methods += detect_added_methods { initialize_library_module(gem_module) }
-              library_config.merge!(:module=>gem_module)
-            else
-              added_methods += detect_added_methods { safe_require library.to_s }
-            end
-            return create_loaded_library(library, :commands=>added_methods)
-          rescue
-            puts "Failed to load gem library #{library}"
-            puts caller.slice(0,5).join("\n")
+          added_methods = detect_added_methods { safe_require "libraries/#{library}"}
+          if (gem_module = Util.constantize("iam/libraries/#{library}"))
+            added_methods += detect_added_methods { initialize_library_module(gem_module) }
+            library_config.merge!(:module=>gem_module)
+          else
+            added_methods += detect_added_methods { safe_require library.to_s }
           end
-          puts "Library '#{library}' not found"
+          add_commands_to_library_config(added_methods)
         end
-        rescue LoadError
-          puts "Failed to load '#{library}'"
-        rescue Exception
-          puts "Failed to load '#{library}'"
-          puts "Reason: #{$!}"
-          puts caller.slice(0,5).join("\n")
-        end
+        is_valid_library
+      rescue Exception
+        puts "Failed to load '#{library}'"
+        puts "Reason: #{$!}"
+        puts caller.slice(0,5).join("\n")
+        false
+      end
+
+      def is_valid_library
+        !(library_config[:commands].empty? && library_config[:gems].empty? && !library_config.has_key?(:module))
       end
 
       def detect_added_methods
@@ -70,7 +77,7 @@ module Iam
         lib_module.send(:init) if lib_module.respond_to?(:init)
         Iam.base_object.extend(lib_module)
         #td: eval in base_object without having to intrude with extend
-        (library_config[:load] || []).each do |m|
+        library_config[:call_methods].each do |m|
           Iam.base_object.send m
         end
       end
@@ -83,20 +90,15 @@ module Iam
         end
       end
 
-      def create_loaded_library(name, lib_hash={})
-        create(name, lib_hash.merge(:loaded=>true))
-      end
-
       # attributes: name, type, loaded, commands
       def create(name, lib_hash={})
-        library_obj = {:loaded=>false, :name=>name.to_s}.merge(library_config(name)).merge(lib_hash)
+        library_obj = library_config(name).merge(lib_hash)
         set_library_commands(library_obj)
         @library_config = nil
         new(library_obj)
       end
 
       def set_library_commands(library_obj)
-        library_obj[:commands] ||= []
         if library_obj[:module]
           aliases = library_obj[:module].instance_methods.map {|e|
             config[:commands][e][:alias] rescue nil
