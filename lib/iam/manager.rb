@@ -51,6 +51,10 @@ module Iam
         Alias.manager.create_aliases(:instance_method, aliases_hash)
       end
 
+      def library_loaded?(lib_name)
+        ((lib = Iam.libraries.find {|e| e[:name] == lib_name}) && lib[:loaded]) ? true : false
+      end
+
       def add_library(lib)
         if (existing_lib = Iam.libraries.find {|e| e[:name] == lib[:name]})
           existing_lib.merge!(lib)

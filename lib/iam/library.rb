@@ -48,6 +48,7 @@ module Iam
           dependencies = library_config[:dependencies]
           reset_library_config
           dependencies.each do |e|
+            next if Manager.library_loaded?(e)
             if (dep = load_and_create(e, options))
               deps << dep
             else
