@@ -23,12 +23,19 @@ module Iam
       end
 
       def load_library(library, options={})
-        if (lib = Library.load_and_create(library, options)) && lib.is_a?(Library)
+        if (lib = Library.load_and_create(library, options))
           add_library(lib)
           add_lib_commands(lib)
-          puts "Loaded library #{lib[:name]}."
+          puts "Loaded library #{lib[:name]}"
+          lib[:created_dependencies].each do |e|
+            add_library(e)
+            add_lib_commands(e)
+            puts "Loaded library dependency #{e[:name]}"
+          end
+          true
         else
-          puts "Library #{library} not found."
+          puts "Unable to load library #{library}"
+          false
         end
       end
 

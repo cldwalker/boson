@@ -1,5 +1,6 @@
 module Iam
   class Library < ::Hash
+    class LoadingDependencyError < StandardError; end
     extend Config
     def initialize(hash)
       super
@@ -8,12 +9,14 @@ module Iam
 
     class<<self
       def default_library
-        {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[]}
+        {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[]}
       end
 
       def library_config(library=nil)
         @library_config ||= default_library.merge(:name=>library.to_s).merge!(config[:libraries][library.to_s] || {})
       end
+
+      def reset_library_config; @library_config = nil; end
 
       def set_library_config(library)
         if library.is_a?(Module)
@@ -34,9 +37,30 @@ module Iam
       def load_and_create(library, options={})
         set_library_config(library)
         load(library, options) && create(library_config[:name], :loaded=>true)
+      rescue LoadingDependencyError=>e
+        puts e.message
+        false
+      end
+
+      def load_dependencies(library, options)
+        deps = []
+        if !library_config[:dependencies].empty?
+          dependencies = library_config[:dependencies]
+          reset_library_config
+          dependencies.each do |e|
+            if (dep = load_and_create(e, options))
+              deps << dep
+            else
+              raise LoadingDependencyError, "Failed to load dependency #{e}"
+            end
+          end
+          set_library_config(library)
+        end
+        library_config[:created_dependencies] = deps
       end
 
       def load(library, options={})
+        load_dependencies(library, options) 
         if library.is_a?(Module)
           added_methods = detect_added_methods { initialize_library_module(library) }
           add_commands_to_library_config(added_methods)
@@ -51,6 +75,8 @@ module Iam
           add_commands_to_library_config(added_methods)
         end
         is_valid_library
+      rescue LoadingDependencyError
+        raise
       rescue Exception
         puts "Failed to load '#{library}'"
         puts "Reason: #{$!}"
@@ -94,7 +120,7 @@ module Iam
       def create(name, lib_hash={})
         library_obj = library_config(name).merge(lib_hash)
         set_library_commands(library_obj)
-        @library_config = nil
+        reset_library_config
         new(library_obj)
       end
 
