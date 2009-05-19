@@ -1,5 +1,5 @@
 == Description
-Irb's Awesome/Awful/Audacious/Asinine Manager for managing your irb features and commands.
+A command manager that will fundamentally change how you use irb/console.
 For my irb libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
 
 == Features
