@@ -1,6 +1,8 @@
 module Iam
   class Library < ::Hash
     class LoadingDependencyError < StandardError; end
+    class NoLibraryModuleError < StandardError; end
+    class MultipleLibraryModulesError < StandardError; end
     extend Config
     def initialize(hash)
       super
@@ -57,12 +59,17 @@ module Iam
         if library.is_a?(Module)
           detect_additions { initialize_library_module(library) }
         else
-          detected = detect_additions(:modules=>true, :record_detections=>true) { Util.safe_require "libraries/#{library}"}
-          if (gem_module = Util.constantize("iam/libraries/#{library}"))
-            detect_additions { initialize_library_module(gem_module) }
-            library_config.merge!(:module=>gem_module)
+          library = library.to_s
+          if File.exists?(library_file(library))
+            detected = detect_additions(:modules=>true, :record_detections=>true) { read_library(library) }
+            lib_module = determine_lib_module(detected[:modules])
+            detect_additions { initialize_library_module(lib_module) }
+            library_config.merge!(:module=>lib_module)
           else
-            detect_additions { Util.safe_require library.to_s }
+            detect_additions {
+              Util.safe_require library.to_s
+              initialize_library_module(lib_module) if library_config[:module] && (lib_module = Util.constantize(library_config[:module]))
+            }
           end
         end
         is_valid_library?
@@ -73,6 +80,32 @@ module Iam
         $stderr.puts "Reason: #{$!}"
         $stderr.puts caller.slice(0,5).join("\n")
         false
+      end
+
+      def read_library(library)
+        if library_config[:module]
+          Kernel.load library_file(library)
+        else
+          library_string = File.read(library_file(library))
+          Libraries.module_eval(library_string, library_file(library))
+        end
+        $" << "libraries/#{library}.rb"
+      end
+
+      def determine_lib_module(detected_modules)
+        if library_config[:module]
+          raise InvalidLibraryModuleError unless (lib_module = Util.constantize(library_config[:module]))
+        else
+          case detected_modules.size
+          when 1 then lib_module = detected_modules[0]
+          when 0 then raise NoLibraryModuleError
+          else
+            unless ((lib_module = Util.constantize("iam/libraries/#{library_config[:name]}")) && lib_module.to_s[/^Iam::Libraries/])
+              raise MultipleLibraryModulesError
+            end
+          end
+        end
+        lib_module
       end
 
       def is_valid_library?
