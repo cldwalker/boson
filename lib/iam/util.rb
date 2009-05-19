@@ -49,6 +49,14 @@ module Iam
       detected
     end
 
+    def safe_require(lib)
+      begin
+        require lib
+      rescue LoadError
+        false
+      end
+    end
+
     def modules
       all_modules = []
       ObjectSpace.each_object(Module) {|e| all_modules << e}
