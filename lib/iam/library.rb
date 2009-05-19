@@ -63,15 +63,15 @@ module Iam
       def load(library, options={})
         load_dependencies(library, options) 
         if library.is_a?(Module)
-          added_methods = detect_added_methods { initialize_library_module(library) }
+          added_methods = detect_additions { initialize_library_module(library) }
           add_commands_to_library_config(added_methods)
         else
-          added_methods = detect_added_methods { safe_require "libraries/#{library}"}
+          added_methods = detect_additions(:modules=>true) { safe_require "libraries/#{library}"}
           if (gem_module = Util.constantize("iam/libraries/#{library}"))
-            added_methods += detect_added_methods { initialize_library_module(gem_module) }
+            added_methods += detect_additions { initialize_library_module(gem_module) }
             library_config.merge!(:module=>gem_module)
           else
-            added_methods += detect_added_methods { safe_require library.to_s }
+            added_methods += detect_additions { safe_require library.to_s }
           end
           add_commands_to_library_config(added_methods)
         end
@@ -89,15 +89,10 @@ module Iam
         !(library_config[:commands].empty? && library_config[:gems].empty? && !library_config.has_key?(:module))
       end
 
-      def detect_added_methods
-        original_gems = Gem.loaded_specs.keys if Object.const_defined? :Gem
-        original_object_methods = Object.instance_methods
-        original_instance_methods = Iam.base_object.instance_eval("class<<self;self;end").instance_methods
-        yield
-        add_gems_to_library_config(Gem.loaded_specs.keys - original_gems) if Object.const_defined? :Gem
-        return library_config[:detect_methods] ? (Object.instance_methods - original_object_methods + 
-          Iam.base_object.instance_eval("class<<self;self;end").instance_methods - original_instance_methods).uniq :
-          Object.instance_methods - original_object_methods
+      def detect_additions(options={}, &block)
+        detected = Util.detect(options.merge(:detect_methods=>library_config[:detect_methods]), &block)
+        add_gems_to_library_config(detected[:gems]) if detected[:gems]
+        detected[:methods]
       end
 
       def initialize_library_module(lib_module)

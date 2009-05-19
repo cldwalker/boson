@@ -33,5 +33,26 @@ module Iam
          nil
       end
     end
+
+    def detect(options={}, &block)
+      original_gems = Gem.loaded_specs.keys if Object.const_defined? :Gem
+      original_object_methods = Object.instance_methods
+      original_instance_methods = Iam.base_object.instance_eval("class<<self;self;end").instance_methods
+      original_modules = modules if options[:modules]
+      block.call
+      detected = {}
+      detected[:methods] = options[:detect_methods] ? (Object.instance_methods - original_object_methods + 
+        Iam.base_object.instance_eval("class<<self;self;end").instance_methods - original_instance_methods).uniq :
+        Object.instance_methods - original_object_methods
+      detected[:gems] = Gem.loaded_specs.keys - original_gems if Object.const_defined? :Gem
+      detected[:modules] = modules - original_modules if options[:modules]
+      detected
+    end
+
+    def modules
+      all_modules = []
+      ObjectSpace.each_object(Module) {|e| all_modules << e}
+      all_modules
+    end
   end
 end
