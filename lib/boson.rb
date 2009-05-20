@@ -2,14 +2,14 @@ require 'yaml'
 require 'hirb'
 require 'alias'
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
-require 'iam/config'
-require 'iam/manager'
-require 'iam/library'
-require 'iam/util'
-require 'iam/commands'
-require 'iam/searchable_array'
+require 'boson/config'
+require 'boson/manager'
+require 'boson/library'
+require 'boson/util'
+require 'boson/commands'
+require 'boson/searchable_array'
 
-module Iam
+module Boson
   extend Config
   module Libraries; end
   module ObjectCommands; end
@@ -32,13 +32,13 @@ module Iam
     end
 
     def load_default_libraries(options)
-      defaults = [Iam::Commands, Iam::ObjectCommands]
+      defaults = [Boson::Commands, Boson::ObjectCommands]
       defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
       Manager.load_libraries(defaults, options)
     end
 
     def create_default_libraries(options)
-      detected_libraries = Dir[File.join(Iam.base_dir, 'libraries', '**/*.rb')].map {|e| e.gsub(/.*libraries\//,'').gsub('.rb','') }
+      detected_libraries = Dir[File.join(Boson.base_dir, 'libraries', '**/*.rb')].map {|e| e.gsub(/.*libraries\//,'').gsub('.rb','') }
       Manager.create_libraries(detected_libraries, options)
     end
 

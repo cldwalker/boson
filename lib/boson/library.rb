@@ -1,4 +1,4 @@
-module Iam
+module Boson
   class Library < ::Hash
     class LoadingDependencyError < StandardError; end
     class NoLibraryModuleError < StandardError; end
@@ -100,7 +100,7 @@ module Iam
           when 1 then lib_module = detected_modules[0]
           when 0 then raise NoLibraryModuleError
           else
-            unless ((lib_module = Util.constantize("iam/libraries/#{library_config[:name]}")) && lib_module.to_s[/^Iam::Libraries/])
+            unless ((lib_module = Util.constantize("boson/libraries/#{library_config[:name]}")) && lib_module.to_s[/^Boson::Libraries/])
               raise MultipleLibraryModulesError
             end
           end
@@ -113,7 +113,7 @@ module Iam
       end
 
       def library_file(library)
-        File.join(Iam.base_dir, 'libraries', library + ".rb")
+        File.join(Boson.base_dir, 'libraries', library + ".rb")
       end
 
       def detect_additions(options={}, &block)
@@ -139,11 +139,11 @@ module Iam
         if library_config[:object_command]
           create_object_command(lib_module)
         else
-          Iam.base_object.extend(lib_module)
+          Boson.base_object.extend(lib_module)
         end
         #td: eval in base_object without having to intrude with extend
         library_config[:call_methods].each do |m|
-          Iam.base_object.send m
+          Boson.base_object.send m
         end
       end
 
@@ -157,7 +157,7 @@ module Iam
               end
               private
               def obj.method_missing(method, *args, &block)
-                Iam.base_object.send(method, *args, &block)
+                Boson.base_object.send(method, *args, &block)
               end
               obj
             end

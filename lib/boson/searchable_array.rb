@@ -1,4 +1,4 @@
-module Iam
+module Boson
   class SearchableArray < ::Array
     def search_fields
       @search_fields ||= self[0].keys.map {|e| e.to_s }

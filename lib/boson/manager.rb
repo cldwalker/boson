@@ -1,4 +1,4 @@
-module Iam
+module Boson
   class Manager
     extend Config
     class<<self
@@ -41,7 +41,7 @@ module Iam
 
       def create_lib_aliases(commands, lib_module)
         aliases_hash = {}
-        select_commands = Iam.commands.select {|e| commands.include?(e[:name])}
+        select_commands = Boson.commands.select {|e| commands.include?(e[:name])}
         select_commands.each do |e|
           if e[:alias]
             aliases_hash[lib_module.to_s] ||= {}
@@ -55,28 +55,28 @@ module Iam
         if lib[:module]
           create_lib_aliases(lib[:commands], lib[:module])
         else
-          if (commands = Iam.commands.select {|e| lib[:commands].include?(e[:name])}) && commands.find {|e| e[:alias]}
+          if (commands = Boson.commands.select {|e| lib[:commands].include?(e[:name])}) && commands.find {|e| e[:alias]}
             puts "No aliases created for lib #{lib[:name]} because there is no lib module"
           end
         end
       end
 
       def library_loaded?(lib_name)
-        ((lib = Iam.libraries.find {|e| e[:name] == lib_name}) && lib[:loaded]) ? true : false
+        ((lib = Boson.libraries.find {|e| e[:name] == lib_name}) && lib[:loaded]) ? true : false
       end
 
       def add_library(lib)
-        if (existing_lib = Iam.libraries.find {|e| e[:name] == lib[:name]})
+        if (existing_lib = Boson.libraries.find {|e| e[:name] == lib[:name]})
           existing_lib.merge!(lib)
         else
-          Iam.libraries << lib
+          Boson.libraries << lib
         end
       end
 
       def add_object_command(obj_command)
-        if (lib = Iam.libraries.find {|e| e[:module] == Iam::ObjectCommands})
+        if (lib = Boson.libraries.find {|e| e[:module] == Boson::ObjectCommands})
           lib[:commands] << obj_command
-          Iam.commands << create_command(obj_command, lib[:name])
+          Boson.commands << create_command(obj_command, lib[:name])
           create_lib_aliases_or_warn(lib)
         end
       end
@@ -85,9 +85,9 @@ module Iam
         if lib[:loaded]
           if lib[:except]
             lib[:commands] -= lib[:except]
-            lib[:except].each {|e| Iam.base_object.instance_eval("class<<self;self;end").send :undef_method, e }
+            lib[:except].each {|e| Boson.base_object.instance_eval("class<<self;self;end").send :undef_method, e }
           end
-          lib[:commands].each {|e| Iam.commands << create_command(e, lib[:name])}
+          lib[:commands].each {|e| Boson.commands << create_command(e, lib[:name])}
           if lib[:commands].size > 0
             create_lib_aliases_or_warn(lib)
           end
