@@ -1,5 +1,5 @@
 == Description
-A command manager that will fundamentally change how you use irb/console.
+A command manager that could fundamentally change how you use irb or your ruby console/shell.
 For my irb libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
 
 == Features
