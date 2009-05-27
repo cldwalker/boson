@@ -34,6 +34,7 @@ module Boson
     def load_default_libraries(options)
       defaults = [Boson::Commands, Boson::ObjectCommands]
       defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
+      defaults += config[:defaults] if config[:defaults]
       Manager.load_libraries(defaults, options)
     end
 
