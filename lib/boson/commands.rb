@@ -12,5 +12,11 @@ module Boson
     def load_library(*args)
       Boson::Manager.load_library(*args)
     end
+
+    def reload_library(name)
+      if (lib = Boson.libraries.search(:name=>name)[0])
+        Boson::Library.read_library(lib)
+      end
+    end
   end
 end

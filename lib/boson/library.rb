@@ -26,6 +26,7 @@ module Boson
         else
           library_config(library)
         end
+        library_config.merge!(:non_module_eval => library_config.has_key?(:module))
       end
 
       def load_and_create(library, options={})
@@ -34,6 +35,8 @@ module Boson
       rescue LoadingDependencyError=>e
         $stderr.puts e.message
         false
+      ensure
+        reset_library_config
       end
 
       def load_dependencies(library, options)
@@ -61,7 +64,7 @@ module Boson
         else
           library = library.to_s
           if File.exists?(library_file(library))
-            detected = detect_additions(:modules=>true, :record_detections=>true) { read_library(library) }
+            detected = detect_additions(:modules=>true, :record_detections=>true) { read_library(library_config) }
             lib_module = determine_lib_module(detected[:modules])
             detect_additions { initialize_library_module(lib_module) }
             library_config.merge!(:module=>lib_module)
@@ -82,14 +85,15 @@ module Boson
         false
       end
 
-      def read_library(library)
-        if library_config[:module]
+      def read_library(library_hash)
+        library = library_hash[:name]
+        if library_hash[:non_module_eval]
           Kernel.load library_file(library)
         else
           library_string = File.read(library_file(library))
           Libraries.module_eval(library_string, library_file(library))
         end
-        $" << "libraries/#{library}.rb"
+        $" << "libraries/#{library}.rb" unless $".include?("libraries/#{library}.rb")
       end
 
       def determine_lib_module(detected_modules)
