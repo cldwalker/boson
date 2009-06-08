@@ -34,7 +34,7 @@ module Boson
           end
           true
         else
-          puts "Unable to load library #{library}"
+          puts "Unable to load library #{library}" if lib.is_a?(FalseClass)
           false
         end
       end

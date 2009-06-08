@@ -62,5 +62,9 @@ module Boson
       ObjectSpace.each_object(Module) {|e| all_modules << e}
       all_modules
     end
+
+    def common_instance_methods(module1, module2)
+      (module1.instance_methods + module1.private_instance_methods) & (module2.instance_methods + module2.private_instance_methods)
+    end
   end
 end

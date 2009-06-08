@@ -3,6 +3,7 @@ module Boson
     class LoadingDependencyError < StandardError; end
     class NoLibraryModuleError < StandardError; end
     class MultipleLibraryModulesError < StandardError; end
+    class MethodConflictError < StandardError; end
     extend Config
     def initialize(hash)
       super
@@ -11,7 +12,7 @@ module Boson
 
     class<<self
       def default_library
-        {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[]}
+        {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[], :force=>false}
       end
 
       def library_config(library=nil)
@@ -20,19 +21,25 @@ module Boson
 
       def reset_library_config; @library_config = nil; end
 
-      def set_library_config(library)
+      def set_library_config(library, options={})
         if library.is_a?(Module)
           library_config(Util.underscore(library)).merge!(:module=>library)
         else
           library_config(library)
         end
-        library_config.merge!(:non_module_eval => library_config.has_key?(:module))
+        library_config.merge! options.dup.delete_if {|k,v| !library_config.has_key?(k)} unless options.empty?
+        library_config.merge!(:no_module_eval => library_config.has_key?(:module))
       end
 
+      # Returns: true if loaded, false if failed, nil if already exists
       def load_and_create(library, options={})
-        set_library_config(library)
+        set_library_config(library, options)
+        return nil if Manager.library_loaded?(library_config[:name])
         load(library, options) && create(library_config[:name], :loaded=>true)
       rescue LoadingDependencyError=>e
+        $stderr.puts e.message
+        false
+      rescue MethodConflictError=>e
         $stderr.puts e.message
         false
       ensure
@@ -76,7 +83,7 @@ module Boson
           end
         end
         is_valid_library?
-      rescue LoadingDependencyError
+      rescue LoadingDependencyError, MethodConflictError
         raise
       rescue Exception
         $stderr.puts "Failed to load '#{library}'"
@@ -87,7 +94,7 @@ module Boson
 
       def read_library(library_hash)
         library = library_hash[:name]
-        if library_hash[:non_module_eval]
+        if library_hash[:no_module_eval]
           Kernel.load library_file(library)
         else
           library_string = File.read(library_file(library))
@@ -139,15 +146,25 @@ module Boson
       end
 
       def initialize_library_module(lib_module)
+        check_for_method_conflicts(lib_module)
         lib_module.send(:init) if lib_module.respond_to?(:init)
         if library_config[:object_command]
           create_object_command(lib_module)
         else
-          Boson.base_object.extend(lib_module)
+          Boson::Libraries.send :include, lib_module
+          Boson::Libraries.send :extend_object, Boson.base_object
         end
         #td: eval in base_object without having to intrude with extend
         library_config[:call_methods].each do |m|
           Boson.base_object.send m
+        end
+      end
+
+      def check_for_method_conflicts(lib_module)
+        return if library_config[:force]
+        conflicts = Util.common_instance_methods(lib_module, Boson::Libraries)
+        unless conflicts.empty?
+          raise MethodConflictError, "Can't load library because these methods conflict with existing libraries: #{conflicts.join(', ')}"
         end
       end
 

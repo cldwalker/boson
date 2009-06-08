@@ -24,6 +24,7 @@ module Boson
       @base_dir = options[:base_dir] || (File.exists?("#{ENV['HOME']}/.irb") ? "#{ENV['HOME']}/.irb" : '.irb')
       $:.unshift @base_dir unless $:.include? File.expand_path(@base_dir)
       @base_object = options[:with] || @base_object || Object.new
+      @base_object.extend Libraries
       Alias.init
       create_default_libraries(options)
       Manager.create_config_libraries
@@ -35,7 +36,7 @@ module Boson
       defaults = [Boson::Commands, Boson::ObjectCommands]
       defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
       defaults += config[:defaults] if config[:defaults]
-      Manager.load_libraries(defaults, options)
+      Manager.load_libraries(defaults)
     end
 
     def create_default_libraries(options)
@@ -47,7 +48,7 @@ module Boson
     def register(*args)
       options = args[-1].is_a?(Hash) ? args.pop : {}
       init(options) unless init_called?
-      Manager.load_libraries(args, options)
+      Manager.load_libraries(args)
     end
   end  
 end
