@@ -21,7 +21,7 @@ module Boson
     def init(options={})
       @libraries ||= SearchableArray.new
       @commands ||= SearchableArray.new
-      @base_dir = options[:base_dir] || (File.exists?("#{ENV['HOME']}/.irb") ? "#{ENV['HOME']}/.irb" : '.irb')
+      @base_dir = File.expand_path options[:base_dir] || (File.exists?("#{ENV['HOME']}/.irb") ? "#{ENV['HOME']}/.irb" : '.irb')
       $:.unshift @base_dir unless $:.include? File.expand_path(@base_dir)
       @base_object = options[:with] || @base_object || Object.new
       @base_object.extend Libraries

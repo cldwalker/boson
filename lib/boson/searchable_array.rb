@@ -1,14 +1,17 @@
 module Boson
+  # Searches array of hashes with a hash or string
   class SearchableArray < ::Array
-    def search_fields
-      @search_fields ||= self[0].keys.map {|e| e.to_s }
-    end
+    attr_accessor :default_search_field
 
     def default_search_field
-      :name
+      @default_search_field ||= :name
     end
 
-    def search(search_hash={}, options={})
+    def search_fields
+      @search_fields ||= self[0].keys.map {|e| e.to_s }.sort
+    end
+
+    def search(search_hash={})
       return self if search_hash.is_a?(Hash) && search_hash.empty?
       search_hash = {default_search_field=>search_hash} unless search_hash.is_a?(Hash)
       unalias_search_fields(search_hash)
