@@ -9,8 +9,8 @@ module Boson
         :filters=>{:gems=>lambda {|e| e.join(',')}, :commands=>:size} )
     end
     
-    def load_library(*args)
-      Boson::Manager.load_library(*args)
+    def load_library(libraries, options={})
+      Boson::Manager.load_library(libraries, {:verbose=>true}.merge!(options))
     end
 
     def reload_library(name)

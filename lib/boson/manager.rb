@@ -26,15 +26,15 @@ module Boson
         if (lib = Library.load_and_create(library, options))
           add_library(lib)
           add_lib_commands(lib)
-          puts "Loaded library #{lib[:name]}"
+          puts "Loaded library #{lib[:name]}" if options[:verbose]
           lib[:created_dependencies].each do |e|
             add_library(e)
             add_lib_commands(e)
-            puts "Loaded library dependency #{e[:name]}"
+            puts "Loaded library dependency #{e[:name]}" if options[:verbose]
           end
           true
         else
-          puts "Unable to load library #{library}" if lib.is_a?(FalseClass)
+          $stderr.puts "Unable to load library #{library}" if lib.is_a?(FalseClass)
           false
         end
       end
@@ -56,7 +56,7 @@ module Boson
           create_lib_aliases(lib[:commands], lib[:module])
         else
           if (commands = Boson.commands.select {|e| lib[:commands].include?(e[:name])}) && commands.find {|e| e[:alias]}
-            puts "No aliases created for lib #{lib[:name]} because there is no lib module"
+            $stderr.puts "No aliases created for lib #{lib[:name]} because there is no lib module"
           end
         end
       end
