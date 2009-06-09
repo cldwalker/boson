@@ -147,7 +147,6 @@ module Boson
 
       def initialize_library_module(lib_module)
         check_for_method_conflicts(lib_module)
-        lib_module.send(:init) if lib_module.respond_to?(:init)
         if library_config[:object_command]
           create_object_command(lib_module)
         else
