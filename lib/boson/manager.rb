@@ -1,6 +1,5 @@
 module Boson
   class Manager
-    extend Config
     class<<self
       def load_libraries(libraries, options={})
         libraries.each {|e| load_library(e, options) }
@@ -56,11 +55,11 @@ module Boson
       end
 
       def library_loaded?(lib_name)
-        ((lib = Boson.libraries.find {|e| e[:name] == lib_name}) && lib[:loaded]) ? true : false
+        ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib[:loaded]) ? true : false
       end
 
       def add_library(lib)
-        if (existing_lib = Boson.libraries.find {|e| e[:name] == lib[:name]})
+        if (existing_lib = Boson.libraries.find_by(:name => lib[:name]))
           existing_lib.merge!(lib)
         else
           Boson.libraries << lib
@@ -68,7 +67,7 @@ module Boson
       end
 
       def add_object_command(obj_command)
-        if (lib = Boson.libraries.find {|e| e[:module] == Boson::ObjectCommands})
+        if (lib = Boson.libraries.find_by(:module=>Boson::ObjectCommands))
           lib[:commands] << obj_command
           Boson.commands << create_command(obj_command, lib[:name])
           create_lib_aliases_or_warn(lib)
