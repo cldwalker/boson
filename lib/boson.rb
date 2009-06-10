@@ -26,8 +26,7 @@ module Boson
       @base_object = options[:with] || @base_object || Object.new
       @base_object.extend Libraries
       Alias.init
-      create_default_libraries(options)
-      Manager.create_config_libraries
+      create_libraries(options)
       load_default_libraries(options)
       @init_called = true
     end
@@ -39,9 +38,10 @@ module Boson
       Manager.load_libraries(defaults)
     end
 
-    def create_default_libraries(options)
+    def create_libraries(options)
       detected_libraries = Dir[File.join(Boson.base_dir, 'libraries', '**/*.rb')].map {|e| e.gsub(/.*libraries\//,'').gsub('.rb','') }
-      Manager.create_libraries(detected_libraries, options)
+      libs = (detected_libraries + config[:libraries].keys).uniq
+      Manager.create_libraries(libs, options)
     end
 
     # can only be run once b/c of alias and extend

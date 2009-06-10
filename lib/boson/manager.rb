@@ -10,12 +10,6 @@ module Boson
         libraries.each {|e| add_library(create_library(e)) }
       end
 
-      def create_config_libraries
-        config[:libraries].each do |name, lib|
-          add_library(create_library(name))
-        end
-      end
-
       def create_library(*args)
         lib = Library.create(*args)
         add_lib_commands(lib)

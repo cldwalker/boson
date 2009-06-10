@@ -65,7 +65,14 @@ class BosonTest < Test::Unit::TestCase
       boson_init
     end
 
-    test "creates libraries in config[:defaults]" do
+    test "creates libraries in config[:libraries]" do
+      Boson.config[:libraries] = {'yada'=>{:detect_methods=>false}}
+      Boson::Manager.expects(:create_libraries).with(['yada'], anything)
+      boson_init
+      Boson.config[:libraries] = {}
+    end
+
+    test "loads libraries in config[:defaults]" do
       Boson.config[:defaults] = ['yo']
       Boson::Manager.expects(:load_libraries).with {|args| args.include?('yo') }
       boson_init
@@ -86,9 +93,22 @@ class BosonTest < Test::Unit::TestCase
     end
   end
 
-  # context "config" do
-  #   test "reloads when passed true"
-  #   test "reads existing config correctly"
-  #   test "ignores nonexistent file and sets config defaults"
-  # end
+  context "config" do
+    before(:all) { reset_init; boson_init }
+    before(:each) { Boson.instance_variable_set("@config", nil) }
+
+    test "reloads config when passed true" do
+      Boson.config.object_id.should_not == Boson.config(true).object_id
+    end
+
+    test "reads existing config correctly" do
+      expected_hash = {:commands=>{'c1'=>{}}, :libraries=>{}}
+      YAML.expects(:load_file).returns(expected_hash)
+      Boson.config.should == expected_hash
+    end
+
+    test "ignores nonexistent file and sets config defaults" do
+      assert Boson.config[:commands].is_a?(Hash) && Boson.config[:libraries].is_a?(Hash)
+    end
+  end
 end
