@@ -4,7 +4,6 @@ module Boson
     class NoLibraryModuleError < StandardError; end
     class MultipleLibraryModulesError < StandardError; end
     class MethodConflictError < StandardError; end
-    extend Config
     def initialize(hash)
       super
       replace(hash)
@@ -16,7 +15,7 @@ module Boson
       end
 
       def library_config(library=nil)
-        @library_config ||= default_library.merge(:name=>library.to_s).merge!(config[:libraries][library.to_s] || {})
+        @library_config ||= default_library.merge(:name=>library.to_s).merge!(Boson.config[:libraries][library.to_s] || {})
       end
 
       def reset_library_config; @library_config = nil; end
@@ -196,7 +195,7 @@ module Boson
 
       def set_library_commands(library_obj)
         aliases = library_obj[:commands].map {|e|
-          config[:commands][e][:alias] rescue nil
+          Boson.config[:commands][e][:alias] rescue nil
         }.compact
         library_obj[:commands] -= aliases
         library_obj[:commands].delete(library_obj[:name]) if library_obj[:object_command]

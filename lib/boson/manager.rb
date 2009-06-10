@@ -89,7 +89,7 @@ module Boson
       end
 
       def create_command(name, library=nil)
-        (config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
+        (Boson.config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
       end
     end
   end
