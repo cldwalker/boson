@@ -28,4 +28,8 @@ class Boson::SearchableArrayTest < Test::Unit::TestCase
   test "search ands multiple search terms" do
     @sarray.search(:color=>'e', :name=>'do').should == @sarray.slice(0,1)
   end
+
+  test "search can have default search terms" do
+    @sarray.search(nil, :name=>'do').should == @sarray.slice(0,1)
+  end
 end

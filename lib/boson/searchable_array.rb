@@ -11,9 +11,11 @@ module Boson
       @search_fields ||= self[0].keys.map {|e| e.to_s }.sort
     end
 
-    def search(search_hash={})
-      return self if search_hash.is_a?(Hash) && search_hash.empty?
+    def search(search_hash=nil, defaults={})
+      search_hash = {} if search_hash.nil?
       search_hash = {default_search_field=>search_hash} unless search_hash.is_a?(Hash)
+      search_hash = defaults.merge(search_hash) unless defaults.empty?
+      return self if search_hash.empty?
       unalias_search_fields(search_hash)
       search_hash.inject(self) {|t,(k,v)| true_intersection(t, search_field(k,v)) }
     end

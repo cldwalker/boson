@@ -4,8 +4,8 @@ module Boson
       puts Hirb::Helpers::Table.render(Boson.commands.search(*args), :fields=>[:name, :lib, :alias, :description])
     end
 
-    def libraries(*args)
-      puts Hirb::Helpers::Table.render(Boson.libraries.search(*args), :fields=>[:name, :loaded, :commands, :gems],
+    def libraries(query=nil)
+      puts Hirb::Helpers::Table.render(Boson.libraries.search(query, :loaded=>true), :fields=>[:name, :loaded, :commands, :gems],
         :filters=>{:gems=>lambda {|e| e.join(',')}, :commands=>:size} )
     end
     
