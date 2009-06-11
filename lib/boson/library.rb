@@ -64,7 +64,7 @@ module Boson
       end
 
       def load(library, options={})
-        load_dependencies(library, options) 
+        load_dependencies(library, options)
         if library.is_a?(Module)
           detect_additions { initialize_library_module(library) }
         else
