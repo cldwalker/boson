@@ -123,7 +123,7 @@ module Boson
       end
 
       def library_file(library)
-        File.join(Boson.base_dir, 'libraries', library + ".rb")
+        File.join(Boson.dir, 'libraries', library + ".rb")
       end
 
       def detect_additions(options={}, &block)
@@ -150,11 +150,11 @@ module Boson
           create_object_command(lib_module)
         else
           Boson::Libraries.send :include, lib_module
-          Boson::Libraries.send :extend_object, Boson.base_object
+          Boson::Libraries.send :extend_object, Boson.main_object
         end
-        #td: eval in base_object without having to intrude with extend
+        #td: eval in main_object without having to intrude with extend
         library_config[:call_methods].each do |m|
-          Boson.base_object.send m
+          Boson.main_object.send m
         end
       end
 
@@ -176,7 +176,7 @@ module Boson
               end
               private
               def obj.method_missing(method, *args, &block)
-                Boson.base_object.send(method, *args, &block)
+                Boson.main_object.send(method, *args, &block)
               end
               obj
             end

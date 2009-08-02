@@ -1,6 +1,34 @@
 module Boson
   class Manager
     class<<self
+      def init(options={})
+        $:.unshift Boson.dir unless $:.include? File.expand_path(Boson.dir)
+        Boson.main_object.extend Libraries
+        create_initial_libraries(options)
+        load_default_libraries(options)
+        @initialized = true
+      end
+
+      def load_default_libraries(options)
+        defaults = [Boson::Commands, Boson::ObjectCommands]
+        defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
+        defaults += Boson.config[:defaults] if Boson.config[:defaults]
+        load_libraries(defaults)
+      end
+
+      def create_initial_libraries(options)
+        detected_libraries = Dir[File.join(Boson.dir, 'libraries', '**/*.rb')].map {|e| e.gsub(/.*libraries\//,'').gsub('.rb','') }
+        libs = (detected_libraries + Boson.config[:libraries].keys).uniq
+        create_libraries(libs, options)
+      end
+
+      # can only be run once b/c of alias and extend
+      def activate(*args)
+        options = args[-1].is_a?(Hash) ? args.pop : {}
+        init(options) unless @initialized
+        load_libraries(args, options)
+      end
+
       def load_libraries(libraries, options={})
         libraries.each {|e| load_library(e, options) }
       end
@@ -78,7 +106,7 @@ module Boson
         if lib[:loaded]
           if lib[:except]
             lib[:commands] -= lib[:except]
-            lib[:except].each {|e| Boson.base_object.instance_eval("class<<self;self;end").send :undef_method, e }
+            lib[:except].each {|e| Boson.main_object.instance_eval("class<<self;self;end").send :undef_method, e }
           end
           lib[:commands].each {|e| Boson.commands << create_command(e, lib[:name])}
           if lib[:commands].size > 0

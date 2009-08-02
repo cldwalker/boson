@@ -7,4 +7,15 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'boson'
 
 class Test::Unit::TestCase
+  # make local so it doesn't pick up my real boson dir
+  Boson.dir = File.expand_path('.')
+
+  def reset_boson
+    (Boson.instance_variables - ['@dir']).each do |e|
+      Boson.instance_variable_set(e, nil)
+    end
+    Boson.send :remove_const, "Libraries"
+    eval "module ::Boson::Libraries; end"
+    Boson::Manager.instance_eval("@initialized = false")
+  end
 end
