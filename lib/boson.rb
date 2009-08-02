@@ -25,7 +25,7 @@ module Boson
       $:.unshift @base_dir unless $:.include? File.expand_path(@base_dir)
       @base_object = options[:with] || @base_object || Object.new
       @base_object.extend Libraries
-      Alias.init
+      # Alias.init :file=>false
       create_libraries(options)
       load_default_libraries(options)
       @init_called = true
@@ -48,7 +48,7 @@ module Boson
     def register(*args)
       options = args[-1].is_a?(Hash) ? args.pop : {}
       init(options) unless init_called?
-      Manager.load_libraries(args)
+      Manager.load_libraries(args, options)
     end
   end  
 end

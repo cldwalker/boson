@@ -13,7 +13,6 @@ class Boson::ManagerTest < Test::Unit::TestCase
     #   Boson.libraries.find_by(:name=>'blah').size.should == 1
     #   Boson.libraries.find_by(:name=>'blah')[:loaded].should be(true)
     # end
-    # creates multiple libs
     # adds lib: add or update
     # adds lib commands: only when loaded, lib except option, aliases (module + no module)
     # adds lib deps

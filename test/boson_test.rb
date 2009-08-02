@@ -88,7 +88,7 @@ class BosonTest < Test::Unit::TestCase
     end
 
     test "loads multiple libraries" do
-      Boson::Manager.expects(:load_libraries).with([:lib1,:lib2])
+      Boson::Manager.expects(:load_libraries).with([:lib1,:lib2], anything)
       Boson.register(:lib1, :lib2, :base_dir=>'.')
     end
   end
