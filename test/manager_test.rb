@@ -108,13 +108,13 @@ module Boson
     test "returns false when library isn't loaded" do
       Boson.config[:libraries] = {'blah'=>{:loaded=>false}}
       Boson::Manager.create_libraries(['blah'])
-      Boson::Manager.library_loaded?('blah').should be(false)
+      Boson::Loader.library_loaded?('blah').should be(false)
     end
 
     test "returns true when library is loaded" do
       Boson.config[:libraries] = {'blah'=>{:loaded=>true}}
       Boson::Manager.create_libraries(['blah'])
-      Boson::Manager.library_loaded?('blah').should be(true)
+      Boson::Loader.library_loaded?('blah').should be(true)
     end
   end
   end

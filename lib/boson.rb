@@ -8,6 +8,7 @@ require 'boson/util'
 require 'boson/libraries/core'
 require 'boson/libraries/object_commands'
 require 'boson/searchable_array'
+require 'boson/loader'
 
 module Boson
   class <<self
