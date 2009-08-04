@@ -10,13 +10,13 @@ module Boson
           :filters=>{:gems=>lambda {|e| e.join(',')}, :commands=>:size} )
       end
     
-      def load_library(libraries, options={})
-        Boson::Manager.load_library(libraries, {:verbose=>true}.merge!(options))
+      def load_library(library, options={})
+        Boson::Library.load_library(library, {:verbose=>true}.merge!(options))
       end
 
       def reload_library(name)
         if (lib = Boson.libraries.search(:name=>name)[0])
-          Boson::Library.read_library(lib)
+          Boson::Loader.read_library(lib)
         end
       end
     end

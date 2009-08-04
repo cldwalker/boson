@@ -36,20 +36,20 @@ module Boson
 
     test "creates libraries under :dir/libraries/" do
       Dir.stubs(:[]).returns(['./libraries/lib.rb', './libraries/lib2.rb'])
-      Manager.expects(:create_libraries).with(['lib', 'lib2'], anything)
+      Library.expects(:create).with(['lib', 'lib2'], anything)
       activate
     end
 
     test "creates libraries in config[:libraries]" do
       Boson.config[:libraries] = {'yada'=>{:detect_methods=>false}}
-      Manager.expects(:create_libraries).with(['yada'], anything)
+      Library.expects(:create).with(['yada'], anything)
       activate
       Boson.config[:libraries] = {}
     end
 
     test "loads libraries in config[:defaults]" do
       Boson.config[:defaults] = ['yo']
-      Manager.stubs(:load_libraries).with {|*args| args[0].empty? ? true : args[0].include?('yo') }
+      Library.stubs(:load).with {|*args| args[0].empty? ? true : args[0].include?('yo') }
       activate
       Boson.config.delete(:defaults)
     end
@@ -62,64 +62,8 @@ module Boson
 
     test "loads multiple libraries" do
       Manager.expects(:init)
-      Manager.expects(:load_libraries).with([:lib1,:lib2], anything)
+      Library.expects(:load).with([:lib1,:lib2], anything)
       activate(:libraries=>[:lib1, :lib2])
-    end
-  end
-
-  def reset_libraries
-    Boson.instance_eval("@libraries = SearchableArray.new")
-  end
-
-  context "load_libraries" do
-    before(:each) { reset_libraries; Boson.config[:libraries] = {}}
-    # test "loads and creates multiple basic libraries" do
-    #   Manager.stubs(:load).returns(true)
-    #   Manager.load_libraries(['blah'])
-    #   Boson.libraries.find_by(:name=>'blah').size.should == 1
-    #   Boson.libraries.find_by(:name=>'blah')[:loaded].should be(true)
-    # end
-    # adds lib: add or update
-    # adds lib commands: only when loaded, lib except option, aliases (module + no module)
-    # adds lib deps
-  end
-
-  context "create_libraries" do
-    before(:each) { reset_libraries }
-    test "creates library" do
-      Manager.create_libraries(['blah'])
-      Boson.libraries.find_by(:name=>'blah').is_a?(Library).should be(true)
-    end
-
-    test "creates library with config" do
-      Boson.config[:libraries] = {'blah'=>{:dependencies=>['bluh']}}
-      Manager.create_libraries(['blah'])
-      Boson.libraries.find_by(:name=>'blah').is_a?(Library).should be(true)
-      Boson.libraries.find_by(:name=>'blah')[:dependencies].should == ['bluh']
-      Boson.config[:libraries] = {}
-    end
-
-    test "doesn't create two libraries with same name" do
-      Manager.create_libraries(['doh'])
-      Manager.create_libraries(['doh'])
-      Boson.libraries.size.should == 1
-    end
-  end
-
-  context "library_loaded" do
-    before(:each) { reset_libraries }
-    after(:each) { Boson.config[:libraries] = {}}
-  
-    test "returns false when library isn't loaded" do
-      Boson.config[:libraries] = {'blah'=>{:loaded=>false}}
-      Manager.create_libraries(['blah'])
-      Loader.library_loaded?('blah').should be(false)
-    end
-
-    test "returns true when library is loaded" do
-      Boson.config[:libraries] = {'blah'=>{:loaded=>true}}
-      Manager.create_libraries(['blah'])
-      Loader.library_loaded?('blah').should be(true)
     end
   end
   end

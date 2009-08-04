@@ -1,5 +1,38 @@
 module Boson
   class Library < ::Hash
+    class <<self
+      def load(libraries, options={})
+        libraries.each {|e| load_library(e, options) }
+      end
+
+      def create(libraries, options={})
+        libraries.each {|e| create_library(e).add_library }
+      end
+
+      def create_library(*args)
+        lib = Loader.create(*args)
+        lib.add_lib_commands
+        lib
+      end
+
+      def load_library(library, options={})
+        if (lib = Loader.load_and_create(library, options))
+          lib.add_library
+          lib.add_lib_commands
+          puts "Loaded library #{lib[:name]}" if options[:verbose]
+          lib[:created_dependencies].each do |e|
+            e.add_library
+            e.add_lib_commands
+            puts "Loaded library dependency #{e[:name]}" if options[:verbose]
+          end
+          true
+        else
+          $stderr.puts "Unable to load library #{library}" if lib.is_a?(FalseClass)
+          false
+        end
+      end
+    end
+
     def initialize(hash)
       super
       replace(hash)
