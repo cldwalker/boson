@@ -167,21 +167,7 @@ module Boson
       end
 
       def create_object_command(lib_module)
-        ObjectCommands.module_eval %[
-          def #{library_config[:name]}
-            @#{library_config[:name]} ||= begin
-              obj = Object.new.extend(#{lib_module})
-              def obj.commands
-                #{lib_module}.instance_methods
-              end
-              private
-              def obj.method_missing(method, *args, &block)
-                Boson.main_object.send(method, *args, &block)
-              end
-              obj
-            end
-          end
-        ]
+        Libraries::ObjectCommands.create(library_config[:name], lib_module)
         Manager.add_object_command(library_config[:name])
       end
 

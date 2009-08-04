@@ -3,6 +3,7 @@ module Boson
     class<<self
       def init(options={})
         $:.unshift Boson.dir unless $:.include? File.expand_path(Boson.dir)
+        $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
         Boson.main_object.extend Libraries
         create_initial_libraries(options)
         load_default_libraries(options)
@@ -10,7 +11,7 @@ module Boson
       end
 
       def load_default_libraries(options)
-        defaults = [Boson::Commands, Boson::ObjectCommands]
+        defaults = [Boson::Libraries::Core, Boson::Libraries::ObjectCommands]
         defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
         defaults += Boson.config[:defaults] if Boson.config[:defaults]
         load_libraries(defaults)
@@ -22,11 +23,10 @@ module Boson
         create_libraries(libs, options)
       end
 
-      # can only be run once b/c of alias and extend
-      def activate(*args)
-        options = args[-1].is_a?(Hash) ? args.pop : {}
+      def activate(options={})
         init(options) unless @initialized
-        load_libraries(args, options)
+        libraries = options[:libraries] || []
+        load_libraries(libraries, options)
       end
 
       def load_libraries(libraries, options={})
@@ -95,7 +95,7 @@ module Boson
       end
 
       def add_object_command(obj_command)
-        if (lib = Boson.libraries.find_by(:module=>Boson::ObjectCommands))
+        if (lib = Boson.libraries.find_by(:module=>Boson::Libraries::ObjectCommands))
           lib[:commands] << obj_command
           Boson.commands << create_command(obj_command, lib[:name])
           create_lib_aliases_or_warn(lib)

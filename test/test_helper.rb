@@ -16,6 +16,8 @@ class Test::Unit::TestCase
     end
     Boson.send :remove_const, "Libraries"
     eval "module ::Boson::Libraries; end"
+    $".delete('boson/libraries/core.rb') && require('boson/libraries/core.rb')
+    $".delete('boson/libraries/object_commands.rb') && require('boson/libraries/object_commands.rb')
     Boson::Manager.instance_eval("@initialized = false")
   end
 end

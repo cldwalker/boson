@@ -14,7 +14,7 @@ module Boson
     #test "creates default libraries and commands" do
       #activate
       #assert Boson.libraries.map {|e| e[:name]}.select {|e| e.include?('boson')}.size >= 2
-      #(Boson::Commands.instance_methods - Boson.commands.map {|e| e[:name]}).empty?.should be(true)
+      #(Boson::Libraries::Core.instance_methods - Boson.commands.map {|e| e[:name]}).empty?.should be(true)
     #end
 
     test "adds dir to $LOAD_PATH" do
@@ -63,7 +63,7 @@ module Boson
     test "loads multiple libraries" do
       Manager.expects(:init)
       Manager.expects(:load_libraries).with([:lib1,:lib2], anything)
-      activate(:lib1, :lib2)
+      activate(:libraries=>[:lib1, :lib2])
     end
   end
 

@@ -5,13 +5,11 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 require 'boson/manager'
 require 'boson/library'
 require 'boson/util'
-require 'boson/commands'
+require 'boson/libraries/core'
+require 'boson/libraries/object_commands'
 require 'boson/searchable_array'
 
 module Boson
-  module Libraries; end
-  module ObjectCommands; end
-
   class <<self
     attr_accessor :dir, :main_object
     alias_method :higgs, :main_object
@@ -35,8 +33,8 @@ module Boson
       @config
     end
 
-    def activate(*args)
-      Manager.activate(*args)
+    def activate(options={})
+      Manager.activate(options)
     end
   end  
 end
