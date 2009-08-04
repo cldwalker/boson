@@ -6,16 +6,17 @@ module Boson
       end
 
       def create(libraries, options={})
-        libraries.each {|e| create_library(e).add_library }
+        libraries.each {|e| create_library(e) }
       end
 
-      def create_library(*args)
+      def create_library(*args) #:nodoc:
         lib = Loader.create(*args)
         lib.add_lib_commands
+        lib.add_library
         lib
       end
 
-      def load_library(library, options={})
+      def load_library(library, options={}) #:nodoc:
         if (lib = Loader.load_and_create(library, options))
           lib.add_library
           lib.add_lib_commands

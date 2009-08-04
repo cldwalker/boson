@@ -13,7 +13,7 @@ require 'boson/searchable_array'
 
 module Boson
   class <<self
-    attr_accessor :dir, :main_object
+    attr_accessor :dir, :main_object, :config
     alias_method :higgs, :main_object
 
     def libraries

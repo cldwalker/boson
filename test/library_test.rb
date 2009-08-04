@@ -19,6 +19,13 @@ module Boson
       # adds lib deps
     end
 
+    def with_config(options)
+      old_config = Boson.config
+      Boson.config = Boson.config.merge(options)
+      yield
+      Boson.config = old_config
+    end
+
     context "create" do
       before(:each) { reset_libraries }
       test "creates library" do
@@ -27,14 +34,15 @@ module Boson
       end
 
       test "creates library with config" do
-        Boson.config[:libraries] = {'blah'=>{:dependencies=>['bluh']}}
-        Library.create(['blah'])
-        Boson.libraries.find_by(:name=>'blah').is_a?(Library).should be(true)
-        Boson.libraries.find_by(:name=>'blah')[:dependencies].should == ['bluh']
-        Boson.config[:libraries] = {}
+        with_config(:libraries => {'blah'=>{:dependencies=>['bluh']}}) do
+          Library.create(['blah'])
+          Boson.libraries.find_by(:name=>'blah').is_a?(Library).should be(true)
+          Boson.libraries.find_by(:name=>'blah')[:dependencies].should == ['bluh']
+        end
       end
 
-      test "doesn't create two libraries with same name" do
+      # td :test merging
+      test "merges multiple libraries with same name into one" do
         Library.create(['doh'])
         Library.create(['doh'])
         Boson.libraries.size.should == 1

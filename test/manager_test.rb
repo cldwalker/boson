@@ -10,12 +10,12 @@ module Boson
 
     before(:each) { reset_boson }
 
-    # td: fix
-    #test "creates default libraries and commands" do
-      #activate
-      #assert Boson.libraries.map {|e| e[:name]}.select {|e| e.include?('boson')}.size >= 2
-      #(Boson::Libraries::Core.instance_methods - Boson.commands.map {|e| e[:name]}).empty?.should be(true)
-    #end
+    # td: fake Util.detect_methods in Util.detect once it knows about current lib_module
+    # test "creates default libraries and commands" do
+    #   activate
+    #   assert Boson.libraries.map {|e| e[:name]}.select {|e| e.include?('boson')}.size >= 2
+    #   assert_equal Boson.commands.map {|e| e.name}.sort, Boson::Libraries::Core.instance_methods.map {|e| e.to_s}.sort
+    # end
 
     test "adds dir to $LOAD_PATH" do
       activate
@@ -24,7 +24,7 @@ module Boson
 
     test "main_object responds to commands" do
       activate
-      assert Boson.commands.map {|e| e[:name]}.all? {|e| Boson.main_object.respond_to?(e)}
+      assert Boson.commands.map {|e| e.name }.all? {|e| Boson.main_object.respond_to?(e)}
     end
 
     test "loads default irb library when irb exists" do
@@ -40,14 +40,14 @@ module Boson
       activate
     end
 
-    test "creates libraries in config[:libraries]" do
+    test "creates libraries in :libraries config" do
       Boson.config[:libraries] = {'yada'=>{:detect_methods=>false}}
       Library.expects(:create).with(['yada'], anything)
       activate
       Boson.config[:libraries] = {}
     end
 
-    test "loads libraries in config[:defaults]" do
+    test "loads libraries in :defaults config" do
       Boson.config[:defaults] = ['yo']
       Library.stubs(:load).with {|*args| args[0].empty? ? true : args[0].include?('yo') }
       activate
@@ -60,7 +60,7 @@ module Boson
       activate
     end
 
-    test "loads multiple libraries" do
+    test "loads multiple libraries with :libraries option" do
       Manager.expects(:init)
       Library.expects(:load).with([:lib1,:lib2], anything)
       activate(:libraries=>[:lib1, :lib2])
