@@ -3,12 +3,13 @@ require 'hirb'
 require 'alias'
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 require 'boson/manager'
+require 'boson/loader'
 require 'boson/library'
+require 'boson/command'
 require 'boson/util'
 require 'boson/libraries/core'
 require 'boson/libraries/object_commands'
 require 'boson/searchable_array'
-require 'boson/loader'
 
 module Boson
   class <<self

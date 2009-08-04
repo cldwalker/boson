@@ -182,7 +182,7 @@ module Boson
       # Manager.add_object_command(library_config[:name])
       if (lib = Boson.libraries.find_by(:module=>Boson::Libraries::ObjectCommands))
         lib[:commands] << library_config[:name]
-        Boson.commands << create_command(library_config[:name], lib[:name])
+        Boson.commands << Command.create(library_config[:name], lib[:name])
         lib.create_lib_aliases_or_warn
       end
     end

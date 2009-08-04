@@ -68,14 +68,14 @@ module Boson
   end
 
   def reset_libraries
-    Boson.instance_eval("@libraries = Boson::SearchableArray.new")
+    Boson.instance_eval("@libraries = SearchableArray.new")
   end
 
   context "load_libraries" do
     before(:each) { reset_libraries; Boson.config[:libraries] = {}}
     # test "loads and creates multiple basic libraries" do
-    #   Boson::Manager.stubs(:load).returns(true)
-    #   Boson::Manager.load_libraries(['blah'])
+    #   Manager.stubs(:load).returns(true)
+    #   Manager.load_libraries(['blah'])
     #   Boson.libraries.find_by(:name=>'blah').size.should == 1
     #   Boson.libraries.find_by(:name=>'blah')[:loaded].should be(true)
     # end
@@ -86,17 +86,22 @@ module Boson
 
   context "create_libraries" do
     before(:each) { reset_libraries }
-    test "creates basic library" do
+    test "creates library" do
+      Manager.create_libraries(['blah'])
+      Boson.libraries.find_by(:name=>'blah').is_a?(Library).should be(true)
+    end
+
+    test "creates library with config" do
       Boson.config[:libraries] = {'blah'=>{:dependencies=>['bluh']}}
-      Boson::Manager.create_libraries(['blah'])
-      Boson.libraries.find_by(:name=>'blah').is_a?(Boson::Library).should be(true)
+      Manager.create_libraries(['blah'])
+      Boson.libraries.find_by(:name=>'blah').is_a?(Library).should be(true)
       Boson.libraries.find_by(:name=>'blah')[:dependencies].should == ['bluh']
       Boson.config[:libraries] = {}
     end
 
     test "doesn't create two libraries with same name" do
-      Boson::Manager.create_libraries(['doh'])
-      Boson::Manager.create_libraries(['doh'])
+      Manager.create_libraries(['doh'])
+      Manager.create_libraries(['doh'])
       Boson.libraries.size.should == 1
     end
   end
@@ -107,14 +112,14 @@ module Boson
   
     test "returns false when library isn't loaded" do
       Boson.config[:libraries] = {'blah'=>{:loaded=>false}}
-      Boson::Manager.create_libraries(['blah'])
-      Boson::Loader.library_loaded?('blah').should be(false)
+      Manager.create_libraries(['blah'])
+      Loader.library_loaded?('blah').should be(false)
     end
 
     test "returns true when library is loaded" do
       Boson.config[:libraries] = {'blah'=>{:loaded=>true}}
-      Boson::Manager.create_libraries(['blah'])
-      Boson::Loader.library_loaded?('blah').should be(true)
+      Manager.create_libraries(['blah'])
+      Loader.library_loaded?('blah').should be(true)
     end
   end
   end
