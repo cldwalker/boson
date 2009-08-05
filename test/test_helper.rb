@@ -20,4 +20,15 @@ class Test::Unit::TestCase
     $".delete('boson/libraries/object_commands.rb') && require('boson/libraries/object_commands.rb')
     Boson::Manager.instance_eval("@initialized = false")
   end
+
+  def capture_stderr(&block)
+    original_stderr = $stderr
+    $stderr = fake = StringIO.new
+    begin
+      yield
+    ensure
+      $stderr = original_stderr
+    end
+    fake.string
+  end
 end

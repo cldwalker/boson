@@ -3,20 +3,11 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class LibraryTest < Test::Unit::TestCase    
     def reset_libraries
-      Boson.instance_eval("@libraries = SearchableArray.new")
+      Boson.instance_eval("@libraries = nil")
     end
 
-    context "load" do
-      before(:each) { reset_libraries; Boson.config[:libraries] = {}}
-      # test "loads and creates multiple basic libraries" do
-      #   Loader.stubs(:load).returns(true)
-      #   Loader.load(['blah'])
-      #   Boson.libraries.find_by(:name=>'blah').size.should == 1
-      #   Boson.libraries.find_by(:name=>'blah')[:loaded].should be(true)
-      # end
-      # adds lib: add or update
-      # adds lib commands: only when loaded, lib except option, aliases (module + no module)
-      # adds lib deps
+    def reset_commands
+      Boson.instance_eval("@commands = nil")
     end
 
     def with_config(options)
@@ -24,6 +15,69 @@ module Boson
       Boson.config = Boson.config.merge(options)
       yield
       Boson.config = old_config
+    end
+
+    context "load" do
+      def load_library(hash)
+        lib = Library.new Library.default_attributes.merge(hash).merge(:loaded=>true)
+        Loader.expects(:load_and_create).returns(lib)
+        Library.load([hash[:name]])
+      end
+
+      def command_exists?(cmd)
+        Boson.commands.find_by(:name=>cmd).is_a?(Boson::Command)
+      end
+
+      before(:each) { reset_libraries; reset_commands}
+
+      test "loads basic library" do
+        load_library :name=>'blah'
+        Library.loaded?('blah').should == true
+      end
+
+      test "loads library with commands" do
+        load_library :name=>'blah', :commands=>['frylock','meatwad']
+        Library.loaded?('blah').should == true
+        command_exists?('frylock').should == true
+        command_exists?('meatwad').should == true
+      end
+
+      test "loads library with commands and except option" do
+        Boson.main_object.instance_eval("class<<self;self;end").expects(:undef_method).with('frylock')
+        load_library :name=>'blah', :commands=>['frylock','meatwad'], :except=>['frylock']
+        Library.loaded?('blah').should == true
+        command_exists?('frylock').should == false
+        command_exists?('meatwad').should == true
+      end
+
+      test "creates aliases for commands" do
+        eval %[module ::Aquateen; def frylock; end; end]
+        with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
+          load_library :name=>'aquateen', :commands=>['frylock','meatwad'], :module=>Aquateen
+          Library.loaded?('aquateen').should == true
+          Aquateen.method_defined?(:fr).should == true
+        end
+      end
+
+      test "doesn't create aliases and warns for commands with no module" do
+        eval %[module ::Aquateen2; def frylock; end; end]
+        with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
+          capture_stderr { 
+            load_library(:name=>'aquateen', :commands=>['frylock','meatwad'])
+          }.should =~ /No aliases/
+          Library.loaded?('aquateen').should == true
+          Aquateen2.method_defined?(:fr).should == false
+        end
+      end
+
+      test "merges with existing created library" do
+        Library.create(['blah'])
+        load_library :name=>'blah'
+        Library.loaded?('blah').should == true
+        Boson.libraries.size.should == 1
+      end
+      # td: adds lib commands: only when loaded
+      # td: adds lib deps
     end
 
     context "create" do
@@ -41,7 +95,7 @@ module Boson
         end
       end
 
-      # td :test merging
+      # td: merge created libraries?
       test "merges multiple libraries with same name into one" do
         Library.create(['doh'])
         Library.create(['doh'])
@@ -49,20 +103,20 @@ module Boson
       end
     end
 
-    context "library_loaded" do
+    context "loaded" do
       before(:each) { reset_libraries }
       after(:each) { Boson.config[:libraries] = {}}
 
       test "returns false when library isn't loaded" do
         Boson.config[:libraries] = {'blah'=>{:loaded=>false}}
         Library.create(['blah'])
-        Loader.library_loaded?('blah').should be(false)
+        Library.loaded?('blah').should be(false)
       end
 
       test "returns true when library is loaded" do
         Boson.config[:libraries] = {'blah'=>{:loaded=>true}}
         Library.create(['blah'])
-        Loader.library_loaded?('blah').should be(true)
+        Library.loaded?('blah').should be(true)
       end
     end
   end

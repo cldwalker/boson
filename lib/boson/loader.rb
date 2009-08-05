@@ -6,12 +6,8 @@ module Boson
 
   module Loader
     extend self
-    def default_library
-      {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[], :force=>false}
-    end
-
     def library_config(library=nil)
-      @library_config ||= default_library.merge(:name=>library.to_s).merge!(Boson.config[:libraries][library.to_s] || {})
+      @library_config ||= Library.default_attributes.merge(:name=>library.to_s).merge!(Boson.config[:libraries][library.to_s] || {})
     end
 
     def reset_library_config; @library_config = nil; end
@@ -29,7 +25,7 @@ module Boson
     # Returns: true if loaded, false if failed, nil if already exists
     def load_and_create(library, options={})
       set_library_config(library, options)
-      return nil if library_loaded?(library_config[:name])
+      return nil if Library.loaded?(library_config[:name])
       load(library, options) && create(library_config[:name], :loaded=>true)
     rescue LoadingDependencyError=>e
       $stderr.puts e.message
@@ -62,7 +58,7 @@ module Boson
         dependencies = library_config[:dependencies]
         reset_library_config
         dependencies.each do |e|
-          next if library_loaded?(e)
+          next if Library.loaded?(e)
           if (dep = load_and_create(e, options))
             deps << dep
           else
@@ -183,12 +179,8 @@ module Boson
       if (lib = Boson.libraries.find_by(:module=>Boson::Libraries::ObjectCommands))
         lib[:commands] << library_config[:name]
         Boson.commands << Command.create(library_config[:name], lib[:name])
-        lib.create_lib_aliases_or_warn
+        lib.create_command_aliases
       end
-    end
-
-    def library_loaded?(lib_name)
-      ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib[:loaded]) ? true : false
     end
   end
 end

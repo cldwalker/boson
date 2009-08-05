@@ -9,14 +9,15 @@ module Boson
         libraries.each {|e| create_library(e) }
       end
 
-      def create_library(*args) #:nodoc:
+      #:stopdoc:
+      def create_library(*args)
         lib = Loader.create(*args)
         lib.add_lib_commands
         lib.add_library
         lib
       end
 
-      def load_library(library, options={}) #:nodoc:
+      def load_library(library, options={})
         if (lib = Loader.load_and_create(library, options))
           lib.add_library
           lib.add_lib_commands
@@ -32,6 +33,16 @@ module Boson
           false
         end
       end
+
+      def default_attributes
+        {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[],
+          :force=>false, :created_dependencies=>[]}
+      end
+
+      def loaded?(lib_name)
+        ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib[:loaded]) ? true : false
+      end
+      #:startdoc:
     end
 
     def initialize(hash)
@@ -47,7 +58,7 @@ module Boson
         end
         self[:commands].each {|e| Boson.commands << Command.create(e, self[:name])}
         if self[:commands].size > 0
-          create_lib_aliases_or_warn
+          create_command_aliases
         end
       end
     end
@@ -60,21 +71,9 @@ module Boson
       end
     end
 
-    def create_lib_aliases(commands, lib_module)
-      aliases_hash = {}
-      select_commands = Boson.commands.select {|e| commands.include?(e.name)}
-      select_commands.each do |e|
-        if e.alias
-          aliases_hash[lib_module.to_s] ||= {}
-          aliases_hash[lib_module.to_s][e.name] = e.alias
-        end
-      end
-      Alias.manager.create_aliases(:instance_method, aliases_hash)
-    end
-
-    def create_lib_aliases_or_warn
+    def create_command_aliases
       if self[:module]
-        create_lib_aliases(self[:commands], self[:module])
+        Command.create_aliases(self[:commands], self[:module])
       else
         if (commands = Boson.commands.select {|e| self[:commands].include?(e.name)}) && commands.find {|e| e.alias }
           $stderr.puts "No aliases created for lib #{self[:name]} because there is no lib module"
