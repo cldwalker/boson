@@ -25,7 +25,7 @@ module Boson
     end
 
     def dir
-      @dir ||= File.expand_path(File.exists?('.irb') ? '.irb' : "#{ENV['HOME']}/.irb")
+      @dir ||= File.expand_path(File.exists?('.boson') ? '.boson' : "#{ENV['HOME']}/.boson")
     end
 
     def config(reload=false)
