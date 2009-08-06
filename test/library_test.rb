@@ -2,30 +2,11 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
   class LibraryTest < Test::Unit::TestCase    
-    def reset_libraries
-      Boson.instance_eval("@libraries = nil")
-    end
-
-    def reset_commands
-      Boson.instance_eval("@commands = nil")
-    end
-
-    def with_config(options)
-      old_config = Boson.config
-      Boson.config = Boson.config.merge(options)
-      yield
-      Boson.config = old_config
-    end
-
     context "load" do
       def load_library(hash)
         lib = Library.new Library.default_attributes.merge(hash).merge(:loaded=>true)
         Loader.expects(:load_and_create).returns(lib)
         Library.load([hash[:name]])
-      end
-
-      def command_exists?(cmd)
-        Boson.commands.find_by(:name=>cmd).is_a?(Boson::Command)
       end
 
       before(:each) { reset_libraries; reset_commands}
@@ -48,6 +29,11 @@ module Boson
         Library.loaded?('blah').should == true
         command_exists?('frylock').should == false
         command_exists?('meatwad').should == true
+      end
+
+      test "prints error if library loading fails" do
+        Loader.expects(:load_and_create).returns(false)
+        capture_stderr { Library.load(['blah']) }.should =~ /Unable.*load/
       end
 
       test "creates aliases for commands" do

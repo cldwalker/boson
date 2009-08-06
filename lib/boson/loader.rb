@@ -18,7 +18,7 @@ module Boson
       else
         library_config(library)
       end
-      library_config.merge! options.dup.delete_if {|k,v| !library_config.has_key?(k)} unless options.empty?
+      # library_config.merge! options.dup.delete_if {|k,v| !library_config.has_key?(k)} unless options.empty?
       library_config.merge!(:no_module_eval => library_config.has_key?(:module))
     end
 
@@ -84,7 +84,10 @@ module Boson
         else
           detect_additions {
             Util.safe_require library.to_s
-            initialize_library_module(lib_module) if library_config[:module] && (lib_module = Util.constantize(library_config[:module]))
+            if library_config[:module] && (lib_module = Util.constantize(library_config[:module]))
+              initialize_library_module(lib_module)
+              library_config[:module] = lib_module
+            end
           }
         end
       end

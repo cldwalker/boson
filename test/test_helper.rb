@@ -21,6 +21,36 @@ class Test::Unit::TestCase
     Boson::Manager.instance_eval("@initialized = false")
   end
 
+  def reset_libraries
+    Boson.instance_eval("@libraries = nil")
+  end
+
+  def reset_commands
+    Boson.instance_eval("@commands = nil")
+  end
+
+  def command_exists?(cmd)
+    Boson.commands.find_by(:name=>cmd).is_a?(Boson::Command)
+  end
+
+  def capture_stdout(&block)
+    original_stdout = $stdout
+    $stdout = fake = StringIO.new
+    begin
+      yield
+    ensure
+      $stdout = original_stdout
+    end
+    fake.string
+  end
+
+  def with_config(options)
+    old_config = Boson.config
+    Boson.config = Boson.config.merge(options)
+    yield
+    Boson.config = old_config
+  end
+
   def capture_stderr(&block)
     original_stderr = $stderr
     $stderr = fake = StringIO.new
