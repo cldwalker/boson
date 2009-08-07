@@ -7,7 +7,7 @@ module Boson
   module Loader
     extend self
     def library_config(library=nil)
-      @library_config ||= Library.default_attributes.merge(:name=>library.to_s).merge!(Boson.config[:libraries][library.to_s] || {})
+      @library_config ||= Library.config_attributes(library)
     end
 
     def reset_library_config; @library_config = nil; end
@@ -18,7 +18,6 @@ module Boson
       else
         library_config(library)
       end
-      # library_config.merge! options.dup.delete_if {|k,v| !library_config.has_key?(k)} unless options.empty?
       library_config.merge!(:no_module_eval => library_config.has_key?(:module))
     end
 
@@ -26,7 +25,7 @@ module Boson
     def load_and_create(library, options={})
       set_library_config(library, options)
       return nil if Library.loaded?(library_config[:name])
-      load(library, options) && create(library_config[:name], :loaded=>true)
+      load(library, options) && Library.new(library_config.merge(:loaded=>true))
     rescue LoadingDependencyError=>e
       $stderr.puts e.message
       false
@@ -35,21 +34,6 @@ module Boson
       false
     ensure
       reset_library_config
-    end
-
-    def create(name, lib_hash={})
-      library_obj = library_config(name).merge(lib_hash)
-      set_library_commands(library_obj)
-      reset_library_config
-      Library.new(library_obj)
-    end
-
-    def set_library_commands(library_obj)
-      aliases = library_obj[:commands].map {|e|
-        Boson.config[:commands][e][:alias] rescue nil
-      }.compact
-      library_obj[:commands] -= aliases
-      library_obj[:commands].delete(library_obj[:name]) if library_obj[:object_command]
     end
 
     def load_dependencies(library, options)
@@ -80,7 +64,7 @@ module Boson
           detected = detect_additions(:modules=>true, :record_detections=>true) { read_library(library_config) }
           lib_module = determine_lib_module(detected[:modules])
           detect_additions { initialize_library_module(lib_module) }
-          library_config.merge!(:module=>lib_module)
+          library_config[:module] = lib_module
         else
           detect_additions {
             Util.safe_require library.to_s
@@ -178,7 +162,6 @@ module Boson
 
     def create_object_command(lib_module)
       Libraries::ObjectCommands.create(library_config[:name], lib_module)
-      # Manager.add_object_command(library_config[:name])
       if (lib = Boson.libraries.find_by(:module=>Boson::Libraries::ObjectCommands))
         lib[:commands] << library_config[:name]
         Boson.commands << Command.create(library_config[:name], lib[:name])

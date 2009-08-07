@@ -6,17 +6,14 @@ module Boson
       end
 
       def create(libraries, options={})
-        libraries.each {|e| create_library(e) }
+        libraries.each {|e|
+          lib = new(:name=>e)
+          lib.add_lib_commands
+          lib.add_library
+        }
       end
 
       #:stopdoc:
-      def create_library(*args)
-        lib = Loader.create(*args)
-        lib.add_lib_commands
-        lib.add_library
-        lib
-      end
-
       def load_library(library, options={})
         if (lib = Loader.load_and_create(library, options))
           lib.add_library
@@ -39,6 +36,10 @@ module Boson
           :force=>false, :created_dependencies=>[]}
       end
 
+      def config_attributes(lib)
+        default_attributes.merge(:name=>lib.to_s).merge!(Boson.config[:libraries][lib.to_s] || {})
+      end
+
       def loaded?(lib_name)
         ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib[:loaded]) ? true : false
       end
@@ -47,7 +48,18 @@ module Boson
 
     def initialize(hash)
       super
+      raise ArgumentError unless hash[:name]
+      hash = self.class.config_attributes(hash[:name]).merge(hash)
       replace(hash)
+      set_library_commands
+    end
+
+    def set_library_commands
+      aliases = self[:commands].map {|e|
+        Boson.config[:commands][e][:alias] rescue nil
+      }.compact
+      self[:commands] -= aliases
+      self[:commands].delete(self[:name]) if self[:object_command]
     end
 
     def add_lib_commands

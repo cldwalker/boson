@@ -19,11 +19,17 @@ module Boson
     end
 
     context "load_and_create" do
+      def library_has_module(lib, lib_module)
+        Library.loaded?(lib).should == true
+        test_lib = library(lib)
+        (test_lib[:module].is_a?(Module) && (test_lib[:module].to_s == lib_module)).should == true
+      end
+
       before(:each) { reset_libraries; reset_commands }
       test "loads a module" do
         eval %[module ::Harvey; def bird; end; end]
         load ::Harvey
-        Library.loaded?('harvey').should == true
+        library_has_module('harvey', "Harvey")
         command_exists?('bird').should == true
       end
 
@@ -31,25 +37,30 @@ module Boson
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
         }.should =~ /included blah/
-        Library.loaded?('blah').should == true
+        library_has_module('blah', 'Boson::Libraries::Blah')
         command_exists?('blah').should == true
-        library('blah')[:module].is_a?(Module).should == true
-        library('blah')[:module].to_s.should == "Boson::Libraries::Blah"
+      end
+
+      test "loads and strips aliases from a lib's commands" do
+        with_config(:commands=>{"blah2"=>{:alias=>'b2'}}) do
+          load :blah, :file_string=>"module Blah2; def blah2; end; alias_method(:b2, :blah2); end"
+          Library.loaded?('blah').should == true
+          library('blah')[:commands].should == ['blah2']
+        end
       end
 
       test "loads a library in a subdirectory" do
         load 'site/delicious', :file_string=>"module Delicious; def bundles; end; end"
-        Library.loaded?("site/delicious").should == true
+        library_has_module('site/delicious', "Boson::Libraries::Delicious")
         command_exists?('bundles').should == true
-        library('site/delicious')[:module].is_a?(Module).should == true
-        library('site/delicious')[:module].to_s.should == "Boson::Libraries::Delicious"
       end
 
-      test "loads a polluting gem" do
+      test "loads a monkeypatched gem" do
         File.expects(:exists?).returns(false)
         Util.expects(:safe_require).with { eval "module ::Kernel; def dude; end; end"; true}.returns(true)
         Library.load ["dude"]
         Library.loaded?("dude").should == true
+        library('dude')[:module].should == nil
         command_exists?("dude").should == true
       end
 
@@ -58,9 +69,8 @@ module Boson
         Util.expects(:safe_require).with { eval "module ::Dude2; def dude2; end; end"; true}.returns(true)
         with_config(:libraries=>{"dude2"=>{:module=>'Dude2'}}) do
           Library.load ["dude2"]
-          Library.loaded?("dude2").should == true
+          library_has_module('dude2', "Dude2")
           command_exists?("dude2").should == true
-          library('dude2')[:module].should == ::Dude2
         end
       end
 
