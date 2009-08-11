@@ -1,34 +1,47 @@
 module Boson
   class LoadingDependencyError < StandardError; end
-  class NoLibraryModuleError < StandardError; end
-  class MultipleLibraryModulesError < StandardError; end
   class MethodConflictError < StandardError; end
+  class InvalidLibraryModuleError < StandardError; end
 
   class Loader
+    def self.load_library(library, options={})
+      if (lib = load_and_create(library, options))
+        lib.after_load
+        puts "Loaded library #{lib[:name]}" if options[:verbose]
+        lib[:created_dependencies].each do |e|
+          e.after_load
+          puts "Loaded library dependency #{e[:name]}" if options[:verbose]
+        end
+        true
+      else
+        false
+      end
+    end
+
     def self.load_and_create(library, options={})
-      loader = library.is_a?(Module) ? LibraryLoader.new(library, options) : ( File.exists?(library_file(library.to_s)) ?
+      loader = library.is_a?(Module) ? ModuleLoader.new(library, options) : ( File.exists?(library_file(library.to_s)) ?
         FileLoader.new(library, options) : new(library, options) )
-      loader.load
-    rescue LoadingDependencyError=>e
-      $stderr.puts e.message
-      false
-    rescue MethodConflictError=>e
-      $stderr.puts e.message
-      false
+      return false if Library.loaded?(loader.name)
+      result = loader.load
+      $stderr.puts "Unable to load library #{loader.name}." if !result && !options[:dependency]
+      result
+    rescue LoadingDependencyError, MethodConflictError, InvalidLibraryModuleError =>e
+      $stderr.puts "Unable to load library #{loader.name}. Reason: #{e.message}"
+    rescue Exception
+      $stderr.puts "Unable to load library #{loader.name}. Reason: #{$!}"
+      $stderr.puts caller.slice(0,5).join("\n")
     end
 
     def self.library_file(library)
       File.join(Boson.dir, 'libraries', library + ".rb")
     end
 
-    # Returns: true if loaded, false if failed, nil if already exists
     def initialize(library, options={})
       set_library(library)
       @options = options
-      raise ArgumentError unless @library[:name]
       @name = @library[:name].to_s
-      @library.merge!(:no_module_eval => @library.has_key?(:module))
     end
+    attr_reader :name
 
     def set_library(library)
       @library = Library.config_attributes(library)
@@ -40,10 +53,10 @@ module Boson
         dependencies = @library[:dependencies]
         dependencies.each do |e|
           next if Library.loaded?(e)
-          if (dep = Loader.load_and_create(e, @options))
+          if (dep = Loader.load_and_create(e, @options.merge(:dependency=>true)))
             deps << dep
           else
-            raise LoadingDependencyError, "Failed to load dependency #{e}"
+            raise LoadingDependencyError, "Can't load dependency #{e}"
           end
         end
       end
@@ -51,43 +64,16 @@ module Boson
     end
 
     def load
-      return nil if Library.loaded?(@name)
       load_dependencies
       load_main
       is_valid_library? && Library.new(@library.merge(:loaded=>true))
-    rescue LoadingDependencyError, MethodConflictError
-      raise
-    rescue Exception
-      $stderr.puts "Failed to load '#{library}'"
-      $stderr.puts "Reason: #{$!}"
-      $stderr.puts caller.slice(0,5).join("\n")
-      false
     end
 
     def load_main
       detect_additions {
         Util.safe_require @name
-        if @library[:module] && (lib_module = Util.constantize(@library[:module]))
-          initialize_library_module(lib_module)
-          @library[:module] = lib_module
-        end
+        initialize_library_module
       }
-    end
-
-    def determine_lib_module(detected_modules)
-      if @library[:module]
-        raise InvalidLibraryModuleError unless (lib_module = Util.constantize(@library[:module]))
-      else
-        case detected_modules.size
-        when 1 then lib_module = detected_modules[0]
-        when 0 then raise NoLibraryModuleError
-        else
-          unless ((lib_module = Util.constantize("boson/libraries/#{@library[:name]}")) && lib_module.to_s[/^Boson::Libraries/])
-            raise MultipleLibraryModulesError
-          end
-        end
-      end
-      lib_module
     end
 
     def is_valid_library?
@@ -98,21 +84,16 @@ module Boson
       options = {:record_detections=>true}.merge!(options)
       detected = Util.detect(options.merge(:detect_methods=>@library[:detect_methods]), &block)
       if options[:record_detections]
-        add_gems_to_library(detected[:gems]) if detected[:gems]
-        add_commands_to_library(detected[:methods])
+        @library[:gems] += detected[:gems] if detected[:gems]
+        @library[:commands] += detected[:methods]
       end
       detected
     end
 
-    def add_gems_to_library(gems)
-      @library.merge! :gems=>(@library[:gems] + gems)
-    end
-
-    def add_commands_to_library(commands)
-      @library.merge! :commands=>(@library[:commands] + commands)
-    end
-
-    def initialize_library_module(lib_module)
+    def initialize_library_module
+      return unless @library[:module]
+      lib_module = @library[:module] = Util.constantize(@library[:module]) ||
+        raise(InvalidLibraryModuleError, "Module #{@library[:module]} doesn't exist")
       check_for_method_conflicts(lib_module)
       if @library[:object_command]
         create_object_command(lib_module)
@@ -121,16 +102,15 @@ module Boson
         Boson::Libraries.send :extend_object, Boson.main_object
       end
       #td: eval in main_object without having to intrude with extend
-      @library[:call_methods].each do |m|
-        Boson.main_object.send m
-      end
+      @library[:call_methods].each {|m| Boson.main_object.send m }
     end
 
     def check_for_method_conflicts(lib_module)
       return if @library[:force]
       conflicts = Util.common_instance_methods(lib_module, Boson::Libraries)
       unless conflicts.empty?
-        raise MethodConflictError, "Can't load library because these methods conflict with existing libraries: #{conflicts.join(', ')}"
+        raise MethodConflictError,
+          "The following commands conflict with existing commands: #{conflicts.join(', ')}"
       end
     end
 
@@ -144,9 +124,9 @@ module Boson
     end
   end
 
-  class LibraryLoader < Loader
+  class ModuleLoader < Loader
     def load_main
-      detect_additions { initialize_library_module(@library[:module]) }
+      detect_additions { initialize_library_module }
     end
 
     def set_library(library)
@@ -154,7 +134,15 @@ module Boson
     end
   end
 
+  class NoLibraryModuleError < StandardError; end
+  class MultipleLibraryModulesError < StandardError; end
+
   class FileLoader < Loader
+    def initialize(*args)
+      super
+      @library[:no_module_eval] = @library.has_key?(:module)
+    end
+
     def read_library(library_hash)
       library = library_hash[:name]
       if library_hash[:no_module_eval]
@@ -167,10 +155,21 @@ module Boson
     end
 
     def load_main
-      detected = detect_additions(:modules=>true, :record_detections=>true) { read_library(@library) }
-      lib_module = determine_lib_module(detected[:modules])
-      detect_additions { initialize_library_module(lib_module) }
-      @library[:module] = lib_module
+      detected = detect_additions(:modules=>true) { read_library(@library) }
+      @library[:module] = determine_lib_module(detected[:modules]) unless @library[:module]
+      detect_additions { initialize_library_module }
+    end
+
+    def determine_lib_module(detected_modules)
+      case detected_modules.size
+      when 1 then lib_module = detected_modules[0]
+      when 0 then raise NoLibraryModuleError
+      else
+        unless ((lib_module = Util.constantize("boson/libraries/#{@library[:name]}")) && lib_module.to_s[/^Boson::Libraries/])
+          raise MultipleLibraryModulesError
+        end
+      end
+      lib_module
     end
   end
 end

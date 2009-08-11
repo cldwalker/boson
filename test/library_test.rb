@@ -31,11 +31,6 @@ module Boson
         command_exists?('meatwad').should == true
       end
 
-      test "prints error if library loading fails" do
-        Loader.expects(:load_and_create).returns(false)
-        capture_stderr { Library.load(['blah']) }.should =~ /Unable.*load/
-      end
-
       test "creates aliases for commands" do
         eval %[module ::Aquateen; def frylock; end; end]
         with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
@@ -62,8 +57,6 @@ module Boson
         Library.loaded?('blah').should == true
         Boson.libraries.size.should == 1
       end
-      # td: adds lib commands: only when loaded
-      # td: adds lib deps
     end
 
     context "create" do

@@ -2,35 +2,14 @@ module Boson
   class Library < ::Hash
     class <<self
       def load(libraries, options={})
-        libraries.each {|e| load_library(e, options) }
+        libraries.all? {|e| Loader.load_library(e, options) }
       end
 
       def create(libraries, options={})
-        libraries.each {|e|
-          lib = new(:name=>e)
-          lib.add_lib_commands
-          lib.add_library
-        }
+        libraries.each {|e| new(:name=>e).add_library }
       end
 
       #:stopdoc:
-      def load_library(library, options={})
-        if (lib = Loader.load_and_create(library, options))
-          lib.add_library
-          lib.add_lib_commands
-          puts "Loaded library #{lib[:name]}" if options[:verbose]
-          lib[:created_dependencies].each do |e|
-            e.add_library
-            e.add_lib_commands
-            puts "Loaded library dependency #{e[:name]}" if options[:verbose]
-          end
-          true
-        else
-          $stderr.puts "Unable to load library #{library}" if lib.is_a?(FalseClass)
-          false
-        end
-      end
-
       def default_attributes
         {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[],
           :force=>false, :created_dependencies=>[]}
@@ -62,16 +41,19 @@ module Boson
       self[:commands].delete(self[:name]) if self[:object_command]
     end
 
+    def after_load
+      add_lib_commands
+      add_library
+    end
+
     def add_lib_commands
-      if self[:loaded]
-        if self[:except]
-          self[:commands] -= self[:except]
-          self[:except].each {|e| Boson.main_object.instance_eval("class<<self;self;end").send :undef_method, e }
-        end
-        self[:commands].each {|e| Boson.commands << Command.create(e, self[:name])}
-        if self[:commands].size > 0
-          create_command_aliases
-        end
+      if self[:except]
+        self[:commands] -= self[:except]
+        self[:except].each {|e| Boson.main_object.instance_eval("class<<self;self;end").send :undef_method, e }
+      end
+      self[:commands].each {|e| Boson.commands << Command.create(e, self[:name])}
+      if self[:commands].size > 0
+        create_command_aliases
       end
     end
 
