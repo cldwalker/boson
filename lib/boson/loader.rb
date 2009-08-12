@@ -151,7 +151,6 @@ module Boson
         library_string = File.read(self.class.library_file(library))
         Libraries.module_eval(library_string, self.class.library_file(library))
       end
-      $" << "libraries/#{library}.rb" unless $".include?("libraries/#{library}.rb")
     end
 
     def load_main

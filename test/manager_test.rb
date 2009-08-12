@@ -17,11 +17,6 @@ module Boson
     #   assert_equal Boson.commands.map {|e| e.name}.sort, Boson::Libraries::Core.instance_methods.map {|e| e.to_s}.sort
     # end
 
-    test "adds dir to $LOAD_PATH" do
-      activate
-      assert $LOAD_PATH.include?(Boson.dir)
-    end
-
     test "main_object responds to commands" do
       activate
       assert Boson.commands.map {|e| e.name }.all? {|e| Boson.main_object.respond_to?(e)}
