@@ -2,7 +2,7 @@ module Boson
   module Manager
     extend self
     def init(options={})
-      $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
+      $:.unshift Boson.dir unless $:.include? File.expand_path(Boson.dir)
       Boson.main_object.extend Libraries
       create_initial_libraries(options)
       load_default_libraries(options)
