@@ -57,13 +57,21 @@ module Boson
 
       test "loads a file library with config no_module_eval" do
         with_config(:libraries=>{"cool"=>{:no_module_eval=>true}}) do
-          load :cool, :file_string=>"module Boson::Libraries::Cool; def cool; end; end", :no_module_eval=>true
+          load :cool, :file_string=>"module ::Bogus; end; module Boson::Libraries::Cool; def cool; end; end", :no_module_eval=>true
         end
         library_has_module('cool', 'Boson::Libraries::Cool')
         command_exists?('cool').should == true
       end
 
-      test "prints error for invalid library" do
+      test "prints error for file library with no module" do
+        capture_stderr { load(:ok, :file_string=>"def ok; end") }.should =~ /Can't.*at least/
+      end
+
+      test "prints error for file library with multiple modules" do
+        capture_stderr { load(:ok, :file_string=>"module Doo; end; module Daa; end") }.should =~ /Can't.*config/
+      end
+
+      test "prints error for generally invalid library" do
         capture_stderr { load('blah', :gem=>true) }.should =~ /Unable.*load/
       end
 

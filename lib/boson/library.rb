@@ -27,7 +27,7 @@ module Boson
 
     def initialize(hash)
       super
-      raise ArgumentError unless hash[:name]
+      raise ArgumentError, "New library missing required key :name" unless hash[:name]
       hash = self.class.config_attributes(hash[:name]).merge(hash)
       replace(hash)
       set_library_commands

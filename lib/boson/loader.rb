@@ -2,6 +2,7 @@ module Boson
   class LoadingDependencyError < StandardError; end
   class MethodConflictError < StandardError; end
   class InvalidLibraryModuleError < StandardError; end
+  class LoaderError < StandardError; end
 
   class Loader
     def self.load_library(library, options={})
@@ -25,7 +26,7 @@ module Boson
       result = loader.load
       $stderr.puts "Unable to load library #{loader.name}." if !result && !options[:dependency]
       result
-    rescue LoadingDependencyError, MethodConflictError, InvalidLibraryModuleError =>e
+    rescue LoadingDependencyError, MethodConflictError, InvalidLibraryModuleError, LoaderError =>e
       $stderr.puts "Unable to load library #{loader.name}. Reason: #{e.message}"
     rescue Exception
       $stderr.puts "Unable to load library #{loader.name}. Reason: #{$!}"
@@ -50,11 +51,8 @@ module Boson
     def load_dependencies
       @library[:created_dependencies] = @library[:dependencies].map do |e|
         next if Library.loaded?(e)
-        if (dep = Loader.load_and_create(e, @options.merge(:dependency=>true)))
-          dep
-        else
-          raise LoadingDependencyError, "Can't load dependency #{e}"
-        end
+        Loader.load_and_create(e, @options.merge(:dependency=>true)) ||
+          raise(LoadingDependencyError, "Can't load dependency #{e}")
       end.compact
     end
 
@@ -125,12 +123,10 @@ module Boson
     end
 
     def set_library(library)
-      @library = Library.config_attributes(Util.underscore(library)).merge!(:module=>library)
+      underscore_lib = library.to_s[/^Boson::Libraries/] ? library.to_s.split('::')[-1] : library
+      @library = Library.config_attributes(Util.underscore(underscore_lib)).merge!(:module=>library)
     end
   end
-
-  class NoLibraryModuleError < StandardError; end
-  class MultipleLibraryModulesError < StandardError; end
 
   class FileLoader < Loader
     def initialize(*args)
@@ -156,10 +152,10 @@ module Boson
     def determine_lib_module(detected_modules)
       case detected_modules.size
       when 1 then lib_module = detected_modules[0]
-      when 0 then raise NoLibraryModuleError
+      when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
       else
         unless ((lib_module = Util.constantize("boson/libraries/#{@library[:name]}")) && lib_module.to_s[/^Boson::Libraries/])
-          raise MultipleLibraryModulesError
+          raise LoaderError, "Can't detect module. Specify a module in this library's config."
         end
       end
       lib_module
