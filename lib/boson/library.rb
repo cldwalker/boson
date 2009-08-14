@@ -2,7 +2,7 @@ module Boson
   class Library < ::Hash
     class <<self
       def load(libraries, options={})
-        libraries.all? {|e| Loader.load_library(e, options) }
+        libraries.map {|e| Loader.load_library(e, options) }.all?
       end
 
       def create(libraries, options={})

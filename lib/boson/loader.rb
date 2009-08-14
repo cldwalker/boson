@@ -48,19 +48,14 @@ module Boson
     end
 
     def load_dependencies
-      deps = []
-      if !@library[:dependencies].empty?
-        dependencies = @library[:dependencies]
-        dependencies.each do |e|
-          next if Library.loaded?(e)
-          if (dep = Loader.load_and_create(e, @options.merge(:dependency=>true)))
-            deps << dep
-          else
-            raise LoadingDependencyError, "Can't load dependency #{e}"
-          end
+      @library[:created_dependencies] = @library[:dependencies].map do |e|
+        next if Library.loaded?(e)
+        if (dep = Loader.load_and_create(e, @options.merge(:dependency=>true)))
+          dep
+        else
+          raise LoadingDependencyError, "Can't load dependency #{e}"
         end
-      end
-      @library[:created_dependencies] = deps
+      end.compact
     end
 
     def load
@@ -140,21 +135,20 @@ module Boson
   class FileLoader < Loader
     def initialize(*args)
       super
-      @library[:no_module_eval] = @library.has_key?(:module)
+      @library[:no_module_eval] ||= @library.has_key?(:module)
     end
 
-    def read_library(library_hash)
-      library = library_hash[:name]
-      if library_hash[:no_module_eval]
-        Kernel.load self.class.library_file(library)
+    def read_library
+      if @library[:no_module_eval]
+        Kernel.load self.class.library_file(@name)
       else
-        library_string = File.read(self.class.library_file(library))
-        Libraries.module_eval(library_string, self.class.library_file(library))
+        library_string = File.read(self.class.library_file(@name))
+        Libraries.module_eval(library_string, self.class.library_file(@name))
       end
     end
 
     def load_main
-      detected = detect_additions(:modules=>true) { read_library(@library) }
+      detected = detect_additions(:modules=>true) { read_library }
       @library[:module] = determine_lib_module(detected[:modules]) unless @library[:module]
       detect_additions { initialize_library_module }
     end

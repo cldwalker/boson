@@ -11,7 +11,8 @@ module Boson
       end
     
       def load_library(library, options={})
-        Boson::Library.load_library(library, {:verbose=>true}.merge!(options))
+        Library.loaded?(library) ? puts("Library already exists.") :
+          Boson::Loader.load_library(library, {:verbose=>true}.merge!(options))
       end
 
       def reload_library(name)

@@ -10,7 +10,11 @@ module Boson
           Util.expects(:safe_require).with { eval options.delete(:file_string); true}.returns(true)
         else
           File.expects(:exists?).with(Loader.library_file(lib.to_s)).returns(true)
-          File.expects(:read).returns(options.delete(:file_string))
+          if options.delete(:no_module_eval)
+            Kernel.expects(:load).with { eval options.delete(:file_string); true}.returns(true)
+          else
+            File.expects(:read).returns(options.delete(:file_string))
+          end
         end
       end
       Library.load([lib], options)
@@ -35,12 +39,28 @@ module Boson
         command_exists?('bird').should == true
       end
 
-      test "loads a basic library" do
+      test "loads a file library" do
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
         }.should =~ /included blah/
         library_has_module('blah', 'Boson::Libraries::Blah')
         command_exists?('blah').should == true
+      end
+
+      test "loads a file library with config module" do
+        with_config(:libraries=>{"blah"=>{:module=>"Coolness"}}) do
+          load :blah, :file_string=>"module ::Coolness; def coolness; end; end", :no_module_eval=>true
+        end
+        library_has_module('blah', 'Coolness')
+        command_exists?('coolness').should == true
+      end
+
+      test "loads a file library with config no_module_eval" do
+        with_config(:libraries=>{"cool"=>{:no_module_eval=>true}}) do
+          load :cool, :file_string=>"module Boson::Libraries::Cool; def cool; end; end", :no_module_eval=>true
+        end
+        library_has_module('cool', 'Boson::Libraries::Cool')
+        command_exists?('cool').should == true
       end
 
       test "prints error for invalid library" do
@@ -52,7 +72,7 @@ module Boson
         capture_stderr { load('blah', :no_mock=>true).should == false }.should == ''
       end
 
-      test "loads and strips aliases from a lib's commands" do
+      test "loads and strips aliases from a library's commands" do
         with_config(:commands=>{"blah2"=>{:alias=>'b2'}}) do
           load :blah, :file_string=>"module Blah2; def blah2; end; alias_method(:b2, :blah2); end"
           Library.loaded?('blah').should == true
@@ -60,7 +80,7 @@ module Boson
         end
       end
 
-      test "loads a library in a subdirectory" do
+      test "loads a file library in a subdirectory" do
         load 'site/delicious', :file_string=>"module Delicious; def bundles; end; end"
         library_has_module('site/delicious', "Boson::Libraries::Delicious")
         command_exists?('bundles').should == true
