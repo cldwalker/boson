@@ -5,6 +5,8 @@ module Boson
   class LoaderError < StandardError; end
 
   class Loader
+    # ==== Options:
+    # [:verbose] Prints the status of each library as its loaded. Default is false.
     def self.load_library(library, options={})
       if (lib = load_and_create(library, options))
         lib.after_load
@@ -22,10 +24,14 @@ module Boson
     def self.load_and_create(library, options={})
       loader = library.is_a?(Module) ? ModuleLoader.new(library, options) : ( File.exists?(library_file(library.to_s)) ?
         FileLoader.new(library, options) : new(library, options) )
-      return false if Library.loaded?(loader.name)
-      result = loader.load
-      $stderr.puts "Unable to load library #{loader.name}." if !result && !options[:dependency]
-      result
+      if Library.loaded?(loader.name)
+        puts "Library #{loader.name} already exists" if options[:verbose] && !options[:dependency]
+        false
+      else
+        result = loader.load
+        $stderr.puts "Unable to load library #{loader.name}." if !result && !options[:dependency]
+        result
+      end
     rescue LoadingDependencyError, MethodConflictError, InvalidLibraryModuleError, LoaderError =>e
       $stderr.puts "Unable to load library #{loader.name}. Reason: #{e.message}"
     rescue Exception

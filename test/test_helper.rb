@@ -21,6 +21,12 @@ class Test::Unit::TestCase
     Boson::Manager.instance_eval("@initialized = false")
   end
 
+  def reset_main_object
+    Boson.send :remove_const, "Libraries"
+    eval "module ::Boson::Libraries; end"
+    Boson.main_object = Object.new
+  end
+
   def reset_libraries
     Boson.instance_eval("@libraries = nil")
   end

@@ -28,6 +28,10 @@ module Boson
       @dir ||= File.expand_path(File.exists?('.boson') ? '.boson' : "#{ENV['HOME']}/.boson")
     end
 
+    def main_object=(value)
+      @main_object = value.extend(Libraries)
+    end
+
     def config(reload=false)
       if reload || @config.nil?
         @config = YAML::load_file(Boson.dir + '/boson.yml') rescue {:commands=>{}, :libraries=>{}}

@@ -24,14 +24,14 @@ module Boson
       Boson.libraries.find_by(:name=>name)
     end
 
-    context "load_and_create" do
+    context "load_library" do
       def library_has_module(lib, lib_module)
         Library.loaded?(lib).should == true
         test_lib = library(lib)
         (test_lib[:module].is_a?(Module) && (test_lib[:module].to_s == lib_module)).should == true
       end
 
-      before(:each) { reset_libraries; reset_commands }
+      before(:each) { reset_main_object; reset_libraries; reset_commands }
       test "loads a module library" do
         eval %[module ::Harvey; def bird; end; end]
         load ::Harvey
@@ -56,19 +56,19 @@ module Boson
       end
 
       test "loads a file library with config no_module_eval" do
-        with_config(:libraries=>{"cool"=>{:no_module_eval=>true}}) do
-          load :cool, :file_string=>"module ::Bogus; end; module Boson::Libraries::Cool; def cool; end; end", :no_module_eval=>true
+        with_config(:libraries=>{"blah"=>{:no_module_eval=>true}}) do
+          load :blah, :file_string=>"module ::Bogus; end; module Boson::Libraries::Blah; def blah; end; end", :no_module_eval=>true
         end
-        library_has_module('cool', 'Boson::Libraries::Cool')
-        command_exists?('cool').should == true
+        library_has_module('blah', 'Boson::Libraries::Blah')
+        command_exists?('blah').should == true
       end
 
       test "prints error for file library with no module" do
-        capture_stderr { load(:ok, :file_string=>"def ok; end") }.should =~ /Can't.*at least/
+        capture_stderr { load(:blah, :file_string=>"def blah; end") }.should =~ /Can't.*at least/
       end
 
       test "prints error for file library with multiple modules" do
-        capture_stderr { load(:ok, :file_string=>"module Doo; end; module Daa; end") }.should =~ /Can't.*config/
+        capture_stderr { load(:blah, :file_string=>"module Doo; end; module Daa; end") }.should =~ /Can't.*config/
       end
 
       test "prints error for generally invalid library" do
@@ -81,17 +81,17 @@ module Boson
       end
 
       test "loads and strips aliases from a library's commands" do
-        with_config(:commands=>{"blah2"=>{:alias=>'b2'}}) do
-          load :blah, :file_string=>"module Blah2; def blah2; end; alias_method(:b2, :blah2); end"
+        with_config(:commands=>{"blah"=>{:alias=>'b'}}) do
+          load :blah, :file_string=>"module Blah; def blah; end; alias_method(:b, :blah); end"
           Library.loaded?('blah').should == true
-          library('blah')[:commands].should == ['blah2']
+          library('blah')[:commands].should == ['blah']
         end
       end
 
       test "loads a file library in a subdirectory" do
-        load 'site/delicious', :file_string=>"module Delicious; def bundles; end; end"
+        load 'site/delicious', :file_string=>"module Delicious; def blah; end; end"
         library_has_module('site/delicious', "Boson::Libraries::Delicious")
-        command_exists?('bundles').should == true
+        command_exists?('blah').should == true
       end
 
       test "loads a monkeypatched gem" do
@@ -102,10 +102,10 @@ module Boson
       end
 
       test "loads a normal gem" do
-        with_config(:libraries=>{"dude2"=>{:module=>'Dude2'}}) do
-          load "dude2", :file_string=>"module ::Dude2; def dude2; end; end", :gem=>true
-          library_has_module('dude2', "Dude2")
-          command_exists?("dude2").should == true
+        with_config(:libraries=>{"dude"=>{:module=>'Dude'}}) do
+          load "dude", :file_string=>"module ::Dude; def blah; end; end", :gem=>true
+          library_has_module('dude', "Dude")
+          command_exists?("blah").should == true
         end
       end
 

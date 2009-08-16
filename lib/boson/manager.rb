@@ -3,7 +3,6 @@ module Boson
     extend self
     def init(options={})
       $:.unshift Boson.dir unless $:.include? File.expand_path(Boson.dir)
-      Boson.main_object.extend Libraries
       create_initial_libraries(options)
       load_default_libraries(options)
       @initialized = true
