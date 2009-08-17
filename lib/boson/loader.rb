@@ -21,9 +21,28 @@ module Boson
       end
     end
 
+    def self.reload_library(library)
+      if (lib = Boson.libraries.find_by(:name=>library))
+        if lib[:loaded]
+          lib.reload_source
+          lib.reset_commands
+        else
+          puts "Library hasn't been loaded yet. Loading library ..."
+          load_library(library)
+        end
+      else
+        puts "Library #{library} doesn't exist."
+      end
+    end
+
+    def self.is_a_gem?(name)
+      Gem.searcher.find(name).is_a?(Gem::Specification)
+    end
+
     def self.load_and_create(library, options={})
       loader = library.is_a?(Module) ? ModuleLoader.new(library, options) : ( File.exists?(library_file(library.to_s)) ?
-        FileLoader.new(library, options) : new(library, options) )
+        FileLoader.new(library, options) : (is_a_gem?(library) ? GemLoader.new(library, options) :
+        raise(LoaderError, "Library #{library} not found.") ) )
       if Library.loaded?(loader.name)
         puts "Library #{loader.name} already exists" if options[:verbose] && !options[:dependency]
         false
@@ -33,9 +52,9 @@ module Boson
         result
       end
     rescue LoadingDependencyError, MethodConflictError, InvalidLibraryModuleError, LoaderError =>e
-      $stderr.puts "Unable to load library #{loader.name}. Reason: #{e.message}"
+      $stderr.puts "Unable to load library #{library}. Reason: #{e.message}"
     rescue Exception
-      $stderr.puts "Unable to load library #{loader.name}. Reason: #{$!}"
+      $stderr.puts "Unable to load library #{library}. Reason: #{$!}"
       $stderr.puts caller.slice(0,5).join("\n")
     end
 
@@ -64,16 +83,12 @@ module Boson
 
     def load
       load_dependencies
-      load_main
+      load_source
+      detect_additions { initialize_library_module }
       is_valid_library? && Library.new(@library.merge(:loaded=>true))
     end
 
-    def load_main
-      detect_additions {
-        Util.safe_require @name
-        initialize_library_module
-      }
-    end
+    def load_source; end
 
     def is_valid_library?
       !(@library[:commands].empty? && @library[:gems].empty? && !@library.has_key?(:module))
@@ -100,7 +115,6 @@ module Boson
         Boson::Libraries.send :include, lib_module
         Boson::Libraries.send :extend_object, Boson.main_object
       end
-      #td: eval in main_object without having to intrude with extend
       @library[:call_methods].each {|m| Boson.main_object.send m }
     end
 
@@ -123,10 +137,13 @@ module Boson
     end
   end
 
-  class ModuleLoader < Loader
-    def load_main
-      detect_additions { initialize_library_module }
+  class GemLoader < Loader
+    def load_source
+      detect_additions { Util.safe_require @name }
     end
+  end
+
+  class ModuleLoader < Loader
 
     def set_library(library)
       underscore_lib = library.to_s[/^Boson::Libraries/] ? library.to_s.split('::')[-1] : library
@@ -149,10 +166,9 @@ module Boson
       end
     end
 
-    def load_main
+    def load_source
       detected = detect_additions(:modules=>true) { read_library }
       @library[:module] = determine_lib_module(detected[:modules]) unless @library[:module]
-      detect_additions { initialize_library_module }
     end
 
     def determine_lib_module(detected_modules)

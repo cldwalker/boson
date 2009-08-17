@@ -3,10 +3,11 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class LoaderTest < Test::Unit::TestCase
     def load(lib, options={})
-      unless lib.is_a?(Module) || options.delete(:no_mock)
+      unless lib.is_a?(Module) || options[:no_mock]
         options[:file_string] ||= ''
         if options.delete(:gem)
           File.expects(:exists?).returns(false)
+          Loader.expects(:is_a_gem?).returns(true)
           Util.expects(:safe_require).with { eval options.delete(:file_string); true}.returns(true)
         else
           File.expects(:exists?).with(Loader.library_file(lib.to_s)).returns(true)
@@ -17,6 +18,7 @@ module Boson
           end
         end
       end
+      Loader.stubs(:is_a_gem?).returns(true) if options.delete(:no_mock)
       Library.load([lib], options)
     end
 
@@ -39,10 +41,14 @@ module Boson
         command_exists?('bird').should == true
       end
 
-      test "loads a file library" do
+      test "calls included hook of a file library" do
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
         }.should =~ /included blah/
+      end
+
+      test "loads a file library" do
+        load :blah, :file_string=>"module Blah; def blah; end; end"
         library_has_module('blah', 'Boson::Libraries::Blah')
         command_exists?('blah').should == true
       end
@@ -61,6 +67,14 @@ module Boson
         end
         library_has_module('blah', 'Boson::Libraries::Blah')
         command_exists?('blah').should == true
+      end
+
+      test "loads a file library with config call_methods" do
+        with_config(:libraries=>{"blah"=>{:call_methods=>['blah']}}) do
+          capture_stdout {
+            load :blah, :file_string=>"module Blah; def blah; puts 'yo'; end; end"
+          }.should == "yo\n"
+        end
       end
 
       test "prints error for file library with no module" do

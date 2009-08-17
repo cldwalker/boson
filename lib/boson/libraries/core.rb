@@ -15,9 +15,7 @@ module Boson
       end
 
       def reload_library(name)
-        if (lib = Boson.libraries.search(:name=>name)[0])
-          Boson::Loader.read_library(lib)
-        end
+        Boson::Loader.reload_library(library)
       end
     end
   end
