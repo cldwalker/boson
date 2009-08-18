@@ -15,7 +15,7 @@ module Boson
       end
 
       def reload_library(name)
-        Boson::Loader.reload_library(library)
+        Boson::Loader.reload_library(name)
       end
     end
   end

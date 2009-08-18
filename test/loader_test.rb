@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
   class LoaderTest < Test::Unit::TestCase
-    def load(lib, options={})
+    def setup_load(lib, options={})
       unless lib.is_a?(Module) || options[:no_mock]
         options[:file_string] ||= ''
         if options.delete(:gem)
@@ -19,6 +19,10 @@ module Boson
         end
       end
       Loader.stubs(:is_a_gem?).returns(true) if options.delete(:no_mock)
+    end
+
+    def load(lib, options={})
+      setup_load(lib, options)
       Library.load([lib], options)
     end
 
@@ -26,14 +30,15 @@ module Boson
       Boson.libraries.find_by(:name=>name)
     end
 
-    context "load_library" do
-      def library_has_module(lib, lib_module)
-        Library.loaded?(lib).should == true
-        test_lib = library(lib)
-        (test_lib[:module].is_a?(Module) && (test_lib[:module].to_s == lib_module)).should == true
-      end
+    def library_has_module(lib, lib_module)
+      Library.loaded?(lib).should == true
+      test_lib = library(lib)
+      (test_lib[:module].is_a?(Module) && (test_lib[:module].to_s == lib_module)).should == true
+    end
 
-      before(:each) { reset_main_object; reset_libraries; reset_commands }
+    before(:each) { reset_main_object; reset_libraries; reset_commands }
+
+    context "load_library" do
       test "loads a module library" do
         eval %[module ::Harvey; def bird; end; end]
         load ::Harvey
@@ -157,6 +162,26 @@ module Boson
             load('coolio', :gem=>true, :file_string=>"module ::Coolio; def coolio; end; end")
           }.should =~ /Unable.*coolio.*Module Cool/
         end
+      end
+    end
+
+    context "reload_library" do
+      test "reloads file library with same module" do
+        load(:blah, :file_string=>"module Blah; def blah; end; end")
+        File.stubs(:exists?).returns(true)
+        File.stubs(:read).returns("module Blah; def bling; end; end")
+        Loader.reload_library('blah')
+        command_exists?('bling').should == true
+      end
+
+      test "reloads file library with different module" do
+        load(:blah, :file_string=>"module Blah; def blah; end; end")
+        File.stubs(:exists?).returns(true)
+        File.stubs(:read).returns("module Bling; def bling; end; end")
+        Loader.reload_library('blah')
+        library_has_module('blah', "Boson::Libraries::Bling")
+        command_exists?('bling').should == true
+        command_exists?('blah').should == false
       end
     end
   end

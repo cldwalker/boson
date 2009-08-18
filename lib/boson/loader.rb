@@ -24,14 +24,21 @@ module Boson
     def self.reload_library(library)
       if (lib = Boson.libraries.find_by(:name=>library))
         if lib[:loaded]
-          lib.reload_source
-          lib.reset_commands
+          loader = create(library)
+          loader.reload
+          if loader.library[:module]
+            lib[:module] = loader.library[:module]
+            Boson.commands.delete_if {|e| e[:lib] == lib.name }
+          end
+          lib.create_commands(loader.library[:commands])
         else
-          puts "Library hasn't been loaded yet. Loading library ..."
+          puts "Library hasn't been loaded yet. Loading library #{library}..."
           load_library(library)
         end
+        true
       else
         puts "Library #{library} doesn't exist."
+        false
       end
     end
 
@@ -39,10 +46,14 @@ module Boson
       Gem.searcher.find(name).is_a?(Gem::Specification)
     end
 
-    def self.load_and_create(library, options={})
-      loader = library.is_a?(Module) ? ModuleLoader.new(library, options) : ( File.exists?(library_file(library.to_s)) ?
+    def self.create(library, options={})
+      library.is_a?(Module) ? ModuleLoader.new(library, options) : ( File.exists?(library_file(library.to_s)) ?
         FileLoader.new(library, options) : (is_a_gem?(library) ? GemLoader.new(library, options) :
         raise(LoaderError, "Library #{library} not found.") ) )
+    end
+
+    def self.load_and_create(library, options={})
+      loader = create(library, options)
       if Library.loaded?(loader.name)
         puts "Library #{loader.name} already exists" if options[:verbose] && !options[:dependency]
         false
@@ -67,7 +78,7 @@ module Boson
       @options = options
       @name = @library[:name].to_s
     end
-    attr_reader :name
+    attr_reader :name, :library
 
     def set_library(library)
       @library = Library.config_attributes(library)
@@ -89,6 +100,7 @@ module Boson
     end
 
     def load_source; end
+    def reload; end
 
     def is_valid_library?
       !(@library[:commands].empty? && @library[:gems].empty? && !@library.has_key?(:module))
@@ -144,7 +156,6 @@ module Boson
   end
 
   class ModuleLoader < Loader
-
     def set_library(library)
       underscore_lib = library.to_s[/^Boson::Libraries/] ? library.to_s.split('::')[-1] : library
       @library = Library.config_attributes(Util.underscore(underscore_lib)).merge!(:module=>library)
@@ -169,6 +180,14 @@ module Boson
     def load_source
       detected = detect_additions(:modules=>true) { read_library }
       @library[:module] = determine_lib_module(detected[:modules]) unless @library[:module]
+    end
+
+    def reload
+      detected = detect_additions(:modules=>true, :record_detections=>true) { read_library }
+      if !detected[:modules].empty?
+        @library[:module] = determine_lib_module(detected[:modules])
+        detect_additions { initialize_library_module }
+      end
     end
 
     def determine_lib_module(detected_modules)

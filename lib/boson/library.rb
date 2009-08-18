@@ -42,19 +42,17 @@ module Boson
     end
 
     def after_load
-      add_lib_commands
+      create_commands
       add_library
     end
 
-    def add_lib_commands
+    def create_commands(commands=self[:commands])
       if self[:except]
-        self[:commands] -= self[:except]
+        commands -= self[:except]
         self[:except].each {|e| Boson.main_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
-      self[:commands].each {|e| Boson.commands << Command.create(e, self[:name])}
-      if self[:commands].size > 0
-        create_command_aliases
-      end
+      commands.each {|e| Boson.commands << Command.create(e, self[:name])}
+      create_command_aliases(commands) if commands.size > 0
     end
 
     def add_library
@@ -65,12 +63,12 @@ module Boson
       end
     end
 
-    def create_command_aliases
+    def create_command_aliases(commands=self[:commands])
       if self[:module]
-        Command.create_aliases(self[:commands], self[:module])
+        Command.create_aliases(commands, self[:module])
       else
-        if (commands = Boson.commands.select {|e| self[:commands].include?(e.name)}) && commands.find {|e| e.alias }
-          $stderr.puts "No aliases created for lib #{self[:name]} because there is no lib module"
+        if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
+          $stderr.puts "No aliases created for library #{self[:name]} because it has no module"
         end
       end
     end
