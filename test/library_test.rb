@@ -70,7 +70,7 @@ module Boson
         with_config(:libraries => {'blah'=>{:dependencies=>['bluh']}}) do
           Library.create(['blah'])
           Boson.libraries.find_by(:name=>'blah').is_a?(Library).should be(true)
-          Boson.libraries.find_by(:name=>'blah')[:dependencies].should == ['bluh']
+          Boson.libraries.find_by(:name=>'blah').dependencies.should == ['bluh']
         end
       end
 

@@ -11,9 +11,9 @@ module Boson
       if (lib = load_once(library, options))
         lib.after_load
         puts "Loaded library #{lib.name}" if options[:verbose]
-        lib[:created_dependencies].each do |e|
+        lib.created_dependencies.each do |e|
           e.after_load
-          puts "Loaded library dependency #{e[:name]}" if options[:verbose]
+          puts "Loaded library dependency #{e.name}" if options[:verbose]
         end
         true
       else
@@ -23,7 +23,7 @@ module Boson
 
     def self.reload_library(library, options={})
       if (lib = Boson.libraries.find_by(:name=>library))
-        if lib[:loaded]
+        if lib.loaded
           command_size = Boson.commands.size
           if (result = reload_existing(lib))
             puts "Reloaded library #{library}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
@@ -54,7 +54,7 @@ module Boson
         loader = create(library.name)
         loader.reload
         if loader.library[:new_module]
-          library[:module] = loader.library[:module]
+          library.module = loader.library[:module]
           Boson.commands.delete_if {|e| e.lib == library.name }
         end
         library.create_commands(loader.library[:commands])
@@ -169,8 +169,8 @@ module Boson
     def create_object_command(lib_module)
       Libraries::ObjectCommands.create(@library[:name], lib_module)
       if (lib = Boson.libraries.find_by(:module=>Boson::Libraries::ObjectCommands))
-        lib[:commands] << @library[:name]
-        Boson.commands << Command.create(@library[:name], lib[:name])
+        lib.commands << @library[:name]
+        Boson.commands << Command.create(@library[:name], lib.name)
         lib.create_command_aliases
       end
     end

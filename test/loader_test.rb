@@ -33,7 +33,7 @@ module Boson
     def library_has_module(lib, lib_module)
       Library.loaded?(lib).should == true
       test_lib = library(lib)
-      (test_lib[:module].is_a?(Module) && (test_lib[:module].to_s == lib_module)).should == true
+      (test_lib.module.is_a?(Module) && (test_lib.module.to_s == lib_module)).should == true
     end
 
     before(:each) { reset_main_object; reset_libraries; reset_commands }
@@ -103,7 +103,7 @@ module Boson
         with_config(:commands=>{"blah"=>{:alias=>'b'}}) do
           load :blah, :file_string=>"module Blah; def blah; end; alias_method(:b, :blah); end"
           Library.loaded?('blah').should == true
-          library('blah')[:commands].should == ['blah']
+          library('blah').commands.should == ['blah']
         end
       end
 
@@ -116,7 +116,7 @@ module Boson
       test "loads a monkeypatched gem" do
         load "dude", :file_string=>"module ::Kernel; def dude; end; end", :gem=>true
         Library.loaded?("dude").should == true
-        library('dude')[:module].should == nil
+        library('dude').module.should == nil
         command_exists?("dude").should == true
       end
 

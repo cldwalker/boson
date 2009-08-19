@@ -25,7 +25,7 @@ module Boson
     test "loads default irb library when irb exists" do
       eval %[module ::IRB; module ExtendCommandBundle; end; end]
       activate
-      assert Boson.libraries.any? {|e| e[:module] == IRB::ExtendCommandBundle}
+      assert Boson.libraries.any? {|e| e.module == IRB::ExtendCommandBundle}
       IRB.send :remove_const, "ExtendCommandBundle"
     end
 

@@ -1,5 +1,5 @@
 module Boson
-  class Library < ::Hash
+  class Library
     class <<self
       def load(libraries, options={})
         libraries.map {|e| Loader.load_library(e, options) }.all?
@@ -12,7 +12,7 @@ module Boson
       #:stopdoc:
       def default_attributes
         {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[],
-          :force=>false, :created_dependencies=>[], :name=>nil}
+          :force=>false, :created_dependencies=>[]}
       end
 
       def config_attributes(lib)
@@ -20,25 +20,38 @@ module Boson
       end
 
       def loaded?(lib_name)
-        ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib[:loaded]) ? true : false
+        ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib.loaded) ? true : false
       end
       #:startdoc:
     end
 
     def initialize(hash)
-      super
-      raise ArgumentError, "New library missing required key :name" unless hash[:name]
-      hash = self.class.config_attributes(hash[:name]).merge(hash)
-      replace(hash)
-      set_library_commands
+        @name = hash[:name] or raise ArgumentError, "New library missing required key :name"
+        hash = self.class.config_attributes(hash[:name]).merge(hash)
+        set_attributes(hash)
+        set_library_commands
+    end
+
+    attr_accessor :module
+    attr_reader :gems, :created_dependencies, :dependencies, :loaded, :commands, :name
+
+    def set_attributes(hash)
+      @module = hash[:module]
+      @loaded = hash[:loaded]
+      @gems = hash[:gems]
+      @commands = hash[:commands]
+      @except = hash[:except]
+      @call_methods = hash[:call_methods]
+      @dependencies = hash[:dependencies]
+      @created_dependencies = hash[:created_dependencies]
     end
 
     def set_library_commands
-      aliases = self[:commands].map {|e|
+      aliases = @commands.map {|e|
         Boson.config[:commands][e][:alias] rescue nil
       }.compact
-      self[:commands] -= aliases
-      self[:commands].delete(self[:name]) if self[:object_command]
+      @commands -= aliases
+      @commands.delete(@name) if @object_command
     end
 
     def after_load
@@ -46,46 +59,36 @@ module Boson
       add_library
     end
 
-    def create_commands(commands=self[:commands])
-      if self[:except]
-        commands -= self[:except]
-        self[:except].each {|e| Boson.main_object.instance_eval("class<<self;self;end").send :undef_method, e }
+    def create_commands(commands=@commands)
+      if @except
+        commands -= @except
+        @except.each {|e| Boson.main_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
-      commands.each {|e| Boson.commands << Command.create(e, self[:name])}
+      commands.each {|e| Boson.commands << Command.create(e, @name)}
       create_command_aliases(commands) if commands.size > 0
     end
 
     def add_library
-      if (existing_lib = Boson.libraries.find_by(:name => self[:name]))
-        existing_lib.merge!(self)
+      if (existing_lib = Boson.libraries.find_by(:name => @name))
+        Boson.libraries.delete(existing_lib)
+        Boson.libraries << self
       else
         Boson.libraries << self
       end
     end
 
-    def create_command_aliases(commands=self[:commands])
-      if self[:module]
-        Command.create_aliases(commands, self[:module])
+    def create_command_aliases(commands=@commands)
+      if @module
+        Command.create_aliases(commands, @module)
       else
         if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
-          $stderr.puts "No aliases created for library #{self[:name]} because it has no module"
+          $stderr.puts "No aliases created for library #{@name} because it has no module"
         end
       end
     end
 
     def to_hash
-      (self.class.default_attributes.keys + [:module]).inject({}) {|h,e| h[e] = send(e) rescue nil; h}
-    end
-
-    def method_missing(method, *args, &block)
-      method = method.to_s
-      if method =~ /^(\w+)=$/ && has_key?($1.to_sym)
-        self[$1.to_sym] = args.first
-      elsif method =~ /^(\w+)$/ && has_key?($1.to_sym)
-        self[$1.to_sym]
-      else
-        super(method.to_sym, *args, &block)
-      end
+      (self.class.default_attributes.keys + [:module, :name]).inject({}) {|h,e| h[e] = send(e) rescue nil; h}
     end
   end
 end

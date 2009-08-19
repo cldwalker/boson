@@ -6,8 +6,8 @@ module Boson
       end
 
       def libraries(query=nil)
-        puts ::Hirb::Helpers::Table.render(Boson.libraries.search(query, :loaded=>true), :fields=>[:name, :loaded, :commands, :gems],
-          :filters=>{:gems=>lambda {|e| e.join(',')}, :commands=>:size} )
+        puts ::Hirb::Helpers::Table.render(Boson.libraries.search(query, :loaded=>true).map {|e| e.to_hash},
+         :fields=>[:name, :loaded, :commands, :gems], :filters=>{:gems=>lambda {|e| e.join(',')}, :commands=>:size} )
       end
     
       def load_library(library, options={})
