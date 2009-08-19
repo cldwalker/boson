@@ -12,7 +12,7 @@ module Boson
       #:stopdoc:
       def default_attributes
         {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[],
-          :force=>false, :created_dependencies=>[]}
+          :force=>false, :created_dependencies=>[], :name=>nil}
       end
 
       def config_attributes(lib)
@@ -71,6 +71,10 @@ module Boson
           $stderr.puts "No aliases created for library #{self[:name]} because it has no module"
         end
       end
+    end
+
+    def to_hash
+      (self.class.default_attributes.keys + [:module]).inject({}) {|h,e| h[e] = send(e) rescue nil; h}
     end
 
     def method_missing(method, *args, &block)

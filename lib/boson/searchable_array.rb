@@ -26,7 +26,7 @@ module Boson
     end
 
     def search_fields
-      @search_fields ||= self[0].keys.map {|e| e.to_s }.sort
+      @search_fields ||= self[0].to_hash.keys.map {|e| e.to_s }.sort
     end
 
     def hash_search(search_hash)
@@ -46,7 +46,7 @@ module Boson
     end
 
     def search_field(field, term)
-      self.select {|e| search_proc.call(e, field, term) }
+      self.select {|e| search_proc.call(e.to_hash, field, term) }
     end
 
     def search_proc

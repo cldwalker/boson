@@ -1,9 +1,16 @@
 module Boson
-  class Command < ::Hash
-    def self.create(name, library=nil)
-      hash = (Boson.config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
-      new.replace hash
+  class Command
+    def self.create(name, library)
+      new (Boson.config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
     end
+
+    def initialize(hash)
+      @name = hash[:name] or raise ArgumentError
+      @lib = hash[:lib] or raise ArgumentError
+      @alias = hash[:alias] if hash[:alias]
+    end
+
+    attr_accessor :name, :lib, :alias
 
     def self.create_aliases(commands, lib_module)
       aliases_hash = {}
@@ -17,8 +24,8 @@ module Boson
       Alias.manager.create_aliases(:instance_method, aliases_hash)
     end
 
-    def name; self[:name]; end
-    def alias; self[:alias]; end
-    def lib; self[:lib]; end
+    def to_hash
+      {:name=>@name, :lib=>@lib, :alias=>@alias}
+    end
   end
 end

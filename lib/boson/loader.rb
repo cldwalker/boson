@@ -10,7 +10,7 @@ module Boson
     def self.load_library(library, options={})
       if (lib = load_once(library, options))
         lib.after_load
-        puts "Loaded library #{lib[:name]}" if options[:verbose]
+        puts "Loaded library #{lib.name}" if options[:verbose]
         lib[:created_dependencies].each do |e|
           e.after_load
           puts "Loaded library dependency #{e[:name]}" if options[:verbose]
@@ -55,7 +55,7 @@ module Boson
         loader.reload
         if loader.library[:new_module]
           library[:module] = loader.library[:module]
-          Boson.commands.delete_if {|e| e[:lib] == library.name }
+          Boson.commands.delete_if {|e| e.lib == library.name }
         end
         library.create_commands(loader.library[:commands])
         true

@@ -2,7 +2,7 @@ module Boson
   module Libraries
     module Core
       def commands(*args)
-        puts ::Hirb::Helpers::Table.render(Boson.commands.search(*args), :fields=>[:name, :lib, :alias, :description])
+        puts ::Hirb::Helpers::Table.render(Boson.commands.search(*args).map {|e| e.to_hash}, :fields=>[:name, :lib, :alias, :description])
       end
 
       def libraries(query=nil)
