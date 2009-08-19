@@ -5,6 +5,14 @@ module Boson
   class InvalidLibraryModuleError < LoaderError; end
 
   class Loader
+    def self.default_attributes
+      {:detect_methods=>true, :gems=>[], :commands=>[], :call_methods=>[], :dependencies=>[]}
+    end
+
+    def self.config_attributes(lib)
+      default_attributes.merge(:name=>lib.to_s).merge!(Boson.config[:libraries][lib.to_s] || {})
+    end
+
     # ==== Options:
     # [:verbose] Prints the status of each library as its loaded. Default is false.
     def self.load_library(library, options={})
@@ -97,7 +105,7 @@ module Boson
     attr_reader :name, :library
 
     def set_library(library)
-      @library = Library.config_attributes(library)
+      @library = Loader.config_attributes(library)
     end
 
     def load_dependencies
@@ -112,7 +120,7 @@ module Boson
       load_dependencies
       load_source
       detect_additions { initialize_library_module }
-      is_valid_library? && Library.new(@library.merge(:loaded=>true))
+      is_valid_library? && Library.loader_create(@library)
     end
 
     def load_source; end
@@ -187,7 +195,7 @@ module Boson
 
     def set_library(library)
       underscore_lib = library.to_s[/^Boson::Libraries/] ? library.to_s.split('::')[-1] : library
-      @library = Library.config_attributes(Util.underscore(underscore_lib)).merge!(:module=>library)
+      @library = Loader.config_attributes(Util.underscore(underscore_lib)).merge!(:module=>library)
     end
   end
 

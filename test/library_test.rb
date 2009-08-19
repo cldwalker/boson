@@ -4,7 +4,7 @@ module Boson
   class LibraryTest < Test::Unit::TestCase    
     context "load" do
       def load_library(hash)
-        lib = Library.new Library.default_attributes.merge(hash).merge(:loaded=>true)
+        lib = Library.loader_create Loader.default_attributes.merge(hash).merge(:created_dependencies=>[])
         Loader.expects(:load_once).returns(lib)
         Library.load([hash[:name]])
       end
@@ -84,17 +84,14 @@ module Boson
 
     context "loaded" do
       before(:each) { reset_libraries }
-      after(:each) { Boson.config[:libraries] = {}}
 
       test "returns false when library isn't loaded" do
-        Boson.config[:libraries] = {'blah'=>{:loaded=>false}}
         Library.create(['blah'])
         Library.loaded?('blah').should be(false)
       end
 
       test "returns true when library is loaded" do
-        Boson.config[:libraries] = {'blah'=>{:loaded=>true}}
-        Library.create(['blah'])
+        Library.create(['blah'], :loaded=>true)
         Library.loaded?('blah').should be(true)
       end
     end

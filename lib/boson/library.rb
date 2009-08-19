@@ -5,45 +5,37 @@ module Boson
         libraries.map {|e| Loader.load_library(e, options) }.all?
       end
 
-      def create(libraries, options={})
-        libraries.each {|e| new(:name=>e).add_library }
+      def create(libraries, attributes={})
+        libraries.map {|e| lib = new({:name=>e}.update(attributes)); lib.add_library; lib }
       end
 
       #:stopdoc:
-      def default_attributes
-        {:loaded=>false, :detect_methods=>true, :gems=>[], :commands=>[], :except=>[], :call_methods=>[], :dependencies=>[],
-          :force=>false, :created_dependencies=>[]}
-      end
-
-      def config_attributes(lib)
-        default_attributes.merge(:name=>lib.to_s).merge!(Boson.config[:libraries][lib.to_s] || {})
-      end
-
       def loaded?(lib_name)
         ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib.loaded) ? true : false
+      end
+
+      def loader_create(hash)
+        valid_attributes = [:call_methods, :except, :module, :gems, :commands, :dependencies, :created_dependencies]
+        lib = new(:name=>hash.delete(:name))
+        hash.delete_if {|k,v| !valid_attributes.include?(k) }
+        lib.set_attributes hash.merge(:loaded=>true)
+        lib.set_library_commands
+        lib
       end
       #:startdoc:
     end
 
     def initialize(hash)
-        @name = hash[:name] or raise ArgumentError, "New library missing required key :name"
-        hash = self.class.config_attributes(hash[:name]).merge(hash)
-        set_attributes(hash)
-        set_library_commands
+      @name = hash[:name] or raise ArgumentError, "New library missing required key :name"
+      @loaded = false
+      set_attributes (Boson.config[:libraries][@name] || {}).merge(hash)
     end
 
     attr_accessor :module
-    attr_reader :gems, :created_dependencies, :dependencies, :loaded, :commands, :name
+    attr_reader :gems, :created_dependencies, :dependencies, :commands, :name, :loaded
 
     def set_attributes(hash)
-      @module = hash[:module]
-      @loaded = hash[:loaded]
-      @gems = hash[:gems]
-      @commands = hash[:commands]
-      @except = hash[:except]
-      @call_methods = hash[:call_methods]
-      @dependencies = hash[:dependencies]
-      @created_dependencies = hash[:created_dependencies]
+      hash.each {|k,v| instance_variable_set("@#{k}", v)}
     end
 
     def set_library_commands
@@ -71,10 +63,8 @@ module Boson
     def add_library
       if (existing_lib = Boson.libraries.find_by(:name => @name))
         Boson.libraries.delete(existing_lib)
-        Boson.libraries << self
-      else
-        Boson.libraries << self
       end
+      Boson.libraries << self
     end
 
     def create_command_aliases(commands=@commands)
@@ -88,7 +78,8 @@ module Boson
     end
 
     def to_hash
-      (self.class.default_attributes.keys + [:module, :name]).inject({}) {|h,e| h[e] = send(e) rescue nil; h}
+      [:name, :module, :gems, :dependencies, :loaded, :commands].inject({}) {
+        |h,e| h[e] = instance_variable_get("@#{e}"); h}
     end
   end
 end
