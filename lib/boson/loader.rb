@@ -138,7 +138,7 @@ module Boson
     end
 
     def is_valid_library?
-      !(@library[:commands].empty? && @library[:gems].empty? && !@library.has_key?(:module))
+      @library.has_key?(:module)
     end
 
     def detect_additions(options={}, &block)
@@ -152,7 +152,6 @@ module Boson
     end
 
     def initialize_library_module
-      return unless @library[:module]
       lib_module = @library[:module] = Util.constantize(@library[:module]) ||
         raise(InvalidLibraryModuleError, "Module #{@library[:module]} doesn't exist")
       check_for_method_conflicts(lib_module)
@@ -185,6 +184,14 @@ module Boson
   end
 
   class GemLoader < Loader
+    def initialize_library_module
+      super if @library[:module]
+    end
+
+    def is_valid_library?
+      !@library[:gems].empty? || !@library[:commands].empty? || @library.has_key?(:module)
+    end
+
     def load_source
       detect_additions { Util.safe_require @name }
     end
