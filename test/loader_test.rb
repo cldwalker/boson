@@ -166,11 +166,21 @@ module Boson
     end
 
     context "reload_library" do
+      test "loads currently unloaded library" do
+        Library.create(['blah'])
+        Loader.expects(:load_library).with('blah', anything)
+        Loader.reload_library('blah')
+      end
+
+      test "doesn't load nonexistent library" do
+        capture_stdout { Loader.reload_library('bling', :verbose=>true) }.should =~ /bling doesn't/
+      end
+
       test "reloads file library with same module" do
         load(:blah, :file_string=>"module Blah; def blah; end; end")
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Blah; def bling; end; end")
-        Loader.reload_library('blah')
+        Loader.reload_library('blah').should == true
         command_exists?('bling').should == true
       end
 
@@ -178,7 +188,7 @@ module Boson
         load(:blah, :file_string=>"module Blah; def blah; end; end")
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Bling; def bling; end; end")
-        Loader.reload_library('blah')
+        Loader.reload_library('blah').should == true
         library_has_module('blah', "Boson::Libraries::Bling")
         command_exists?('bling').should == true
         command_exists?('blah').should == false

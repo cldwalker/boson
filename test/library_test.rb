@@ -5,7 +5,7 @@ module Boson
     context "load" do
       def load_library(hash)
         lib = Library.new Library.default_attributes.merge(hash).merge(:loaded=>true)
-        Loader.expects(:load_and_create).returns(lib)
+        Loader.expects(:load_once).returns(lib)
         Library.load([hash[:name]])
       end
 

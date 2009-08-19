@@ -1,14 +1,14 @@
 module Boson
-  class LoadingDependencyError < StandardError; end
-  class MethodConflictError < StandardError; end
-  class InvalidLibraryModuleError < StandardError; end
   class LoaderError < StandardError; end
+  class LoadingDependencyError < LoaderError; end
+  class MethodConflictError < LoaderError; end
+  class InvalidLibraryModuleError < LoaderError; end
 
   class Loader
     # ==== Options:
     # [:verbose] Prints the status of each library as its loaded. Default is false.
     def self.load_library(library, options={})
-      if (lib = load_and_create(library, options))
+      if (lib = load_once(library, options))
         lib.after_load
         puts "Loaded library #{lib[:name]}" if options[:verbose]
         lib[:created_dependencies].each do |e|
@@ -21,23 +21,20 @@ module Boson
       end
     end
 
-    def self.reload_library(library)
+    def self.reload_library(library, options={})
       if (lib = Boson.libraries.find_by(:name=>library))
         if lib[:loaded]
-          loader = create(library)
-          loader.reload
-          if loader.library[:module]
-            lib[:module] = loader.library[:module]
-            Boson.commands.delete_if {|e| e[:lib] == lib.name }
+          command_size = Boson.commands.size
+          if (result = reload_existing(lib))
+            puts "Reloaded library #{library}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
           end
-          lib.create_commands(loader.library[:commands])
+          result
         else
-          puts "Library hasn't been loaded yet. Loading library #{library}..."
-          load_library(library)
+          puts "Library hasn't been loaded yet. Loading library #{library}..." if options[:verbose]
+          load_library(library, options)
         end
-        true
       else
-        puts "Library #{library} doesn't exist."
+        puts "Library #{library} doesn't exist." if options[:verbose]
         false
       end
     end
@@ -52,21 +49,40 @@ module Boson
         raise(LoaderError, "Library #{library} not found.") ) )
     end
 
-    def self.load_and_create(library, options={})
-      loader = create(library, options)
-      if Library.loaded?(loader.name)
-        puts "Library #{loader.name} already exists" if options[:verbose] && !options[:dependency]
-        false
-      else
-        result = loader.load
-        $stderr.puts "Unable to load library #{loader.name}." if !result && !options[:dependency]
-        result
+    def self.reload_existing(library)
+      rescue_loader(library.name, :reload) do
+        loader = create(library.name)
+        loader.reload
+        if loader.library[:new_module]
+          library[:module] = loader.library[:module]
+          Boson.commands.delete_if {|e| e[:lib] == library.name }
+        end
+        library.create_commands(loader.library[:commands])
+        true
       end
-    rescue LoadingDependencyError, MethodConflictError, InvalidLibraryModuleError, LoaderError =>e
-      $stderr.puts "Unable to load library #{library}. Reason: #{e.message}"
+    end
+
+    def self.rescue_loader(library, load_method)
+      yield
+    rescue LoaderError=>e
+      $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
     rescue Exception
-      $stderr.puts "Unable to load library #{library}. Reason: #{$!}"
+      $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{$!}"
       $stderr.puts caller.slice(0,5).join("\n")
+    end
+
+    def self.load_once(library, options={})
+      rescue_loader(library, :load) do
+        loader = create(library, options)
+        if Library.loaded?(loader.name)
+          puts "Library #{loader.name} already exists" if options[:verbose] && !options[:dependency]
+          false
+        else
+          result = loader.load
+          $stderr.puts "Unable to load library #{loader.name}." if !result && !options[:dependency]
+          result
+        end
+      end
     end
 
     def self.library_file(library)
@@ -87,7 +103,7 @@ module Boson
     def load_dependencies
       @library[:created_dependencies] = @library[:dependencies].map do |e|
         next if Library.loaded?(e)
-        Loader.load_and_create(e, @options.merge(:dependency=>true)) ||
+        Loader.load_once(e, @options.merge(:dependency=>true)) ||
           raise(LoadingDependencyError, "Can't load dependency #{e}")
       end.compact
     end
@@ -100,7 +116,18 @@ module Boson
     end
 
     def load_source; end
-    def reload; end
+
+    def reload
+      detected = detect_additions(:modules=>true) { reload_source }
+      if (@library[:new_module] = !detected[:modules].empty?)
+        @library[:module] = determine_lib_module(detected[:modules])
+        detect_additions { initialize_library_module }
+      end
+    end
+
+    def reload_source
+      raise LoaderError, "Reload not implemented"
+    end
 
     def is_valid_library?
       !(@library[:commands].empty? && @library[:gems].empty? && !@library.has_key?(:module))
@@ -156,6 +183,8 @@ module Boson
   end
 
   class ModuleLoader < Loader
+    def reload; end
+
     def set_library(library)
       underscore_lib = library.to_s[/^Boson::Libraries/] ? library.to_s.split('::')[-1] : library
       @library = Library.config_attributes(Util.underscore(underscore_lib)).merge!(:module=>library)
@@ -182,13 +211,7 @@ module Boson
       @library[:module] = determine_lib_module(detected[:modules]) unless @library[:module]
     end
 
-    def reload
-      detected = detect_additions(:modules=>true, :record_detections=>true) { read_library }
-      if !detected[:modules].empty?
-        @library[:module] = determine_lib_module(detected[:modules])
-        detect_additions { initialize_library_module }
-      end
-    end
+    def reload_source; read_library; end
 
     def determine_lib_module(detected_modules)
       case detected_modules.size

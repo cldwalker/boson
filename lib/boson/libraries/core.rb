@@ -14,8 +14,8 @@ module Boson
         Boson::Loader.load_library(library, {:verbose=>true}.merge!(options))
       end
 
-      def reload_library(name)
-        Boson::Loader.reload_library(name)
+      def reload_library(name, options={})
+        Boson::Loader.reload_library(name, {:verbose=>true}.merge!(options))
       end
     end
   end
