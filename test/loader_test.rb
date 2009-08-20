@@ -7,7 +7,7 @@ module Boson
         options[:file_string] ||= ''
         if options.delete(:gem)
           File.expects(:exists?).returns(false)
-          Library.expects(:is_a_gem?).returns(true)
+          GemLibrary.expects(:is_a_gem?).returns(true)
           Util.expects(:safe_require).with { eval options.delete(:file_string); true}.returns(true)
         else
           File.expects(:exists?).with(Library.library_file(lib.to_s)).returns(true)
@@ -18,7 +18,7 @@ module Boson
           end
         end
       end
-      Library.stubs(:is_a_gem?).returns(true) if options.delete(:no_mock)
+      GemLibrary.stubs(:is_a_gem?).returns(true) if options.delete(:no_mock)
     end
 
     def load(lib, options={})

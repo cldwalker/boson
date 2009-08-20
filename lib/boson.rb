@@ -5,6 +5,7 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 require 'boson/manager'
 require 'boson/loader'
 require 'boson/library'
+require 'boson/libraries'
 require 'boson/command'
 require 'boson/util'
 require 'boson/libraries/core'
