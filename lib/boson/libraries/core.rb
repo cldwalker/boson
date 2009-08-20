@@ -11,11 +11,11 @@ module Boson
       end
     
       def load_library(library, options={})
-        Boson::Loader.load_library(library, {:verbose=>true}.merge!(options))
+        Boson::Library.load_library(library, {:verbose=>true}.merge!(options))
       end
 
       def reload_library(name, options={})
-        Boson::Loader.reload_library(name, {:verbose=>true}.merge!(options))
+        Boson::Library.reload_library(name, {:verbose=>true}.merge!(options))
       end
     end
   end

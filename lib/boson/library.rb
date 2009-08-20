@@ -2,7 +2,7 @@ module Boson
   class Library
     class <<self
       def load(libraries, options={})
-        libraries.map {|e| Loader.load_library(e, options) }.all?
+        libraries.map {|e| Library.load_library(e, options) }.all?
       end
 
       def create(libraries, attributes={})

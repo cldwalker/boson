@@ -4,8 +4,8 @@ module Boson
   class LibraryTest < Test::Unit::TestCase    
     context "load" do
       def load_library(hash)
-        lib = Library.loader_create Loader.default_attributes.merge(hash).merge(:created_dependencies=>[])
-        Loader.expects(:load_once).returns(lib)
+        lib = Library.loader_create Library.default_attributes.merge(hash).merge(:created_dependencies=>[])
+        Library.expects(:load_once).returns(lib)
         Library.load([hash[:name]])
       end
 

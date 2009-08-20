@@ -7,10 +7,10 @@ module Boson
         options[:file_string] ||= ''
         if options.delete(:gem)
           File.expects(:exists?).returns(false)
-          Loader.expects(:is_a_gem?).returns(true)
+          Library.expects(:is_a_gem?).returns(true)
           Util.expects(:safe_require).with { eval options.delete(:file_string); true}.returns(true)
         else
-          File.expects(:exists?).with(Loader.library_file(lib.to_s)).returns(true)
+          File.expects(:exists?).with(Library.library_file(lib.to_s)).returns(true)
           if options.delete(:no_module_eval)
             Kernel.expects(:load).with { eval options.delete(:file_string); true}.returns(true)
           else
@@ -18,7 +18,7 @@ module Boson
           end
         end
       end
-      Loader.stubs(:is_a_gem?).returns(true) if options.delete(:no_mock)
+      Library.stubs(:is_a_gem?).returns(true) if options.delete(:no_mock)
     end
 
     def load(lib, options={})
@@ -168,19 +168,19 @@ module Boson
     context "reload_library" do
       test "loads currently unloaded library" do
         Library.create(['blah'])
-        Loader.expects(:load_library).with('blah', anything)
-        Loader.reload_library('blah')
+        Library.expects(:load_library).with('blah', anything)
+        Library.reload_library('blah')
       end
 
       test "doesn't load nonexistent library" do
-        capture_stdout { Loader.reload_library('bling', :verbose=>true) }.should =~ /bling doesn't/
+        capture_stdout { Library.reload_library('bling', :verbose=>true) }.should =~ /bling doesn't/
       end
 
       test "reloads file library with same module" do
         load(:blah, :file_string=>"module Blah; def blah; end; end")
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Blah; def bling; end; end")
-        Loader.reload_library('blah').should == true
+        Library.reload_library('blah').should == true
         command_exists?('bling').should == true
       end
 
@@ -188,7 +188,7 @@ module Boson
         load(:blah, :file_string=>"module Blah; def blah; end; end")
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Bling; def bling; end; end")
-        Loader.reload_library('blah').should == true
+        Library.reload_library('blah').should == true
         library_has_module('blah', "Boson::Libraries::Bling")
         command_exists?('bling').should == true
         command_exists?('blah').should == false

@@ -4,13 +4,13 @@ module Boson
   class MethodConflictError < LoaderError; end
   class InvalidLibraryModuleError < LoaderError; end
 
-  class Loader
+  class Library
     def self.default_attributes
       {:detect_methods=>true, :gems=>[], :commands=>[], :call_methods=>[], :dependencies=>[]}
     end
 
     def config_attributes(lib)
-      @obj = Library.new(:name=>lib.to_s)
+      @obj = self #Library.new(:name=>lib.to_s)
       self.class.default_attributes.merge(:name=>lib.to_s).merge!(@obj.config)
     end
 
@@ -52,15 +52,17 @@ module Boson
       Gem.searcher.find(name).is_a?(Gem::Specification)
     end
 
-    def self.create(library, options={})
-      library.is_a?(Module) ? ModuleLoader.new(library, options) : ( File.exists?(library_file(library.to_s)) ?
-        FileLoader.new(library, options) : (is_a_gem?(library) ? GemLoader.new(library, options) :
+    def self.create_with_loader(library, options={})
+      lib = library.is_a?(Module) ? ModuleLibrary.new(:name=>library.to_s) : ( File.exists?(library_file(library.to_s)) ?
+        FileLibrary.new(:name=>library.to_s) : (is_a_gem?(library) ? GemLibrary.new(:name=>library.to_s) :
         raise(LoaderError, "Library #{library} not found.") ) )
+      lib.load_init(library, options)
+      lib
     end
 
     def self.reload_existing(library)
       rescue_loader(library.name, :reload) do
-        loader = create(library.name)
+        loader = create_with_loader(library.name)
         loader.reload
         if loader.library[:new_module]
           library.module = loader.library[:module]
@@ -82,7 +84,7 @@ module Boson
 
     def self.load_once(library, options={})
       rescue_loader(library, :load) do
-        loader = create(library, options)
+        loader = create_with_loader(library, options)
         if Library.loaded?(loader.name)
           puts "Library #{loader.name} already exists" if options[:verbose] && !options[:dependency]
           false
@@ -98,7 +100,7 @@ module Boson
       File.join(Boson.dir, 'libraries', library + ".rb")
     end
 
-    def initialize(library, options={})
+    def load_init(library, options={})
       set_library(library)
       @options = options
       @name = @library[:name].to_s
@@ -112,7 +114,7 @@ module Boson
     def load_dependencies
       @library[:created_dependencies] = @library[:dependencies].map do |e|
         next if Library.loaded?(e)
-        Loader.load_once(e, @options.merge(:dependency=>true)) ||
+        Library.load_once(e, @options.merge(:dependency=>true)) ||
           raise(LoadingDependencyError, "Can't load dependency #{e}")
       end.compact
     end
@@ -184,7 +186,7 @@ module Boson
     end
   end
 
-  class GemLoader < Loader
+  class GemLibrary < Library
     def initialize_library_module
       super if @library[:module]
     end
@@ -198,7 +200,7 @@ module Boson
     end
   end
 
-  class ModuleLoader < Loader
+  class ModuleLibrary < Library
     def reload; end
 
     def set_library(library)
@@ -207,8 +209,8 @@ module Boson
     end
   end
 
-  class FileLoader < Loader
-    def initialize(*args)
+  class FileLibrary < Library
+    def load_init(*args)
       super
       @library[:no_module_eval] ||= @library.has_key?(:module)
     end
