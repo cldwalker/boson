@@ -9,8 +9,9 @@ module Boson
       {:detect_methods=>true, :gems=>[], :commands=>[], :call_methods=>[], :dependencies=>[]}
     end
 
-    def self.config_attributes(lib)
-      default_attributes.merge(:name=>lib.to_s).merge!(Boson.config[:libraries][lib.to_s] || {})
+    def config_attributes(lib)
+      @obj = Library.new(:name=>lib.to_s)
+      self.class.default_attributes.merge(:name=>lib.to_s).merge!(@obj.config)
     end
 
     # ==== Options:
@@ -105,7 +106,7 @@ module Boson
     attr_reader :name, :library
 
     def set_library(library)
-      @library = Loader.config_attributes(library)
+      @library = config_attributes(library)
     end
 
     def load_dependencies
@@ -120,7 +121,7 @@ module Boson
       load_dependencies
       load_source
       detect_additions { initialize_library_module }
-      is_valid_library? && Library.loader_create(@library)
+      is_valid_library? && Library.loader_create(@library, @obj)
     end
 
     def load_source; end
@@ -202,7 +203,7 @@ module Boson
 
     def set_library(library)
       underscore_lib = library.to_s[/^Boson::Libraries/] ? library.to_s.split('::')[-1] : library
-      @library = Loader.config_attributes(Util.underscore(underscore_lib)).merge!(:module=>library)
+      @library = config_attributes(Util.underscore(underscore_lib)).merge!(:module=>library)
     end
   end
 
