@@ -107,8 +107,7 @@ module Boson
       def create_with_loader(library, options={})
         lib_class = Library.handle_blocks.find {|k,v| v.call(library) } or raise(LoaderError, "Library #{library} not found.")
         lib_class = lib_class[0]
-        lib = lib_class.new(:name=>library.to_s)
-        lib.load_init(library)
+        lib = lib_class.new(:name=>library.to_s, :source=>library)
         lib
       end
 

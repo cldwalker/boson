@@ -7,13 +7,12 @@ module Boson
   module Loader
     attr_reader :library
 
-    def load_init(name)
-      @library = set_library(name)
-      @name = @library[:name].to_s
-    end
-
-    def set_library(name)
-      self.class.default_attributes.merge(:name=>@name).merge!(self.config)
+    def load
+      load_init(@source)
+      load_dependencies
+      load_source
+      detect_additions { initialize_library_module }
+      is_valid_library? && loader_create(library)
     end
 
     def load_dependencies
@@ -24,18 +23,20 @@ module Boson
       end.compact
     end
 
-    def load
-      load_dependencies
-      load_source
-      detect_additions { initialize_library_module }
-      is_valid_library? && loader_create(library)
+    def load_source; end
+
+    def load_init(name)
+      @library = set_library(name)
+      @name = @library[:name].to_s
+    end
+
+    def set_library(name)
+      self.class.default_attributes.merge(:name=>@name).merge!(self.config)
     end
 
     def loader_create(library)
       self.class.loader_create(library, self)
     end
-
-    def load_source; end
 
     def reload
       detected = detect_additions(:modules=>true) { reload_source }
