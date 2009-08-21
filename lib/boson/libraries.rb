@@ -4,22 +4,22 @@ module Boson
 
     def reload; end
 
-    def set_library(name)
-      underscore_lib = name.to_s[/^Boson::Libraries/] ? name.to_s.split('::')[-1] : name
-      super.merge(:module=>name, :name=>Util.underscore(underscore_lib))
+    def create_loader
+      underscore_lib = @source.to_s[/^Boson::Libraries/] ? @source.to_s.split('::')[-1] : @source
+      super.merge(:module=>@source, :name=>Util.underscore(underscore_lib))
     end
   end
 
   class FileLibrary < Library
     handles {|name| File.exists?(library_file(name.to_s)) }
 
-    def load_init(*args)
+    def load_init
       super
-      @library[:no_module_eval] ||= @library.has_key?(:module)
+      @loader[:no_module_eval] ||= @loader.has_key?(:module)
     end
 
     def read_library
-      if @library[:no_module_eval]
+      if @loader[:no_module_eval]
         Kernel.load self.class.library_file(@name)
       else
         library_string = File.read(self.class.library_file(@name))
@@ -29,7 +29,7 @@ module Boson
 
     def load_source
       detected = detect_additions(:modules=>true) { read_library }
-      @library[:module] = determine_lib_module(detected[:modules]) unless @library[:module]
+      @loader[:module] = determine_lib_module(detected[:modules]) unless @loader[:module]
     end
 
     def reload_source; read_library; end
@@ -39,7 +39,7 @@ module Boson
       when 1 then lib_module = detected_modules[0]
       when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
       else
-        unless ((lib_module = Util.constantize("boson/libraries/#{@library[:name]}")) && lib_module.to_s[/^Boson::Libraries/])
+        unless ((lib_module = Util.constantize("boson/libraries/#{@loader[:name]}")) && lib_module.to_s[/^Boson::Libraries/])
           raise LoaderError, "Can't detect module. Specify a module in this library's config."
         end
       end
@@ -55,11 +55,11 @@ module Boson
     handles {|name| is_a_gem?(name.to_s) }
 
     def initialize_library_module
-      super if @library[:module]
+      super if @loader[:module]
     end
 
     def is_valid_library?
-      !@library[:gems].empty? || !@library[:commands].empty? || @library.has_key?(:module)
+      !@loader[:gems].empty? || !@loader[:commands].empty? || @loader.has_key?(:module)
     end
 
     def load_source

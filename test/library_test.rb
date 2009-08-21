@@ -5,7 +5,7 @@ module Boson
     context "load" do
       def load_library(hash)
         lib = Library.new(:name=>hash.delete(:name))
-        lib.transfer_loader Library.default_attributes.merge(hash).merge(:created_dependencies=>[])
+        lib.transfer_loader lib.create_loader.merge(hash).merge(:created_dependencies=>[])
         Library.expects(:load_once).returns(lib)
         Library.load([hash[:name]])
       end
@@ -75,8 +75,7 @@ module Boson
         end
       end
 
-      # td: merge created libraries?
-      test "merges multiple libraries with same name into one" do
+      test "only makes one library with the same name" do
         Library.create(['doh'])
         Library.create(['doh'])
         Boson.libraries.size.should == 1
