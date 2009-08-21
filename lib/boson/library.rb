@@ -16,11 +16,8 @@ module Boson
       end
 
       def loader_create(hash, lib=nil)
-        valid_attributes = [:call_methods, :except, :module, :gems, :commands, :dependencies, :created_dependencies]
         lib ||= new(:name=>hash.delete(:name))
-        hash.delete_if {|k,v| !valid_attributes.include?(k) }
-        lib.set_attributes hash.merge(:loaded=>true)
-        lib.set_library_commands
+        lib.transfer_loader(hash)
         lib
       end
 
@@ -47,19 +44,6 @@ module Boson
         end
       end
 
-      def reload_existing(library)
-        rescue_loader(library.name, :reload) do
-          loader = create_with_loader(library.name)
-          loader.reload
-          if loader.library[:new_module]
-            library.module = loader.library[:module]
-            Boson.commands.delete_if {|e| e.lib == library.name }
-          end
-          library.create_commands(loader.library[:commands])
-          true
-        end
-      end
-
       # ==== Options:
       # [:verbose] Prints the status of each library as its loaded. Default is false.
       def load_library(library, options={})
@@ -80,7 +64,7 @@ module Boson
         if (lib = Boson.libraries.find_by(:name=>library))
           if lib.loaded
             command_size = Boson.commands.size
-            if (result = reload_existing(lib))
+            if (result = rescue_loader(lib.name, :reload) { lib.reload })
               puts "Reloaded library #{library}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
             end
             result

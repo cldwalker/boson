@@ -12,7 +12,7 @@ module Boson
       load_dependencies
       load_source
       detect_additions { initialize_library_module }
-      is_valid_library? && loader_create(library)
+      is_valid_library? && transfer_loader(@library)
     end
 
     def load_dependencies
@@ -30,20 +30,30 @@ module Boson
       @name = @library[:name].to_s
     end
 
+    def transfer_loader(hash)
+      valid_attributes = [:call_methods, :except, :module, :gems, :commands, :dependencies, :created_dependencies]
+      hash.delete_if {|k,v| !valid_attributes.include?(k) }
+      set_attributes hash.merge(:loaded=>true)
+      set_library_commands
+      self
+    end
+
     def set_library(name)
       self.class.default_attributes.merge(:name=>@name).merge!(self.config)
     end
 
-    def loader_create(library)
-      self.class.loader_create(library, self)
-    end
-
     def reload
+      @library[:detect_methods] = true
       detected = detect_additions(:modules=>true) { reload_source }
       if (@library[:new_module] = !detected[:modules].empty?)
         @library[:module] = determine_lib_module(detected[:modules])
+        @commands.each {|e| @library[:commands].delete(e) } #td: fix hack
         detect_additions { initialize_library_module }
+        Boson.commands.delete_if {|e| e.lib == @name }
+        @module = library[:module]
       end
+      create_commands(@library[:commands])
+      true
     end
 
     def reload_source
