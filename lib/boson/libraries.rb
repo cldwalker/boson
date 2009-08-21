@@ -4,9 +4,11 @@ module Boson
 
     def reload; end
 
-    def create_loader
+    def load_init
+      super
+      @module = @source
       underscore_lib = @source.to_s[/^Boson::Libraries/] ? @source.to_s.split('::')[-1] : @source
-      super.merge(:module=>@source, :name=>Util.underscore(underscore_lib))
+      @name = Util.underscore(underscore_lib)
     end
   end
 
@@ -15,11 +17,11 @@ module Boson
 
     def load_init
       super
-      @loader[:no_module_eval] ||= @loader.has_key?(:module)
+      @no_module_eval ||= !!@module
     end
 
     def read_library
-      if @loader[:no_module_eval]
+      if @no_module_eval
         Kernel.load self.class.library_file(@name)
       else
         library_string = File.read(self.class.library_file(@name))
@@ -29,7 +31,7 @@ module Boson
 
     def load_source
       detected = detect_additions(:modules=>true) { read_library }
-      @loader[:module] = determine_lib_module(detected[:modules]) unless @loader[:module]
+      @module = determine_lib_module(detected[:modules]) unless @module
     end
 
     def reload_source; read_library; end
@@ -39,7 +41,7 @@ module Boson
       when 1 then lib_module = detected_modules[0]
       when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
       else
-        unless ((lib_module = Util.constantize("boson/libraries/#{@loader[:name]}")) && lib_module.to_s[/^Boson::Libraries/])
+        unless ((lib_module = Util.constantize("boson/libraries/#{@name}")) && lib_module.to_s[/^Boson::Libraries/])
           raise LoaderError, "Can't detect module. Specify a module in this library's config."
         end
       end
@@ -55,11 +57,11 @@ module Boson
     handles {|name| is_a_gem?(name.to_s) }
 
     def initialize_library_module
-      super if @loader[:module]
+      super if @module
     end
 
     def is_valid_library?
-      !@loader[:gems].empty? || !@loader[:commands].empty? || @loader.has_key?(:module)
+      !@gems.empty? || !@commands.empty? || !!@module
     end
 
     def load_source

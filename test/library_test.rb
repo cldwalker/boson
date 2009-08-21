@@ -4,8 +4,13 @@ module Boson
   class LibraryTest < Test::Unit::TestCase    
     context "load" do
       def load_library(hash)
-        lib = Library.new(:name=>hash.delete(:name))
-        lib.transfer_loader lib.create_loader.merge(hash).merge(:created_dependencies=>[])
+        new_attributes = {:name=>hash.delete(:name), :commands=>[], :created_dependencies=>[]}
+        new_attributes[:module] = hash.delete(:module) if hash[:module]
+        new_attributes[:except] = hash.delete(:except) if hash[:except]
+        lib = Library.new(new_attributes)
+        lib.instance_variable_set "@commands", hash[:commands] if hash[:commands]
+        lib.instance_variable_set "@loaded", true
+        lib.set_library_commands
         Library.expects(:load_once).returns(lib)
         Library.load([hash[:name]])
       end
