@@ -1,24 +1,4 @@
 module Boson
-  class GemLibrary < Library
-    def self.is_a_gem?(name)
-      Gem.searcher.find(name).is_a?(Gem::Specification)
-    end
-
-    handles {|name| is_a_gem?(name.to_s) }
-
-    def initialize_library_module
-      super if @library[:module]
-    end
-
-    def is_valid_library?
-      !@library[:gems].empty? || !@library[:commands].empty? || @library.has_key?(:module)
-    end
-
-    def load_source
-      detect_additions { Util.safe_require @name }
-    end
-  end
-
   class ModuleLibrary < Library
     handles {|name| name.is_a?(Module) }
 
@@ -64,6 +44,26 @@ module Boson
         end
       end
       lib_module
+    end
+  end
+
+  class GemLibrary < Library
+    def self.is_a_gem?(name)
+      Gem.searcher.find(name).is_a?(Gem::Specification)
+    end
+
+    handles {|name| is_a_gem?(name.to_s) }
+
+    def initialize_library_module
+      super if @library[:module]
+    end
+
+    def is_valid_library?
+      !@library[:gems].empty? || !@library[:commands].empty? || @library.has_key?(:module)
+    end
+
+    def load_source
+      detect_additions { Util.safe_require @name }
     end
   end
 end

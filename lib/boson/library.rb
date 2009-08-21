@@ -15,12 +15,6 @@ module Boson
         ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib.loaded) ? true : false
       end
 
-      def loader_create(hash, lib=nil)
-        lib ||= new(:name=>hash.delete(:name))
-        lib.transfer_loader(hash)
-        lib
-      end
-
       def rescue_loader(library, load_method)
         yield
       rescue LoaderError=>e
@@ -32,13 +26,13 @@ module Boson
 
       def load_once(library, options={})
         rescue_loader(library, :load) do
-          loader = create_with_loader(library, options)
-          if loaded?(loader.name)
-            puts "Library #{loader.name} already exists" if options[:verbose] && !options[:dependency]
+          lib = loader_create(library, options)
+          if loaded?(lib.name)
+            puts "Library #{lib.name} already exists" if options[:verbose] && !options[:dependency]
             false
           else
-            result = loader.load
-            $stderr.puts "Unable to load library #{loader.name}." if !result && !options[:dependency]
+            result = lib.load
+            $stderr.puts "Unable to load library #{lib.name}." if !result && !options[:dependency]
             result
           end
         end
@@ -84,15 +78,12 @@ module Boson
 
       attr_accessor :handle_blocks
       def handles(&block)
-        Library.handle_blocks ||= {}
-        Library.handle_blocks[self] = block
+        (Library.handle_blocks ||= []) << [self,block]
       end
 
-      def create_with_loader(library, options={})
-        lib_class = Library.handle_blocks.find {|k,v| v.call(library) } or raise(LoaderError, "Library #{library} not found.")
-        lib_class = lib_class[0]
-        lib = lib_class.new(:name=>library.to_s, :source=>library)
-        lib
+      def loader_create(library, options={})
+        lib_class = Library.handle_blocks.find {|k,v| v.call(library) }[0] or raise(LoaderError, "Library #{library} not found.")
+        lib_class.new(:name=>library.to_s, :source=>library)
       end
 
       def library_file(library)
