@@ -14,29 +14,29 @@ module Boson
 
       test "loads basic library" do
         load_library :name=>'blah'
-        Library.loaded?('blah').should == true
+        library_loaded? 'blah'
       end
 
       test "loads library with commands" do
         load_library :name=>'blah', :commands=>['frylock','meatwad']
-        Library.loaded?('blah').should == true
-        command_exists?('frylock').should == true
-        command_exists?('meatwad').should == true
+        library_loaded? 'blah'
+        command_exists?('frylock')
+        command_exists?('meatwad')
       end
 
       test "loads library with commands and except option" do
         Boson.main_object.instance_eval("class<<self;self;end").expects(:undef_method).with('frylock')
         load_library :name=>'blah', :commands=>['frylock','meatwad'], :except=>['frylock']
-        Library.loaded?('blah').should == true
-        command_exists?('frylock').should == false
-        command_exists?('meatwad').should == true
+        library_loaded? 'blah'
+        command_exists?('frylock', false)
+        command_exists?('meatwad')
       end
 
       test "creates aliases for commands" do
         eval %[module ::Aquateen; def frylock; end; end]
         with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
           load_library :name=>'aquateen', :commands=>['frylock','meatwad'], :module=>Aquateen
-          Library.loaded?('aquateen').should == true
+          library_loaded? 'aquateen'
           Aquateen.method_defined?(:fr).should == true
         end
       end
@@ -47,7 +47,7 @@ module Boson
           capture_stderr { 
             load_library(:name=>'aquateen', :commands=>['frylock','meatwad'])
           }.should =~ /No aliases/
-          Library.loaded?('aquateen').should == true
+          library_loaded? 'aquateen'
           Aquateen2.method_defined?(:fr).should == false
         end
       end
@@ -55,7 +55,7 @@ module Boson
       test "merges with existing created library" do
         Library.create(['blah'])
         load_library :name=>'blah'
-        Library.loaded?('blah').should == true
+        library_loaded? 'blah'
         Boson.libraries.size.should == 1
       end
     end

@@ -43,7 +43,7 @@ module Boson
         eval %[module ::Harvey; def bird; end; end]
         load ::Harvey
         library_has_module('harvey', "Harvey")
-        command_exists?('bird').should == true
+        command_exists?('bird')
       end
 
       test "calls included hook of a file library" do
@@ -55,7 +55,7 @@ module Boson
       test "loads a file library" do
         load :blah, :file_string=>"module Blah; def blah; end; end"
         library_has_module('blah', 'Boson::Commands::Blah')
-        command_exists?('blah').should == true
+        command_exists?('blah')
       end
 
       test "loads a file library with config module" do
@@ -63,7 +63,7 @@ module Boson
           load :blah, :file_string=>"module ::Coolness; def coolness; end; end", :no_module_eval=>true
         end
         library_has_module('blah', 'Coolness')
-        command_exists?('coolness').should == true
+        command_exists?('coolness')
       end
 
       test "loads a file library with config no_module_eval" do
@@ -71,7 +71,7 @@ module Boson
           load :blah, :file_string=>"module ::Bogus; end; module Boson::Commands::Blah; def blah; end; end", :no_module_eval=>true
         end
         library_has_module('blah', 'Boson::Commands::Blah')
-        command_exists?('blah').should == true
+        command_exists?('blah')
       end
 
       test "loads a file library with config call_methods" do
@@ -102,7 +102,7 @@ module Boson
       test "loads and strips aliases from a library's commands" do
         with_config(:commands=>{"blah"=>{:alias=>'b'}}) do
           load :blah, :file_string=>"module Blah; def blah; end; alias_method(:b, :blah); end"
-          Library.loaded?('blah').should == true
+          library_loaded?('blah')
           library('blah').commands.should == ['blah']
         end
       end
@@ -110,21 +110,21 @@ module Boson
       test "loads a file library in a subdirectory" do
         load 'site/delicious', :file_string=>"module Delicious; def blah; end; end"
         library_has_module('site/delicious', "Boson::Commands::Delicious")
-        command_exists?('blah').should == true
+        command_exists?('blah')
       end
 
       test "loads a monkeypatched gem" do
         load "dude", :file_string=>"module ::Kernel; def dude; end; end", :gem=>true
-        Library.loaded?("dude").should == true
+        library_loaded? 'dude'
         library('dude').module.should == nil
-        command_exists?("dude").should == true
+        command_exists?("dude")
       end
 
       test "loads a normal gem" do
         with_config(:libraries=>{"dude"=>{:module=>'Dude'}}) do
           load "dude", :file_string=>"module ::Dude; def blah; end; end", :gem=>true
           library_has_module('dude', "Dude")
-          command_exists?("blah").should == true
+          command_exists?("blah")
         end
       end
 
@@ -135,8 +135,8 @@ module Boson
           Library.load ['water']
           library_has_module('water', "Boson::Commands::Water")
           library_has_module('oaks', "Boson::Commands::Oaks")
-          command_exists?('water').should == true
-          command_exists?('oaks').should == true
+          command_exists?('water')
+          command_exists?('oaks')
         end
       end
 
@@ -181,7 +181,7 @@ module Boson
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Blah; def bling; end; end")
         Library.reload_library('blah').should == true
-        command_exists?('bling').should == true
+        command_exists?('bling')
       end
 
       test "reloads file library with different module" do
@@ -190,8 +190,8 @@ module Boson
         File.stubs(:read).returns("module Bling; def bling; end; end")
         Library.reload_library('blah').should == true
         library_has_module('blah', "Boson::Commands::Bling")
-        command_exists?('bling').should == true
-        command_exists?('blah').should == false
+        command_exists?('bling')
+        command_exists?('blah', false)
       end
     end
   end

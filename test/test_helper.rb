@@ -35,8 +35,12 @@ class Test::Unit::TestCase
     Boson.instance_eval("@commands = nil")
   end
 
-  def command_exists?(cmd)
-    Boson.commands.find_by(:name=>cmd).is_a?(Boson::Command)
+  def command_exists?(name, bool=true)
+    Boson::Command.loaded?(name).should == bool
+  end
+
+  def library_loaded?(name, bool=true)
+    Boson::Library.loaded?(name).should == bool
   end
 
   def capture_stdout(&block)
