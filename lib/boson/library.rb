@@ -21,6 +21,7 @@ module Boson
           if lib.loaded
             command_size = Boson.commands.size
             if (result = rescue_load_action(lib.name, :reload) { lib.reload })
+              lib.after_reload
               puts "Reloaded library #{source}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
             end
             result
@@ -112,8 +113,13 @@ module Boson
         e.add_library
         puts "Loaded library dependency #{e.name}" if options[:verbose]
       end
-      @create_dependencies = nil
+      @created_dependencies = nil
       true
+    end
+
+    def after_reload
+      Boson.commands.delete_if {|e| e.lib == @name } if @new_module
+      create_commands(@commands)
     end
 
     def create_commands(commands=@commands)

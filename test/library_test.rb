@@ -2,16 +2,11 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
   class LibraryTest < Test::Unit::TestCase    
-    context "load" do
+    context "after_load" do
       def load_library(hash)
-        new_attributes = {:name=>hash.delete(:name), :commands=>[], :created_dependencies=>[]}
-        new_attributes[:module] = hash.delete(:module) if hash[:module]
-        new_attributes[:except] = hash.delete(:except) if hash[:except]
-        lib = Library.new(new_attributes)
-        lib.instance_variable_set "@commands", hash[:commands] if hash[:commands]
-        lib.instance_variable_set "@loaded", true
-        lib.set_library_commands
-        Library.expects(:load_once).returns(lib)
+        new_attributes = {:name=>hash.delete(:name), :commands=>[], :created_dependencies=>[], :loaded=>true}
+        [:module, :except, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
+        Library.expects(:load_once).returns(Library.new(new_attributes))
         Library.load([hash[:name]])
       end
 

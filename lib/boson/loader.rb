@@ -8,8 +8,9 @@ module Boson
     def load
       load_init
       load_dependencies
-      load_source
-      detect_additions { initialize_library_module }
+      load_source_and_set_module
+      detect_additions { initialize_library_module } if @module
+      @call_methods.each {|m| Boson.main_object.send m }
       is_valid_library? && (@loaded = true)
     end
 
@@ -21,7 +22,7 @@ module Boson
       end.compact
     end
 
-    def load_source; end
+    def load_source_and_set_module; end
 
     def load_attributes
       {:detect_methods=>true, :gems=>[], :commands=>[], :call_methods=>[], :dependencies=>[]}
@@ -31,25 +32,19 @@ module Boson
       set_attributes load_attributes.merge(@config)
     end
 
+    def is_valid_library?
+      !!@module
+    end
+
     def reload
-      @detect_methods = true
-      detected = detect_additions(:modules=>true) { reload_source }
-      if !detected[:modules].empty?
-        @module = determine_lib_module(detected[:modules])
-        @commands = []
-        detect_additions { initialize_library_module }
-        Boson.commands.delete_if {|e| e.lib == @name }
-      end
-      create_commands(@commands)
+      @detect_methods = true #reload_init
+      reload_source_and_set_module
+      detect_additions { initialize_library_module } if @new_module
       true
     end
 
-    def reload_source
+    def reload_source_and_set_module
       raise LoaderError, "Reload not implemented"
-    end
-
-    def is_valid_library?
-      !!@module
     end
 
     def detect_additions(options={}, &block)
@@ -71,7 +66,6 @@ module Boson
         Boson::Libraries.send :include, @module
         Boson::Libraries.send :extend_object, Boson.main_object
       end
-      @call_methods.each {|m| Boson.main_object.send m }
     end
 
     def check_for_method_conflicts

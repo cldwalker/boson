@@ -1,8 +1,8 @@
 module Boson
   class ModuleLibrary < Library
-    handles {|name| name.is_a?(Module) }
+    handles {|source| source.is_a?(Module) }
 
-    def reload; end
+    def reload; true; end
 
     def load_init
       super
@@ -13,14 +13,14 @@ module Boson
   end
 
   class FileLibrary < Library
-    handles {|name| File.exists?(library_file(name.to_s)) }
+    handles {|source| File.exists?(library_file(source.to_s)) }
 
     def load_init
       super
       @no_module_eval ||= !!@module
     end
 
-    def read_library
+    def load_source
       if @no_module_eval
         Kernel.load self.class.library_file(@name)
       else
@@ -29,12 +29,18 @@ module Boson
       end
     end
 
-    def load_source
-      detected = detect_additions(:modules=>true) { read_library }
+    def load_source_and_set_module
+      detected = detect_additions(:modules=>true) { load_source }
       @module = determine_lib_module(detected[:modules]) unless @module
     end
 
-    def reload_source; read_library; end
+    def reload_source_and_set_module
+      detected = detect_additions(:modules=>true) { load_source }
+      if (@new_module = !detected[:modules].empty?)
+        @commands = []
+        @module = determine_lib_module(detected[:modules])
+      end
+    end
 
     def determine_lib_module(detected_modules)
       case detected_modules.size
@@ -54,17 +60,13 @@ module Boson
       Gem.searcher.find(name).is_a?(Gem::Specification)
     end
 
-    handles {|name| is_a_gem?(name.to_s) }
-
-    def initialize_library_module
-      super if @module
-    end
+    handles {|source| is_a_gem?(source.to_s) }
 
     def is_valid_library?
       !@gems.empty? || !@commands.empty? || !!@module
     end
 
-    def load_source
+    def load_source_and_set_module
       detect_additions { Util.safe_require @name }
     end
   end

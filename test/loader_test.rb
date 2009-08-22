@@ -38,7 +38,7 @@ module Boson
 
     before(:each) { reset_main_object; reset_libraries; reset_commands }
 
-    context "load_library" do
+    context "load" do
       test "loads a module library" do
         eval %[module ::Harvey; def bird; end; end]
         load ::Harvey
