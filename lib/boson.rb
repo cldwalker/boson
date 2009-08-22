@@ -36,6 +36,12 @@ module Boson
       @main_object = value.extend(Commands)
     end
 
+    # ==== Valid config keys:
+    # [:libraries] Hash of libraries mapping their name to attribute hashes.
+    # [:commands] Hash of commands mapping their name to attribute hashes.
+    # [:defaults] Array of libraries to load at start up.
+    # [:add_load_path] Boolean specifying whether to add a load path pointing to the lib under boson's directory. Defaults to false if
+    #                  the lib directory isn't defined in the boson directory.
     def config(reload=false)
       if reload || @config.nil?
         @config = YAML::load_file(Boson.dir + '/boson.yml') rescue {:commands=>{}, :libraries=>{}}

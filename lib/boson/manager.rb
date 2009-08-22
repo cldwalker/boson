@@ -2,7 +2,9 @@ module Boson
   module Manager
     extend self
     def init(options={})
-      $:.unshift Boson.dir unless $:.include? File.expand_path(Boson.dir)
+      if Boson.config[:add_load_path] || File.exists?(File.join(Boson.dir, 'lib'))
+        $: <<  File.join(Boson.dir, 'lib') unless $:.include? File.expand_path(File.join(Boson.dir, 'lib'))
+      end
       create_initial_libraries(options)
       load_default_libraries(options)
       @initialized = true

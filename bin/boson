@@ -6,7 +6,7 @@ require 'local_gem'
 LocalGem.local_require 'hirb'
 
 require File.expand_path(File.join(File.dirname(__FILE__), "..","lib","boson"))
-Boson.init
+Boson.activate
 Hirb::View.enable(:config_file=>File.join(Boson.base_dir, 'config', 'hirb.yml'))
-output = Boson.base_object.instance_eval(ARGV.join(" "))
+output = Boson.main_object.instance_eval(ARGV.join(" "))
 puts Hirb::View.render_output(output) || output.inspect
