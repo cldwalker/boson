@@ -8,8 +8,8 @@ require 'boson/library'
 require 'boson/libraries'
 require 'boson/command'
 require 'boson/util'
-require 'boson/libraries/core'
-require 'boson/libraries/object_commands'
+require 'boson/commands/core'
+require 'boson/commands/object_commands'
 require 'boson/searchable_array'
 
 module Boson
@@ -30,7 +30,7 @@ module Boson
     end
 
     def main_object=(value)
-      @main_object = value.extend(Libraries)
+      @main_object = value.extend(Commands)
     end
 
     def config(reload=false)

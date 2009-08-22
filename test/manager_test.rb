@@ -14,7 +14,7 @@ module Boson
     # test "creates default libraries and commands" do
     #   activate
     #   assert Boson.libraries.map {|e| e[:name]}.select {|e| e.include?('boson')}.size >= 2
-    #   assert_equal Boson.commands.map {|e| e.name}.sort, Boson::Libraries::Core.instance_methods.map {|e| e.to_s}.sort
+    #   assert_equal Boson.commands.map {|e| e.name}.sort, Boson::Commands::Core.instance_methods.map {|e| e.to_s}.sort
     # end
 
     test "main_object responds to commands" do
@@ -30,7 +30,7 @@ module Boson
     end
 
     test "creates libraries under :dir/libraries/" do
-      Dir.stubs(:[]).returns(['./libraries/lib.rb', './libraries/lib2.rb'])
+      Dir.stubs(:[]).returns(['./commands/lib.rb', './commands/lib2.rb'])
       Library.expects(:create).with(['lib', 'lib2'], anything)
       activate
     end

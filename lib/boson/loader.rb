@@ -63,22 +63,22 @@ module Boson
       if @object_command
         create_object_command
       else
-        Boson::Libraries.send :include, @module
-        Boson::Libraries.send :extend_object, Boson.main_object
+        Boson::Commands.send :include, @module
+        Boson::Commands.send :extend_object, Boson.main_object
       end
     end
 
     def check_for_method_conflicts
       return if @force
-      conflicts = Util.common_instance_methods(@module, Boson::Libraries)
+      conflicts = Util.common_instance_methods(@module, Boson::Commands)
       unless conflicts.empty?
         raise MethodConflictError,"The following commands conflict with existing commands: #{conflicts.join(', ')}"
       end
     end
 
     def create_object_command
-      Libraries::ObjectCommands.create(@name, @module)
-      if (lib = Boson.libraries.find_by(:module=>Boson::Libraries::ObjectCommands))
+      Commands::ObjectCommands.create(@name, @module)
+      if (lib = Boson.libraries.find_by(:module=>Boson::Commands::ObjectCommands))
         lib.commands << @name
         Boson.commands << Command.create(@name, lib.name)
         lib.create_command_aliases

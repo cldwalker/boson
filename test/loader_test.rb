@@ -54,7 +54,7 @@ module Boson
 
       test "loads a file library" do
         load :blah, :file_string=>"module Blah; def blah; end; end"
-        library_has_module('blah', 'Boson::Libraries::Blah')
+        library_has_module('blah', 'Boson::Commands::Blah')
         command_exists?('blah').should == true
       end
 
@@ -68,9 +68,9 @@ module Boson
 
       test "loads a file library with config no_module_eval" do
         with_config(:libraries=>{"blah"=>{:no_module_eval=>true}}) do
-          load :blah, :file_string=>"module ::Bogus; end; module Boson::Libraries::Blah; def blah; end; end", :no_module_eval=>true
+          load :blah, :file_string=>"module ::Bogus; end; module Boson::Commands::Blah; def blah; end; end", :no_module_eval=>true
         end
-        library_has_module('blah', 'Boson::Libraries::Blah')
+        library_has_module('blah', 'Boson::Commands::Blah')
         command_exists?('blah').should == true
       end
 
@@ -109,7 +109,7 @@ module Boson
 
       test "loads a file library in a subdirectory" do
         load 'site/delicious', :file_string=>"module Delicious; def blah; end; end"
-        library_has_module('site/delicious', "Boson::Libraries::Delicious")
+        library_has_module('site/delicious', "Boson::Commands::Delicious")
         command_exists?('blah').should == true
       end
 
@@ -133,8 +133,8 @@ module Boson
         File.stubs(:read).returns("module Oaks; def oaks; end; end", "module Water; def water; end; end")
         with_config(:libraries=>{"water"=>{:dependencies=>"oaks"}}) do
           Library.load ['water']
-          library_has_module('water', "Boson::Libraries::Water")
-          library_has_module('oaks', "Boson::Libraries::Oaks")
+          library_has_module('water', "Boson::Commands::Water")
+          library_has_module('oaks', "Boson::Commands::Oaks")
           command_exists?('water').should == true
           command_exists?('oaks').should == true
         end
@@ -189,7 +189,7 @@ module Boson
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Bling; def bling; end; end")
         Library.reload_library('blah').should == true
-        library_has_module('blah', "Boson::Libraries::Bling")
+        library_has_module('blah', "Boson::Commands::Bling")
         command_exists?('bling').should == true
         command_exists?('blah').should == false
       end

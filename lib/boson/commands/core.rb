@@ -1,5 +1,5 @@
 module Boson
-  module Libraries
+  module Commands
     module Core
       def commands(*args)
         puts ::Hirb::Helpers::Table.render(Boson.commands.search(*args).map {|e| e.to_hash}, :fields=>[:name, :lib, :alias, :description])

@@ -77,7 +77,7 @@ module Boson
       end
 
       def library_file(library)
-        File.join(Boson.dir, 'libraries', library + ".rb")
+        File.join(Boson.dir, 'commands', library + ".rb")
       end
       #:startdoc:
     end

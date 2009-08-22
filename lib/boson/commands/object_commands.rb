@@ -1,5 +1,5 @@
 module Boson
-  module Libraries
+  module Commands
     module ObjectCommands
       def self.create(name, lib_module)
         module_eval %[

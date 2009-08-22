@@ -14,16 +14,16 @@ class Test::Unit::TestCase
     (Boson.instance_variables - ['@dir']).each do |e|
       Boson.instance_variable_set(e, nil)
     end
-    Boson.send :remove_const, "Libraries"
-    eval "module ::Boson::Libraries; end"
-    $".delete('boson/libraries/core.rb') && require('boson/libraries/core.rb')
-    $".delete('boson/libraries/object_commands.rb') && require('boson/libraries/object_commands.rb')
+    Boson.send :remove_const, "Commands"
+    eval "module ::Boson::Commands; end"
+    $".delete('boson/commands/core.rb') && require('boson/commands/core.rb')
+    $".delete('boson/commands/object_commands.rb') && require('boson/commands/object_commands.rb')
     Boson::Manager.instance_eval("@initialized = false")
   end
 
   def reset_main_object
-    Boson.send :remove_const, "Libraries"
-    eval "module ::Boson::Libraries; end"
+    Boson.send :remove_const, "Commands"
+    eval "module ::Boson::Commands; end"
     Boson.main_object = Object.new
   end
 

@@ -7,7 +7,7 @@ module Boson
     def load_init
       super
       @module = @source
-      underscore_lib = @source.to_s[/^Boson::Libraries/] ? @source.to_s.split('::')[-1] : @source
+      underscore_lib = @source.to_s[/^Boson::Commands/] ? @source.to_s.split('::')[-1] : @source
       @name = Util.underscore(underscore_lib)
     end
   end
@@ -25,7 +25,7 @@ module Boson
         Kernel.load self.class.library_file(@name)
       else
         library_string = File.read(self.class.library_file(@name))
-        Libraries.module_eval(library_string, self.class.library_file(@name))
+        Commands.module_eval(library_string, self.class.library_file(@name))
       end
     end
 
@@ -47,7 +47,7 @@ module Boson
       when 1 then lib_module = detected_modules[0]
       when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
       else
-        unless ((lib_module = Util.constantize("boson/libraries/#{@name}")) && lib_module.to_s[/^Boson::Libraries/])
+        unless ((lib_module = Util.constantize("boson/commands/#{@name}")) && lib_module.to_s[/^Boson::Commands/])
           raise LoaderError, "Can't detect module. Specify a module in this library's config."
         end
       end
