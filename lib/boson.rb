@@ -52,7 +52,16 @@ module Boson
     def activate(options={})
       Manager.activate(options)
     end
-  end  
+
+    def start(args=ARGV)
+      if Boson::Manager.bin_init :discover=>args[0][/\w+/], :verbose=>true
+        output = Boson.main_object.instance_eval(args.join(" "))
+        puts Hirb::View.render_output(output) || output.inspect
+      else
+        $stderr.puts "Error: No command found to execute"
+      end
+    end
+  end
 end
 
 Boson.main_object = self
