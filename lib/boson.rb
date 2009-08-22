@@ -5,7 +5,10 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 require 'boson/manager'
 require 'boson/loader'
 require 'boson/library'
-require 'boson/libraries'
+# order of library subclasses matters
+require 'boson/libraries/module_library'
+require 'boson/libraries/file_library'
+require 'boson/libraries/gem_library'
 require 'boson/command'
 require 'boson/util'
 require 'boson/commands/core'
