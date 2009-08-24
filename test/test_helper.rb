@@ -17,7 +17,7 @@ class Test::Unit::TestCase
     Boson.send :remove_const, "Commands"
     eval "module ::Boson::Commands; end"
     $".delete('boson/commands/core.rb') && require('boson/commands/core.rb')
-    $".delete('boson/commands/object_commands.rb') && require('boson/commands/object_commands.rb')
+    $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
     Boson::Manager.instance_eval("@initialized = false")
   end
 

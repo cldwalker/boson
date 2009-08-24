@@ -34,7 +34,7 @@ module Boson
     end
 
     def boson_libraries
-      [Boson::Commands::Core, Boson::Commands::ObjectCommands]
+      [Boson::Commands::Core, Boson::Commands::Namespace]
     end
 
     def detected_libraries

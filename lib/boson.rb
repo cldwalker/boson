@@ -12,7 +12,7 @@ require 'boson/libraries/gem_library'
 require 'boson/command'
 require 'boson/util'
 require 'boson/commands/core'
-require 'boson/commands/object_commands'
+require 'boson/commands/namespace'
 require 'boson/searchable_array'
 
 module Boson

@@ -60,8 +60,8 @@ module Boson
     def initialize_library_module
       @module = Util.constantize(@module) || raise(InvalidLibraryModuleError, "Module #{@module} doesn't exist")
       check_for_method_conflicts
-      if @object_command
-        create_object_command
+      if @namespace
+        create_namespace_command
       else
         Boson::Commands.send :include, @module
         Boson::Commands.send :extend_object, Boson.main_object
@@ -76,10 +76,10 @@ module Boson
       end
     end
 
-    def create_object_command
-      command_name = @object_command.is_a?(String) ? @object_command : @name[/\w+$/]
-      Commands::ObjectCommands.create(command_name, @module)
-      if (lib = Boson.libraries.find_by(:module=>Boson::Commands::ObjectCommands))
+    def create_namespace_command
+      command_name = @namespace.is_a?(String) ? @namespace : @name[/\w+$/]
+      Commands::Namespace.create(command_name, @module)
+      if (lib = Boson.libraries.find_by(:module=>Boson::Commands::Namespace))
         lib.commands << command_name
         Boson.commands << Command.create(command_name, lib.name)
         lib.create_command_aliases
