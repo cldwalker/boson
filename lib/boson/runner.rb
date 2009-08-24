@@ -1,5 +1,5 @@
 module Boson
-  module Manager
+  module Runner
     extend self
     def bin_init(options={})
       Hirb::View.enable(:config_file=>File.join(Boson.dir, 'config', 'hirb.yml'))
@@ -20,7 +20,7 @@ module Boson
           dispatcher = Boson.invoke(meth1)
           args.unshift meth2
         else
-          dispatcher = main_object
+          dispatcher = Boson.main_object
         end
         output = dispatcher.send(*args)
         puts Hirb::View.render_output(output) || output.inspect

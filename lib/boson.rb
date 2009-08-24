@@ -2,7 +2,7 @@ require 'yaml'
 require 'hirb'
 require 'alias'
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
-require 'boson/manager'
+require 'boson/runner'
 require 'boson/loader'
 require 'boson/library'
 # order of library subclasses matters
@@ -50,7 +50,7 @@ module Boson
     end
 
     def activate(options={})
-      Manager.activate(options)
+      Runner.activate(options)
     end
 
     def invoke(*args)

@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
-  class ManagerTest < Test::Unit::TestCase
+  class RunnerTest < Test::Unit::TestCase
 
   context "activate" do
     def activate(*args)
@@ -51,12 +51,12 @@ module Boson
 
     test "doesn't call init twice" do
       activate
-      Manager.expects(:init).never
+      Runner.expects(:init).never
       activate
     end
 
     test "loads multiple libraries with :libraries option" do
-      Manager.expects(:init)
+      Runner.expects(:init)
       Library.expects(:load).with([:lib1,:lib2], anything)
       activate(:libraries=>[:lib1, :lib2])
     end
