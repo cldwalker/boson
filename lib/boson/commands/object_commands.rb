@@ -5,7 +5,8 @@ module Boson
         module_eval %[
           def #{name}
             @#{name} ||= begin
-              obj = Object.new.extend(#{lib_module})
+              obj = Object.new
+              obj.instance_eval("class<<self;self;end").send :include, #{lib_module}
               def obj.commands
                 #{lib_module}.instance_methods
               end

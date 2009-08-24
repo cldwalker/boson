@@ -77,10 +77,11 @@ module Boson
     end
 
     def create_object_command
-      Commands::ObjectCommands.create(@name, @module)
+      command_name = @object_command.is_a?(String) ? @object_command : @name[/\w+$/]
+      Commands::ObjectCommands.create(command_name, @module)
       if (lib = Boson.libraries.find_by(:module=>Boson::Commands::ObjectCommands))
-        lib.commands << @name
-        Boson.commands << Command.create(@name, lib.name)
+        lib.commands << command_name
+        Boson.commands << Command.create(command_name, lib.name)
         lib.create_command_aliases
       end
     end
