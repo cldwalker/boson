@@ -53,20 +53,8 @@ module Boson
       Manager.activate(options)
     end
 
-    def start(args=ARGV)
-      if Boson::Manager.bin_init :discover=>args[0][/\w+/], :verbose=>true
-        if args[0].include?('.')
-          meth1, meth2 = args.shift.split('.', 2)
-          dispatcher = main_object.send(meth1)
-          args.unshift meth2
-        else
-          dispatcher = main_object
-        end
-        output = dispatcher.send(*args)
-        puts Hirb::View.render_output(output) || output.inspect
-      else
-        $stderr.puts "Error: No command found to execute"
-      end
+    def invoke(*args)
+      main_object.send(*args)
     end
   end
 end
