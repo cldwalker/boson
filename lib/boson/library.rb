@@ -53,7 +53,7 @@ module Boson
         rescue_load_action(source, :load) do
           lib = loader_create(source, options)
           if loaded?(lib.name)
-            puts "Library #{lib.name} already exists" if options[:verbose] && !options[:dependency]
+            $stderr.puts "Library #{lib.name} already exists" if options[:verbose] && !options[:dependency]
             false
           else
             if lib.load
@@ -67,8 +67,8 @@ module Boson
       end
 
       def loader_create(source, options={})
-        lib_class = Library.handle_blocks.find {|k,v| v.call(source) }[0] or raise(LoaderError, "Library #{source} not found.")
-        lib_class.new(:name=>source.to_s, :source=>source)
+        lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or raise(LoaderError, "Library #{source} not found.")
+        lib_class[0].new(:name=>source.to_s, :source=>source)
       end
 
       attr_accessor :handle_blocks

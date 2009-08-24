@@ -43,6 +43,32 @@ class Test::Unit::TestCase
     Boson::Library.loaded?(name).should == bool
   end
 
+  def library(name)
+    Boson.libraries.find_by(:name=>name)
+  end
+
+  def library_has_module(lib, lib_module)
+    Boson::Library.loaded?(lib).should == true
+    test_lib = library(lib)
+    (test_lib.module.is_a?(Module) && (test_lib.module.to_s == lib_module)).should == true
+  end
+
+  # mocks as a file library
+  def mock_library(lib, options={})
+    options[:file_string] ||= ''
+    File.expects(:exists?).with(Boson::Library.library_file(lib.to_s)).returns(true)
+    if options.delete(:no_module_eval)
+      Kernel.expects(:load).with { eval options.delete(:file_string); true}.returns(true)
+    else
+      File.expects(:read).returns(options.delete(:file_string))
+    end
+  end
+
+  def load(lib, options={})
+    mock_library(lib, options) unless options.delete(:no_mock)
+    Boson::Library.load([lib], options)
+  end
+
   def capture_stdout(&block)
     original_stdout = $stdout
     $stdout = fake = StringIO.new
