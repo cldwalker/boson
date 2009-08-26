@@ -4,10 +4,6 @@ module Boson
   class RunnerTest < Test::Unit::TestCase
 
   context "activate" do
-    def activate(*args)
-      Boson.activate(*args)
-    end
-
     before(:each) { reset_boson }
 
     # td: fake Util.detect_methods in Util.detect once it knows about current lib_module

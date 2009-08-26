@@ -2,8 +2,7 @@ module Boson
   module Runner
     extend self
     def bin_init(options={})
-      Hirb::View.enable(:config_file=>File.join(Boson.dir, 'config', 'hirb.yml'))
-      add_load_path
+      basic_init
       if main_method = options[:discover]
         libraries_to_load = boson_libraries + all_libraries.partition {|e| e =~ /#{main_method}/ }.flatten
         libraries_to_load.find {|e|
@@ -29,9 +28,14 @@ module Boson
       end
     end
 
-    def init(options={})
+    def basic_init
+      Hirb.enable(:config_file=>File.join(Boson.dir, 'config', 'hirb.yml'))
       add_load_path
+    end
+
+    def init(options={})
       Library.create all_libraries, options
+      basic_init
       load_default_libraries(options)
       @initialized = true
     end

@@ -10,6 +10,11 @@ class Test::Unit::TestCase
   # make local so it doesn't pick up my real boson dir
   Boson.dir = File.expand_path('.')
 
+  def activate(*args)
+    Hirb.stubs(:enable)
+    Boson.activate(*args)
+  end
+
   def reset_boson
     (Boson.instance_variables - ['@dir']).each do |e|
       Boson.instance_variable_set(e, nil)
