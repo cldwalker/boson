@@ -3,6 +3,11 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class LoaderTest < Test::Unit::TestCase
 
+    def load_namespace_library
+      $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
+      Library.load([Boson::Commands::Namespace])
+    end
+
     context "load" do
       before(:each) { reset_main_object; reset_libraries; reset_commands }
       test "calls included hook" do
@@ -56,12 +61,25 @@ module Boson
         end
       end
 
-      test "prints error for library with method conflicts" do
+      test "prints error for method conflicts with config error_method_conflicts" do
+        with_config(:error_method_conflicts=>true) do
+          load('chwhat', :file_string=>"module Chwhat; def chwhat; end; end")
+          capture_stderr {
+            load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
+          }.should =~ /Unable to load library chwhat2.*conflict.*chwhat/
+        end
+      end
+
+      test "namespaces a library that has a method conflict" do
+        load_namespace_library
         load('chwhat', :file_string=>"module Chwhat; def chwhat; end; end")
         capture_stderr {
           load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
-        }.should =~ /Unable to load library chwhat2.*conflict.*chwhat/
+        }.should == ''
+        library_has_command('namespace', 'chwhat2')
+        library_has_command('chwhat2', 'chwhat')
       end
+
       context "module library" do
         def mock_library(*args); end
 
@@ -111,11 +129,7 @@ module Boson
     end
 
     context "library with namespace" do
-      before(:all) {
-        reset_main_object
-        $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
-        reset_libraries; Library.load([Boson::Commands::Namespace])
-      }
+      before(:all) { reset_main_object; reset_libraries; load_namespace_library }
       before(:each) { reset_commands }
 
       test "loads and defaults to library name" do

@@ -9,7 +9,7 @@ module Boson
       load_init
       load_dependencies
       load_source_and_set_module
-      detect_additions { initialize_library_module } if @module
+      detect_additions { load_module_commands } if @module
       @call_methods.each {|m| Boson.invoke m }
       is_valid_library? && (@loaded = true)
     end
@@ -30,6 +30,16 @@ module Boson
 
     def load_init
       set_attributes load_attributes.merge(@config)
+    end
+
+    def load_module_commands
+        initialize_library_module
+    rescue MethodConflictError=>e
+      if Boson.config[:error_method_conflicts] || @namespace
+        raise MethodConflictError, e.message
+      else
+        (@namespace = true) && initialize_library_module
+      end
     end
 
     def is_valid_library?
@@ -59,7 +69,7 @@ module Boson
 
     def initialize_library_module
       @module = Util.constantize(@module) || raise(InvalidLibraryModuleError, "Module #{@module} doesn't exist")
-      check_for_method_conflicts
+      check_for_method_conflicts unless @force
       if @namespace
         create_namespace_command
         @commands += Boson.invoke(namespace_command).commands
@@ -70,7 +80,6 @@ module Boson
     end
 
     def check_for_method_conflicts
-      return if @force
       conflicts = @namespace ? (Boson.main_object.respond_to?(namespace_command) ? [namespace_command] : []) :
         Util.common_instance_methods(@module, Boson::Commands)
       unless conflicts.empty?
