@@ -110,7 +110,7 @@ module Boson
       end
     end
 
-    context "namespace_command" do
+    context "library with namespace" do
       before(:all) {
         reset_main_object
         $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
@@ -118,7 +118,7 @@ module Boson
       }
       before(:each) { reset_commands }
 
-      test "creates and defaults to library name" do
+      test "loads and defaults to library name" do
         with_config(:libraries=>{'blang'=>{:namespace=>true}}) do
           load 'blang', :file_string=>"module Blang; def bling; end; end"
           library_has_command('namespace', 'blang')
@@ -126,7 +126,7 @@ module Boson
         end
       end
 
-      test "creates with config namespace" do
+      test "loads with config namespace" do
         with_config(:libraries=>{'blung'=>{:namespace=>'dope'}}) do
           load 'blung', :file_string=>"module Blung; def bling; end; end"
           library_has_command('namespace', 'dope')
@@ -135,13 +135,23 @@ module Boson
         end
       end
 
-      test "creates with config except" do
+      test "loads with config except" do
         with_config(:libraries=>{'blong'=>{:namespace=>true, :except=>['blong']}}) do
           load 'blong', :file_string=>"module Blong; def bling; end; def blong; end; end"
           library_has_command('namespace', 'blong')
           library_has_command('blong', 'bling')
           library_has_command('blong', 'blong', false)
           library('blong').commands.size.should == 1
+        end
+      end
+
+      test "prints error if namespace conflicts with existing commands" do
+        eval "module Conflict; def bleng; end; end"
+        load Conflict, :no_mock=>true
+        with_config(:libraries=>{'bleng'=>{:namespace=>true}}) do
+          capture_stderr {
+            load 'bleng', :file_string=>"module Bleng; def bling; end; end"
+          }.should =~ /conflict.*bleng/
         end
       end
     end
