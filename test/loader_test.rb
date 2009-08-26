@@ -126,12 +126,22 @@ module Boson
         end
       end
 
-      test "creates with namespace_config" do
+      test "creates with config namespace" do
         with_config(:libraries=>{'blung'=>{:namespace=>'dope'}}) do
           load 'blung', :file_string=>"module Blung; def bling; end; end"
           library_has_command('namespace', 'dope')
           library_has_command('blung', 'bling')
           library('blung').commands.size.should == 1
+        end
+      end
+
+      test "creates with config except" do
+        with_config(:libraries=>{'blong'=>{:namespace=>true, :except=>['blong']}}) do
+          load 'blong', :file_string=>"module Blong; def bling; end; def blong; end; end"
+          library_has_command('namespace', 'blong')
+          library_has_command('blong', 'bling')
+          library_has_command('blong', 'blong', false)
+          library('blong').commands.size.should == 1
         end
       end
     end

@@ -81,12 +81,15 @@ module Boson
       @namespace_command ||= @namespace.is_a?(String) ? @namespace : @name[/\w+$/]
     end
 
+    def namespace_object
+      @namespace_object ||= @namespace ? Boson.invoke(namespace_command) : Boson.main_object
+    end
+
     def create_namespace_command
       Commands::Namespace.create(namespace_command, @module)
       if (lib = Boson.libraries.find_by(:module=>Boson::Commands::Namespace))
         lib.commands << namespace_command
-        Boson.commands << Command.create(namespace_command, lib.name)
-        lib.create_command_aliases
+        lib.create_commands([namespace_command])
       end
     end
   end

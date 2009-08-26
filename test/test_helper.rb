@@ -53,8 +53,8 @@ class Test::Unit::TestCase
     (test_lib.module.is_a?(Module) && (test_lib.module.to_s == lib_module)).should == true
   end
 
-  def library_has_command(lib, command)
-    (lib = library(lib)) && lib.commands.include?(command).should == true
+  def library_has_command(lib, command, bool=true)
+    (lib = library(lib)) && lib.commands.include?(command).should == bool
   end
 
   # mocks as a file library

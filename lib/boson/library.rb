@@ -125,7 +125,7 @@ module Boson
     def create_commands(commands=@commands)
       if @except
         commands -= @except
-        @except.each {|e| Boson.main_object.instance_eval("class<<self;self;end").send :undef_method, e }
+        @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
       commands.each {|e| Boson.commands << Command.create(e, @name)}
       create_command_aliases(commands) if commands.size > 0
