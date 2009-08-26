@@ -62,6 +62,7 @@ module Boson
       check_for_method_conflicts
       if @namespace
         create_namespace_command
+        @commands += Boson.invoke(namespace_command).commands
       else
         Boson::Commands.send :include, @module
         Boson::Commands.send :extend_object, Boson.main_object
@@ -76,12 +77,15 @@ module Boson
       end
     end
 
+    def namespace_command
+      @namespace_command ||= @namespace.is_a?(String) ? @namespace : @name[/\w+$/]
+    end
+
     def create_namespace_command
-      command_name = @namespace.is_a?(String) ? @namespace : @name[/\w+$/]
-      Commands::Namespace.create(command_name, @module)
+      Commands::Namespace.create(namespace_command, @module)
       if (lib = Boson.libraries.find_by(:module=>Boson::Commands::Namespace))
-        lib.commands << command_name
-        Boson.commands << Command.create(command_name, lib.name)
+        lib.commands << namespace_command
+        Boson.commands << Command.create(namespace_command, lib.name)
         lib.create_command_aliases
       end
     end

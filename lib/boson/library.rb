@@ -100,7 +100,7 @@ module Boson
         Boson.config[:commands][e][:alias] rescue nil
       }.compact
       @commands -= aliases
-      @commands.delete(@name) if @namespace
+      @commands.delete(namespace_command) if @namespace
     end
 
     def after_load(options)

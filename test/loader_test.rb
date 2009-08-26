@@ -2,9 +2,9 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
   class LoaderTest < Test::Unit::TestCase
-    before(:each) { reset_main_object; reset_libraries; reset_commands }
 
     context "load" do
+      before(:each) { reset_main_object; reset_libraries; reset_commands }
       test "calls included hook" do
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
@@ -62,56 +62,82 @@ module Boson
           load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
         }.should =~ /Unable to load library chwhat2.*conflict.*chwhat/
       end
-    end
+      context "module library" do
+        def mock_library(*args); end
 
-    context "module library" do
-      def mock_library(*args); end
-
-      test "loads a module library" do
-        eval %[module ::Harvey; def bird; end; end]
-        load ::Harvey, :no_mock=>true
-        library_has_module('harvey', "Harvey")
-        command_exists?('bird')
-      end
-    end
-
-    context "gem library" do
-      def mock_library(lib, options={})
-        options[:file_string] ||= ''
-        File.expects(:exists?).returns(false)
-        GemLibrary.expects(:is_a_gem?).returns(true)
-        Util.expects(:safe_require).with { eval options.delete(:file_string) || ''; true}.returns(true)
-      end
-
-      test "loads" do
-        with_config(:libraries=>{"dude"=>{:module=>'Dude'}}) do
-          load "dude", :file_string=>"module ::Dude; def blah; end; end"
-          library_has_module('dude', "Dude")
-          command_exists?("blah")
+        test "loads a module library" do
+          eval %[module ::Harvey; def bird; end; end]
+          load ::Harvey, :no_mock=>true
+          library_has_module('harvey', "Harvey")
+          command_exists?('bird')
         end
       end
 
-      test "with kernel methods loads" do
-        load "dude", :file_string=>"module ::Kernel; def dude; end; end"
-        library_loaded? 'dude'
-        library('dude').module.should == nil
-        command_exists?("dude")
+      context "gem library" do
+        def mock_library(lib, options={})
+          options[:file_string] ||= ''
+          File.expects(:exists?).returns(false)
+          GemLibrary.expects(:is_a_gem?).returns(true)
+          Util.expects(:safe_require).with { eval options.delete(:file_string) || ''; true}.returns(true)
+        end
+
+        test "loads" do
+          with_config(:libraries=>{"dude"=>{:module=>'Dude'}}) do
+            load "dude", :file_string=>"module ::Dude; def blah; end; end"
+            library_has_module('dude', "Dude")
+            command_exists?("blah")
+          end
+        end
+
+        test "with kernel methods loads" do
+          load "dude", :file_string=>"module ::Kernel; def dude; end; end"
+          library_loaded? 'dude'
+          library('dude').module.should == nil
+          command_exists?("dude")
+        end
+
+        test "prints error when nonexistent" do
+          capture_stderr { load('blah') }.should =~ /Unable.*load/
+        end
+
+        test "with invalid module prints error" do
+          with_config(:libraries=>{"coolio"=>{:module=>"Cool"}}) do
+            capture_stderr {
+              load('coolio', :file_string=>"module ::Coolio; def coolio; end; end")
+            }.should =~ /Unable.*coolio.*Module Cool/
+          end
+        end
+      end
+    end
+
+    context "namespace_command" do
+      before(:all) {
+        reset_main_object
+        $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
+        reset_libraries; Library.load([Boson::Commands::Namespace])
+      }
+      before(:each) { reset_commands }
+
+      test "creates and defaults to library name" do
+        with_config(:libraries=>{'blang'=>{:namespace=>true}}) do
+          load 'blang', :file_string=>"module Blang; def bling; end; end"
+          library_has_command('namespace', 'blang')
+          library_has_command('blang', 'bling')
+        end
       end
 
-      test "prints error when nonexistent" do
-        capture_stderr { load('blah') }.should =~ /Unable.*load/
-      end
-
-      test "with invalid module prints error" do
-        with_config(:libraries=>{"coolio"=>{:module=>"Cool"}}) do
-          capture_stderr {
-            load('coolio', :file_string=>"module ::Coolio; def coolio; end; end")
-          }.should =~ /Unable.*coolio.*Module Cool/
+      test "creates with namespace_config" do
+        with_config(:libraries=>{'blung'=>{:namespace=>'dope'}}) do
+          load 'blung', :file_string=>"module Blung; def bling; end; end"
+          library_has_command('namespace', 'dope')
+          library_has_command('blung', 'bling')
+          library('blung').commands.size.should == 1
         end
       end
     end
 
     context "reload_library" do
+      before(:each) { reset_main_object; reset_libraries; reset_commands }
       test "loads currently unloaded library" do
         Library.create(['blah'])
         Library.expects(:load_library).with('blah', anything)
