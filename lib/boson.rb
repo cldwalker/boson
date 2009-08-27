@@ -3,6 +3,7 @@ require 'hirb'
 require 'alias'
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 require 'boson/runner'
+require 'boson/runners/repl_runner'
 require 'boson/loader'
 require 'boson/library'
 # order of library subclasses matters
