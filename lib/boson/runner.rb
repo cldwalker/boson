@@ -29,7 +29,7 @@ module Boson
     end
 
     def basic_init
-      Hirb.enable(:config_file=>File.join(Boson.dir, 'config', 'hirb.yml'))
+      Hirb.enable(:config_file=>File.join(Boson.config_dir, 'hirb.yml'))
       add_load_path
     end
 
@@ -58,7 +58,7 @@ module Boson
     end
 
     def detected_libraries
-      Dir[File.join(Boson.dir, 'commands', '**/*.rb')].map {|e| e.gsub(/.*commands\//,'').gsub('.rb','') }
+      Dir[File.join(Boson.commands_dir, '**/*.rb')].map {|e| e.gsub(/.*commands\//,'').gsub('.rb','') }
     end
 
     def all_libraries

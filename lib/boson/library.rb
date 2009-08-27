@@ -44,9 +44,9 @@ module Boson
         yield
       rescue LoaderError=>e
         $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
-      rescue Exception
+      rescue Exception=>e
         $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{$!}"
-        $stderr.puts caller.slice(0,5).join("\n")
+        $stderr.puts e.backtrace.slice(0,3).join("\n")
       end
 
       def load_once(source, options={})
@@ -77,7 +77,7 @@ module Boson
       end
 
       def library_file(library)
-        File.join(Boson.dir, 'commands', library + ".rb")
+        File.join(Boson.commands_dir, library + ".rb")
       end
       #:startdoc:
     end

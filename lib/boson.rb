@@ -48,9 +48,17 @@ module Boson
     def config(reload=false)
       if reload || @config.nil?
         default = {:commands=>{}, :libraries=>{}, :command_aliases=>{}, :defaults=>[]}
-        @config = default.merge(YAML::load_file(Boson.dir + '/boson.yml')) rescue default
+        @config = default.merge(YAML::load_file(config_dir + '/boson.yml')) rescue default
       end
       @config
+    end
+
+    def config_dir
+      File.join(dir, 'config')
+    end
+
+    def commands_dir
+      File.join(dir, 'commands')
     end
 
     def activate(options={})
