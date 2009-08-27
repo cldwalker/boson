@@ -119,7 +119,7 @@ module Boson
 
     def after_reload
       Boson.commands.delete_if {|e| e.lib == @name } if @new_module
-      create_commands(@commands)
+      create_commands(@new_commands)
     end
 
     def create_commands(commands=@commands)

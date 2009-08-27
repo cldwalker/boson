@@ -47,6 +47,7 @@ module Boson
         File.stubs(:read).returns("module Blah; def bling; end; end")
         Library.reload_library('blah').should == true
         command_exists?('bling')
+        library('blah').commands.size.should == 2
       end
 
       test "with different module reloads" do
@@ -57,6 +58,7 @@ module Boson
         library_has_module('blah', "Boson::Commands::Bling")
         command_exists?('bling')
         command_exists?('blah', false)
+        library('blah').commands.size.should == 1
       end
       
     end

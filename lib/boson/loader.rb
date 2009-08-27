@@ -48,9 +48,11 @@ module Boson
     end
 
     def reload
+      original_commands = @commands
       @detect_methods = true #reload_init
       reload_source_and_set_module
       detect_additions { initialize_library_module } if @new_module
+      @new_commands = @commands - original_commands
       true
     end
 

@@ -32,17 +32,17 @@ module Boson
     end
 
     test "creates libraries in :libraries config" do
-      Boson.config[:libraries] = {'yada'=>{:detect_methods=>false}}
-      Library.expects(:create).with(['yada'], anything)
-      activate
-      Boson.config[:libraries] = {}
+      with_config :libraries=>{'yada'=>{:detect_methods=>false}} do
+        Library.expects(:create).with(['yada'], anything)
+        activate
+      end
     end
 
     test "loads libraries in :defaults config" do
-      Boson.config[:defaults] = ['yo']
-      Library.stubs(:load).with {|*args| args[0].empty? ? true : args[0].include?('yo') }
-      activate
-      Boson.config.delete(:defaults)
+      with_config(:defaults=>['yo']) do
+        Library.stubs(:load).with {|*args| args[0].empty? ? true : args[0].include?('yo') }
+        activate
+      end
     end
 
     test "doesn't call init twice" do
