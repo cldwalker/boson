@@ -38,6 +38,7 @@ module Boson
       if Boson.config[:error_method_conflicts] || @namespace
         raise MethodConflictError, e.message
       else
+        $stderr.puts "Unable to load library into global namespace. Attempting load into the namespace #{namespace_command}."
         (@namespace = true) && initialize_library_module
       end
     end
