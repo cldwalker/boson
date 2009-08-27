@@ -32,23 +32,34 @@ module Boson
         command_exists?('meatwad')
       end
 
-      test "creates aliases for commands" do
-        eval %[module ::Aquateen; def frylock; end; end]
-        with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
-          load_library :name=>'aquateen', :commands=>['frylock','meatwad'], :module=>Aquateen
-          library_loaded? 'aquateen'
-          Aquateen.method_defined?(:fr).should == true
-        end
-      end
+      context "command aliases" do
+        before(:each) { eval %[module ::Aquateen; def frylock; end; end] }
+        after(:each) { Object.send(:remove_const, "Aquateen") }
 
-      test "doesn't create aliases and warns for commands with no module" do
-        eval %[module ::Aquateen2; def frylock; end; end]
-        with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
-          capture_stderr { 
-            load_library(:name=>'aquateen', :commands=>['frylock','meatwad'])
-          }.should =~ /No aliases/
-          library_loaded? 'aquateen'
-          Aquateen2.method_defined?(:fr).should == false
+        test "created with command specific config" do
+          with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
+            load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
+            library_loaded? 'aquateen'
+            Aquateen.method_defined?(:fr).should == true
+          end
+        end
+
+        test "created with config command_aliases" do
+          with_config(:command_aliases=>{"frylock"=>"fr"}) do
+            load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
+            library_loaded? 'aquateen'
+            Aquateen.method_defined?(:fr).should == true
+          end
+        end
+
+        test "not created and warns for commands with no module" do
+          with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
+            capture_stderr {
+              load_library(:name=>'aquateen', :commands=>['frylock'])
+            }.should =~ /No aliases/
+            library_loaded? 'aquateen'
+            Aquateen.method_defined?(:fr).should == false
+          end
         end
       end
 

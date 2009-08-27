@@ -1,7 +1,9 @@
 module Boson
   class Command
     def self.create(name, library)
-      new (Boson.config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
+      attributes = (Boson.config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
+      attributes[:alias] = Boson.config[:command_aliases][name] if Boson.config[:command_aliases][name]
+      new attributes
     end
 
     def self.create_aliases(commands, lib_module)

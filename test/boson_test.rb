@@ -12,7 +12,7 @@ class BosonTest < Test::Unit::TestCase
     test "reads existing config correctly" do
       expected_hash = {:commands=>{'c1'=>{}}, :libraries=>{}}
       YAML.expects(:load_file).returns(expected_hash)
-      Boson.config.should == expected_hash
+      Boson.config[:commands]['c1'].should == {}
     end
 
     test "ignores nonexistent file and sets config defaults" do
