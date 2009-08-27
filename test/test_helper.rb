@@ -23,7 +23,7 @@ class Test::Unit::TestCase
     eval "module ::Boson::Commands; end"
     $".delete('boson/commands/core.rb') && require('boson/commands/core.rb')
     $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
-    Boson::Runner.instance_eval("@initialized = false")
+    Boson::ReplRunner.instance_eval("@initialized = false")
   end
 
   def reset_main_object

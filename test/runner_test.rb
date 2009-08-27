@@ -47,12 +47,12 @@ module Boson
 
     test "doesn't call init twice" do
       activate
-      Runner.expects(:init).never
+      ReplRunner.expects(:init).never
       activate
     end
 
     test "loads multiple libraries with :libraries option" do
-      Runner.expects(:init)
+      ReplRunner.expects(:init)
       Library.expects(:load).with([:lib1,:lib2], anything)
       activate(:libraries=>[:lib1, :lib2])
     end
