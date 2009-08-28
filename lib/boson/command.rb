@@ -18,16 +18,11 @@ module Boson
       Alias.manager.create_aliases(:instance_method, aliases_hash)
     end
 
+    attr_accessor :name, :lib, :alias
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
       @alias = hash[:alias] if hash[:alias]
-    end
-
-    attr_accessor :name, :lib, :alias
-
-    def to_hash
-      {:name=>@name, :lib=>@lib, :alias=>@alias}
     end
   end
 end

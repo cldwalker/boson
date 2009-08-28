@@ -82,14 +82,13 @@ module Boson
       #:startdoc:
     end
 
+    attr_reader :gems, :dependencies, :commands, :loaded, :module, :name
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError, "New library missing required key :name"
       @loaded = false
       @config = Boson.config[:libraries][@name] || {}
       set_attributes @config.merge(hash)
     end
-
-    attr_reader :gems, :dependencies, :commands, :loaded, :module, :name
 
     def set_attributes(hash)
       hash.each {|k,v| instance_variable_set("@#{k}", v)}
@@ -144,11 +143,6 @@ module Boson
           $stderr.puts "No aliases created for library #{@name} because it has no module"
         end
       end
-    end
-
-    def to_hash
-      [:name, :module, :gems, :dependencies, :loaded, :commands].
-        inject({}) {|h,e| h[e] = instance_variable_get("@#{e}"); h}
     end
   end
 end
