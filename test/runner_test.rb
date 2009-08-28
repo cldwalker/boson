@@ -2,6 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
   class RunnerTest < Test::Unit::TestCase
+    before(:all) { require 'boson/runners/bin_runner' }
     context "repl_runner" do
       def activate(*args)
         Hirb.stubs(:enable)
@@ -45,7 +46,6 @@ module Boson
         BinRunner.start(args)
       end
 
-      before(:all) { require 'boson/runners/bin_runner' }
       before(:all) { reset_boson }
 
       test "with no arguments prints usage" do
@@ -70,6 +70,27 @@ module Boson
         BinRunner.expects(:init).returns(true)
         BinRunner.expects(:render_output).with('done')
         start 'phone.home'
+      end
+    end
+
+    context "parse_args" do
+      test "parses option without value as true" do
+        BinRunner.parse_args(['it', '-o']).should == ["it", {:o=>true}, []]
+      end
+
+      test "parses option with =value" do
+        BinRunner.parse_args(['it', '-o=cool']).should == ["it", {:o=>'cool'}, []]
+      end
+
+      test "passes multiple arguments" do
+        BinRunner.parse_args(['que','hora','es']).should == ['que', {}, ['hora','es']]
+      end
+
+      test "parses options anywhere" do
+        expected = ['it', {:o=>'d'}, ['github']]
+        BinRunner.parse_args(['it', '-o=d', 'github']).should == expected
+        BinRunner.parse_args(['-o=d', 'it', 'github']).should == expected
+        BinRunner.parse_args(['it', 'github', '-o=d']).should == expected
       end
     end
   end

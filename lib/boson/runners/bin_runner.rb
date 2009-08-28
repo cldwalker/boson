@@ -33,6 +33,18 @@ module Boson
         end
       end
 
+      # taken from rip
+      def parse_args(args)
+        options, args = args.partition { |piece| piece =~ /^-/ }
+        command = args.shift
+        options = options.inject({}) do |hash, flag|
+          key, value = flag.split('=')
+          hash[key.sub(/^--?/,'').intern] = value.nil? ? true : value
+          hash
+        end
+        [command, options, args]
+      end
+
       def render_output(output)
         puts Hirb::View.render_output(output) || output.inspect
       end
