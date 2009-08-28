@@ -1,13 +1,19 @@
 module Boson
   module Commands
     module Core
-      def commands(*args)
-        render Boson.commands.search(*args).map {|e| e.to_hash}, :fields=>[:name, :lib, :alias, :description]
+      def commands(query='', options={})
+        options = {:fields=>[:name, :lib, :alias],:search_field=>:name}.merge(options)
+        search_field = options.delete(:search_field)
+        results = Boson.commands.select {|f| f.send(search_field) =~ /#{query}/ }
+        render results, options
       end
 
-      def libraries(query=nil)
-        render Boson.libraries.search(query, :loaded=>true).map {|e| e.to_hash},
-         :fields=>[:name, :loaded, :commands, :gems], :filters=>{:gems=>lambda {|e| e.join(',')}, :commands=>:size}
+      def libraries(query='', options={})
+        options = {:fields=>[:name, :loaded, :commands, :gems], :search_field=>:name,
+          :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
+        search_field = options.delete(:search_field)
+        results = Boson.libraries.select {|f| f.send(search_field) =~ /#{query}/ }
+        render results, options
       end
     
       def load_library(library, options={})

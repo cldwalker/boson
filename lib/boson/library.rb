@@ -17,7 +17,7 @@ module Boson
       end
 
       def reload_library(source, options={})
-        if (lib = Boson.libraries.find_by(:name=>source))
+        if (lib = Boson.library(source))
           if lib.loaded
             command_size = Boson.commands.size
             if (result = rescue_load_action(lib.name, :reload) { lib.reload })
@@ -37,7 +37,7 @@ module Boson
 
       #:stopdoc:
       def loaded?(lib_name)
-        ((lib = Boson.libraries.find_by(:name=>lib_name)) && lib.loaded) ? true : false
+        ((lib = Boson.library(lib_name)) && lib.loaded) ? true : false
       end
 
       def rescue_load_action(library, load_method)
@@ -132,9 +132,7 @@ module Boson
     end
 
     def add_library
-      if (existing_lib = Boson.libraries.find_by(:name => @name))
-        Boson.libraries.delete(existing_lib)
-      end
+      Boson.libraries.delete(Boson.library(@name))
       Boson.libraries << self
     end
 

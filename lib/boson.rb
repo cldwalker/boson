@@ -14,7 +14,6 @@ require 'boson/command'
 require 'boson/util'
 require 'boson/commands/core'
 require 'boson/commands/namespace'
-require 'boson/searchable_array'
 
 module Boson
   extend self
@@ -22,11 +21,19 @@ module Boson
   alias_method :higgs, :main_object
 
   def libraries
-    @libraries ||= SearchableArray.new
+    @libraries ||= Array.new
+  end
+
+  def library(query, attribute='name')
+    libraries.find {|e| e.send(attribute) == query }
   end
 
   def commands
-    @commands ||= SearchableArray.new
+    @commands ||= Array.new
+  end
+
+  def command(query, attribute='name')
+    commands.find {|e| e.send(attribute) == query }
   end
 
   def dir

@@ -100,7 +100,7 @@ module Boson
 
     def create_namespace_command
       Commands::Namespace.create(namespace_command, @module)
-      if (lib = Boson.libraries.find_by(:module=>Boson::Commands::Namespace))
+      if (lib = Boson.library(Boson::Commands::Namespace, :module))
         lib.commands << namespace_command
         lib.create_commands([namespace_command])
       end

@@ -19,7 +19,7 @@ module Boson
     end
 
     def self.loaded?(name)
-      Boson.commands.find_by(:name=>name).is_a?(Boson::Command)
+      Boson.command(name).is_a?(Boson::Command)
     end
 
     def initialize(hash)

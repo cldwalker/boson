@@ -49,7 +49,7 @@ class Test::Unit::TestCase
   end
 
   def library(name)
-    Boson.libraries.find_by(:name=>name)
+    Boson.library(name)
   end
 
   def library_has_module(lib, lib_module)
