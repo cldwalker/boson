@@ -15,7 +15,11 @@ module Boson
         results = Boson.libraries.select {|f| f.send(search_field) =~ /#{query}/ }
         render results, options
       end
-    
+
+      def unloaded_libraries
+        (Boson::Runner.all_libraries - Boson.libraries.map {|e| e.name }).sort
+      end
+
       def load_library(library, options={})
         Boson::Library.load_library(library, {:verbose=>true}.merge!(options))
       end

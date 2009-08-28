@@ -16,14 +16,10 @@ class Test::Unit::TestCase
   end
 
   def reset_boson
-    (Boson.instance_variables - ['@dir']).each do |e|
-      Boson.instance_variable_set(e, nil)
-    end
     Boson.send :remove_const, "Commands"
     eval "module ::Boson::Commands; end"
     $".delete('boson/commands/core.rb') && require('boson/commands/core.rb')
     $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
-    Boson::ReplRunner.instance_eval("@initialized = false")
   end
 
   def reset_main_object
@@ -41,7 +37,7 @@ class Test::Unit::TestCase
   end
 
   def command_exists?(name, bool=true)
-    Boson::Command.loaded?(name).should == bool
+    !!Boson.command(name).should == bool
   end
 
   def library_loaded?(name, bool=true)
