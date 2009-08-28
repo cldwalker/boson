@@ -16,6 +16,7 @@ require 'boson/commands/core'
 require 'boson/commands/namespace'
 
 module Boson
+  module Universe; end
   extend self
   attr_accessor :dir, :main_object, :config
   alias_method :higgs, :main_object
@@ -41,7 +42,7 @@ module Boson
   end
 
   def main_object=(value)
-    @main_object = value.extend(Commands)
+    @main_object = value.extend(Universe)
   end
 
   # ==== Valid config keys:

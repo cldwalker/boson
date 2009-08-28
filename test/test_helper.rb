@@ -15,16 +15,15 @@ class Test::Unit::TestCase
     Boson.activate(*args)
   end
 
-  def reload_commands
-    Boson.send :remove_const, "Commands"
-    eval "module ::Boson::Commands; end"
-    $".delete('boson/commands/core.rb') && require('boson/commands/core.rb')
-    $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
+  def reset
+    reset_main_object
+    reset_boson
   end
 
   def reset_main_object
-    Boson.send :remove_const, "Commands"
-    eval "module ::Boson::Commands; end"
+    Boson.send :remove_const, "Universe"
+    eval "module ::Boson::Universe; end"
+    Boson::Commands.send :remove_const, "Blah" if Boson::Commands.const_defined?("Blah")
     Boson.main_object = Object.new
   end
 

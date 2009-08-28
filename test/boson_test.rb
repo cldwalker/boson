@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 class BosonTest < Test::Unit::TestCase
   context "config" do
-    before(:all) { reset_boson; reload_commands; activate }
+    before(:all) { reset; activate }
     before(:each) { Boson.instance_variable_set("@config", nil) }
 
     test "reloads config when passed true" do

@@ -77,14 +77,14 @@ module Boson
         create_namespace_command
         @commands += Boson.invoke(namespace_command).commands
       else
-        Boson::Commands.send :include, @module
-        Boson::Commands.send :extend_object, Boson.main_object
+        Boson::Universe.send :include, @module
+        Boson::Universe.send :extend_object, Boson.main_object
       end
     end
 
     def check_for_method_conflicts
       conflicts = @namespace ? (Boson.main_object.respond_to?(namespace_command) ? [namespace_command] : []) :
-        Util.common_instance_methods(@module, Boson::Commands)
+        Util.common_instance_methods(@module, Boson::Universe)
       unless conflicts.empty?
         raise MethodConflictError,"The following commands conflict with existing commands: #{conflicts.join(', ')}"
       end

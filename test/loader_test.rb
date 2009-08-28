@@ -4,12 +4,11 @@ module Boson
   class LoaderTest < Test::Unit::TestCase
 
     def load_namespace_library
-      $".delete('boson/commands/namespace.rb') && require('boson/commands/namespace.rb')
       Library.load([Boson::Commands::Namespace])
     end
 
     context "load" do
-      before(:each) { reset_main_object; reset_boson }
+      before(:each) { reset }
       test "calls included hook" do
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
@@ -63,16 +62,16 @@ module Boson
 
       test "prints error for method conflicts with config error_method_conflicts" do
         with_config(:error_method_conflicts=>true) do
-          load('chwhat', :file_string=>"module Chwhat; def chwhat; end; end")
+          load('blah', :file_string=>"module Blah; def chwhat; end; end")
           capture_stderr {
-            load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
-          }.should =~ /Unable to load library chwhat2.*conflict.*chwhat/
+            load('chwhat', :file_string=>"module Chwhat; def chwhat; end; end")
+          }.should =~ /Unable to load library chwhat.*conflict.*chwhat/
         end
       end
 
       test "namespaces a library that has a method conflict" do
         load_namespace_library
-        load('chwhat', :file_string=>"module Chwhat; def chwhat; end; end")
+        load('blah', :file_string=>"module Blah; def chwhat; end; end")
         capture_stderr {
           load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
         }.should =~ /Unable.*chwhat2/
@@ -171,7 +170,7 @@ module Boson
     end
 
     context "reload_library" do
-      before(:each) { reset_main_object; reset_boson }
+      before(:each) { reset }
       test "loads currently unloaded library" do
         Library.create(['blah'])
         Library.expects(:load_library).with('blah', anything)
