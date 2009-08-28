@@ -71,7 +71,7 @@ module Boson
   end
 
   def activate(options={})
-    ReplRunner.activate(options)
+    ReplRunner.start(options)
   end
 
   def invoke(*args)

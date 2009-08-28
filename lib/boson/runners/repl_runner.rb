@@ -1,7 +1,7 @@
 module Boson
   class ReplRunner < Runner
     class <<self
-      def activate(options={})
+      def start(options={})
         init(options) unless @initialized
         Library.load(options[:libraries], options) if options[:libraries]
       end
