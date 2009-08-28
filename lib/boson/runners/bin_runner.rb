@@ -9,11 +9,24 @@ module Boson
       end
 
       def discover_command(command, options)
-        libraries_to_load = boson_libraries + all_libraries.partition {|e| e =~ /#{command}/ }.flatten
+        libraries_to_load.find {|e|
+          if (lib = Library.quick_load(e, options)) && lib.commands.include?(command)
+            lib.load_dependencies
+            lib.after_load(options)
+          end
+          Boson.main_object.respond_to? command
+        }
+      end
+
+      def full_discover_command(command, options)
         libraries_to_load.find {|e|
           Library.load [e], options
           Boson.main_object.respond_to? command
         }
+      end
+
+      def libraries_to_load
+        boson_libraries + all_libraries.partition {|e| e =~ /#{@command}/ }.flatten
       end
 
       def start(args=ARGV)
