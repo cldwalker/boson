@@ -3,7 +3,8 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class RunnerTest < Test::Unit::TestCase
     context "repl_runner" do
-      before(:each) { reset_libraries; reset_commands; reset_boson; Boson::ReplRunner.instance_eval("@initialized = false") }
+      before(:all) { reload_commands }
+      before(:each) { reset_boson; Boson::ReplRunner.instance_eval("@initialized = false") }
 
       test "loads default irb library when irb exists" do
         eval %[module ::IRB; module ExtendCommandBundle; end; end]

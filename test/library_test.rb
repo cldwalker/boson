@@ -10,7 +10,7 @@ module Boson
         Library.load([hash[:name]])
       end
 
-      before(:each) { reset_libraries; reset_commands}
+      before(:each) { reset_boson }
 
       test "loads basic library" do
         load_library :name=>'blah'

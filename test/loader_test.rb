@@ -9,7 +9,7 @@ module Boson
     end
 
     context "load" do
-      before(:each) { reset_main_object; reset_libraries; reset_commands }
+      before(:each) { reset_main_object; reset_boson }
       test "calls included hook" do
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
@@ -129,8 +129,8 @@ module Boson
     end
 
     context "library with namespace" do
-      before(:all) { reset_main_object; reset_libraries; load_namespace_library }
-      before(:each) { reset_commands }
+      before(:all) { reset_main_object; load_namespace_library }
+      before(:each) { reset_boson }
 
       test "loads and defaults to library name" do
         with_config(:libraries=>{'blang'=>{:namespace=>true}}) do
@@ -171,7 +171,7 @@ module Boson
     end
 
     context "reload_library" do
-      before(:each) { reset_main_object; reset_libraries; reset_commands }
+      before(:each) { reset_main_object; reset_boson }
       test "loads currently unloaded library" do
         Library.create(['blah'])
         Library.expects(:load_library).with('blah', anything)

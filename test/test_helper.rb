@@ -15,7 +15,7 @@ class Test::Unit::TestCase
     Boson.activate(*args)
   end
 
-  def reset_boson
+  def reload_commands
     Boson.send :remove_const, "Commands"
     eval "module ::Boson::Commands; end"
     $".delete('boson/commands/core.rb') && require('boson/commands/core.rb')
@@ -28,12 +28,13 @@ class Test::Unit::TestCase
     Boson.main_object = Object.new
   end
 
-  def reset_libraries
-    Boson.instance_eval("@libraries = nil")
+  def reset_boson
+    reset_libraries
+    Boson.instance_eval("@commands = nil")
   end
 
-  def reset_commands
-    Boson.instance_eval("@commands = nil")
+  def reset_libraries
+    Boson.instance_eval("@libraries = nil")
   end
 
   def command_exists?(name, bool=true)
