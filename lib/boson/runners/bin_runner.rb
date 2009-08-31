@@ -3,12 +3,14 @@ module Boson
     class <<self
       def init(options={})
         super
-        if @command = options[:discover][/\w+/]
-          discover_command(@command, options)
-        end
+        options[:quick_discover] ? quick_discover_command(@command, options) : discover_command(@command, options)
       end
 
-      def discover_command(command, options)
+      def default_options
+        {:quick_discover=>false, :verbose=>true}
+      end
+
+      def quick_discover_command(command, options)
         libraries_to_load.find {|e|
           if (lib = Library.quick_load(e, options)) && lib.commands.include?(command)
             lib.load_dependencies
@@ -18,7 +20,7 @@ module Boson
         }
       end
 
-      def full_discover_command(command, options)
+      def discover_command(command, options)
         libraries_to_load.find {|e|
           Library.load [e], options
           Boson.main_object.respond_to? command
@@ -31,19 +33,26 @@ module Boson
 
       def start(args=ARGV)
         return print_usage if args.empty?
-        if init :discover=>args[0], :verbose=>true
-          if args[0].include?('.')
-            meth1, meth2 = args.shift.split('.', 2)
-            dispatcher = Boson.invoke(meth1)
-            args.unshift meth2
-          else
-            dispatcher = Boson.main_object
-          end
-          output = dispatcher.send(*args)
+        @command, @options, @args = parse_args(args)
+        process_options
+        @command, @subcommand = @command.split('.', 2) if @command.include?('.')
+        if init @options
+          dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
+          output = dispatcher.send(@subcommand || @command, *@args)
           render_output(output)
         else
           $stderr.puts "Error: Command #{@command} not found."
         end
+      end
+
+      def process_options
+        possible_options = default_options.keys
+        @options.each {|k,v|
+          if (match = possible_options.find {|e| e.to_s =~ /^#{k}/ })
+            @options[match] = @options.delete(k)
+          end
+        }
+        @options = default_options.merge(@options)
       end
 
       # taken from rip
