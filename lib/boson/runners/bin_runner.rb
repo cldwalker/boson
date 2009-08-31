@@ -3,11 +3,19 @@ module Boson
     class <<self
       def init(options={})
         super
-        options[:quick_discover] ? quick_discover_command(@command, options) : discover_command(@command, options)
+        Library.load boson_libraries
+        if options.delete(:index)
+          if index && (found = index.find {|lib, commands| commands.include?(@full_command) })
+            Library.load_library found[0], options
+          end
+          true
+        else
+          options[:quick_discover] ? quick_discover_command(@command, options) : discover_command(@command, options)
+        end
       end
 
       def default_options
-        {:quick_discover=>false, :verbose=>true}
+        {:quick_discover=>false, :verbose=>true, :index=>false}
       end
 
       def quick_discover_command(command, options)
@@ -28,13 +36,14 @@ module Boson
       end
 
       def libraries_to_load
-        boson_libraries + all_libraries.partition {|e| e =~ /#{@command}/ }.flatten
+        all_libraries.partition {|e| e =~ /^#{@command}/ }.flatten
       end
 
       def start(args=ARGV)
         return print_usage if args.empty?
         @command, @options, @args = parse_args(args)
         process_options
+        @full_command = @command
         @command, @subcommand = @command.split('.', 2) if @command.include?('.')
         if init @options
           dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object

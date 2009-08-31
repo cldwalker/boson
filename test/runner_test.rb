@@ -9,7 +9,7 @@ module Boson
         Boson.activate(*args)
       end
 
-      before(:all) { reset_boson }
+      before(:all) { reset }
       before(:each) { Boson::ReplRunner.instance_eval("@initialized = false") }
 
       test "loads default irb library when irb exists" do
@@ -46,7 +46,7 @@ module Boson
         BinRunner.start(args)
       end
 
-      before(:all) { reset_boson }
+      before(:all) { reset }
 
       test "with no arguments prints usage" do
         capture_stdout { start }.should =~ /^boson/

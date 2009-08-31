@@ -28,6 +28,11 @@ module Boson
         Boson::Library.reload_library(name, {:verbose=>true}.merge!(options))
       end
 
+      def index
+        Boson::Runner.index_commands
+        puts "Indexed #{Boson.libraries.size} libraries and #{Boson.commands.size} commands."
+      end
+
       def render(object, options={})
         options[:class] = options.delete(:as) || :auto_table
         ::Hirb::Console.render_output(object, options)

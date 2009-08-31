@@ -76,7 +76,7 @@ module Boson
 
       def loader_create(source, options={})
         lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or raise(LoaderError, "Library #{source} not found.")
-        lib_class[0].new(:name=>source.to_s, :source=>source)
+        lib_class[0].new(:name=>source.to_s, :source=>source, :options=>options)
       end
 
       attr_accessor :handle_blocks
@@ -92,7 +92,8 @@ module Boson
 
     attr_reader :gems, :dependencies, :commands, :loaded, :module, :name
     def initialize(hash)
-      @name = hash[:name] or raise ArgumentError, "New library missing required key :name"
+      @name = hash.delete(:name) or raise ArgumentError, "New library missing required key :name"
+      @options = hash.delete(:options) || {}
       @loaded = false
       @config = Boson.config[:libraries][@name] || {}
       set_attributes @config.merge(hash)
@@ -150,6 +151,19 @@ module Boson
         if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
           $stderr.puts "No aliases created for library #{@name} because it has no module"
         end
+      end
+    end
+
+    def all_commands
+      names = Boson.commands.select {|e| e.lib == @name }.map {|e| [e.name, e.alias]}.flatten.compact
+      if @namespace
+        namespaces = [@namespace]
+        if (namespace_obj = Boson.command(@namespace)) && namespace_obj.alias
+          namespaces << namespace_obj.alias
+        end
+        namespaces.map {|e| names.map {|f| "#{e}.#{f}"}}.flatten
+      else
+        names
       end
     end
   end
