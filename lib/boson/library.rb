@@ -154,17 +154,16 @@ module Boson
       end
     end
 
-    def all_commands
-      names = Boson.commands.select {|e| e.lib == @name }.map {|e| [e.name, e.alias]}.flatten.compact
-      if @namespace
-        namespaces = [@namespace]
-        if (namespace_obj = Boson.command(@namespace)) && namespace_obj.alias
-          namespaces << namespace_obj.alias
-        end
-        namespaces.map {|e| names.map {|f| "#{e}.#{f}"}}.flatten
-      else
-        names
-      end
+    def library_type
+      str = self.class.to_s[/::(\w+)Library$/, 1] || 'library'
+      str.downcase.to_sym
+    end
+
+    def marshalize
+      @namespace_object = @source = nil
+      @module = @module.to_s
+      @loaded = false
+      self
     end
   end
 end

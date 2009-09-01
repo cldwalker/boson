@@ -5,8 +5,9 @@ module Boson
         super
         Library.load boson_libraries
         if options.delete(:index)
-          if index && (found = index.find {|lib, commands| commands.include?(@full_command) })
-            Library.load_library found[0], options
+          command_to_search = @subcommand || @command
+          if index && (found = Boson.commands.find {|e| [e.name, e.alias].include?(command_to_search) })
+            Library.load_library found.lib, options
           end
           true
         else

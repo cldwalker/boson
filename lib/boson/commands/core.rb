@@ -9,7 +9,7 @@ module Boson
       end
 
       def libraries(query='', options={})
-        options = {:fields=>[:name, :loaded, :commands, :gems], :search_field=>:name,
+        options = {:fields=>[:name, :commands, :gems, :library_type], :search_field=>:name,
           :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
         search_field = options.delete(:search_field)
         results = Boson.libraries.select {|f| f.send(search_field) =~ /#{query}/ }

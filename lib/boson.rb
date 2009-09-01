@@ -20,7 +20,7 @@ require 'boson/commands/namespace'
 module Boson
   module Universe; end
   extend self
-  attr_accessor :dir, :main_object, :config
+  attr_accessor :dir, :main_object, :config, :commands, :libraries
   alias_method :higgs, :main_object
 
   def libraries

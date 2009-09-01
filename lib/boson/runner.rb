@@ -29,13 +29,17 @@ module Boson
       end
 
       def marshal_write
-        marshal_string = Marshal.dump Boson.libraries.map {|e| [e.name, e.all_commands] }
+        marshal_string = Marshal.dump [Boson.libraries.map {|e| e.dup.marshalize }, Boson.commands]
         File.open(marshal_file, 'w') {|f| f.write marshal_string }
       end
 
       def marshal_read
         if File.exists?(marshal_file)
-          Marshal.load(File.read(marshal_file))
+          new_libraries, new_commands = Marshal.load(File.read(marshal_file))
+          existing_libraries = Boson.libraries.map {|e| e.name}
+          Boson.libraries += new_libraries.select {|e| !existing_libraries.include?(e.name)}
+          existing_commands = Boson.commands.map {|e| e.name}
+          Boson.commands += new_commands.select {|e| !existing_commands.include?(e.name)}
         end
       end
 
