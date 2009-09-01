@@ -48,17 +48,16 @@ module Boson
       end
 
       def download(url)
-        require 'fileutils'
-        FileUtils.mkdir_p(File.join(Boson.dir,'downloads'))
-        response = get(url)
         filename = determine_download_name(url)
-        File.open(filename, 'w') { |f| f.write response }
+        File.open(filename, 'w') { |f| f.write get(url) }
         filename
       end
 
       private
       def determine_download_name(url)
         require 'uri'
+        FileUtils.mkdir_p(File.join(Boson.dir,'downloads'))
+
         basename = URI.parse(url).path.split('/')[-1]
         basename = URI.parse(url).host.sub('www.','') if basename.nil? || basename.empty?
         filename = File.join(Boson.dir, 'downloads', basename)

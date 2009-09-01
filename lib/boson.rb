@@ -1,6 +1,8 @@
 require 'yaml'
 require 'hirb'
 require 'alias'
+require 'fileutils'
+
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 require 'boson/runner'
 require 'boson/runners/repl_runner'
@@ -63,7 +65,7 @@ module Boson
   end
 
   def config_dir
-    File.join(dir, 'config')
+    @config_dir ||= FileUtils.mkdir_p File.join(dir, 'config')
   end
 
   def commands_dir
