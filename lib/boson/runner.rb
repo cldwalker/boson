@@ -1,7 +1,7 @@
 module Boson
   class Runner
     class<<self
-      def init(options={})
+      def init
         Hirb.enable(:config_file=>File.join(Boson.config_dir, 'hirb.yml'))
         add_load_path
       end
@@ -48,7 +48,7 @@ module Boson
       end
 
       def index_commands
-        Library.load([Boson::Commands::Namespace] + all_libraries, :index=>true)
+        Library.load(all_libraries, :index=>true)
         marshal_write
       end
     end

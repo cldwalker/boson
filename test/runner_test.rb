@@ -53,7 +53,7 @@ module Boson
       end
 
       test "with undiscovered command prints error" do
-         BinRunner.expects(:discover_command).with('blah', anything).returns(false)
+         BinRunner.expects(:load_command_from_index).returns(false)
         capture_stderr { start('blah') }.should =~ /Error.*blah/
       end
 

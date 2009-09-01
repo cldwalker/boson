@@ -1,22 +1,51 @@
 module Boson
   class BinRunner < Runner
     class <<self
-      def init(options={})
-        super
-        Library.load boson_libraries
-        if options.delete(:index)
-          command_to_search = @subcommand || @command
-          if index && (found = Boson.commands.find {|e| [e.name, e.alias].include?(command_to_search) })
-            Library.load_library found.lib, options
-          end
-          true
+      def start(args=ARGV)
+        return print_usage if args.empty?
+        @command, @options, @args = parse_args(args)
+        process_options
+        @command, @subcommand = @command.split('.', 2) if @command.include?('.')
+        if init
+          dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
+          output = dispatcher.send(@subcommand || @command, *@args)
+          render_output(output)
         else
-          options[:quick_discover] ? quick_discover_command(@command, options) : discover_command(@command, options)
+          $stderr.puts "Error: Command #{@command} not found."
         end
       end
 
+      def init
+        super
+        Library.load boson_libraries, @options
+        @options.delete(:discover) ? load_command_by_discovery : load_command_from_index
+        command_defined? @command
+      end
+
+      def command_defined?(command)
+        Boson.main_object.respond_to? command
+      end
+
+      def load_command_from_index
+        find_lambda = @subcommand ? method(:is_namespace_command) : lambda {|e| [e.name, e.alias].include?(@command)}
+        if !@options[:index] && index
+          if !command_defined?(@command) && (found = Boson.commands.find(&find_lambda))
+            Library.load_library found.lib, @options
+          end
+        else
+          puts "Indexing commands ..."
+          index_commands
+        end
+      end
+
+      def is_namespace_command(cmd)
+        [cmd.name, cmd.alias].include?(@subcommand) &&
+        (command = Boson.commands.find {|f| f.name == @command && f.lib == 'namespace'} || Boson.command(@command, :alias)) &&
+        cmd.lib[/\w+$/] == command.name
+      end
+
       def default_options
-        {:quick_discover=>false, :verbose=>true, :index=>false}
+        {:discover=>false, :verbose=>true, :index=>false}
       end
 
       def quick_discover_command(command, options)
@@ -29,30 +58,15 @@ module Boson
         }
       end
 
-      def discover_command(command, options)
+      def load_command_by_discovery
         libraries_to_load.find {|e|
-          Library.load [e], options
-          Boson.main_object.respond_to? command
+          Library.load [e], @options
+          command_defined? @command
         }
       end
 
       def libraries_to_load
         all_libraries.partition {|e| e =~ /^#{@command}/ }.flatten
-      end
-
-      def start(args=ARGV)
-        return print_usage if args.empty?
-        @command, @options, @args = parse_args(args)
-        process_options
-        @full_command = @command
-        @command, @subcommand = @command.split('.', 2) if @command.include?('.')
-        if init @options
-          dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
-          output = dispatcher.send(@subcommand || @command, *@args)
-          render_output(output)
-        else
-          $stderr.puts "Error: Command #{@command} not found."
-        end
       end
 
       def process_options
@@ -78,7 +92,8 @@ module Boson
       end
 
       def render_output(output)
-        puts Hirb::View.render_output(output) || output.inspect
+        return if output.nil?
+        puts Hirb::View.render_output(output) || output
       end
 
       def print_usage
