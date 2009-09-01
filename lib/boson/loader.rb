@@ -17,7 +17,7 @@ module Boson
     def load_dependencies
       @created_dependencies = @dependencies.map do |e|
         next if Library.loaded?(e)
-        Library.load_once(e, :dependency=>true) ||
+        Library.load_once(e, @options.merge(:dependency=>true)) ||
           raise(LoadingDependencyError, "Can't load dependency #{e}")
       end.compact
     end

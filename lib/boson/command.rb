@@ -15,6 +15,10 @@ module Boson
           aliases_hash[lib_module.to_s][e.name] = e.alias
         end
       end
+      generate_aliases(aliases_hash)
+    end
+
+    def self.generate_aliases(aliases_hash)
       Alias.manager.create_aliases(:instance_method, aliases_hash)
     end
 

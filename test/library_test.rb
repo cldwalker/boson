@@ -38,17 +38,17 @@ module Boson
 
         test "created with command specific config" do
           with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
+            Command.expects(:generate_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
             load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
             library_loaded? 'aquateen'
-            Aquateen.method_defined?(:fr).should == true
           end
         end
 
         test "created with config command_aliases" do
           with_config(:command_aliases=>{"frylock"=>"fr"}) do
+            Command.expects(:generate_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
             load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
             library_loaded? 'aquateen'
-            Aquateen.method_defined?(:fr).should == true
           end
         end
 

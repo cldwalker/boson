@@ -20,7 +20,7 @@ module Boson
         if (lib = Boson.library(source))
           if lib.loaded
             command_size = Boson.commands.size
-            if (result = rescue_load_action(lib.name, :reload) { lib.reload })
+            if (result = rescue_load_action(lib.name, :reload, options) { lib.reload })
               lib.after_reload
               puts "Reloaded library #{source}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
             end
@@ -40,17 +40,21 @@ module Boson
         ((lib = Boson.library(lib_name)) && lib.loaded) ? true : false
       end
 
-      def rescue_load_action(library, load_method)
+      def rescue_load_action(library, load_method, options={})
         yield
       rescue LoaderError=>e
-        $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
+        print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}", options
       rescue Exception=>e
-        $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{$!}"
-        $stderr.puts e.backtrace.slice(0,3).join("\n")
+        print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" +
+          e.backtrace.slice(0,3).join("\n"), options
+      end
+
+      def print_error_message(message, options)
+        $stderr.puts message if !options[:index] || (options[:index] && options[:verbose])
       end
 
       def load_once(source, options={})
-        rescue_load_action(source, :load) do
+        rescue_load_action(source, :load, options) do
           lib = loader_create(source, options)
           if loaded?(lib.name)
             $stderr.puts "Library #{lib.name} already exists" if options[:verbose] && !options[:dependency]

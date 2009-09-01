@@ -28,7 +28,7 @@ module Boson
 
       def load_command_from_index
         find_lambda = @subcommand ? method(:is_namespace_command) : lambda {|e| [e.name, e.alias].include?(@command)}
-        if !@options[:index] && index
+        if !@options[:index_create] && index
           if !command_defined?(@command) && (found = Boson.commands.find(&find_lambda))
             Library.load_library found.lib, @options
           end
@@ -45,7 +45,7 @@ module Boson
       end
 
       def default_options
-        {:discover=>false, :verbose=>true, :index=>false}
+        {:discover=>false, :verbose=>false, :index_create=>false}
       end
 
       def load_command_by_discovery
@@ -79,7 +79,11 @@ module Boson
 
       def render_output(output)
         return if output.nil?
-        puts Hirb::View.render_output(output) || output
+        if output.is_a?(Array)
+          Boson.invoke :render, output
+        else
+          puts Hirb::View.render_output(output) || output
+        end
       end
 
       def print_usage
