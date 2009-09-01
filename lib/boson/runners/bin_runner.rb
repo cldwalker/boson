@@ -48,25 +48,11 @@ module Boson
         {:discover=>false, :verbose=>true, :index=>false}
       end
 
-      def quick_discover_command(command, options)
-        libraries_to_load.find {|e|
-          if (lib = Library.quick_load(e, options)) && lib.commands.include?(command)
-            lib.load_dependencies
-            lib.after_load(options)
-          end
-          Boson.main_object.respond_to? command
-        }
-      end
-
       def load_command_by_discovery
-        libraries_to_load.find {|e|
+        all_libraries.partition {|e| e =~ /^#{@command}/ }.flatten.find {|e|
           Library.load [e], @options
           command_defined? @command
         }
-      end
-
-      def libraries_to_load
-        all_libraries.partition {|e| e =~ /^#{@command}/ }.flatten
       end
 
       def process_options

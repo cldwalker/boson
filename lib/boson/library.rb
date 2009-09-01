@@ -49,14 +49,6 @@ module Boson
         $stderr.puts e.backtrace.slice(0,3).join("\n")
       end
 
-      def quick_load(source, options={})
-        rescue_load_action(source, :quick_load) do
-          lib = loader_create(source, options)
-          lib.quick_load
-          lib
-        end
-      end
-
       def load_once(source, options={})
         rescue_load_action(source, :load) do
           lib = loader_create(source, options)
