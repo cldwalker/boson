@@ -141,12 +141,12 @@ module Boson
     end
 
     def create_command_aliases(commands=@commands)
-      if @module
-        Command.create_aliases(commands, @module)
-      else
-        if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
-          $stderr.puts "No aliases created for library #{@name} because it has no module"
-        end
+      @module ? Command.create_aliases(commands, @module) : check_for_uncreated_aliases
+    end
+
+    def check_for_uncreated_aliases
+      if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
+        $stderr.puts "No aliases created for library #{@name} because it has no module"
       end
     end
 

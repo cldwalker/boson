@@ -25,7 +25,7 @@ module Boson
     def load_source_and_set_module; end
 
     def load_attributes
-      {:detect_methods=>true, :gems=>[], :commands=>[], :call_methods=>[], :dependencies=>[]}
+      {:detect_methods=>true, :gems=>[], :commands=>[], :call_methods=>[], :dependencies=>[], :detect_object_methods=>true}
     end
 
     def load_init
@@ -61,12 +61,10 @@ module Boson
     end
 
     def detect_additions(options={}, &block)
-      options = {:record_detections=>true}.merge!(options)
-      detected = Util.detect(options.merge(:detect_methods=>@detect_methods), &block)
-      if options[:record_detections]
-        @gems += detected[:gems] if detected[:gems]
-        @commands += detected[:methods]
-      end
+      options.merge!(:detect_methods=>@detect_methods, :detect_object_methods=>@detect_object_methods)
+      detected = Util.detect(options, &block)
+      @gems += detected[:gems] if detected[:gems]
+      @commands += detected[:methods]
       detected
     end
 

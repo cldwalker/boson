@@ -13,5 +13,7 @@ module Boson
     def load_source_and_set_module
       detect_additions { Util.safe_require @name }
     end
+
+    def check_for_uncreated_aliases; end
   end
 end
