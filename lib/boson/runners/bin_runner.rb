@@ -28,13 +28,18 @@ module Boson
 
       def load_command_from_index
         find_lambda = @subcommand ? method(:is_namespace_command) : lambda {|e| [e.name, e.alias].include?(@command)}
-        if !@options[:index_create] && index
-          if !command_defined?(@command) && (found = Boson.commands.find(&find_lambda))
-            Library.load_library found.lib, @options
-          end
-        else
+        load_index(@options[:index_create]) unless @command == 'index' && @subcommand.nil?
+        if !command_defined?(@command) && (found = Boson.commands.find(&find_lambda))
+          Library.load_library found.lib, @options
+        end
+      end
+
+      def load_index(force=false)
+        if !File.exists?(marshal_file) || force
           puts "Indexing commands ..."
-          index_commands
+          index_commands(@options)
+        else
+          marshal_read
         end
       end
 
