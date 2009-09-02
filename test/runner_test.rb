@@ -52,6 +52,10 @@ module Boson
         capture_stdout { start }.should =~ /^boson/
       end
 
+      test "with option but no arguments prints usage" do
+        capture_stdout { start '-v' }.should =~ /^boson/
+      end
+
       test "with undiscovered command prints error" do
          BinRunner.expects(:load_command_by_index).returns(false)
         capture_stderr { start('blah') }.should =~ /Error.*blah/

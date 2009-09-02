@@ -2,8 +2,8 @@ module Boson
   class BinRunner < Runner
     class <<self
       def start(args=ARGV)
-        return print_usage if args.empty?
         @command, @options, @args = parse_args(args)
+        return print_usage if args.empty? || @command.nil?
         process_options
         @original_command = @command
         @command, @subcommand = @command.split('.', 2) if @command.include?('.')
