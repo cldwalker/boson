@@ -5,20 +5,30 @@ module Boson
         return print_usage if args.empty?
         @command, @options, @args = parse_args(args)
         process_options
+        @original_command = @command
         @command, @subcommand = @command.split('.', 2) if @command.include?('.')
-        if init
-          dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
-          output = dispatcher.send(@subcommand || @command, *@args)
-          render_output(output)
+        if init || @options[:execute]
+          execute_command
         else
           $stderr.puts "Error: Command #{@command} not found."
         end
       end
 
+      def execute_command
+        if @options[:execute]
+          Boson.main_object.instance_eval "#{@original_command} #{@args.join(' ')}"
+        else
+          dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
+          output = dispatcher.send(@subcommand || @command, *@args)
+          render_output(output)
+        end
+      end
+
       def init
         super
-        Library.load boson_libraries, @options
-        @options.delete(:discover) ? load_command_by_discovery : load_command_from_index
+        Library.load boson_libraries, load_options
+        @options[:load] ? load_command_by_option : (@options[:discover] ?
+          load_command_by_discovery : load_command_by_index)
         command_defined? @command
       end
 
@@ -26,18 +36,26 @@ module Boson
         Boson.main_object.respond_to? command
       end
 
-      def load_command_from_index
+      def load_command_by_option
+        Library.load @options[:load].split(/\s*,\s*/), load_options
+      end
+
+      def load_command_by_index
         find_lambda = @subcommand ? method(:is_namespace_command) : lambda {|e| [e.name, e.alias].include?(@command)}
         load_index(@options[:index_create]) unless @command == 'index' && @subcommand.nil?
         if !command_defined?(@command) && (found = Boson.commands.find(&find_lambda))
-          Library.load_library found.lib, @options
+          Library.load_library found.lib, load_options
         end
+      end
+
+      def load_options
+        @load_options ||= {:verbose=>@options[:verbose]}
       end
 
       def load_index(force=false)
         if !File.exists?(marshal_file) || force
           puts "Indexing commands ..."
-          index_commands(@options)
+          index_commands(load_options)
         else
           marshal_read
         end
@@ -50,12 +68,12 @@ module Boson
       end
 
       def default_options
-        {:discover=>false, :verbose=>false, :index_create=>false}
+        {:discover=>false, :verbose=>false, :index_create=>false, :execute=>false, :load=>false}
       end
 
       def load_command_by_discovery
         all_libraries.partition {|e| e =~ /^#{@command}/ }.flatten.find {|e|
-          Library.load [e], @options
+          Library.load [e], load_options
           command_defined? @command
         }
       end
