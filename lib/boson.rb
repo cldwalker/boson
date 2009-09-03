@@ -16,6 +16,7 @@ require 'boson/libraries/require_library'
 require 'boson/command'
 require 'boson/util'
 require 'boson/commands/core'
+require 'boson/commands/web_core'
 require 'boson/commands/namespace'
 
 module Boson
