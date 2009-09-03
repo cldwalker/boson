@@ -4,7 +4,7 @@ module Boson
       def commands(query='', options={})
         options = {:fields=>[:name, :lib, :alias],:search_field=>:name}.merge(options)
         search_field = options.delete(:search_field)
-        results = Boson.commands.select {|f| f.send(search_field) =~ /#{query}/ }
+        results = ::Boson.commands.select {|f| f.send(search_field) =~ /#{query}/ }
         render results, options
       end
 
@@ -12,25 +12,25 @@ module Boson
         options = {:fields=>[:name, :commands, :gems, :library_type], :search_field=>:name,
           :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
         search_field = options.delete(:search_field)
-        results = Boson.libraries.select {|f| f.send(search_field) =~ /#{query}/ }
+        results = ::Boson.libraries.select {|f| f.send(search_field) =~ /#{query}/ }
         render results, options
       end
 
       def unloaded_libraries
-        (Boson::Runner.all_libraries - Boson.libraries.map {|e| e.name }).sort
+        (::Boson::Runner.all_libraries - ::Boson.libraries.map {|e| e.name }).sort
       end
 
       def load_library(library, options={})
-        Boson::Library.load_library(library, {:verbose=>true}.merge!(options))
+        ::Boson::Library.load_library(library, {:verbose=>true}.merge!(options))
       end
 
       def reload_library(name, options={})
-        Boson::Library.reload_library(name, {:verbose=>true}.merge!(options))
+        ::Boson::Library.reload_library(name, {:verbose=>true}.merge!(options))
       end
 
       def index
-        Boson::Runner.index_commands
-        puts "Indexed #{Boson.libraries.size} libraries and #{Boson.commands.size} commands."
+        ::Boson::Runner.index_commands
+        puts "Indexed #{::Boson.libraries.size} libraries and #{::Boson.commands.size} commands."
       end
 
       def render(object, options={})
@@ -44,24 +44,24 @@ module Boson
 
       def get(url)
         require 'net/http'
-        Net::HTTP.get(URI.parse(url))
+        ::Net::HTTP.get(::URI.parse(url))
       end
 
       def download(url)
         filename = determine_download_name(url)
-        File.open(filename, 'w') { |f| f.write get(url) }
+        ::File.open(filename, 'w') { |f| f.write get(url) }
         filename
       end
 
       private
       def determine_download_name(url)
         require 'uri'
-        FileUtils.mkdir_p(File.join(Boson.dir,'downloads'))
+        ::FileUtils.mkdir_p(::File.join(::Boson.dir,'downloads'))
 
-        basename = URI.parse(url).path.split('/')[-1]
-        basename = URI.parse(url).host.sub('www.','') if basename.nil? || basename.empty?
-        filename = File.join(Boson.dir, 'downloads', basename)
-        filename += "-#{Time.now.strftime("%m_%d_%y_%H_%M_%S")}" if File.exists?(filename)
+        basename = ::URI.parse(url).path.split('/')[-1]
+        basename = ::URI.parse(url).host.sub('www.','') if basename.nil? || basename.empty?
+        filename = ::File.join(::Boson.dir, 'downloads', basename)
+        filename += "-#{::Time.now.strftime("%m_%d_%y_%H_%M_%S")}" if ::File.exists?(filename)
         filename
       end
     end

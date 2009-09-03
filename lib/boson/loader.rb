@@ -69,7 +69,7 @@ module Boson
     end
 
     def initialize_library_module
-      @module = @class_commands ? Util.create_module(Boson::Commands, @name[/\w+$/]) : Util.constantize(@module)
+      @module = @module ? Util.constantize(@module) : Util.create_module(Boson::Commands, @name[/\w+$/])
       raise(InvalidLibraryModuleError, "No module for library #{@name}") unless @module
       create_class_commands unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
