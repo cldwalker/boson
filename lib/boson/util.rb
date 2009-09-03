@@ -35,7 +35,7 @@ module Boson
     end
 
     def detect(options={}, &block)
-      options = {:methods=>true, :detect_object_methods=>true}.merge!(options)
+      options = {:methods=>true, :object_methods=>true}.merge!(options)
       original_gems = Gem.loaded_specs.keys if Object.const_defined? :Gem
       original_object_methods = Object.instance_methods
       original_instance_methods = Boson.main_object.instance_eval("class<<self;self;end").instance_methods
@@ -44,7 +44,7 @@ module Boson
       detected = {}
       detected[:methods] = options[:methods] ? (Boson.main_object.instance_eval("class<<self;self;end").instance_methods -
         original_instance_methods) : []
-      detected[:methods] -= (Object.instance_methods - original_object_methods) unless options[:detect_object_methods]
+      detected[:methods] -= (Object.instance_methods - original_object_methods) unless options[:object_methods]
       detected[:gems] = Gem.loaded_specs.keys - original_gems if Object.const_defined? :Gem
       detected[:modules] = modules - original_modules if options[:modules]
       detected
