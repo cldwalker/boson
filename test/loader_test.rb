@@ -15,8 +15,8 @@ module Boson
         }.should =~ /included blah/
       end
 
-      test "calls methods in config call_methods" do
-        with_config(:libraries=>{"blah"=>{:call_methods=>['blah']}}) do
+      test "calls methods in config init_methods" do
+        with_config(:libraries=>{"blah"=>{:init_methods=>['blah']}}) do
           capture_stdout {
             load :blah, :file_string=>"module Blah; def blah; puts 'yo'; end; end"
           }.should == "yo\n"

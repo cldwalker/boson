@@ -10,7 +10,7 @@ module Boson
       load_dependencies
       load_source_and_set_module
       detect_additions { load_module_commands } if @module || @class_commands
-      @call_methods.each {|m| Boson.invoke m } unless @options[:index]
+      @init_methods.each {|m| Boson.invoke m } if @init_methods && !@options[:index]
       is_valid_library? && (@loaded = true)
     end
 
@@ -25,7 +25,7 @@ module Boson
     def load_source_and_set_module; end
 
     def load_attributes
-      {:gems=>[], :commands=>[], :call_methods=>[], :dependencies=>[], :detect_object_methods=>true}
+      {:gems=>[], :commands=>[], :dependencies=>[], :detect_object_methods=>true}
     end
 
     def load_init
