@@ -12,7 +12,7 @@ module Boson
               end
               # private
               def obj.method_missing(method, *args, &block)
-                ::Boson.main_object.send(method, *args, &block)
+                ::Boson.invoke(method, *args, &block)
               end
               obj
             end

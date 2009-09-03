@@ -77,8 +77,8 @@ module Boson
     ReplRunner.start(options)
   end
 
-  def invoke(*args)
-    main_object.send(*args)
+  def invoke(*args, &block)
+    main_object.send(*args, &block)
   end
 end
 
