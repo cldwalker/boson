@@ -12,7 +12,7 @@ module Boson
     end
 
     test "unloaded_libraries detect libraries in :libraries config" do
-      with_config :libraries=>{'yada'=>{:detect_methods=>false}} do
+      with_config :libraries=>{'yada'=>{}} do
         @higgs.unloaded_libraries.should == ['yada']
       end
     end
