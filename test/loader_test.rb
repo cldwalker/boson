@@ -121,7 +121,7 @@ module Boson
           with_config(:libraries=>{"coolio"=>{:module=>"Cool"}}) do
             capture_stderr {
               load('coolio', :file_string=>"module ::Coolio; def coolio; end; end")
-            }.should =~ /Unable.*coolio.*Module Cool/
+            }.should =~ /Unable.*coolio.*No module/
           end
         end
       end

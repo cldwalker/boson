@@ -66,5 +66,12 @@ module Boson
     def common_instance_methods(module1, module2)
       (module1.instance_methods + module1.private_instance_methods) & (module2.instance_methods + module2.private_instance_methods)
     end
+
+    def create_module(base_module, name)
+      desired_class = camelize(name)
+      if (suffix = ([""] + (1..10).to_a).find {|e| !base_module.const_defined?(desired_class+e)})
+        base_module.const_set(desired_class+suffix, Module.new)
+      end
+    end
   end
 end

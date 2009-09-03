@@ -9,7 +9,7 @@ module Boson
       load_init
       load_dependencies
       load_source_and_set_module
-      detect_additions { load_module_commands } if @module
+      detect_additions { load_module_commands } if @module || @class_commands
       @call_methods.each {|m| Boson.invoke m } unless @options[:index]
       is_valid_library? && (@loaded = true)
     end
@@ -51,7 +51,7 @@ module Boson
       original_commands = @commands
       @detect_methods = true #reload_init
       reload_source_and_set_module
-      detect_additions { initialize_library_module } if @new_module
+      detect_additions { load_module_commands } if @new_module
       @new_commands = @commands - original_commands
       true
     end
@@ -69,7 +69,9 @@ module Boson
     end
 
     def initialize_library_module
-      @module = Util.constantize(@module) || raise(InvalidLibraryModuleError, "Module #{@module} doesn't exist")
+      @module = @class_commands ? Util.create_module(Boson::Commands, @name[/\w+$/]) : Util.constantize(@module)
+      raise(InvalidLibraryModuleError, "No module for library #{@name}") unless @module
+      create_class_commands unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
       if @namespace
         create_namespace_command
@@ -78,6 +80,10 @@ module Boson
         Boson::Universe.send :include, @module
         Boson::Universe.send :extend_object, Boson.main_object
       end
+    end
+
+    def create_class_commands
+      Alias.manager.create_aliases(:class_to_instance_method, @module.to_s=>@class_commands.invert)
     end
 
     def check_for_method_conflicts
