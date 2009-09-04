@@ -3,8 +3,12 @@ module Boson
     class <<self
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
-        return print_usage if args.empty? || @command.nil?
         process_options
+        return print_usage if args.empty? || (!@options[:repl] && @command.nil?)
+        @options[:repl] ? load_repl : load_command
+      end
+
+      def load_command
         @original_command = @command
         @command, @subcommand = @command.split('.', 2) if @command.include?('.')
         if init || @options[:execute]
@@ -12,6 +16,15 @@ module Boson
         else
           $stderr.puts "Error: Command #{@command} not found."
         end
+      end
+
+      def load_repl
+        require 'tempfile'
+        string = "$: << 'lib'; require 'rubygems'; require 'boson'; Boson::Library.load #{boson_libraries.inspect}"
+        string += "; Boson::Library.load #{@options[:load].split(/\s*,\s*/).inspect}" if @options[:load]
+        tempfile = 'boson_irbrc.rb'
+        File.open(File.join(Dir.tmpdir, tempfile) , 'w') {|f| f.write string }
+        exec "irb -f -I #{Dir.tmpdir} -r #{tempfile}"
       end
 
       def execute_command
@@ -68,7 +81,7 @@ module Boson
       end
 
       def default_options
-        {:discover=>false, :verbose=>false, :index_create=>false, :execute=>false, :load=>false}
+        {:discover=>false, :verbose=>false, :index_create=>false, :execute=>false, :load=>false, :repl=>false}
       end
 
       def load_command_by_discovery
