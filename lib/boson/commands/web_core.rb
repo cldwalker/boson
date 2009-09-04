@@ -1,12 +1,23 @@
 module Boson::Commands::WebCore
   def get(url)
-    require 'net/http'
-    ::Net::HTTP.get(::URI.parse(url))
+    %w{uri net/http}.each {|e| require e }
+    Net::HTTP.get(URI.parse(url))
+  rescue
+    raise "Error opening #{url}"
+  end
+
+  def install(url, name=nil, force=false)
+    name ||= strip_name_from_url(url)
+    return "Please give a library name with this url." unless name
+    filename = File.join Boson.commands_dir, "#{name}.rb"
+    return "Library name #{name} already exists. Try a different name." if File.exists?(filename) && !force
+    File.open(filename, 'w') {|f| f.write get(url) }
+    "Saved to #{filename}."
   end
 
   def download(url)
     filename = determine_download_name(url)
-    ::File.open(filename, 'w') { |f| f.write get(url) }
+    File.open(filename, 'w') { |f| f.write get(url) }
     filename
   end
 
@@ -16,14 +27,15 @@ module Boson::Commands::WebCore
   end
 
   private
-  def determine_download_name(url)
-    require 'uri'
-    ::FileUtils.mkdir_p(::File.join(::Boson.dir,'downloads'))
+  def strip_name_from_url(url)
+    url[/\/([^\/.]+)(\.[a-z]+)?$/, 1]
+  end
 
-    basename = ::URI.parse(url).path.split('/')[-1]
-    basename = ::URI.parse(url).host.sub('www.','') if basename.nil? || basename.empty?
-    filename = ::File.join(::Boson.dir, 'downloads', basename)
-    filename += "-#{::Time.now.strftime("%m_%d_%y_%H_%M_%S")}" if ::File.exists?(filename)
+  def determine_download_name(url)
+    FileUtils.mkdir_p(File.join(Boson.dir,'downloads'))
+    basename = strip_name_from_url(url) || url.sub(/^[a-z]+:\/\//,'').tr('/','-')
+    filename = File.join(Boson.dir, 'downloads', basename)
+    filename += "-#{Time.now.strftime("%m_%d_%y_%H_%M_%S")}" if File.exists?(filename)
     filename
   end
 end
