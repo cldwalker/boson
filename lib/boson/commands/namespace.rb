@@ -4,7 +4,7 @@ module Boson::Commands::Namespace
       def #{name}
         @#{name} ||= begin
           obj = Object.new
-          obj.instance_eval("class<<self;self;end").send :include, #{lib_module}
+          class << obj; include #{lib_module} end
           def obj.commands
             #{lib_module}.instance_methods
           end
