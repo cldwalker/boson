@@ -74,5 +74,9 @@ module Boson
         base_module.const_set(desired_class+suffix, Module.new)
       end
     end
+
+    def which(command)
+      ENV['PATH'].split(File::PATH_SEPARATOR).map {|e| File.join(e, command) }.find {|e| File.exists?(e) }
+    end
   end
 end

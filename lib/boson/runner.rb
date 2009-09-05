@@ -24,6 +24,10 @@ module Boson
         (detected_libraries + Boson.config[:libraries].keys).uniq
       end
 
+      def unalias_libraries(libs)
+        libs ? libs.split(/\s*,\s*/) : []
+      end
+
       def marshal_file
         File.join(Boson.config_dir, 'commands.db')
       end

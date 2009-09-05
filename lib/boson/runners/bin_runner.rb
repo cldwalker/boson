@@ -5,7 +5,7 @@ module Boson
         @command, @options, @args = parse_args(args)
         process_options
         return print_usage if args.empty? || (!@options[:repl] && @command.nil?)
-        @options[:repl] ? load_repl : load_command
+        @options[:repl] ? ReplRunner.bin_start(@options[:repl], unalias_libraries(@options[:load])) : load_command
       end
 
       def load_command
@@ -16,15 +16,6 @@ module Boson
         else
           $stderr.puts "Error: Command #{@command} not found."
         end
-      end
-
-      def load_repl
-        require 'tempfile'
-        string = "$: << 'lib'; require 'rubygems'; require 'boson'; Boson::Library.load #{boson_libraries.inspect}"
-        string += "; Boson::Library.load #{@options[:load].split(/\s*,\s*/).inspect}" if @options[:load]
-        tempfile = 'boson_irbrc.rb'
-        File.open(File.join(Dir.tmpdir, tempfile) , 'w') {|f| f.write string }
-        exec "irb -f -I #{Dir.tmpdir} -r #{tempfile}"
       end
 
       def execute_command
@@ -50,7 +41,7 @@ module Boson
       end
 
       def load_command_by_option
-        Library.load @options[:load].split(/\s*,\s*/), load_options
+        Library.load unalias_libraries(@options[:load]), load_options
       end
 
       def load_command_by_index
