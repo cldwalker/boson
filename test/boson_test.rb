@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 class BosonTest < Test::Unit::TestCase
   context "config" do
     before(:all) { reset }
-    before(:each) { Boson.instance_variable_set("@config", nil) }
+    before(:each) { Boson.repo.config = nil }
 
     test "reloads config when passed true" do
       Boson.config.object_id.should_not == Boson.config(true).object_id

@@ -6,6 +6,7 @@ require 'fileutils'
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 require 'boson/runner'
 require 'boson/runners/repl_runner'
+require 'boson/repo'
 require 'boson/loader'
 require 'boson/library'
 # order of library subclasses matters
@@ -22,7 +23,7 @@ require 'boson/commands/namespace'
 module Boson
   module Universe; end
   extend self
-  attr_accessor :dir, :main_object, :config, :commands, :libraries
+  attr_accessor :main_object, :commands, :libraries
   alias_method :higgs, :main_object
 
   def libraries
@@ -42,7 +43,11 @@ module Boson
   end
 
   def dir
-    @dir ||= File.expand_path(File.exists?('.boson') ? '.boson' : "#{ENV['HOME']}/.boson")
+    repo.dir
+  end
+
+  def repo
+    @repo ||= Repo.new("#{ENV['HOME']}/.boson")
   end
 
   def main_object=(value)
@@ -59,15 +64,11 @@ module Boson
   #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
   #                           When set to true, the library fails to load explicitly. Default is false.
   def config(reload=false)
-    if reload || @config.nil?
-      default = {:commands=>{}, :libraries=>{}, :command_aliases=>{}, :defaults=>[]}
-      @config = default.merge(YAML::load_file(config_dir + '/boson.yml')) rescue default
-    end
-    @config
+    repo.config(reload)
   end
 
   def config_dir
-    @config_dir ||= FileUtils.mkdir_p File.join(dir, 'config')
+    repo.config_dir
   end
 
   def commands_dir

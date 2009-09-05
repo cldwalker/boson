@@ -8,7 +8,7 @@ require 'boson'
 
 class Test::Unit::TestCase
   # make local so it doesn't pick up my real boson dir
-  Boson.dir = File.expand_path('.')
+  Boson.repo.dir = File.expand_path('.')
 
   def reset
     reset_main_object
@@ -82,9 +82,9 @@ class Test::Unit::TestCase
 
   def with_config(options)
     old_config = Boson.config
-    Boson.config = Boson.config.merge(options)
+    Boson.repo.config = Boson.config.merge(options)
     yield
-    Boson.config = old_config
+    Boson.repo.config = old_config
   end
 
   def capture_stderr(&block)
