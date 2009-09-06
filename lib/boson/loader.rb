@@ -82,7 +82,7 @@ module Boson
     end
 
     def create_class_commands
-      Alias.manager.create_aliases(:class_to_instance_method, @module.to_s=>@class_commands.invert)
+      Alias.manager.create_aliases(:any_to_instance_method, @module.to_s=>@class_commands.invert)
     end
 
     def check_for_method_conflicts
