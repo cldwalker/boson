@@ -17,8 +17,7 @@ module Boson
       self.class.library_file(@name, @repo)
     end
 
-    def initialize(hash)
-      super
+    def set_repo
       @repo = self.class.matched_repo
     end
 

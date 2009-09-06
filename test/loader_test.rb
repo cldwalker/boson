@@ -74,7 +74,7 @@ module Boson
         load('blah', :file_string=>"module Blah; def chwhat; end; end")
         capture_stderr {
           load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
-        }.should =~ /Unable.*chwhat2/
+        }.should =~ /conflict.*chwhat.*chwhat2/
         library_has_command('namespace', 'chwhat2')
         library_has_command('chwhat2', 'chwhat')
       end

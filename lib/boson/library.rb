@@ -87,8 +87,12 @@ module Boson
       @name = hash.delete(:name) or raise ArgumentError, "New library missing required key :name"
       @options = hash.delete(:options) || {}
       @loaded = false
-      @repo = Boson.repo
+      set_repo
       set_attributes (@repo.config[:libraries][@name] || {}).merge(hash), true
+    end
+
+    def set_repo
+      @repo = Boson.repo
     end
 
     def set_attributes(hash, force=false)
