@@ -91,17 +91,17 @@ module Boson
       @name = hash.delete(:name) or raise ArgumentError, "New library missing required key :name"
       @options = hash.delete(:options) || {}
       @loaded = false
-      @config = Boson.config[:libraries][@name] || {}
-      set_attributes @config.merge(hash)
+      @repo = Boson.repo
+      set_attributes (@repo.config[:libraries][@name] || {}).merge(hash), true
     end
 
-    def set_attributes(hash)
-      hash.each {|k,v| instance_variable_set("@#{k}", v)}
+    def set_attributes(hash, force=false)
+      hash.each {|k,v| instance_variable_set("@#{k}", v) if instance_variable_get("@#{k}").nil? || force }
     end
 
     def set_library_commands
       aliases = @commands.map {|e|
-        Boson.config[:commands][e][:alias] rescue nil
+        @repo.config[:commands][e][:alias] rescue nil
       }.compact
       @commands -= aliases
       @commands.delete(namespace_command) if @namespace
@@ -131,7 +131,7 @@ module Boson
         commands -= @except
         @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
-      commands.each {|e| Boson.commands << Command.create(e, @name)}
+      commands.each {|e| Boson.commands << Command.create(e, @name, @repo)}
       create_command_aliases(commands) if commands.size > 0
     end
 
@@ -156,7 +156,7 @@ module Boson
     end
 
     def marshalize
-      @namespace_object = @source = nil
+      @repo = @namespace_object = @source = nil
       @module = @module.to_s
       @loaded = false
       self

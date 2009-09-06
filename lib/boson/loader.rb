@@ -29,7 +29,7 @@ module Boson
     end
 
     def load_init
-      set_attributes load_attributes.merge(@config)
+      set_attributes load_attributes
     end
 
     def load_module_commands
