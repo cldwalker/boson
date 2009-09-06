@@ -9,6 +9,7 @@ require 'boson'
 class Test::Unit::TestCase
   # make local so it doesn't pick up my real boson dir
   Boson.repo.dir = File.expand_path('.')
+  Boson.instance_variable_set "@repos", [Boson.repo]
 
   def reset
     reset_main_object

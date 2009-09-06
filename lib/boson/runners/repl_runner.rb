@@ -22,7 +22,7 @@ module Boson
         super
         defaults = boson_libraries
         defaults << IRB::ExtendCommandBundle if Object.const_defined?(:IRB) && IRB.const_defined?(:ExtendCommandBundle)
-        defaults += Boson.config[:defaults] unless @options[:no_defaults]
+        defaults += Boson.repos.map {|e| e.config[:defaults] }.flatten unless @options[:no_defaults]
         Library.load(defaults, @options)
         @initialized = true
       end
