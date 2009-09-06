@@ -10,7 +10,7 @@ module Boson
       load_dependencies
       load_source_and_set_module
       detect_additions { load_module_commands } if @module || @class_commands
-      @init_methods.each {|m| Boson.invoke m } if @init_methods && !@options[:index]
+      @init_methods.each {|m| Boson.invoke(m) if Boson.main_object.respond_to?(m) } if @init_methods && !@options[:index]
       is_valid_library? && (@loaded = true)
     end
 
