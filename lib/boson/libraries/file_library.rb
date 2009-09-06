@@ -1,6 +1,26 @@
 module Boson
   class FileLibrary < Library
-    handles {|source| File.exists?(library_file(source.to_s)) }
+    def self.library_file(library, repo=Boson.repo)
+      File.join(repo.commands_dir, library + ".rb")
+    end
+
+    def self.matched_repo; @repo; end
+
+    handles {|source|
+      @repo = Boson.repos.find {|e|
+        File.exists? library_file(source.to_s, e)
+      }
+      !!@repo
+    }
+
+    def library_file
+      self.class.library_file(@name, @repo)
+    end
+
+    def initialize(hash)
+      super
+      @repo = self.class.matched_repo
+    end
 
     def load_init
       super
@@ -9,10 +29,10 @@ module Boson
 
     def load_source
       if @no_module_eval
-        Kernel.load self.class.library_file(@name)
+        Kernel.load library_file
       else
-        library_string = File.read(self.class.library_file(@name))
-        Commands.module_eval(library_string, self.class.library_file(@name))
+        library_string = File.read(library_file)
+        Commands.module_eval(library_string, library_file)
       end
     end
 

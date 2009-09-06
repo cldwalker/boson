@@ -93,7 +93,7 @@ module Boson
       context "gem library" do
         def mock_library(lib, options={})
           options[:file_string] ||= ''
-          File.expects(:exists?).returns(false)
+          File.stubs(:exists?).returns(false)
           GemLibrary.expects(:is_a_gem?).returns(true)
           Util.expects(:safe_require).with { eval options.delete(:file_string) || ''; true}.returns(true)
         end

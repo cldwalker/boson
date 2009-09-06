@@ -79,10 +79,6 @@ module Boson
       def handles(&block)
         (Library.handle_blocks ||= []) << [self,block]
       end
-
-      def library_file(library)
-        File.join(Boson.commands_dir, library + ".rb")
-      end
       #:startdoc:
     end
 

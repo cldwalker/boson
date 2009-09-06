@@ -9,6 +9,10 @@ module Boson
       @config_dir ||= FileUtils.mkdir_p File.join(dir, 'config')
     end
 
+    def commands_dir
+      File.join(dir, 'commands')
+    end
+
     def config(reload=false)
       if reload || @config.nil?
         default = {:commands=>{}, :libraries=>{}, :command_aliases=>{}, :defaults=>[]}

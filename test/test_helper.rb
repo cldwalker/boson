@@ -56,7 +56,7 @@ class Test::Unit::TestCase
   # mocks as a file library
   def mock_library(lib, options={})
     options[:file_string] ||= ''
-    File.expects(:exists?).with(Boson::Library.library_file(lib.to_s)).returns(true)
+    File.expects(:exists?).with(Boson::FileLibrary.library_file(lib.to_s)).returns(true)
     if options.delete(:no_module_eval)
       Kernel.expects(:load).with { eval options.delete(:file_string); true}.returns(true)
     else

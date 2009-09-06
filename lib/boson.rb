@@ -50,6 +50,11 @@ module Boson
     @repo ||= Repo.new("#{ENV['HOME']}/.boson")
   end
 
+  def repos
+    @repos ||= [repo] + ["lib/boson", ".boson"].select {|e|
+      File.directory?(e)}.map {|e| Repo.new(File.expand_path(e))}
+  end
+
   def main_object=(value)
     @main_object = value.extend(Universe)
   end
@@ -72,7 +77,7 @@ module Boson
   end
 
   def commands_dir
-    File.join(dir, 'commands')
+    repo.commands_dir
   end
 
   def activate(options={})
