@@ -1,5 +1,6 @@
 module Boson
   class LoaderError < StandardError; end
+  class AppendFeaturesFalseError < StandardError; end
   class LoadingDependencyError < LoaderError; end
   class MethodConflictError < LoaderError; end
   class InvalidLibraryModuleError < LoaderError; end
@@ -10,6 +11,7 @@ module Boson
       load_dependencies
       load_source_and_set_module
       detect_additions { load_module_commands } if @module || @class_commands
+      raise AppendFeaturesFalseError if @module && !@module.instance_methods.size.zero? && @commands.size.zero?
       @init_methods.each {|m| Boson.invoke(m) if Boson.main_object.respond_to?(m) } if @init_methods && !@options[:index]
       is_valid_library? && (@loaded = true)
     end

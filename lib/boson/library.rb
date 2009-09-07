@@ -42,6 +42,7 @@ module Boson
 
       def rescue_load_action(library, load_method, options={})
         yield
+      rescue AppendFeaturesFalseError
       rescue LoaderError=>e
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}", options
       rescue Exception=>e
