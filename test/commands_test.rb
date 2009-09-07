@@ -45,8 +45,8 @@ module Boson
 
     context "commands" do
       before(:all) {
-        Boson.commands << Command.create('some', 'thing')
-        Boson.commands << Command.create('and', 'this')
+        Boson.commands << Command.create('some', Library.new(:name=>'thing'))
+        Boson.commands << Command.create('and', Library.new(:name=>'this'))
       }
 
       test "lists all when given no argument" do

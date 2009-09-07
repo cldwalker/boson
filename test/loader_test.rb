@@ -40,7 +40,7 @@ module Boson
 
       test "loads a library with dependencies" do
         File.stubs(:exists?).returns(true)
-        File.stubs(:read).returns("module Oaks; def oaks; end; end", "module Water; def water; end; end")
+        File.stubs(:read).returns("module Water; def water; end; end", "module Oaks; def oaks; end; end")
         with_config(:libraries=>{"water"=>{:dependencies=>"oaks"}}) do
           load 'water', :no_mock=>true
           library_has_module('water', "Boson::Commands::Water")
@@ -52,6 +52,7 @@ module Boson
 
       test "prints error for library with invalid dependencies" do
         GemLibrary.stubs(:is_a_gem?).returns(true) #mock all as gem libs
+        Util.stubs(:safe_require).returns(true)
         with_config(:libraries=>{"water"=>{:dependencies=>"fire"}, "fire"=>{:dependencies=>"man"}}) do
           capture_stderr { 
             load('water', :no_mock=>true)

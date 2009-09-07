@@ -1,8 +1,7 @@
 module Boson
   class Command
-    def self.create(name, library, repo=Boson.repo)
-      attributes = (repo.config[:commands][name] || {}).merge({:name=>name, :lib=>library.to_s})
-      attributes[:alias] = repo.config[:command_aliases][name] if repo.config[:command_aliases][name]
+    def self.create(name, library)
+      attributes = (library.config[:commands_hash][name] || {}).merge({:name=>name, :lib=>library.name})
       new attributes
     end
 

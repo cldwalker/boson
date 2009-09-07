@@ -83,13 +83,23 @@ module Boson
       #:startdoc:
     end
 
-    attr_reader :gems, :dependencies, :commands, :loaded, :module, :name
+    attr_reader :gems, :dependencies, :commands, :loaded, :module, :name, :library_file, :config
     def initialize(hash)
       @name = hash.delete(:name) or raise ArgumentError, "New library missing required key :name"
       @options = hash.delete(:options) || {}
       @loaded = false
       set_repo
-      set_attributes (@repo.config[:libraries][@name] || {}).merge(hash), true
+      @config = (@repo.config[:libraries][@name] || {}).merge(hash)
+      set_attributes @config, true
+      setup_commands_config
+    end
+
+    def setup_commands_config
+      @config[:commands_hash] = @repo.config[:commands].merge(@config[:commands_hash] || {})
+      @repo.config[:command_aliases].each do |cmd, cmd_alias|
+        @config[:commands_hash][cmd] ||= {}
+        @config[:commands_hash][cmd][:alias] ||= cmd_alias
+      end
     end
 
     def set_repo
@@ -102,7 +112,7 @@ module Boson
 
     def set_library_commands
       aliases = @commands.map {|e|
-        @repo.config[:commands][e][:alias] rescue nil
+        @config[:commands_hash][e][:alias] rescue nil
       }.compact
       @commands -= aliases
       @commands.delete(namespace_command) if @namespace
@@ -132,7 +142,7 @@ module Boson
         commands -= @except
         @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
-      commands.each {|e| Boson.commands << Command.create(e, @name, @repo)}
+      commands.each {|e| Boson.commands << Command.create(e, self)}
       create_command_aliases(commands) if commands.size > 0
     end
 

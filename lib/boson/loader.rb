@@ -8,8 +8,8 @@ module Boson
   module Loader
     def load
       load_init
-      load_dependencies
       load_source_and_set_module
+      load_dependencies
       detect_additions { load_module_commands } if @module || @class_commands
       raise AppendFeaturesFalseError if @module && !@module.instance_methods.size.zero? && @commands.size.zero?
       @init_methods.each {|m| Boson.invoke(m) if Boson.main_object.respond_to?(m) } if @init_methods && !@options[:index]
