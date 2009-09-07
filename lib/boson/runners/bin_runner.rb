@@ -19,13 +19,22 @@ module Boson
       end
 
       def execute_command
-        if @options[:execute]
+        if @options[:help]
+          print_command_help
+        elsif @options[:execute]
           Boson.main_object.instance_eval "#{@original_command} #{@args.join(' ')}"
         else
           dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
           output = dispatcher.send(@subcommand || @command, *@args)
           render_output(output)
         end
+      rescue ArgumentError
+        puts "Incorrect number of arguments given"
+        print_command_help
+      end
+
+      def print_command_help
+        puts Boson.invoke('help', @command)
       end
 
       def init
@@ -72,7 +81,7 @@ module Boson
       end
 
       def default_options
-        {:discover=>false, :verbose=>false, :index_create=>false, :execute=>false, :load=>false, :repl=>false}
+        {:discover=>false, :verbose=>false, :index_create=>false, :execute=>false, :load=>false, :repl=>false, :help=>false}
       end
 
       def load_command_by_discovery

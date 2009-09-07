@@ -167,7 +167,7 @@ module Boson
     end
 
     def marshalize
-      @repo = @namespace_object = @source = nil
+      @config = @repo = @namespace_object = @source = nil
       @module = @module.to_s
       @loaded = false
       self
