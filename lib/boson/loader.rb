@@ -10,6 +10,7 @@ module Boson
       load_init
       load_source_and_set_module
       load_dependencies
+      module_callbacks if @module
       detect_additions { load_module_commands } if @module || @class_commands
       raise AppendFeaturesFalseError if @module && !@module.instance_methods.size.zero? && @commands.size.zero?
       @init_methods.each {|m| Boson.invoke(m) if Boson.main_object.respond_to?(m) } if @init_methods && !@options[:index]
@@ -25,6 +26,12 @@ module Boson
     end
 
     def load_source_and_set_module; end
+
+    def module_callbacks
+      if @module.respond_to?(:config)
+        set_attributes @config.merge!(@module.config)
+      end
+    end
 
     def load_attributes
       {:gems=>[], :commands=>[], :dependencies=>[] }

@@ -1,4 +1,8 @@
 module Boson::Commands::WebCore
+  def self.config
+    {:library_file=>File.expand_path(__FILE__) }
+  end
+
   def get(url)
     %w{uri net/http}.each {|e| require e }
     Net::HTTP.get(URI.parse(url))

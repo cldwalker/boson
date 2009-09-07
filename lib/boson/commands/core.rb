@@ -1,5 +1,9 @@
 module Boson::Commands; end # avoid having to :: prefix all classes
 module Boson::Commands::Core
+  def self.config
+    {:library_file=>File.expand_path(__FILE__) }
+  end
+
   def commands(query='', options={})
     options = {:fields=>[:name, :lib, :alias],:search_field=>:name}.merge(options)
     search_field = options.delete(:search_field)
