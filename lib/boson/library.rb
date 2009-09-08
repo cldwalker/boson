@@ -143,7 +143,7 @@ module Boson
         @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
       commands.each {|e| Boson.commands << Command.create(e, self)}
-      create_command_aliases(commands) if commands.size > 0
+      create_command_aliases(commands) if commands.size > 0 && !@no_alias_creation
     end
 
     def add_library

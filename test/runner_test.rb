@@ -14,7 +14,7 @@ module Boson
 
       test "loads default irb library when irb exists" do
         eval %[module ::IRB; module ExtendCommandBundle; end; end]
-        Library.expects(:load).with {|*args| args[0].include?(IRB::ExtendCommandBundle) }
+        Library.expects(:load).with {|*args| args[0].include?(Boson::Commands::IrbCore) }
         activate
         IRB.send :remove_const, "ExtendCommandBundle"
       end

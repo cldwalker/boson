@@ -34,7 +34,7 @@ module Boson
       end
 
       def print_command_help
-        puts Boson.invoke('help', @command)
+        puts Boson.invoke('usage', @command)
       end
 
       def init

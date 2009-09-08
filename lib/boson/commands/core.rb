@@ -45,13 +45,13 @@ module Boson::Commands::Core
     Hirb::Console.format_output(output, options.merge(:class=>"Hirb::Menu"), &block)
   end
 
-  def help(name, debug=false)
+  def usage(name, debug=false)
     help_string = get_help(name)
     (help_string !~ /^#{name}/ && !debug) ? "No help found for command #{name}." : help_string
   end
 
   private
-  def get_help(name)
+  def get_usage(name)
     return "Command not loaded" unless (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias))
     return "Library for #{command_obj.name} not found" unless lib = Boson.library(command.lib)
     return "File for #{lib.name} library not found" unless File.exists?(lib.library_file || '')

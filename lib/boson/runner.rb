@@ -15,7 +15,7 @@ module Boson
       end
 
       def boson_libraries
-        [Boson::Commands::Core, Boson::Commands::WebCore, Boson::Commands::Namespace]
+        [Boson::Commands::Core, Boson::Commands::WebCore, Boson::Commands::Namespace, Boson::Commands::IrbCore]
       end
 
       def detected_libraries
