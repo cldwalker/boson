@@ -1,24 +1,24 @@
 module Boson
   class FileLibrary < Library
-    def self.library_file(library, repo=Boson.repo)
-      File.join(repo.commands_dir, library + ".rb")
+    def self.library_file(library, dir=Boson.repo.dir)
+      File.join(Repo.commands_dir(dir), library + ".rb")
     end
 
     def self.matched_repo; @repo; end
 
     handles {|source|
       @repo = Boson.repos.find {|e|
-        File.exists? library_file(source.to_s, e)
+        File.exists? library_file(source.to_s, e.dir)
       }
       !!@repo
     }
 
     def library_file
-      self.class.library_file(@name, @repo)
+      self.class.library_file(@name, @repo_dir)
     end
 
     def set_repo
-      @repo = self.class.matched_repo
+      self.class.matched_repo
     end
 
     def load_init

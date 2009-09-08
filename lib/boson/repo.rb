@@ -1,5 +1,9 @@
 module Boson
   class Repo
+    def self.commands_dir(dir)
+      File.join(dir, 'commands')
+    end
+
     attr_accessor :dir, :config
     def initialize(dir)
       @dir = dir
@@ -10,7 +14,7 @@ module Boson
     end
 
     def commands_dir
-      File.join(dir, 'commands')
+      self.class.commands_dir(@dir)
     end
 
     def config(reload=false)

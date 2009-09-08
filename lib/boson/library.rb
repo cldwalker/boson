@@ -88,22 +88,23 @@ module Boson
       @name = hash.delete(:name) or raise ArgumentError, "New library missing required key :name"
       @options = hash.delete(:options) || {}
       @loaded = false
-      set_repo
-      @config = (@repo.config[:libraries][@name] || {}).merge(hash)
+      repo = set_repo
+      @repo_dir = repo.dir
+      @config = (repo.config[:libraries][@name] || {}).merge(hash)
       set_attributes @config, true
-      setup_commands_config
+      setup_commands_config(repo)
     end
 
-    def setup_commands_config
-      @config[:commands_hash] = @repo.config[:commands].merge(@config[:commands_hash] || {})
-      @repo.config[:command_aliases].each do |cmd, cmd_alias|
+    def setup_commands_config(repo)
+      @config[:commands_hash] = repo.config[:commands].merge(@config[:commands_hash] || {})
+      repo.config[:command_aliases].each do |cmd, cmd_alias|
         @config[:commands_hash][cmd] ||= {}
         @config[:commands_hash][cmd][:alias] ||= cmd_alias
       end
     end
 
     def set_repo
-      @repo = Boson.repo
+      Boson.repo
     end
 
     def set_attributes(hash, force=false)
@@ -167,7 +168,7 @@ module Boson
     end
 
     def marshalize
-      @config = @repo = @namespace_object = @source = nil
+      @config = @namespace_object = @source = nil
       @module = @module.to_s
       @loaded = false
       self
