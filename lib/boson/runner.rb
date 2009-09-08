@@ -2,7 +2,7 @@ module Boson
   class Runner
     class<<self
       def init
-        Hirb.enable(:config_file=>File.join(Boson.config_dir, 'hirb.yml'))
+        Hirb.enable(:config_file=>File.join(Boson.repo.config_dir, 'hirb.yml'))
         add_load_path
       end
 
@@ -32,7 +32,7 @@ module Boson
       end
 
       def marshal_file
-        File.join(Boson.config_dir, 'commands.db')
+        File.join(Boson.repo.config_dir, 'commands.db')
       end
 
       def marshal_write

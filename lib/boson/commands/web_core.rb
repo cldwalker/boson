@@ -13,7 +13,7 @@ module Boson::Commands::WebCore
   def install(url, name=nil, force=false)
     name ||= strip_name_from_url(url)
     return "Please give a library name with this url." unless name
-    filename = File.join Boson.commands_dir, "#{name}.rb"
+    filename = File.join Boson.repo.commands_dir, "#{name}.rb"
     return "Library name #{name} already exists. Try a different name." if File.exists?(filename) && !force
     File.open(filename, 'w') {|f| f.write get(url) }
     "Saved to #{filename}."
@@ -36,9 +36,9 @@ module Boson::Commands::WebCore
   end
 
   def determine_download_name(url)
-    FileUtils.mkdir_p(File.join(Boson.dir,'downloads'))
+    FileUtils.mkdir_p(File.join(Boson.repo.dir,'downloads'))
     basename = strip_name_from_url(url) || url.sub(/^[a-z]+:\/\//,'').tr('/','-')
-    filename = File.join(Boson.dir, 'downloads', basename)
+    filename = File.join(Boson.repo.dir, 'downloads', basename)
     filename += "-#{Time.now.strftime("%m_%d_%y_%H_%M_%S")}" if File.exists?(filename)
     filename
   end

@@ -1,6 +1,6 @@
 module Boson
   class FileLibrary < Library
-    def self.library_file(library, dir=Boson.repo.dir)
+    def self.library_file(library, dir)
       File.join(Repo.commands_dir(dir), library + ".rb")
     end
 
