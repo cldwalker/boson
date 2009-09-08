@@ -115,7 +115,7 @@ module Boson
         @commands_hash[e][:alias] rescue nil
       }.compact
       @commands -= aliases
-      @commands.delete(namespace_command) if @namespace
+      @commands.delete(namespace_command) if @namespace && !@namespace_delegate
     end
 
     def after_load(options)
@@ -139,6 +139,7 @@ module Boson
 
     def create_commands(commands=@commands)
       if @except
+        @commands -= @except
         commands -= @except
         @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end

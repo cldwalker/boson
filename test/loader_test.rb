@@ -150,11 +150,11 @@ module Boson
       end
 
       test "loads with config except" do
-        with_config(:libraries=>{'blong'=>{:namespace=>true, :except=>['blong']}}) do
-          load 'blong', :file_string=>"module Blong; def bling; end; def blong; end; end"
+        with_config(:libraries=>{'blong'=>{:namespace=>true, :except=>['wrong']}}) do
+          load 'blong', :file_string=>"module Blong; def bling; end; def wrong; end; end"
           library_has_command('namespace', 'blong')
           library_has_command('blong', 'bling')
-          library_has_command('blong', 'blong', false)
+          library_has_command('blong', 'wrong', false)
           library('blong').commands.size.should == 1
         end
       end

@@ -85,13 +85,12 @@ module Boson
       raise(InvalidLibraryModuleError, "No module for library #{@name}") unless @module
       create_class_commands unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
-      if @namespace
-        create_namespace_command
-        @commands += Boson.invoke(namespace_command).commands
-      else
-        Boson::Universe.send :include, @module
-        Boson::Universe.send :extend_object, Boson.main_object
-      end
+      @namespace ? create_namespace_command : include_in_universe
+    end
+
+    def include_in_universe(lib_module=@module)
+      Boson::Universe.send :include, lib_module
+      Boson::Universe.send :extend_object, Boson.main_object
     end
 
     def create_class_commands
@@ -115,11 +114,18 @@ module Boson
     end
 
     def create_namespace_command
-      Commands::Namespace.create(namespace_command, @module)
-      if (lib = Boson.library(Boson::Commands::Namespace, :module))
-        lib.commands << namespace_command
-        lib.create_commands([namespace_command])
+      if @module.instance_methods.include?(namespace_command)
+        include_in_universe
+        @namespace_delegate = true
+      else
+        Commands::Namespace.create(namespace_command, @module)
+        if (lib = Boson.library(Boson::Commands::Namespace, :module))
+          lib.commands << namespace_command
+          lib.create_commands([namespace_command])
+        end
       end
+      Commands::Namespace.add_universe(namespace_object)
+      @commands += Boson.invoke(namespace_command).boson_commands
     end
   end
 end
