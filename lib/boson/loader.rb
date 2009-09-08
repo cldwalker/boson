@@ -28,7 +28,9 @@ module Boson
 
     def module_callbacks
       if @module.respond_to?(:config)
-        set_attributes @config.merge!(@module.config)
+        new_config = @module.config
+        set_command_aliases new_config.delete(:command_aliases) if new_config[:command_aliases]
+        set_attributes new_config, true
       end
       if @module.respond_to?(:append_features)
         raise AppendFeaturesFalseError unless @module.append_features(Module.new)

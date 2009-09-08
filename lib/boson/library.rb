@@ -83,23 +83,22 @@ module Boson
       #:startdoc:
     end
 
-    attr_reader :gems, :dependencies, :commands, :loaded, :module, :name, :library_file, :config
+    attr_reader :gems, :dependencies, :commands, :loaded, :module, :name, :library_file, :commands_hash
     def initialize(hash)
       @name = hash.delete(:name) or raise ArgumentError, "New library missing required key :name"
       @options = hash.delete(:options) || {}
       @loaded = false
       repo = set_repo
       @repo_dir = repo.dir
-      @config = (repo.config[:libraries][@name] || {}).merge(hash)
-      set_attributes @config, true
-      setup_commands_config(repo)
+      set_attributes (repo.config[:libraries][@name] || {}).merge(hash), true
+      @commands_hash = repo.config[:commands].merge(@commands_hash || {})
+      set_command_aliases(repo.config[:command_aliases])
     end
 
-    def setup_commands_config(repo)
-      @config[:commands_hash] = repo.config[:commands].merge(@config[:commands_hash] || {})
-      repo.config[:command_aliases].each do |cmd, cmd_alias|
-        @config[:commands_hash][cmd] ||= {}
-        @config[:commands_hash][cmd][:alias] ||= cmd_alias
+    def set_command_aliases(command_aliases)
+      (command_aliases || {}).each do |cmd, cmd_alias|
+        @commands_hash[cmd] ||= {}
+        @commands_hash[cmd][:alias] ||= cmd_alias
       end
     end
 
@@ -113,7 +112,7 @@ module Boson
 
     def set_library_commands
       aliases = @commands.map {|e|
-        @config[:commands_hash][e][:alias] rescue nil
+        @commands_hash[e][:alias] rescue nil
       }.compact
       @commands -= aliases
       @commands.delete(namespace_command) if @namespace
@@ -129,7 +128,7 @@ module Boson
         e.add_library
         puts "Loaded library dependency #{e.name}" if options[:verbose]
       end
-      @created_dependencies = nil
+      remove_instance_variable("@created_dependencies")
       true
     end
 
@@ -168,7 +167,7 @@ module Boson
     end
 
     def marshalize
-      @config = @namespace_object = @source = nil
+      @commands_hash = @namespace_object = @source = nil
       @module = @module.to_s
       @loaded = false
       self
