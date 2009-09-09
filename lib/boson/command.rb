@@ -20,11 +20,12 @@ module Boson
       Alias.manager.create_aliases(:instance_method, aliases_hash)
     end
 
-    attr_accessor :name, :lib, :alias
+    attr_accessor :name, :lib, :alias, :description
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
       @alias = hash[:alias] if hash[:alias]
+      @description = hash[:description] if hash[:description]
     end
   end
 end

@@ -8,6 +8,7 @@ module Boson::Commands::Core
     options = {:fields=>[:name, :lib, :alias],:search_field=>:name}.merge(options)
     search_field = options.delete(:search_field)
     results = Boson.commands.select {|f| f.send(search_field) =~ /#{query}/ }
+    options[:fields] << :description if results.any? {|e| ! e.description.nil?}
     render results, options
   end
 
