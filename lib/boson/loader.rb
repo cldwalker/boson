@@ -7,7 +7,7 @@ module Boson
 
   module Loader
     def load
-      load_init
+      @gems ||= []; @commands ||= []
       load_source_and_set_module
       module_callbacks if @module
       load_dependencies
@@ -17,7 +17,7 @@ module Boson
     end
 
     def load_dependencies
-      @created_dependencies = @dependencies.map do |e|
+      @created_dependencies = (@dependencies || []).map do |e|
         next if Library.loaded?(e)
         Library.load_once(e, @options.merge(:dependency=>true)) ||
           raise(LoadingDependencyError, "Can't load dependency #{e}")
@@ -38,14 +38,6 @@ module Boson
       if @module.respond_to?(:append_features)
         raise AppendFeaturesFalseError unless @module.append_features(Module.new)
       end
-    end
-
-    def load_attributes
-      {:gems=>[], :commands=>[], :dependencies=>[] }
-    end
-
-    def load_init
-      set_attributes load_attributes
     end
 
     def load_module_commands
