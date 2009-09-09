@@ -1,9 +1,8 @@
+$:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 require 'yaml'
 require 'hirb'
 require 'alias'
 require 'fileutils'
-
-$:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 require 'boson/runner'
 require 'boson/runners/repl_runner'
 require 'boson/repo'
@@ -17,10 +16,7 @@ require 'boson/libraries/gem_library'
 require 'boson/libraries/require_library'
 require 'boson/command'
 require 'boson/util'
-require 'boson/commands/core'
-require 'boson/commands/web_core'
-require 'boson/commands/irb_core'
-require 'boson/commands/namespace'
+require 'boson/commands'
 
 module Boson
   module Universe; end

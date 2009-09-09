@@ -1,4 +1,3 @@
-module Boson::Commands; end # avoid having to :: prefix all classes
 module Boson::Commands::Core
   def self.config
     descriptions = {
@@ -58,20 +57,9 @@ module Boson::Commands::Core
   end
 
   def usage(name, debug=false)
-    help_string = get_usage(name)
+    help_string = Boson::Inspector.command_usage(name)
     (help_string !~ /^#{name}/ && !debug) ? "No help found for command #{name}." : help_string
   end
 
   private
-  def get_usage(name)
-    return "Command not loaded" unless (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias))
-    return "Library for #{command_obj.name} not found" unless lib = Boson.library(command.lib)
-    return "File for #{lib.name} library not found" unless File.exists?(lib.library_file || '')
-    tabspace = "[ \t]"
-    if match = /^#{tabspace}*def#{tabspace}+#{command.name}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(File.read(lib.library_file))
-      "#{name} "+ (match.to_a[2] || '').split(/\s*,\s*/).map {|e| "[#{e}]"}.join(' ')
-    else
-      "Command not found in file"
-    end
-  end
 end

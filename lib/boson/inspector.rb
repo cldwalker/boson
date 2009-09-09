@@ -1,4 +1,5 @@
-# inspired by http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da
+# Handles reading and extracting command description and usage from file libraries
+# comment descriptions inspired by http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da
 module Boson::Inspector
   extend self
   def find_command_description(stack)
@@ -42,5 +43,18 @@ module Boson::Inspector
     lines = file_string.split("\n")
     line -= 2
     (lines[line] =~ /^\s*#\s*(.*)/) ? $1 : nil
+  end
+
+  def command_usage(name)
+    return "Command not loaded" unless (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias))
+    return "Library for #{command_obj.name} not found" unless lib = Boson.library(command.lib)
+    return "File for #{lib.name} library not found" unless File.exists?(lib.library_file || '')
+    tabspace = "[ \t]"
+    file_string = Boson::FileLibrary.read_library_file(lib.library_file)
+    if match = /^#{tabspace}*def#{tabspace}+#{command.name}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
+      "#{name} "+ (match.to_a[2] || '').split(/\s*,\s*/).map {|e| "[#{e}]"}.join(' ')
+    else
+      "Command not found in file"
+    end
   end
 end
