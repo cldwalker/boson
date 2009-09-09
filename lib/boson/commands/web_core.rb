@@ -1,6 +1,10 @@
 module Boson::Commands::WebCore
   def self.config
-    {:library_file=>File.expand_path(__FILE__) }
+    descriptions = {
+      :install=>"Installs a library by url. Library should then be loaded with load_library.",
+      :browser=>"Opens a url in a browser", :get=>"Gets the body of a url" }
+    commands_hash = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
+    {:library_file=>File.expand_path(__FILE__), :commands_hash=>commands_hash}
   end
 
   def get(url)
@@ -19,12 +23,6 @@ module Boson::Commands::WebCore
     "Saved to #{filename}."
   end
 
-  def download(url)
-    filename = determine_download_name(url)
-    File.open(filename, 'w') { |f| f.write get(url) }
-    filename
-  end
-
   # non-mac users should override this with the launchy gem
   def browser(*urls)
     system('open', *urls)
@@ -33,13 +31,5 @@ module Boson::Commands::WebCore
   private
   def strip_name_from_url(url)
     url[/\/([^\/.]+)(\.[a-z]+)?$/, 1]
-  end
-
-  def determine_download_name(url)
-    FileUtils.mkdir_p(File.join(Boson.repo.dir,'downloads'))
-    basename = strip_name_from_url(url) || url.sub(/^[a-z]+:\/\//,'').tr('/','-')
-    filename = File.join(Boson.repo.dir, 'downloads', basename)
-    filename += "-#{Time.now.strftime("%m_%d_%y_%H_%M_%S")}" if File.exists?(filename)
-    filename
   end
 end

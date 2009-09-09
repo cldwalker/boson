@@ -78,5 +78,10 @@ module Boson
     def which(command)
       ENV['PATH'].split(File::PATH_SEPARATOR).map {|e| File.join(e, command) }.find {|e| File.exists?(e) }
     end
+
+    # Recursively merge hash1 with hash2.
+    def recursive_hash_merge(hash1, hash2)
+      hash1.merge(hash2) {|k,o,n| (o.is_a?(Hash)) ? recursive_hash_merge(o,n) : n}
+    end
   end
 end

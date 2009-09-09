@@ -30,6 +30,9 @@ module Boson
       if @module.respond_to?(:config)
         new_config = @module.config
         set_command_aliases new_config.delete(:command_aliases) if new_config[:command_aliases]
+        if new_config[:commands_hash]
+          @commands_hash = Util.recursive_hash_merge(new_config.delete(:commands_hash), (@commands_hash || {}))
+        end
         set_attributes new_config, true
       end
       if @module.respond_to?(:append_features)

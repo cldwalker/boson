@@ -1,7 +1,18 @@
 module Boson::Commands; end # avoid having to :: prefix all classes
 module Boson::Commands::Core
   def self.config
-    {:library_file=>File.expand_path(__FILE__) }
+    descriptions = {
+      :commands=>"List or search loaded commands",
+      :libraries=>"List or search loaded libraries",
+      :unloaded_libraries=>"List libraries that haven't been loaded yet",
+      :load_library=>"Load a library", :reload_library=>"Reload a library",
+      :index=>"Generate index of all libraries and commands",
+      :render=>"Render any object using Hirb",
+      :menu=>"Provide a menu to multi-select elements from a given array",
+      :usage=>"Print a command's usage"
+    }
+    commands_hash = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
+    {:library_file=>File.expand_path(__FILE__), :commands_hash=>commands_hash}
   end
 
   def commands(query='', options={})
