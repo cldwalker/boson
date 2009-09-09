@@ -46,7 +46,7 @@ module Boson::Commands::Core
   end
 
   def usage(name, debug=false)
-    help_string = get_help(name)
+    help_string = get_usage(name)
     (help_string !~ /^#{name}/ && !debug) ? "No help found for command #{name}." : help_string
   end
 
