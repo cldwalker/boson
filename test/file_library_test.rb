@@ -11,22 +11,6 @@ module Boson
         command_exists?('blah')
       end
 
-      test "with config module loads" do
-        with_config(:libraries=>{"blah"=>{:module=>"Coolness"}}) do
-          load :blah, :file_string=>"module ::Coolness; def coolness; end; end", :no_module_eval=>true
-        end
-        library_has_module('blah', 'Coolness')
-        command_exists?('coolness')
-      end
-
-      test "with config no_module_eval loads" do
-        with_config(:libraries=>{"blah"=>{:no_module_eval=>true}}) do
-          load :blah, :file_string=>"module ::Bogus; end; module Boson::Commands::Blah; def blah; end; end", :no_module_eval=>true
-        end
-        library_has_module('blah', 'Boson::Commands::Blah')
-        command_exists?('blah')
-      end
-
       test "in a subdirectory loads" do
         load 'site/delicious', :file_string=>"module Delicious; def blah; end; end"
         library_has_module('site/delicious', "Boson::Commands::Delicious")

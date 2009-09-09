@@ -21,18 +21,9 @@ module Boson
       self.class.matched_repo
     end
 
-    def load_init
-      super
-      @no_module_eval ||= !!@module
-    end
-
     def load_source
-      if @no_module_eval
-        Kernel.load library_file
-      else
-        library_string = File.read(library_file)
-        Commands.module_eval(library_string, library_file)
-      end
+      library_string = File.read(library_file)
+      Commands.module_eval(library_string, library_file)
     end
 
     def load_source_and_set_module
