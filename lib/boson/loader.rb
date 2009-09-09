@@ -123,8 +123,8 @@ module Boson
           lib.commands << namespace_command
           lib.create_commands([namespace_command])
         end
+        Commands::Namespace.add_universe(namespace_object)
       end
-      Commands::Namespace.add_universe(namespace_object)
       @commands += Boson.invoke(namespace_command).boson_commands
     end
   end
