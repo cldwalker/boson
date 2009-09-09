@@ -137,12 +137,16 @@ module Boson
       create_commands(@new_commands)
     end
 
+    # callback method
+    def before_create_commands; end
+
     def create_commands(commands=@commands)
       if @except
         @commands -= @except
         commands -= @except
         @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
+      before_create_commands
       commands.each {|e| Boson.commands << Command.create(e, self)}
       create_command_aliases(commands) if commands.size > 0 && !@no_alias_creation
     end

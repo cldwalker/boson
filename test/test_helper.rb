@@ -63,7 +63,9 @@ class Test::Unit::TestCase
 
   def load(lib, options={})
     mock_library(lib, options) unless options.delete(:no_mock)
-    Boson::Library.load([lib], options)
+    result = Boson::Library.load([lib], options)
+    Boson::FileLibrary.reset_file_cache
+    result
   end
 
   def capture_stdout(&block)

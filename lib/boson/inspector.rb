@@ -14,9 +14,9 @@ module Boson::Inspector
           @descriptions[method.to_s] = @desc 
           @desc = nil
         else
-          @comments ||= {}
+          @comment_descriptions ||= {}
           if (result = Boson::Inspector.find_command_description(caller))
-            @comments[method.to_s] = result
+            @comment_descriptions[method.to_s] = result
           end
         end
       end
@@ -38,11 +38,9 @@ module Boson::Inspector
     ]
   end
 
-  def comment_from_file(file_name, line)
-    @file_cache ||= {}
-    content = (@file_cache[file_name] ||= File.readlines(file_name))
+  def description_from_file(file_string, line)
+    lines = file_string.split("\n")
     line -= 2
-    return nil unless content[line] =~ /^\s*#\s*(.*)/
-    $1
+    (lines[line] =~ /^\s*#\s*(.*)/) ? $1 : nil
   end
 end

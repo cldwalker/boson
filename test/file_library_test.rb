@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class FileLibraryTest < Test::Unit::TestCase
     context "file library" do
-      before(:each) { reset }
+      before(:each) { reset; FileLibrary.reset_file_cache }
 
       test "loads" do
         load :blah, :file_string=>"module Blah; def blah; end; end"

@@ -6,6 +6,14 @@ module Boson
 
     def self.matched_repo; @repo; end
 
+    def self.read_library_file(file, reload=false)
+      @file_cache ||= {}
+      @file_cache[file] = File.read(file) if (!@file_cache.has_key?(file) || reload)
+      @file_cache[file]
+    end
+
+    def self.reset_file_cache; @file_cache = nil; end
+
     handles {|source|
       @repo = Boson.repos.find {|e|
         File.exists? library_file(source.to_s, e.dir)
@@ -21,9 +29,11 @@ module Boson
       self.class.matched_repo
     end
 
-    def load_source
-      library_string = File.read(library_file)
+    def load_source(reload=false)
+      library_string = self.class.read_library_file(library_file, reload)
+      Inspector.add_meta_methods
       Commands.module_eval(library_string, library_file)
+      Inspector.remove_meta_methods
     end
 
     def load_source_and_set_module
@@ -32,7 +42,7 @@ module Boson
     end
 
     def reload_source_and_set_module
-      detected = detect_additions(:modules=>true) { load_source }
+      detected = detect_additions(:modules=>true) { load_source(true) }
       if (@new_module = !detected[:modules].empty?)
         @commands = []
         @module = determine_lib_module(detected[:modules])
@@ -49,6 +59,30 @@ module Boson
         end
       end
       lib_module
+    end
+
+    def before_create_commands
+      add_command_descriptions(commands) if @module && (@module.instance_variable_defined?(:@descriptions) ||
+        @module.instance_variable_defined?(:@comment_descriptions))
+    end
+
+    def command_has_no_description(cmd)
+      !@commands_hash[cmd] || (@commands_hash[cmd] && !@commands_hash[cmd].has_key?(:description))
+    end
+
+    def add_command_descriptions(commands)
+      (@module.instance_variable_get(:@descriptions) || {}).each do |cmd, description|
+        if command_has_no_description(cmd)
+          (@commands_hash[cmd] ||= {})[:description] = description
+        end
+      end
+      (@module.instance_variable_get(:@comment_descriptions) || {}).each do |cmd, (file, lineno)|
+        if (file == library_file) && command_has_no_description(cmd)
+          if (description = Inspector.description_from_file(self.class.read_library_file(file), lineno))
+            (@commands_hash[cmd] ||= {})[:description] = description
+          end
+        end
+      end
     end
   end
 end
