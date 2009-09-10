@@ -55,7 +55,11 @@ module Boson::Commands::Core
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
     if object.is_a?(Array) && (sort = options.delete(:sort))
-      object = object.sort_by {|e| e.send(sort).to_s }
+      begin
+        object = object.sort_by {|e| e.send(sort).to_s }
+      rescue NoMethodError
+        $stderr.puts "Sort failed with nonexistant method '#{sort}'"
+      end
     end
     Hirb::Console.render_output(object, options)
   end
