@@ -27,16 +27,16 @@ module Boson
         
         # Magic predicates. For instance:
         #   options.force? # => !!options['force']
-        def method_missing(method, *args, &block)
-          method = method.to_s
-          if method =~ /^(\w+)=$/ 
-            self[$1] = args.first
-          elsif method =~ /^(\w+)\?$/
-            !!self[$1]
-          else 
-            self[method]
-          end
-        end
+        # def method_missing(method, *args, &block)
+        #   method = method.to_s
+        #   if method =~ /^(\w+)=$/ 
+        #     self[$1] = args.first
+        #   elsif method =~ /^(\w+)\?$/
+        #     !!self[$1]
+        #   else 
+        #     self[method]
+        #   end
+        # end
     end
 
     NUMERIC     = /(\d*\.\d+|\d+)/
