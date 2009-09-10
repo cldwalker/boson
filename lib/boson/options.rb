@@ -1,7 +1,7 @@
 # This is a modified version of Daniel Berger's Getopt::Long class,
 # licensed under Ruby's license.
 
-class Thor
+module Boson
   class Options
     class Error < StandardError; end
     
@@ -63,7 +63,7 @@ class Thor
     #
     # Example:
     #
-    #   opts = Thor::Options.new(
+    #   opts = Boson::Options.new(
     #      "--debug" => true,
     #      ["--verbose", "-v"] => true,
     #      ["--level", "-l"] => :numeric
@@ -121,7 +121,7 @@ class Thor
 
     def parse(args, skip_leading_non_opts = true)
       @args = args
-      # start with Thor::Options::Hash pre-filled with defaults
+      # start with Boson::Options::Hash pre-filled with defaults
       hash = Hash.new @defaults
       
       @leading_non_opts = []
