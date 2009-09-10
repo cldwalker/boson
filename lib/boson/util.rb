@@ -19,6 +19,12 @@ module Boson
       any_const_get(camelize(string))
     end
 
+    def symbolize_keys(hash)
+      hash.inject({}) {|options, (key, value)|
+        options[key.to_sym] = value; options
+      }
+    end
+
     # Returns a constant like const_get() no matter what namespace it's nested in.
     # Returns nil if the constant is not found.
     def any_const_get(name)

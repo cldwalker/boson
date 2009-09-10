@@ -11,22 +11,26 @@ module Boson::Commands::Core
       :usage=>"Print a command's usage"
     }
     commands_hash = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
+    commands_hash['commands'][:options] = {:field=>:optional, :sort=>:optional}
+    commands_hash['libraries'][:options] = {:field=>:optional, :sort=>:optional}
     {:library_file=>File.expand_path(__FILE__), :commands_hash=>commands_hash}
   end
 
-  def commands(query='', options={})
-    options = {:fields=>[:name, :lib, :alias],:search_field=>:name}.merge(options)
-    search_field = options.delete(:search_field)
-    results = Boson.commands.select {|f| f.send(search_field) =~ /#{query}/ }
+  def commands(*args)
+    query = args[0].is_a?(String) ? args.shift : ''
+    options = {:fields=>[:name, :lib, :alias],:field=>:name}.merge(args[0] || {})
+    search_field = options.delete(:field)
+    results = Boson.commands.select {|f| f.send(search_field).to_s =~ /#{query}/i }
     options[:fields] << :description if results.any? {|e| ! e.description.nil?}
     render results, options
   end
 
-  def libraries(query='', options={})
-    options = {:fields=>[:name, :commands, :gems, :library_type], :search_field=>:name,
-      :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
-    search_field = options.delete(:search_field)
-    results = Boson.libraries.select {|f| f.send(search_field) =~ /#{query}/ }
+  def libraries(*args)
+    query = args[0].is_a?(String) ? args.shift : ''
+    options = {:fields=>[:name, :commands, :gems, :library_type], :field=>:name,
+      :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(args[0] || {})
+    search_field = options.delete(:field)
+    results = Boson.libraries.select {|f| f.send(search_field).to_s =~ /#{query}/i }
     render results, options
   end
 
@@ -49,6 +53,9 @@ module Boson::Commands::Core
 
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
+    if object.is_a?(Array) && (sort = options.delete(:sort))
+      object = object.sort_by {|e| e.send(sort).to_s }
+    end
     Hirb::Console.render_output(object, options)
   end
 

@@ -17,6 +17,7 @@ require 'boson/libraries/require_library'
 require 'boson/command'
 require 'boson/util'
 require 'boson/commands'
+require 'boson/options'
 
 module Boson
   module Universe; end

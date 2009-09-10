@@ -20,6 +20,15 @@ module Boson::Inspector
             @comment_descriptions[method.to_s] = result
           end
         end
+        if @opts
+          @options[method.to_s] = @opts
+          @opts = nil
+        end
+      end
+
+      def options(opts)
+        @options ||= {}
+        @opts = opts
       end
 
       def desc(description)

@@ -20,12 +20,49 @@ module Boson
       Alias.manager.create_aliases(:instance_method, aliases_hash)
     end
 
-    attr_accessor :name, :lib, :alias, :description
+    attr_accessor :name, :lib, :alias, :description, :options
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
       @alias = hash[:alias] if hash[:alias]
       @description = hash[:description] if hash[:description]
+      @options = hash[:options] if hash[:options]
+    end
+
+    # def library
+    #   @library ||= Boson.library(@lib)
+    # end
+    # 
+    # def arity
+    #   library && library.module.instance_method(@name).arity
+    # end
+
+    def option_parser
+      @option_parser ||= (@options ? Options.new(@options) : nil)
+    end
+
+    def create_option_command_block
+      command = self
+      options = @options.delete(:options) || {}
+      if options[:solo] #not used yet
+        lambda {|*args|
+          if args.size == arity && args[-1].is_a?(String)
+            args << command.option_parser.parse(args.pop.split(/\s+/))
+          end
+          super(*args)
+        }
+      else
+        require 'shellwords'
+        lambda {|*args|
+          if args.size == 1 && args[0].is_a?(String)
+            args = Shellwords.shellwords(args.join(" "))
+            options = command.option_parser.parse(args)
+            options = Util.symbolize_keys(options)
+            args = command.option_parser.non_opts + [options]
+          end
+          super(*args)
+        }
+      end
     end
   end
 end
