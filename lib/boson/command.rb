@@ -1,3 +1,4 @@
+require 'shellwords'
 module Boson
   class Command
     def self.create(name, library)
@@ -44,25 +45,22 @@ module Boson
     def create_option_command_block
       command = self
       options = @options.delete(:options) || {}
-      if options[:solo] #not used yet
-        lambda {|*args|
-          if args.size == arity && args[-1].is_a?(String)
-            args << command.option_parser.parse(args.pop.split(/\s+/))
-          end
-          super(*args)
-        }
-      else
-        require 'shellwords'
-        lambda {|*args|
-          if args.size == 1 && args[0].is_a?(String)
-            args = Shellwords.shellwords(args.join(" "))
-            options = command.option_parser.parse(args)
-            options = Util.symbolize_keys(options)
-            args = command.option_parser.non_opts + [options]
-          end
-          super(*args)
-        }
-      end
+      lambda {|*args|
+        if args.size == 1 && args[0].is_a?(String)
+          args = Shellwords.shellwords(args.join(" "))
+          parsed_options = command.option_parser.parse(args)
+          args = command.option_parser.non_opts
+        # 2nd string argument interpreted as options
+        elsif args.size > 1 && args[-1].is_a?(String)
+          parsed_options = command.option_parser.parse(args.pop.split(/\s+/))
+        end
+        if parsed_options
+          parsed_options = Util.symbolize_keys(parsed_options)
+          args << parsed_options
+        end
+        # p args
+        super(*args)
+      }
     end
   end
 end
