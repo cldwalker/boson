@@ -42,6 +42,10 @@ module Boson
       @option_parser ||= (@options ? Options.new(@options) : nil)
     end
 
+    def option_help
+      options ? option_parser.to_s : ''
+    end
+
     def create_option_command_block
       command = self
       options = @options.delete(:options) || {}

@@ -4,6 +4,7 @@ module Boson::Commands::WebCore
       :install=>"Installs a library by url. Library should then be loaded with load_library.",
       :browser=>"Opens a url in a browser", :get=>"Gets the body of a url" }
     commands_hash = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
+    commands_hash['install'][:options] = {:name=>:optional, :force=>:boolean}
     {:library_file=>File.expand_path(__FILE__), :commands_hash=>commands_hash}
   end
 
@@ -14,11 +15,11 @@ module Boson::Commands::WebCore
     raise "Error opening #{url}"
   end
 
-  def install(url, name=nil, force=false)
-    name ||= strip_name_from_url(url)
-    return "Please give a library name with this url." unless name
-    filename = File.join Boson.repo.commands_dir, "#{name}.rb"
-    return "Library name #{name} already exists. Try a different name." if File.exists?(filename) && !force
+  def install(url, options={})
+    options[:name] ||= strip_name_from_url(url)
+    return "Please give a library name with this url." unless options[:name]
+    filename = File.join Boson.repo.commands_dir, "#{options[:name]}.rb"
+    return "Library name #{options[:name]} already exists. Try a different name." if File.exists?(filename) && !options[:force]
     File.open(filename, 'w') {|f| f.write get(url) }
     "Saved to #{filename}."
   end
