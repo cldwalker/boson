@@ -3,9 +3,9 @@ module Boson::Commands::WebCore
     descriptions = {
       :install=>"Installs a library by url. Library should then be loaded with load_library.",
       :browser=>"Opens a url in a browser", :get=>"Gets the body of a url" }
-    commands_hash = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
-    commands_hash['install'][:options] = {:name=>:optional, :force=>:boolean}
-    {:library_file=>File.expand_path(__FILE__), :commands_hash=>commands_hash}
+    commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
+    commands['install'][:options] = {:name=>:optional, :force=>:boolean}
+    {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
   def get(url)

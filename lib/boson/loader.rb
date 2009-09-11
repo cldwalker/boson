@@ -7,7 +7,7 @@ module Boson
 
   module Loader
     def load
-      @gems ||= []; @commands ||= []
+      @gems ||= []
       load_source_and_set_module
       module_callbacks if @module
       load_dependencies
@@ -27,14 +27,7 @@ module Boson
     def load_source_and_set_module; end
 
     def module_callbacks
-      if @module.respond_to?(:config)
-        new_config = @module.config
-        set_command_aliases new_config.delete(:command_aliases) if new_config[:command_aliases]
-        if new_config[:commands_hash]
-          @commands_hash = Util.recursive_hash_merge(new_config.delete(:commands_hash), (@commands_hash || {}))
-        end
-        set_attributes new_config, true
-      end
+      process_config(@module.config) if @module.respond_to?(:config)
       if @module.respond_to?(:append_features)
         raise AppendFeaturesFalseError unless @module.append_features(Module.new)
       end

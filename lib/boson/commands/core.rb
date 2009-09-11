@@ -10,10 +10,10 @@ module Boson::Commands::Core
       :menu=>"Provide a menu to multi-select elements from a given array",
       :usage=>"Print a command's usage"
     }
-    commands_hash = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
-    commands_hash['commands'][:options] = {:field=>:optional, :sort=>:optional}
-    commands_hash['libraries'][:options] = {:field=>:optional, :sort=>:optional}
-    {:library_file=>File.expand_path(__FILE__), :commands_hash=>commands_hash}
+    commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
+    commands['commands'][:options] = {:field=>:optional, :sort=>:optional}
+    commands['libraries'][:options] = {:field=>:optional, :sort=>:optional}
+    {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
   def commands(*args)

@@ -90,9 +90,23 @@ module Boson
       @loaded = false
       repo = set_repo
       @repo_dir = repo.dir
-      set_attributes (repo.config[:libraries][@name] || {}).merge(hash), true
-      @commands_hash = repo.config[:commands].merge(@commands_hash || {})
+      @commands_hash = {}
+      @commands = []
+      process_config (repo.config[:libraries][@name] || {}).merge(hash)
+      @commands_hash = repo.config[:commands].merge @commands_hash
       set_command_aliases(repo.config[:command_aliases])
+    end
+
+    def process_config(config)
+      if (commands = config.delete(:commands))
+        if commands.is_a?(Array)
+          @commands += commands
+        elsif commands.is_a?(Hash)
+          @commands_hash = Util.recursive_hash_merge commands, @commands_hash
+        end
+      end
+      set_command_aliases config.delete(:command_aliases) if config[:command_aliases]
+      set_attributes config, true
     end
 
     def set_command_aliases(command_aliases)
