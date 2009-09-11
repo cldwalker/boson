@@ -13,7 +13,6 @@ module Boson::Commands::Core
     commands_hash = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
     commands_hash['commands'][:options] = {:field=>:optional, :sort=>:optional}
     commands_hash['libraries'][:options] = {:field=>:optional, :sort=>:optional}
-    commands_hash['render'][:options] = {:sort=>:optional}
     {:library_file=>File.expand_path(__FILE__), :commands_hash=>commands_hash}
   end
 

@@ -62,7 +62,7 @@ module Boson
           parsed_options = Util.symbolize_keys(parsed_options)
           args << parsed_options
         end
-        # p args
+        p args
         super(*args)
       }
     end
