@@ -27,7 +27,7 @@ module Boson
     def load_source_and_set_module; end
 
     def module_callbacks
-      process_config(@module.config) if @module.respond_to?(:config)
+      set_config(@module.config) if @module.respond_to?(:config)
       if @module.respond_to?(:append_features)
         raise AppendFeaturesFalseError unless @module.append_features(Module.new)
       end

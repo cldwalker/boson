@@ -73,7 +73,7 @@ module Boson
 
       def loader_create(source, options={})
         lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or raise(LoaderError, "Library #{source} not found.")
-        lib_class[0].new(:name=>source.to_s, :source=>source, :options=>options)
+        lib_class[0].new(:name=>source, :options=>options)
       end
 
       attr_accessor :handle_blocks
@@ -85,19 +85,23 @@ module Boson
 
     attr_reader :gems, :dependencies, :commands, :loaded, :module, :name, :library_file, :commands_hash
     def initialize(hash)
-      @name = hash.delete(:name) or raise ArgumentError, "New library missing required key :name"
+      @name = set_name hash.delete(:name)
       @options = hash.delete(:options) || {}
       @loaded = false
       repo = set_repo
       @repo_dir = repo.dir
       @commands_hash = {}
       @commands = []
-      process_config (repo.config[:libraries][@name] || {}).merge(hash)
+      set_config (repo.config[:libraries][@name] || {}).merge(hash)
       @commands_hash = repo.config[:commands].merge @commands_hash
       set_command_aliases(repo.config[:command_aliases])
     end
 
-    def process_config(config)
+    def set_name(name)
+      name.to_s or raise ArgumentError, "New library missing required key :name"
+    end
+
+    def set_config(config)
       if (commands = config.delete(:commands))
         if commands.is_a?(Array)
           @commands += commands
@@ -202,7 +206,7 @@ module Boson
     end
 
     def marshalize
-      @commands_hash = @namespace_object = @source = nil
+      @options = @commands_hash = @namespace_object = nil
       @module = @module.to_s
       @loaded = false
       self
