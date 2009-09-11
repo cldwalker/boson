@@ -39,7 +39,7 @@ module Boson
 
       test "searches with a given search field" do
         render_expects {|*args| args[0] == [Boson.library('another')]}
-        @higgs.libraries('Cool', :search_field=>:module)
+        @higgs.libraries('Cool', :field=>:module)
       end
     end
 
@@ -61,7 +61,7 @@ module Boson
 
       test "searches with a given search field" do
         render_expects {|*args| args[0] == [Boson.command('and')]}
-        @higgs.commands('this', :search_field=>:lib)
+        @higgs.commands('this', :field=>:lib)
       end
     end
   end
