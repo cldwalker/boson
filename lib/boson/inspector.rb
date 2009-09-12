@@ -2,7 +2,8 @@
 # comment descriptions inspired by http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da
 module Boson::Inspector
   extend self
-  def find_command_description(stack)
+  # returns file and line no of method given caller array
+  def find_method_locations(stack)
     if (line = stack.find {|e| e =~ /in `load_source'/ })
       (line =~ /^(.*):(\d+)/) ? [$1, $2.to_i] : nil
     end
@@ -12,27 +13,28 @@ module Boson::Inspector
     ::Module.module_eval %[
       def new_method_added(method)
         if @desc
-          @descriptions[method.to_s] = @desc 
+          @_descriptions[method.to_s] = @desc
           @desc = nil
-        else
-          @comment_descriptions ||= {}
-          if (result = Boson::Inspector.find_command_description(caller))
-            @comment_descriptions[method.to_s] = result
-          end
         end
         if @opts
-          @options[method.to_s] = @opts
+          @_options[method.to_s] = @opts
           @opts = nil
+        end
+        if @opts.nil? || @desc.nil?
+          @_method_locations ||= {}
+          if (result = Boson::Inspector.find_method_locations(caller))
+            @_method_locations[method.to_s] = result
+          end
         end
       end
 
       def options(opts)
-        @options ||= {}
+        @_options ||= {}
         @opts = opts
       end
 
       def desc(description)
-        @descriptions ||= {}
+        @_descriptions ||= {}
         @desc = description
       end
 
@@ -52,6 +54,15 @@ module Boson::Inspector
     lines = file_string.split("\n")
     line -= 2
     (lines[line] =~ /^\s*#\s*(.*)/) ? $1 : nil
+  end
+
+  def options_from_file(file_string, line)
+    lines = file_string.split("\n")
+    line -= 3
+    if options = (lines[line] =~ /^\s*#\s*options\s*(.*)/) ? $1 : nil
+      options = "{#{options}}" unless options[/^\s*\{/]
+      begin eval(options); rescue(Exception); nil end
+    end
   end
 
   def command_usage(name)

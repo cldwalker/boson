@@ -62,36 +62,48 @@ module Boson
     end
 
     def before_create_commands
-      add_command_descriptions(commands) if @module && (@module.instance_variable_defined?(:@descriptions) ||
-        @module.instance_variable_defined?(:@comment_descriptions))
-      add_command_options if @module && @module.instance_variable_defined?(:@options)
+      if @module
+        add_command_descriptions(commands) if @module.instance_variable_defined?(:@_descriptions)
+        add_command_options if @module.instance_variable_defined?(:@_options)
+        add_comment_metadata if @module.instance_variable_defined?(:@_method_locations)
+      end
     end
 
     def add_command_options
-      @module.instance_variable_get(:@options).each do |cmd, options|
+      @module.instance_variable_get(:@_options).each do |cmd, options|
         if no_command_config_for(cmd, :options)
           (@commands_hash[cmd] ||= {})[:options] = options
         end
       end
     end
 
-    def no_command_config_for(cmd, attribute)
-      !@commands_hash[cmd] || (@commands_hash[cmd] && !@commands_hash[cmd].key?(attribute))
+    def add_comment_metadata
+      @module.instance_variable_get(:@_method_locations).each do |cmd, (file, lineno)|
+        if file == library_file
+          if no_command_config_for(cmd, :description)
+            if (description = Inspector.description_from_file(self.class.read_library_file(file), lineno))
+              (@commands_hash[cmd] ||= {})[:description] = description
+            end
+          end
+          if no_command_config_for(cmd, :options)
+            if (options = Inspector.options_from_file(self.class.read_library_file(file), lineno))
+              (@commands_hash[cmd] ||= {})[:options] = options
+            end
+          end
+        end
+      end
     end
 
     def add_command_descriptions(commands)
-      (@module.instance_variable_get(:@descriptions) || {}).each do |cmd, description|
+      @module.instance_variable_get(:@_descriptions).each do |cmd, description|
         if no_command_config_for(cmd, :description)
           (@commands_hash[cmd] ||= {})[:description] = description
         end
       end
-      (@module.instance_variable_get(:@comment_descriptions) || {}).each do |cmd, (file, lineno)|
-        if (file == library_file) && no_command_config_for(cmd, :description)
-          if (description = Inspector.description_from_file(self.class.read_library_file(file), lineno))
-            (@commands_hash[cmd] ||= {})[:description] = description
-          end
-        end
-      end
+    end
+
+    def no_command_config_for(cmd, attribute)
+      !@commands_hash[cmd] || (@commands_hash[cmd] && !@commands_hash[cmd].key?(attribute))
     end
   end
 end
