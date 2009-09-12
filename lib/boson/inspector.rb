@@ -53,16 +53,18 @@ module Boson::Inspector
   def description_from_file(file_string, line)
     lines = file_string.split("\n")
     line -= 2
-    (lines[line] =~ /^\s*#\s*(.*)/) ? $1 : nil
+    (lines[line] =~ /^\s*#\s*(?!\s*options)(.*)/) ? $1 : nil
   end
 
   def options_from_file(file_string, line)
     lines = file_string.split("\n")
-    line -= 3
-    if options = (lines[line] =~ /^\s*#\s*options\s*(.*)/) ? $1 : nil
-      options = "{#{options}}" unless options[/^\s*\{/]
-      begin eval(options); rescue(Exception); nil end
-    end
+    start_line = line - 3
+    (start_line..start_line +1).find {|line|
+      if options = (lines[line] =~ /^\s*#\s*options\s*(.*)/) ? $1 : nil
+        options = "{#{options}}" unless options[/^\s*\{/]
+        return begin eval(options); rescue(Exception); nil end
+      end
+    }
   end
 
   def command_usage(name)
