@@ -54,9 +54,11 @@ module Boson::Commands::Core
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
     if object.is_a?(Array) && (sort = options.delete(:sort))
+      sort.sub!('!','') if (reverse_sort = sort[/^!/])
       begin
         object = object.sort_by {|e| e.send(sort).to_s }
-      rescue NoMethodError
+        object = object.reverse if reverse_sort
+      rescue NoMethodError, ArgumentError
         $stderr.puts "Sort failed with nonexistant method '#{sort}'"
       end
     end
