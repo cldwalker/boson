@@ -16,19 +16,17 @@ module Boson::Commands::Core
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
-  def commands(*args)
-    query = args[0].is_a?(String) ? args.shift : ''
-    options = {:fields=>[:name, :lib, :alias, :usage],:field=>:name}.merge(args[0] || {})
+  def commands(query='', options={})
+    options = {:fields=>[:name, :lib, :alias, :usage],:field=>:name}.merge(options)
     search_field = options.delete(:field)
     results = Boson.commands.select {|f| f.send(search_field).to_s =~ /#{query}/i }
     options[:fields] << :description if results.any? {|e| ! e.description.nil?}
     render results, options
   end
 
-  def libraries(*args)
-    query = args[0].is_a?(String) ? args.shift : ''
+  def libraries(query='', options={})
     options = {:fields=>[:name, :commands, :gems, :library_type], :field=>:name,
-      :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(args[0] || {})
+      :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
     search_field = options.delete(:field)
     results = Boson.libraries.select {|f| f.send(search_field).to_s =~ /#{query}/i }
     render results, options
@@ -70,11 +68,8 @@ module Boson::Commands::Core
   end
 
   def usage(name)
-    if (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias))
-      "#{name} #{command.usage}"
-    else
-      "Command #{name} not found."
-    end
+    (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias)) ?
+      "#{name} #{command.usage}" : "Command '#{name}' not found"
   end
 
   private

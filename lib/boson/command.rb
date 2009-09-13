@@ -38,10 +38,15 @@ module Boson
     def args
       @args ||= begin
         if library && File.exists?(library.library_file || '')
+          @file_parsed_args = true
           file_string = Boson::FileLibrary.read_library_file(library.library_file)
           Inspector.arguments_from_file(file_string, @name)
         end
       end
+    end
+
+    def file_parsed_args?
+      @file_parsed_args
     end
 
     def option_parser
@@ -59,7 +64,9 @@ module Boson
     def usage
       return '' if options.nil? && args.nil?
       usage_args = args && @options ? args[0..-2] : args
-      str = args ? usage_args.map {|e| "[#{e.join('=')}]"}.join(' ') : '[*unknown]'
+      str = args ? usage_args.map {|e|
+        (e.size < 2) ? "[#{e[0]}]" : "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
+      }.join(' ') : '[*unknown]'
       str + option_help
     end
 
@@ -80,6 +87,18 @@ module Boson
           parsed_options = command.option_parser.parse([])
         end
         if parsed_options
+          # add in default values from command.args
+          if command.args && args.size < command.args.size - 1
+            # leave off last arg since its an option
+            command.args.slice(0..-2).each_with_index {|arr,i|
+              next if args.size >= i + 1 # only fill in once args run out
+              break if arr.size != 2 # a default arg value must exist
+              begin
+                args[i] = command.file_parsed_args? ? Boson.main_object.instance_eval(arr[1]) : arr[1]
+              rescue Exception
+              end
+            }
+          end
           parsed_options = Util.symbolize_keys(parsed_options)
           args << parsed_options
           if command.args && args.size < command.args.size && !command.has_splat_args?
