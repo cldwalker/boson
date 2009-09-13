@@ -27,9 +27,13 @@ module Boson::Inspector
           end
         end
         if instance_of? Module
+          @_method_args ||= {}
           o = Object.new
           o.extend(self)
-          Boson::Inspector.output_method_info(self, o, method, false)
+          # private methods return nil
+          if (val = Boson::Inspector.output_method_info(self, o, method, false))
+            @_method_args[method.to_s] = val
+          end
         end
       end
 
@@ -88,7 +92,6 @@ module Boson::Inspector
   MAX_ARGS = 10
   # from http://eigenclass.org/hiki/method+arguments+via+introspection
   def output_method_info(klass, object, meth, is_singleton = false)
-    return if $__method_args_off
     file = line = params = values = nil
     unless %w[initialize].include?(meth.to_s)
       if is_singleton
@@ -114,6 +117,7 @@ module Boson::Inspector
     variadic_with_block = false
     if arity >= 0
       num_args = arity
+      p [meth,num_args]
       catch(:done){ object.send(meth, *(0...arity)) }
     else
       num_args = 0
@@ -149,7 +153,6 @@ module Boson::Inspector
         args.empty? ? object.send(meth) : object.send(meth, *args)
       end
     end
-    #p params, values
     set_trace_func(nil)
 
     if local_variables == params
@@ -163,30 +166,30 @@ module Boson::Inspector
           [a << "*#{x}", i+1] 
         else
           if arity < 0 && i >= arity.abs - 1
-            [a << "#{x} = #{values[i].inspect}", i + 1]
+            [a << [x, values[i]], i + 1]
           else
             [a << x, i+1]
           end
         end
-      end.first.join(", ")
+      end.first
     end
     params ||= []
     params = params[0,num_args]
+    fmt_params.call(params, arity)
     #unfortunately, there's no way to tell the block arg from the first local
     #since its value will be nil even if we pass a block
     #if arity >= 0 && params[arity] # or variadic_with_block
     #  arg_desc = "(#{fmt_params.call(params[0..-2], arity)}, &#{params.last})"
     #else
-    arg_desc = "(#{fmt_params.call(params, arity)})"
+    # arg_desc = "(#{fmt_params.call(params, arity)})"
     #end
 
 
-    puts "#{klass}#{is_singleton ? "." : "#" }#{meth} #{arg_desc}"
+    # puts "#{klass}#{is_singleton ? "." : "#" }#{meth} #{arg_desc}"
     rescue Exception
       #puts "GOT EXCEPTION while processing #{klass} #{meth}"
       #puts $!.message
       #puts $!.backtrace
-      puts "#{klass}#{is_singleton ? "." : "#"}#{meth} (...)"
     ensure
       set_trace_func(nil)
   end

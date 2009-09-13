@@ -66,6 +66,15 @@ module Boson
         add_command_descriptions(commands) if @module.instance_variable_defined?(:@_descriptions)
         add_command_options if @module.instance_variable_defined?(:@_options)
         add_comment_metadata if @module.instance_variable_defined?(:@_method_locations)
+        add_command_args if @module.instance_variable_defined?(:@_method_args)
+      end
+    end
+
+    def add_command_args
+      @module.instance_variable_get(:@_method_args).each do |cmd, args|
+        if no_command_config_for(cmd, :args)
+          (@commands_hash[cmd] ||= {})[:args] = args
+        end
       end
     end
 
