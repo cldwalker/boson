@@ -31,7 +31,7 @@ module Boson::Inspector
           o = Object.new
           o.extend(self)
           # private methods return nil
-          if (val = Boson::Inspector.output_method_info(self, o, method, false))
+          if (val = Boson::Inspector.determine_method_args(method, self, o))
             @_method_args[method.to_s] = val
           end
         end
@@ -89,35 +89,53 @@ module Boson::Inspector
     end
   end
 
-  MAX_ARGS = 10
+  MAX_ARGS = 10 # max number of arguments extracted for a method
   # from http://eigenclass.org/hiki/method+arguments+via+introspection
-  def output_method_info(klass, object, meth, is_singleton = false)
-    file = line = params = values = nil
+  def determine_method_args(meth, klass, object)
     unless %w[initialize].include?(meth.to_s)
-      if is_singleton
-        return if class << klass; private_instance_methods(true) end.include?(meth.to_s)
-      else
-        return if class << object; private_instance_methods(true) end.include?(meth.to_s)
-      end
+      return if class << object; private_instance_methods(true) end.include?(meth.to_s)
     end
-    arity = is_singleton ? object.method(meth).arity : klass.instance_method(meth).arity
+    params, values, arity, num_args = trace_method_args(meth, klass, object)
+    return if local_variables == params # nothing new found
+    format_arguments(params, values, arity, num_args)
+    rescue Exception
+      #puts "#{klass}.#{methd}: #{$!.message}"
+    ensure
+      set_trace_func(nil)
+  end
+
+  # process params + values to return array of arguments / argument-value pairs
+  def format_arguments(params, values, arity, num_args)
+    params ||= []
+    params = params[0,num_args]
+    params.inject([[], 0]) do |(a, i), x|
+      if Array === values[i]
+        [a << "*#{x}", i+1]
+      else
+        if arity < 0 && i >= arity.abs - 1
+          [a << [x, values[i]], i + 1]
+        else
+          [a << x, i+1]
+        end
+      end
+    end.first
+  end
+
+  def trace_method_args(meth, klass, object)
+    file = line = params = values = nil
+    arity = klass.instance_method(meth).arity
     set_trace_func lambda{|event, file, line, id, binding, classname|
       begin
-        #puts "!EVENT: #{event} #{classname}##{id}, #{file} #{line}"
-        #puts "(#{self} #{meth})"
         if event[/call/] && classname == klass && id == meth
           params = eval("local_variables", binding)
           values = eval("local_variables.map{|x| eval(x)}", binding)
-          #puts "EVENT: #{event} #{classname}##{id}"
           throw :done
         end
       rescue Exception
       end
     }
-    variadic_with_block = false
     if arity >= 0
       num_args = arity
-      p [meth,num_args]
       catch(:done){ object.send(meth, *(0...arity)) }
     else
       num_args = 0
@@ -133,64 +151,15 @@ module Boson::Inspector
         next if !values || values.compact.empty? 
         k = nil
         values.each_with_index{|x,j| break (k = j) if Array === x}
-        if k
-          num_args = k+1
-        else
-          num_args = i
-        end
+        num_args = k ? k+1 : i
         break
       end
-      # determine if it's got a block arg
-=begin
-      30.downto(arity.abs - 1) do |i|
-        catch(:done) { object.send(meth, *(0...i)) }
-        next if values.compact.empty?
-        variadic_with_block = true if values[-1] == nil
-      end
-=end
       args = (0...arity.abs-1).to_a
       catch(:done) do 
         args.empty? ? object.send(meth) : object.send(meth, *args)
       end
     end
     set_trace_func(nil)
-
-    if local_variables == params
-      puts "#{klass}#{is_singleton ? "." : "#"}#{meth} (...)"
-      return
-    end
-
-    fmt_params = lambda do |arr, arity|
-      arr.inject([[], 0]) do |(a, i), x|
-        if Array === values[i] 
-          [a << "*#{x}", i+1] 
-        else
-          if arity < 0 && i >= arity.abs - 1
-            [a << [x, values[i]], i + 1]
-          else
-            [a << x, i+1]
-          end
-        end
-      end.first
-    end
-    params ||= []
-    params = params[0,num_args]
-    fmt_params.call(params, arity)
-    #unfortunately, there's no way to tell the block arg from the first local
-    #since its value will be nil even if we pass a block
-    #if arity >= 0 && params[arity] # or variadic_with_block
-    #  arg_desc = "(#{fmt_params.call(params[0..-2], arity)}, &#{params.last})"
-    #else
-    # arg_desc = "(#{fmt_params.call(params, arity)})"
-    #end
-
-
-    # puts "#{klass}#{is_singleton ? "." : "#" }#{meth} #{arg_desc}"
-    rescue Exception
-      #puts "GOT EXCEPTION while processing #{klass} #{meth}"
-      #puts $!.message
-      #puts $!.backtrace
-    ensure
-      set_trace_func(nil)
+    return [params, values, arity, num_args]
   end
 end
