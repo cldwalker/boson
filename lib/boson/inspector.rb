@@ -76,21 +76,17 @@ module Boson::Inspector
     }
   end
 
-  def command_usage(name)
-    return "Command not loaded" unless (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias))
-    return "Library for #{command_obj.name} not found" unless lib = Boson.library(command.lib)
-    return "File for #{lib.name} library not found" unless File.exists?(lib.library_file || '')
+  # produces same argument arrays as determine_method_args
+  def arguments_from_file(file_string, meth)
     tabspace = "[ \t]"
-    file_string = Boson::FileLibrary.read_library_file(lib.library_file)
-    if match = /^#{tabspace}*def#{tabspace}+#{command.name}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
-      "#{name} "+ (match.to_a[2] || '').split(/\s*,\s*/).map {|e| "[#{e}]"}.join(' ')
-    else
-      "Command not found in file"
+    if match = /^#{tabspace}*def#{tabspace}+#{meth}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
+      (match.to_a[2] || '').split(/\s*,\s*/).map {|e| e.split('=')}
     end
   end
 
   MAX_ARGS = 10 # max number of arguments extracted for a method
   # from http://eigenclass.org/hiki/method+arguments+via+introspection
+  # returns argument arrays which have an optional 2nd element with an argument's default value
   def determine_method_args(meth, klass, object)
     unless %w[initialize].include?(meth.to_s)
       return if class << object; private_instance_methods(true) end.include?(meth.to_s)
@@ -104,18 +100,18 @@ module Boson::Inspector
       set_trace_func(nil)
   end
 
-  # process params + values to return array of arguments / argument-value pairs
+  # process params + values to return array of argument arrays
   def format_arguments(params, values, arity, num_args)
     params ||= []
     params = params[0,num_args]
     params.inject([[], 0]) do |(a, i), x|
       if Array === values[i]
-        [a << "*#{x}", i+1]
+        [a << ["*#{x}"], i+1]
       else
         if arity < 0 && i >= arity.abs - 1
           [a << [x, values[i]], i + 1]
         else
-          [a << x, i+1]
+          [a << [x], i+1]
         end
       end
     end.first

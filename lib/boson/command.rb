@@ -31,24 +31,36 @@ module Boson
       @args = hash[:args] if hash[:args]
     end
 
-    # def library
-    #   @library ||= Boson.library(@lib)
-    # end
-    # 
-    # def arity
-    #   library && library.module.instance_method(@name).arity
-    # end
+    def library
+      @library ||= Boson.library(@lib)
+    end
+
+    def args
+      @args ||= begin
+        if library && File.exists?(library.library_file || '')
+          file_string = Boson::FileLibrary.read_library_file(library.library_file)
+          Inspector.arguments_from_file(file_string, @name)
+        end
+      end
+    end
 
     def option_parser
       @option_parser ||= (@options ? Options.new(@options) : nil)
     end
 
     def option_help
-      options ? option_parser.to_s : ''
+      @options ? option_parser.to_s : ''
     end
 
     def has_splat_args?
-      @args && @args.any? {|e| e = e[0] if e.is_a?(Array); e[/^\*/] }
+      @args && @args.any? {|e| e[0][/^\*/] }
+    end
+
+    def usage
+      return '' if options.nil? && args.nil?
+      usage_args = args && @options ? args[0..-2] : args
+      str = args ? usage_args.map {|e| "[#{e.join('=')}]"}.join(' ') : '[*unknown]'
+      str + option_help
     end
 
     def create_option_command_block

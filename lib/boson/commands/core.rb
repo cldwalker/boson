@@ -18,7 +18,7 @@ module Boson::Commands::Core
 
   def commands(*args)
     query = args[0].is_a?(String) ? args.shift : ''
-    options = {:fields=>[:name, :lib, :alias, :option_help],:field=>:name}.merge(args[0] || {})
+    options = {:fields=>[:name, :lib, :alias, :usage],:field=>:name}.merge(args[0] || {})
     search_field = options.delete(:field)
     results = Boson.commands.select {|f| f.send(search_field).to_s =~ /#{query}/i }
     options[:fields] << :description if results.any? {|e| ! e.description.nil?}
@@ -69,9 +69,12 @@ module Boson::Commands::Core
     Hirb::Console.format_output(output, options.merge(:class=>"Hirb::Menu"), &block)
   end
 
-  def usage(name, debug=false)
-    help_string = Boson::Inspector.command_usage(name)
-    (help_string !~ /^#{name}/ && !debug) ? "No help found for command #{name}." : help_string
+  def usage(name)
+    if (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias))
+      "#{name} #{command.usage}"
+    else
+      "Command #{name} not found."
+    end
   end
 
   private
