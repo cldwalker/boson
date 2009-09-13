@@ -47,21 +47,32 @@ module Boson
       options ? option_parser.to_s : ''
     end
 
+    def has_splat_args?
+      @args && @args.any? {|e| e = e[0] if e.is_a?(Array); e[/^\*/] }
+    end
+
     def create_option_command_block
       command = self
       options = @options.delete(:options) || {}
-      lambda {|*args|
+      default_lambda = lambda {|*args|
         if args.size == 1 && args[0].is_a?(String)
           args = Shellwords.shellwords(args.join(" "))
           parsed_options = command.option_parser.parse(args)
-          args = command.option_parser.non_opts
-        # 2nd string argument interpreted as options
+          args = command.option_parser.non_opts.delete_if {|e| bool = e[/^-/]; $stderr.puts "Invalid option #{e}" if bool; bool}
+        # last string argument interpreted as args + options
         elsif args.size > 1 && args[-1].is_a?(String)
           parsed_options = command.option_parser.parse(args.pop.split(/\s+/))
+          args += command.option_parser.non_opts.delete_if {|e| bool = e[/^-/]; $stderr.puts "Invalid option #{e}" if bool; bool}
+        # default options
+        elsif command.args && args.size == command.args.size - 1
+          parsed_options = command.option_parser.parse([])
         end
         if parsed_options
           parsed_options = Util.symbolize_keys(parsed_options)
           args << parsed_options
+          if command.args && args.size < command.args.size && !command.has_splat_args?
+            raise ArgumentError, "wrong number of arguments (#{args.size} for #{command.args.size})"
+          end
         end
         p args
         super(*args)
