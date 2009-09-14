@@ -110,7 +110,7 @@ module Boson
       end
     end
 
-    def parse(args)
+    def parse(args, options={})
       @args = args
       # start with defaults
       hash = IndifferentAccessHash.new @defaults
@@ -160,7 +160,18 @@ module Boson
       
       @trailing_non_opts = @args
       check_required! hash
+      delete_invalid_opts if options[:delete_invalid_opts]
       hash
+    end
+
+    def delete_invalid_opts
+      [@leading_non_opts, @trailing_non_opts].each do |args|
+        args.delete_if {|e|
+          invalid = e.to_s[/^-/]
+          $stderr.puts "Invalid option '#{e}'" if invalid
+          invalid
+        }
+      end
     end
     
     def formatted_usage

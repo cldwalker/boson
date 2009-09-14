@@ -133,6 +133,14 @@ module Boson
     create "--foo" => :optional
     parse("--foo", "12")[:foo].should == "12"
   end
+
+  it "deletes and warns of invalid options" do
+    create(:foo=>:boolean)
+    capture_stderr {
+      @opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
+    }.should =~ /Invalid option '-d'/
+    @opt.non_opts.should == ['ok']
+  end
   
   context "with no arguments" do
     it "and no switches returns an empty hash" do

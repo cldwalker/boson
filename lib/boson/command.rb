@@ -77,15 +77,15 @@ module Boson
         begin
         if args.size == 1 && args[0].is_a?(String)
           args = Shellwords.shellwords(args.join(" "))
-          parsed_options = command.option_parser.parse(args)
-          args = command.option_parser.non_opts.delete_if {|e| bool = e[/^-/]; $stderr.puts "Invalid option #{e}" if bool; bool}
+          parsed_options = command.option_parser.parse(args, :delete_invalid_opts=>true)
+          args = command.option_parser.non_opts
         # last string argument interpreted as args + options
         elsif args.size > 1 && args[-1].is_a?(String)
-          parsed_options = command.option_parser.parse(args.pop.split(/\s+/))
-          args += command.option_parser.non_opts.delete_if {|e| bool = e[/^-/]; $stderr.puts "Invalid option #{e}" if bool; bool}
+          parsed_options = command.option_parser.parse(args.pop.split(/\s+/), :delete_invalid_opts=>true)
+          args += command.option_parser.non_opts
         # default options
         elsif command.args && args.size == command.args.size - 1
-          parsed_options = command.option_parser.parse([])
+          parsed_options = command.option_parser.parse([], :delete_invalid_opts=>true)
         end
         if parsed_options
           # add in default values from command.args
