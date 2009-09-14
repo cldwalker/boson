@@ -77,25 +77,8 @@ module Boson
       end
     end
 
-    context "parse_args" do
-      test "parses option without value as true" do
-        BinRunner.parse_args(['it', '-o']).should == ["it", {:o=>true}, []]
-      end
-
-      test "parses option with =value" do
-        BinRunner.parse_args(['it', '-o=cool']).should == ["it", {:o=>'cool'}, []]
-      end
-
-      test "passes multiple arguments" do
-        BinRunner.parse_args(['que','hora','es']).should == ['que', {}, ['hora','es']]
-      end
-
-      test "parses options anywhere" do
-        expected = ['it', {:o=>'d'}, ['github']]
-        BinRunner.parse_args(['it', '-o=d', 'github']).should == expected
-        BinRunner.parse_args(['-o=d', 'it', 'github']).should == expected
-        BinRunner.parse_args(['it', 'github', '-o=d']).should == expected
-      end
+    test "parse_args only translates options before command" do
+      BinRunner.parse_args(['-v', 'com', '-v']).should == ["com", {:verbose=>true}, ['-v']]
     end
   end
 end

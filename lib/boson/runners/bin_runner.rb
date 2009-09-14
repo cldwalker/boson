@@ -3,7 +3,6 @@ module Boson
     class <<self
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
-        process_options
         return print_usage if args.empty? || (!@options[:repl] && @command.nil?)
         @options[:repl] ? ReplRunner.bin_start(@options[:repl], unalias_libraries(@options[:load])) : load_command
       end
@@ -81,7 +80,8 @@ module Boson
       end
 
       def default_options
-        {:discover=>false, :verbose=>false, :index_create=>false, :execute=>false, :load=>false, :repl=>false, :help=>false}
+        {:discover=>:boolean, :verbose=>:boolean, :index_create=>:boolean, :execute=>:boolean, :load=>:optional,
+           :repl=>:boolean, :help=>:boolean}
       end
 
       def load_command_by_discovery
@@ -91,26 +91,11 @@ module Boson
         }
       end
 
-      def process_options
-        possible_options = default_options.keys
-        @options.each {|k,v|
-          if (match = possible_options.find {|e| e.to_s =~ /^#{k}/ })
-            @options[match] = @options.delete(k)
-          end
-        }
-        @options = default_options.merge(@options)
-      end
-
-      # taken from rip
       def parse_args(args)
-        options, args = args.partition { |piece| piece =~ /^-/ }
-        command = args.shift
-        options = options.inject({}) do |hash, flag|
-          key, value = flag.split('=')
-          hash[key.sub(/^--?/,'').intern] = value.nil? ? true : value
-          hash
-        end
-        [command, options, args]
+        @option_parser = Options.new(default_options)
+        options = Util.symbolize_keys @option_parser.parse(args.dup, false)
+        new_args = @option_parser.non_opts
+        [new_args.shift, options, new_args]
       end
 
       def render_output(output)
