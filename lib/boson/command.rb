@@ -99,7 +99,6 @@ module Boson
               end
             }
           end
-          parsed_options = Util.symbolize_keys(parsed_options)
           args << parsed_options
           if command.args && args.size < command.args.size && !command.has_splat_args?
             raise ArgumentError, "wrong number of arguments (#{args.size} for #{command.args.size})"

@@ -93,7 +93,7 @@ module Boson
 
       def parse_args(args)
         @option_parser = Options.new(default_options)
-        options = Util.symbolize_keys @option_parser.parse(args.dup, false)
+        options = @option_parser.parse(args.dup, false)
         new_args = @option_parser.non_opts
         [new_args.shift, options, new_args]
       end

@@ -252,6 +252,5 @@ module Boson
         end
       end
     end
-    
   end
 end
