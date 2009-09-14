@@ -6,11 +6,15 @@ module Boson
   class IndifferentAccessHash < ::Hash
     def initialize(hash)
       super()
-      update hash
+      update hash.each {|k,v| hash[convert_key(k)] = hash.delete(k) }
     end
 
     def [](key)
       super convert_key(key)
+    end
+
+    def []=(key, value)
+      super convert_key(key), value
     end
 
     def values_at(*indices)
@@ -19,7 +23,7 @@ module Boson
 
     protected
       def convert_key(key)
-        key.kind_of?(Symbol) ? key.to_s : key
+        key.kind_of?(String) ? key.to_sym : key
       end
   end
 
@@ -109,7 +113,7 @@ module Boson
 
     def parse(args, skip_leading_non_opts = true)
       @args = args
-      # start with Boson::IndifferentAccessHash pre-filled with defaults
+      # start with defaults
       hash = IndifferentAccessHash.new @defaults
       
       @leading_non_opts = []
@@ -130,9 +134,9 @@ module Boson
         end
         
         switch    = normalize_switch(switch)
-        nice_name = undasherize(switch)
+        nice_name = undasherize(switch).to_sym
         type      = switch_type(switch)
-        
+
         case type
         when :required
           assert_value!(switch)
@@ -141,7 +145,7 @@ module Boson
         when :optional
           hash[nice_name] = peek.nil? || valid?(peek) || shift
         when :boolean
-          if !@switches.key?(switch) && nice_name =~ /^no-(\w+)$/
+          if !@switches.key?(switch) && nice_name.to_s =~ /^no-(\w+)$/
             hash[$1] = false
           else
             hash[nice_name] = true
@@ -157,9 +161,7 @@ module Boson
       end
       
       @trailing_non_opts = @args
-
       check_required! hash
-      hash.freeze
       hash
     end
     

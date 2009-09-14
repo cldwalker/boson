@@ -12,6 +12,33 @@ module Boson
     @opt.parse(args.flatten)
   end
   
+  context "IndifferentAccessHash" do
+    before(:each) {
+      @hash = IndifferentAccessHash.new 'foo' => 'bar', 'baz' => 'bee'
+    }
+    it "can access values indifferently" do
+      @hash['foo'].should == 'bar'
+      @hash[:foo].should  == 'bar'
+      @hash.values_at(:foo, :baz).should == ['bar', 'bee']
+    end
+
+    it "can be initialized with either strings or symbols and be equal" do
+      hash2 = IndifferentAccessHash.new :foo=>'bar', :baz=>'bee'
+      @hash.should == hash2
+    end
+
+    it "returns keys as symbols by default" do
+      @hash.should == {:foo=>'bar', :baz=>'bee'}
+    end
+
+    it "can set values indifferently" do
+      @hash['foo'] = 'duh'
+      @hash[:foo].should == 'duh'
+      @hash[:baz] = 'wasp'
+      @hash['baz'].should == 'wasp'
+    end
+  end
+
   context "naming" do
     it "automatically aliases long switches with their first letter" do
       create "--foo" => true
@@ -32,22 +59,32 @@ module Boson
     
     it "allows custom short names" do
       create "-f" => :optional
-      parse("-f", "12").should == {"f" => "12"}
+      parse("-f", "12").should == {:f => "12"}
     end
     
     it "allows custom short-name aliases" do
       create ["--bar", "-f"] => :optional
-      parse("-f", "12").should == {"bar" => "12"}
+      parse("-f", "12").should == {:bar => "12"}
     end
     
-    it "should allows humanized switch input" do
+    it "allows humanized switch input" do
       create 'foo' => :optional, :bar => :required
-      parse("-f", "1", "-b", "2").should == {"foo" => "1", "bar" => "2"}
+      parse("-f", "1", "-b", "2").should == {:foo => "1", :bar => "2"}
+    end
+
+    it "allows humanized symbol switch input" do
+      create :foo=>:optional
+      parse('-f','1').should == {:foo=>'1'}
+    end
+
+    it "only creates short for first switch if multiple switches start with same letter" do
+      create :verbose=>:boolean, :vertical=>:optional
+      parse('-v', '2').should == {:verbose=>true}
     end
     
     it "doesn't recognize long switch format for a switch that is originally short" do
       create 'f' => :optional
-      parse("-f", "1").should == {"f" => "1"}
+      parse("-f", "1").should == {:f => "1"}
       parse("--f", "1").should == {}
     end
     
@@ -98,14 +135,6 @@ module Boson
     parse("--foo", "12")[:foo].should == "12"
   end
   
-  it "result is immutable" do
-    create "--foo" => :optional
-    assert_raises(TypeError) {
-      hash = parse
-      hash['foo'] = 'baz'
-    }
-  end
-  
   context "with no arguments" do
     it "and no switches returns an empty hash" do
       create({})
@@ -136,27 +165,27 @@ module Boson
     end
   
     it "sets switches without arguments to true" do
-      parse("--foo")["foo"].should == true
-      parse("--bar")["bar"].should == true
+      parse("--foo")[:foo].should == true
+      parse("--bar")[:bar].should == true
     end
   
     it "doesn't set nonexistant switches" do
-      parse("--foo")["bar"].should == nil
-      parse("--bar")["foo"].should == nil
+      parse("--foo")[:bar].should == nil
+      parse("--bar")[:foo].should == nil
     end
   
     it "sets switches with arguments to their arguments" do
-      parse("--foo", "12")["foo"].should == "12"
-      parse("--bar", "12")["bar"].should == "12"
+      parse("--foo", "12")[:foo].should == "12"
+      parse("--bar", "12")[:bar].should == "12"
     end
   
     it "assumes something that could be either a switch or an argument is a switch" do
-      parse("--foo", "--bar")["foo"].should == true
+      parse("--foo", "--bar")[:foo].should == true
     end
   
     it "overwrites earlier values with later values" do
-      parse("--foo", "--foo", "12")["foo"].should == "12"
-      parse("--foo", "12", "--foo", "13")["foo"].should == "13"
+      parse("--foo", "--foo", "12")[:foo].should == "12"
+      parse("--foo", "12", "--foo", "13")[:foo].should == "13"
     end
   end
   
@@ -181,7 +210,7 @@ module Boson
   it "extracts non-option arguments" do
     create "--foo" => :required, "--bar" => true
     parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").should == {
-      "foo" => "12", "bar" => true
+      :foo => "12", :bar => true
     }
     @opt.leading_non_opts.should == ["foo", "bar", "--baz"]
     @opt.trailing_non_opts.should == ["-T", "bang"]
@@ -194,19 +223,12 @@ module Boson
     end
     
     it "should get the specified value" do
-      parse("--branch", "bugfix").should == { "branch" => "bugfix" }
+      parse("--branch", "bugfix").should == { :branch => "bugfix" }
     end
   
     it "should get the default value when not specified" do
-      parse.should == { "branch" => "master" }
+      parse.should == { :branch => "master" }
     end
-  end
-  
-  it "IndifferentAccessHash has values accessible by either strings or symbols" do
-    @hash = Boson::IndifferentAccessHash.new 'foo' => 'bar', 'baz' => 'bee', 'force' => true
-    @hash['foo'].should == 'bar'
-    @hash[:foo].should  == 'bar'
-    @hash.values_at(:foo, :baz).should == ['bar', 'bee']
   end
   
   context ":numeric type" do
@@ -219,7 +241,7 @@ module Boson
     end
     
     it "converts values to numeric types" do
-      parse("-n", "3", "-m", ".5").should == {"n" => 3, "m" => 0.5}
+      parse("-n", "3", "-m", ".5").should == {:n => 3, :m => 0.5}
     end
     
     it "raises error when value isn't numeric" do
