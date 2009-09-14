@@ -5,6 +5,8 @@ module Boson
         @command, @options, @args = parse_args(args)
         return print_usage if args.empty? || (!@options[:repl] && @command.nil?)
         @options[:repl] ? ReplRunner.bin_start(@options[:repl], unalias_libraries(@options[:load])) : load_command
+      rescue OptionParser::Error
+        $stderr.puts "Error: "+ $!.message
       end
 
       def load_command

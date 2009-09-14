@@ -74,6 +74,7 @@ module Boson
       command = self
       options = @options.delete(:options) || {}
       default_lambda = lambda {|*args|
+        begin
         if args.size == 1 && args[0].is_a?(String)
           args = Shellwords.shellwords(args.join(" "))
           parsed_options = command.option_parser.parse(args)
@@ -104,8 +105,10 @@ module Boson
             raise ArgumentError, "wrong number of arguments (#{args.size} for #{command.args.size})"
           end
         end
-        p args
         super(*args)
+        rescue OptionParser::Error
+          $stderr.puts "Error: " + $!.message
+        end
       }
     end
   end

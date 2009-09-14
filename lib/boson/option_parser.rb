@@ -137,8 +137,8 @@ module Boson
 
         case type
         when :required
-          assert_value!(switch)
-          raise Error, "cannot pass switch '#{peek}' as an argument" if valid?(peek)
+          assert_value!(nice_name)
+          raise Error, "cannot pass '#{peek}' as an argument to option '#{nice_name}'" if valid?(peek)
           hash[nice_name] = shift
         when :optional
           hash[nice_name] = peek.nil? || valid?(peek) || shift
@@ -150,9 +150,9 @@ module Boson
           end
           
         when :numeric
-          assert_value!(switch)
+          assert_value!(nice_name)
           unless peek =~ NUMERIC and $& == peek
-            raise Error, "expected numeric value for '#{switch}'; got #{peek.inspect}"
+            raise Error, "expected numeric value for option '#{nice_name}'; got #{peek.inspect}"
           end
           hash[nice_name] = $&.index('.') ? shift.to_f : shift.to_i
         end
@@ -186,8 +186,8 @@ module Boson
 
     private
     
-    def assert_value!(switch)
-      raise Error, "no value provided for argument '#{switch}'" if peek.nil?
+    def assert_value!(nice_name)
+      raise Error, "no value provided for option '#{nice_name}'" if peek.nil?
     end
     
     def undasherize(str)
