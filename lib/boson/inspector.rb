@@ -2,11 +2,16 @@
 # comment descriptions inspired by http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da
 module Boson::Inspector
   extend self
+
   # returns file and line no of method given caller array
   def find_method_locations(stack)
     if (line = stack.find {|e| e =~ /in `load_source'/ })
       (line =~ /^(.*):(\d+)/) ? [$1, $2.to_i] : nil
     end
+  end
+
+  def current_method_has_options?(meth, method_location)
+    method_location && options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
   end
 
   def add_meta_methods
@@ -26,7 +31,11 @@ module Boson::Inspector
             @_method_locations[method.to_s] = result
           end
         end
-        if instance_of? Module
+
+        # if module && options exists for method
+        if instance_of?(Module) && (@_options && @_options.key?(method.to_s)) ||
+          (@_method_locations && Boson::Inspector.current_method_has_options?(method.to_s, @_method_locations[method.to_s]))
+
           @_method_args ||= {}
           o = Object.new
           o.extend(self)
@@ -55,6 +64,7 @@ module Boson::Inspector
   def remove_meta_methods
     ::Module.module_eval %[
       remove_method :desc
+      remove_method :options
       alias_method :method_added, :_old_method_added
     ]
   end
