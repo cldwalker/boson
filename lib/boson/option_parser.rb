@@ -27,7 +27,7 @@ module Boson
       end
   end
 
-  class Options
+  class OptionParser
     class Error < StandardError; end
     
 
@@ -55,7 +55,7 @@ module Boson
     #
     # Example:
     #
-    #   opts = Boson::Options.new(
+    #   opts = Boson::OptionParser.new(
     #      "--debug" => true,
     #      ["--verbose", "-v"] => true,
     #      ["--level", "-l"] => :numeric

@@ -1,10 +1,9 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
-require "boson/options"
 
 module Boson
-  class OptionsTest < Test::Unit::TestCase
+  class OptionParserTest < Test::Unit::TestCase
   def create(opts)
-    @opt = Boson::Options.new(opts)
+    @opt = OptionParser.new(opts)
   end
   
   def parse(*args)
@@ -148,7 +147,7 @@ module Boson
   
     it "and a required switch raises an error" do
       create "--foo" => :required
-      assert_raises(Boson::Options::Error, "no value provided for required argument '--foo'") { parse }
+      assert_raises(OptionParser::Error, "no value provided for required argument '--foo'") { parse }
     end
   end
   
@@ -195,15 +194,15 @@ module Boson
     end
   
     it "raises an error if the required switch has no argument" do
-      assert_raises(Boson::Options::Error) { parse("--foo") }
+      assert_raises(OptionParser::Error) { parse("--foo") }
     end
   
     it "raises an error if the required switch isn't given" do
-      assert_raises(Boson::Options::Error) { parse("--bar") }
+      assert_raises(OptionParser::Error) { parse("--bar") }
     end
   
     it "raises an error if a switch name is given as the argument to the required switch" do
-	  assert_raises(Boson::Options::Error, "cannot pass switch '--bar' as an argument") { parse("--foo", "--bar") }
+	  assert_raises(OptionParser::Error, "cannot pass switch '--bar' as an argument") { parse("--foo", "--bar") }
     end
   end
   
@@ -245,11 +244,11 @@ module Boson
     end
     
     it "raises error when value isn't numeric" do
-	  assert_raises(Boson::Options::Error, "expected numeric value for '-n'; got \"foo\"") { parse("-n", "foo") }
+	  assert_raises(OptionParser::Error, "expected numeric value for '-n'; got \"foo\"") { parse("-n", "foo") }
     end
     
     it "raises error when switch is present without value" do
-	  assert_raises(Boson::Options::Error, "no value provided for argument '-n'") { parse("-n") }
+	  assert_raises(OptionParser::Error, "no value provided for argument '-n'") { parse("-n") }
     end
   end
   

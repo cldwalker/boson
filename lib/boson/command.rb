@@ -50,7 +50,7 @@ module Boson
     end
 
     def option_parser
-      @option_parser ||= (@options ? Options.new(@options) : nil)
+      @option_parser ||= (@options ? OptionParser.new(@options) : nil)
     end
 
     def option_help
