@@ -29,7 +29,6 @@ module Boson
 
   class OptionParser
     class Error < StandardError; end
-    
 
     NUMERIC     = /(\d*\.\d+|\d+)/
     LONG_RE     = /^(--\w+[-\w+]*)$/
@@ -111,15 +110,14 @@ module Boson
       end
     end
 
-    def parse(args, skip_leading_non_opts = true)
+    def parse(args)
       @args = args
       # start with defaults
       hash = IndifferentAccessHash.new @defaults
       
       @leading_non_opts = []
-      if skip_leading_non_opts
-        @leading_non_opts << shift until current_is_option? || @args.empty?
-      end
+      # allows options after arguments
+      @leading_non_opts << shift until current_is_option? || @args.empty?
 
       while current_is_option?
         case shift
