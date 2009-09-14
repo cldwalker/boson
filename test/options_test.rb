@@ -202,33 +202,12 @@ module Boson
     end
   end
   
-  # context 'Hash' do
-  #   before(:each) do
-  #     @hash = Boson::Options::Hash.new 'foo' => 'bar', 'baz' => 'bee', 'force' => true
-  #   end
-  #   
-  #   it "has values accessible by either strings or symbols" do
-  #     @hash['foo'].should == 'bar'
-  #     @hash[:foo].should  == 'bar'
-  #     @hash.values_at(:foo, :baz).should == ['bar', 'bee']
-  #   end
-  #   
-  #   it "should handles magic boolean predicates" do
-  #     @hash.force?.should == true
-  #     @hash.foo?.should == true
-  #     @hash.nothing?.should == false
-  #   end
-  #   
-  #   it "should map methods to keys: hash.foo => hash[:foo]" do
-  #     @hash.foo.should == @hash['foo']
-  #   end
-  #   
-  #   it "should map setters to keys: hash.foo=bar => hash[:foo] => bar" do
-  #     @hash.foo = :bar2
-  #     @hash.foo.should == :bar2
-  #   end
-  #   
-  # end
+  it "IndifferentAccessHash has values accessible by either strings or symbols" do
+    @hash = Boson::IndifferentAccessHash.new 'foo' => 'bar', 'baz' => 'bee', 'force' => true
+    @hash['foo'].should == 'bar'
+    @hash[:foo].should  == 'bar'
+    @hash.values_at(:foo, :baz).should == ['bar', 'bee']
+  end
   
   context ":numeric type" do
     before(:each) do

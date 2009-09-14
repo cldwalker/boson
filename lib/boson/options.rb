@@ -2,42 +2,30 @@
 # licensed under Ruby's license.
 
 module Boson
+  # Simple Hash with indifferent access
+  class IndifferentAccessHash < ::Hash
+    def initialize(hash)
+      super()
+      update hash
+    end
+
+    def [](key)
+      super convert_key(key)
+    end
+
+    def values_at(*indices)
+      indices.collect { |key| self[convert_key(key)] }
+    end
+
+    protected
+      def convert_key(key)
+        key.kind_of?(Symbol) ? key.to_s : key
+      end
+  end
+
   class Options
     class Error < StandardError; end
     
-    # simple Hash with indifferent access
-    class Hash < ::Hash
-      def initialize(hash)
-        super()
-        update hash
-      end
-      
-      def [](key)
-        super convert_key(key)
-      end
-      
-      def values_at(*indices)
-        indices.collect { |key| self[convert_key(key)] }
-      end
-      
-      protected
-        def convert_key(key)
-          key.kind_of?(Symbol) ? key.to_s : key
-        end
-        
-        # Magic predicates. For instance:
-        #   options.force? # => !!options['force']
-        # def method_missing(method, *args, &block)
-        #   method = method.to_s
-        #   if method =~ /^(\w+)=$/ 
-        #     self[$1] = args.first
-        #   elsif method =~ /^(\w+)\?$/
-        #     !!self[$1]
-        #   else 
-        #     self[method]
-        #   end
-        # end
-    end
 
     NUMERIC     = /(\d*\.\d+|\d+)/
     LONG_RE     = /^(--\w+[-\w+]*)$/
@@ -121,8 +109,8 @@ module Boson
 
     def parse(args, skip_leading_non_opts = true)
       @args = args
-      # start with Boson::Options::Hash pre-filled with defaults
-      hash = Hash.new @defaults
+      # start with Boson::IndifferentAccessHash pre-filled with defaults
+      hash = IndifferentAccessHash.new @defaults
       
       @leading_non_opts = []
       if skip_leading_non_opts
