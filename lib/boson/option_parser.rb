@@ -142,7 +142,7 @@ module Boson
           raise Error, "cannot pass '#{peek}' as an argument to option '#{nice_name}'" if valid?(peek)
           hash[nice_name] = shift
         when :optional
-          hash[nice_name] = peek.nil? || valid?(peek) || shift
+          hash[nice_name] = (peek.nil? || valid?(peek)) ? '' : shift
         when :boolean
           if !@switches.key?(switch) && nice_name.to_s =~ /^no-(\w+)$/
             hash[$1] = false

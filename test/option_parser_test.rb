@@ -178,8 +178,8 @@ module Boson
     end
   
     it "sets switches without arguments to true" do
-      parse("--foo")[:foo].should == true
-      parse("--bar")[:bar].should == true
+      parse("--foo")[:foo].should == ''
+      parse("--bar")[:bar].should == ''
     end
   
     it "doesn't set nonexistant switches" do
@@ -193,7 +193,7 @@ module Boson
     end
   
     it "assumes something that could be either a switch or an argument is a switch" do
-      parse("--foo", "--bar")[:foo].should == true
+      parse("--foo", "--bar")[:foo].should == ''
     end
   
     it "overwrites earlier values with later values" do

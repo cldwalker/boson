@@ -19,7 +19,7 @@ module Boson::Commands::Core
   def commands(query='', options={})
     options = {:fields=>[:name, :lib, :alias, :usage, :description],:field=>:name}.merge(options)
     search_field = options.delete(:field)
-    results = Boson.commands.select {|f| f.send(search_field).to_s =~ /#{query}/i }
+    results = Boson.commands.select {|f| f.send(search_field).to_s =~ /#{query}/i rescue true }
     render results, options
   end
 
@@ -27,7 +27,7 @@ module Boson::Commands::Core
     options = {:fields=>[:name, :commands, :gems, :library_type], :field=>:name,
       :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
     search_field = options.delete(:field)
-    results = Boson.libraries.select {|f| f.send(search_field).to_s =~ /#{query}/i }
+    results = Boson.libraries.select {|f| f.send(search_field).to_s =~ /#{query}/i rescue true }
     render results, options
   end
 

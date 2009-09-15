@@ -5,6 +5,7 @@ require 'matchy' #gem install jeremymcanally-matchy --source http://gems.github.
 require 'mocha'
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'boson'
+require 'test_benchmark' if ENV['BENCHMARK']
 
 class Test::Unit::TestCase
   # make local so it doesn't pick up my real boson dir
