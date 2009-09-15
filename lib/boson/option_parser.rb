@@ -37,7 +37,7 @@ module Boson
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
     
-    attr_reader :leading_non_opts, :trailing_non_opts
+    attr_reader :leading_non_opts, :trailing_non_opts, :shorts
     
     def non_opts
       leading_non_opts + trailing_non_opts

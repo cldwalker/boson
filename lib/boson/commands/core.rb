@@ -17,10 +17,9 @@ module Boson::Commands::Core
   end
 
   def commands(query='', options={})
-    options = {:fields=>[:name, :lib, :alias, :usage],:field=>:name}.merge(options)
+    options = {:fields=>[:name, :lib, :alias, :usage, :description],:field=>:name}.merge(options)
     search_field = options.delete(:field)
     results = Boson.commands.select {|f| f.send(search_field).to_s =~ /#{query}/i }
-    options[:fields] << :description if results.any? {|e| ! e.description.nil?}
     render results, options
   end
 

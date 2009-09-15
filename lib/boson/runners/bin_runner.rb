@@ -86,6 +86,17 @@ module Boson
            :repl=>:boolean, :help=>:boolean}
       end
 
+      def option_descriptions
+        {:discover=>"Loads given command by loading libraries until it discovers the correct library",
+          :verbose=>"Verbose description of loading libraries or help",
+          :index_create=>"Loads/indexes all libraries before executing command",
+          :execute=>"Executes given arguments as a one line script",
+          :load=>"A comma delimited array of libraries to load",
+          :repl=>"Drops into irb or another given repl/shell with default and explicit libraries loaded",
+          :help=>"Displays this help message or a command's help if given a command"
+        }
+      end
+
       def load_command_by_discovery
         all_libraries.partition {|e| e =~ /^#{@command}/ }.flatten.find {|e|
           Library.load [e], load_options
@@ -110,7 +121,16 @@ module Boson
       end
 
       def print_usage
-        puts "boson [COMMAND] [ARGS]"
+        puts "boson [GLOBAL OPTIONS] [COMMAND] [ARGS] [COMMAND OPTIONS]\n\n"
+        puts "GLOBAL OPTIONS"
+        shorts = @option_parser.shorts.invert
+        option_help = option_descriptions.sort_by {|k,v| k.to_s }.map {|e| ["--#{e[0]}", shorts["--#{e[0]}"], e[1]] }
+        Library.load [Boson::Commands::Core]
+        Boson.invoke :render, option_help, :headers=>["Option", "Alias", "Description"]
+        if @options[:verbose]
+          puts "\n\nDEFAULT COMMANDS"
+          Boson.invoke :commands, "", :fields=>["name", "usage", "description"]
+        end
       end
     end
   end
