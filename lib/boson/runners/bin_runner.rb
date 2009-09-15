@@ -4,7 +4,7 @@ module Boson
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
         return print_usage if args.empty? || (!@options[:repl] && @command.nil?)
-        @options[:repl] ? ReplRunner.bin_start(@options[:repl], unalias_libraries(@options[:load])) : load_command
+        @options[:repl] ? ReplRunner.bin_start(@options[:repl], @options[:load]) : load_command
       rescue OptionParser::Error
         $stderr.puts "Error: "+ $!.message
       end
@@ -51,7 +51,7 @@ module Boson
       end
 
       def load_command_by_option
-        Library.load unalias_libraries(@options[:load]), load_options
+        Library.load @options[:load], load_options
       end
 
       def load_command_by_index
@@ -82,7 +82,7 @@ module Boson
       end
 
       def default_options
-        {:discover=>:boolean, :verbose=>:boolean, :index_create=>:boolean, :execute=>:boolean, :load=>:string,
+        {:discover=>:boolean, :verbose=>:boolean, :index_create=>:boolean, :execute=>:boolean, :load=>:array,
            :repl=>:boolean, :help=>:boolean}
       end
 

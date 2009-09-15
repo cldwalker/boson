@@ -27,10 +27,6 @@ module Boson
         (detected_libraries + Boson.repos.map {|e| e.config[:libraries].keys}.flatten).uniq
       end
 
-      def unalias_libraries(libs)
-        libs ? libs.split(/\s*,\s*/) : []
-      end
-
       def marshal_file
         File.join(Boson.repo.config_dir, 'commands.db')
       end
