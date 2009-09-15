@@ -98,6 +98,9 @@ module Boson
         when Numeric
           @defaults[nice_name] = type
           type = :numeric
+        when Array
+          @defaults[nice_name] = type
+          type = :array
         end
         
         mem[name] = type
@@ -149,13 +152,15 @@ module Boson
           else
             hash[nice_name] = true
           end
-          
         when :numeric
           assert_value!(nice_name)
           unless peek =~ NUMERIC and $& == peek
             raise Error, "expected numeric value for option '#{nice_name}'; got #{peek.inspect}"
           end
           hash[nice_name] = $&.index('.') ? shift.to_f : shift.to_i
+        when :array
+          assert_value!(nice_name)
+          hash[nice_name] = shift.split(',')
         end
       end
       
@@ -258,7 +263,7 @@ module Boson
     def check_required!(hash)
       for name, type in @switches
         if type == :required and !hash[undasherize(name)]
-          raise Error, "no value provided for required argument '#{name}'"
+          raise Error, "no value provided for required option '#{name}'"
         end
       end
     end

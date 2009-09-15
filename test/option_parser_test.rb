@@ -161,7 +161,7 @@ module Boson
   
     it "and a required switch raises an error" do
       create "--foo" => :required
-      assert_raises(OptionParser::Error, "no value provided for required argument '--foo'") { parse }
+      assert_raises(OptionParser::Error, "no value provided for required option '--foo'") { parse }
     end
   end
   
@@ -262,7 +262,23 @@ module Boson
     end
     
     it "raises error when switch is present without value" do
-	  assert_raises(OptionParser::Error, "no value provided for argument '-n'") { parse("-n") }
+	    assert_raises(OptionParser::Error, "no value provided for option '-n'") { parse("-n") }
+    end
+  end
+
+  context ":array type" do
+    before(:each) { create :a=>:array, :b=>[1,2,3] }
+
+    it "supports array defaults" do
+      parse[:b].should == [1,2,3]
+    end
+
+    it "converts comma delimited values to an array" do
+      parse("-a","1,2,5")[:a].should == %w{1 2 5}
+    end
+
+    it "raises error when option has no value" do
+      assert_raises(OptionParser::Error) { parse("-a") }
     end
   end
   
