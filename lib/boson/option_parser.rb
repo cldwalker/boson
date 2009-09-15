@@ -80,36 +80,40 @@ module Boson
           nice_name = name
           name = dasherize name
         end
+
+        if type.is_a?(Hash)
+          @option_attributes ||= {}
+          @option_attributes[nice_name] = type
+          @defaults[nice_name] = type[:default] if type[:default]
+          type = determine_option_type(type[:default]) || type[:type] || :boolean
+        end
+
         # if there are no shortcuts specified, generate one using the first character
         shorts << "-" + nice_name[0,1] if shorts.empty? and nice_name.length > 1
         shorts.each { |short| @shorts[short] = name }
         
-        # normalize type
+        # set defaults
         case type
-        when TrueClass
-          @defaults[nice_name] = true
-          type = :boolean
-        when FalseClass
-          @defaults[nice_name] = false
-          type = :boolean
-        when String
-          @defaults[nice_name] = type
-          type = :string
-        when Numeric
-          @defaults[nice_name] = type
-          type = :numeric
-        when Array
-          @defaults[nice_name] = type
-          type = :array
+          when TrueClass, FalseClass  then  @defaults[nice_name] ||= (type ? true : false)
+          when String, Numeric, Array then  @defaults[nice_name] ||= type
         end
         
-        mem[name] = type
+        mem[name] = determine_option_type(type) || type
         mem
       end
-      
       # remove shortcuts that happen to coincide with any of the main switches
       @shorts.keys.each do |short|
         @shorts.delete(short) if @switches.key?(short)
+      end
+    end
+
+    def determine_option_type(value)
+      case value
+        when TrueClass, FalseClass then :boolean
+        when String                then :string
+        when Numeric               then :numeric
+        when Array                 then :array
+        else nil
       end
     end
 

@@ -281,6 +281,24 @@ module Boson
       assert_raises(OptionParser::Error) { parse("-a") }
     end
   end
+
+  context "option with attributes" do
+    it "can get type from :type" do
+      create :foo=>{:type=>:numeric}
+      parse("-f", '3')[:foo] == 3
+    end
+
+    it "can get type and default from :default" do
+      create :foo=>{:default=>[]}
+      parse("-f", "1")[:foo].should == ['1']
+      parse[:foo].should == []
+    end
+
+    it "assumes :boolean type if no type found" do
+      create :foo=>{:some=>'params'}
+      parse('-f')[:foo].should == true
+    end
+  end
   
   context "#formatted_usage" do
     def usage
