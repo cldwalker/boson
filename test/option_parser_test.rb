@@ -134,12 +134,18 @@ module Boson
     parse("--foo", "12")[:foo].should == "12"
   end
 
-  it "deletes and warns of invalid options" do
+  it "deletes and warns of invalid options with :delete_invalid_opts" do
     create(:foo=>:boolean)
     capture_stderr {
       @opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
     }.should =~ /Invalid option '-d'/
     @opt.non_opts.should == ['ok']
+  end
+
+  it "only allows options before args with :opts_before_args" do
+    create(:foo=>:boolean)
+    @opt.parse(%w{ok -f}, :opts_before_args=>true).should == {}
+    @opt.parse(%w{-f ok}, :opts_before_args=>true).should == {:foo=>true}
   end
   
   context "with no arguments" do

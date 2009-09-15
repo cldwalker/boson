@@ -116,8 +116,9 @@ module Boson
       hash = IndifferentAccessHash.new @defaults
       
       @leading_non_opts = []
-      # allows options after arguments
-      @leading_non_opts << shift until current_is_option? || @args.empty?
+      unless options[:opts_before_args]
+        @leading_non_opts << shift until current_is_option? || @args.empty?
+      end
 
       while current_is_option?
         case shift

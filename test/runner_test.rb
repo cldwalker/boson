@@ -79,6 +79,7 @@ module Boson
 
     test "parse_args only translates options before command" do
       BinRunner.parse_args(['-v', 'com', '-v']).should == ["com", {:verbose=>true}, ['-v']]
+      BinRunner.parse_args(['com', '-v']).should == ["com", {}, ['-v']]
     end
   end
 end
