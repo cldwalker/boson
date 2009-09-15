@@ -50,39 +50,39 @@ module Boson
     end
     
     it "allows multiple aliases for a given switch" do
-      create ["--foo", "--bar", "--baz"] => :optional
+      create ["--foo", "--bar", "--baz"] => :string
       parse("--foo", "12")["foo"].should == "12"
       parse("--bar", "12")["foo"].should == "12"
       parse("--baz", "12")["foo"].should == "12"
     end
     
     it "allows custom short names" do
-      create "-f" => :optional
+      create "-f" => :string
       parse("-f", "12").should == {:f => "12"}
     end
     
     it "allows custom short-name aliases" do
-      create ["--bar", "-f"] => :optional
+      create ["--bar", "-f"] => :string
       parse("-f", "12").should == {:bar => "12"}
     end
     
     it "allows humanized switch input" do
-      create 'foo' => :optional, :bar => :required
+      create 'foo' => :string, :bar => :required
       parse("-f", "1", "-b", "2").should == {:foo => "1", :bar => "2"}
     end
 
     it "allows humanized symbol switch input" do
-      create :foo=>:optional
+      create :foo=>:string
       parse('-f','1').should == {:foo=>'1'}
     end
 
     it "only creates short for first switch if multiple switches start with same letter" do
-      create :verbose=>:boolean, :vertical=>:optional
+      create :verbose=>:boolean, :vertical=>:string
       parse('-v', '2').should == {:verbose=>true}
     end
     
     it "doesn't recognize long switch format for a switch that is originally short" do
-      create 'f' => :optional
+      create 'f' => :string
       parse("-f", "1").should == {:f => "1"}
       parse("--f", "1").should == {}
     end
@@ -130,7 +130,7 @@ module Boson
   end
   
   it "makes hash keys available as symbols as well" do
-    create "--foo" => :optional
+    create "--foo" => :string
     parse("--foo", "12")[:foo].should == "12"
   end
 
@@ -155,7 +155,7 @@ module Boson
     end
   
     it "and several switches returns an empty hash" do
-      create "--foo" => :boolean, "--bar" => :optional
+      create "--foo" => :boolean, "--bar" => :string
       parse.should == {}
     end
   
@@ -172,9 +172,9 @@ module Boson
     opts["foo"].should == nil
   end
   
-  context " with several optional switches" do
+  context " with several string switches" do
     before :each do
-      create "--foo" => :optional, "--bar" => :optional
+      create "--foo" => :string, "--bar" => :string
     end
   
     it "sets switches without arguments to true" do
@@ -202,9 +202,9 @@ module Boson
     end
   end
   
-  context " with one required and one optional switch" do
+  context " with one required and one string switch" do
     before :each do
-      create "--foo" => :required, "--bar" => :optional
+      create "--foo" => :required, "--bar" => :string
     end
   
     it "raises an error if the required switch has no argument" do
@@ -230,7 +230,7 @@ module Boson
     @opt.non_opts.should == ["foo", "bar", "--baz", "-T", "bang"]
   end
   
-  context "optional arguments with default values" do
+  context "string arguments with default values" do
     before(:each) do
       create "--branch" => "master"
     end
@@ -271,8 +271,8 @@ module Boson
       @opt.formatted_usage.split(" ").sort
     end
     
-    it "outputs optional args with sample values" do
-      create "--repo" => :optional, "--branch" => "bugfix", "-n" => 6
+    it "outputs string args with sample values" do
+      create "--repo" => :string, "--branch" => "bugfix", "-n" => 6
       usage.should == %w([--branch=bugfix] [--repo=REPO] [-n=6])
     end
     

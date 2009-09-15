@@ -94,7 +94,7 @@ module Boson
           type = :boolean
         when String
           @defaults[nice_name] = type
-          type = :optional
+          type = :string
         when Numeric
           @defaults[nice_name] = type
           type = :numeric
@@ -141,7 +141,7 @@ module Boson
           assert_value!(nice_name)
           raise Error, "cannot pass '#{peek}' as an argument to option '#{nice_name}'" if valid?(peek)
           hash[nice_name] = shift
-        when :optional
+        when :string
           hash[nice_name] = (peek.nil? || valid?(peek)) ? '' : shift
         when :boolean
           if !@switches.key?(switch) && nice_name.to_s =~ /^no-(\w+)$/
@@ -186,7 +186,7 @@ module Boson
         else
           sample = @defaults[undasherize(opt)]
           sample ||= case type
-            when :optional then undasherize(opt).gsub(/\-/, "_").upcase
+            when :string then undasherize(opt).gsub(/\-/, "_").upcase
             when :numeric  then "N"
             end
           "[" + opt + "=" + sample.to_s + "]"

@@ -11,8 +11,8 @@ module Boson::Commands::Core
       :usage=>"Print a command's usage"
     }
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
-    commands['commands'][:options] = {:field=>:optional, :sort=>:optional}
-    commands['libraries'][:options] = {:field=>:optional, :sort=>:optional}
+    commands['commands'][:options] = {:field=>:string, :sort=>:string}
+    commands['libraries'][:options] = {:field=>:string, :sort=>:string}
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 

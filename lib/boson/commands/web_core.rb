@@ -4,7 +4,7 @@ module Boson::Commands::WebCore
       :install=>"Installs a library by url. Library should then be loaded with load_library.",
       :browser=>"Opens urls in a browser", :get=>"Gets the body of a url" }
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
-    commands['install'][:options] = {:name=>:optional, :force=>:boolean}
+    commands['install'][:options] = {:name=>:string, :force=>:boolean}
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
