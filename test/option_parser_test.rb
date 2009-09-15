@@ -88,9 +88,9 @@ module Boson
     end
     
     it "accepts --[no-]opt variant for booleans, setting false for value" do
-      create "--foo" => false
-      parse("--foo")["foo"].should == true
+      create "--foo" => :boolean
       parse("--no-foo")["foo"].should == false
+      parse("--foo")["foo"].should == true
     end
     
     it "will prefer 'no-opt' variant over inverting 'opt' if explicitly set" do
@@ -185,38 +185,31 @@ module Boson
     it "doesn't auto alias if no match" do
       parse("-f", "z")[:foo].should == 'z'
     end
-
-    it "defaults to empty string" do
-      parse("-f")[:foo].should == ''
-    end
   end
   
-  context " with several string switches" do
+  context "string option" do
     before :each do
       create "--foo" => :string, "--bar" => :string
     end
-  
-    it "sets switches without arguments to true" do
-      parse("--foo")[:foo].should == ''
-      parse("--bar")[:bar].should == ''
-    end
-  
+
     it "doesn't set nonexistant switches" do
-      parse("--foo")[:bar].should == nil
-      parse("--bar")[:foo].should == nil
+      parse("--bling")[:bar].should == nil
     end
-  
-    it "sets switches with arguments to their arguments" do
+
+    it "sets values correctly" do
       parse("--foo", "12")[:foo].should == "12"
       parse("--bar", "12")[:bar].should == "12"
     end
-  
-    it "assumes something that could be either a switch or an argument is a switch" do
-      parse("--foo", "--bar")[:foo].should == ''
+
+    it "raises error if passed another valid option" do
+      assert_raises(OptionParser::Error) { parse("--foo", "--bar") }
     end
-  
+
+    it "raises error if not passed a value" do
+      assert_raises(OptionParser::Error) { parse("--foo") }
+    end
+
     it "overwrites earlier values with later values" do
-      parse("--foo", "--foo", "12")[:foo].should == "12"
       parse("--foo", "12", "--foo", "13")[:foo].should == "13"
     end
   end

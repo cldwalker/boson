@@ -140,48 +140,56 @@ module Boson
         end
         
         switch    = normalize_switch(switch)
-        nice_name = undasherize(switch).to_sym
+        nice_name = undasherize(switch)
         type      = switch_type(switch)
 
-        case type
-        when :required
-          assert_value!(nice_name)
-          raise Error, "cannot pass '#{peek}' as an argument to option '#{nice_name}'" if valid?(peek)
-          hash[nice_name] = shift
-        when :string
-          value = (peek.nil? || valid?(peek)) ? '' : shift
-          if (values = @option_attributes[nice_name.to_s][:values].sort_by {|e| e.to_s} rescue nil) && !value.empty?
-            (val = values.find {|v| v.to_s =~ /^#{value}/ }) && value = val
-          end
-          hash[nice_name] = value
-        when :boolean
-          if !@switches.key?(switch) && nice_name.to_s =~ /^no-(\w+)$/
-            hash[$1] = false
-          else
-            hash[nice_name] = true
-          end
-        when :numeric
-          assert_value!(nice_name)
-          unless peek =~ NUMERIC and $& == peek
-            raise Error, "expected numeric value for option '#{nice_name}'; got #{peek.inspect}"
-          end
-          hash[nice_name] = $&.index('.') ? shift.to_f : shift.to_i
-        when :array
-          assert_value!(nice_name)
-          array = shift.split(',')
-          if values = @option_attributes[nice_name.to_s][:values].sort_by {|e| e.to_s } rescue nil
-            array.each_with_index {|e,i|
-              (value = values.find {|v| v.to_s =~ /^#{e}/ }) && array[i] = value
-            }
-          end
-          hash[nice_name] = array
-        end
+        validate_option_value(type, nice_name)
+        value = get_option_value(type, nice_name, switch)
+        # set on different line since nice_name may change
+        hash[nice_name.to_sym] = value
       end
-      
+
       @trailing_non_opts = @args
       check_required! hash
       delete_invalid_opts if options[:delete_invalid_opts]
       hash
+    end
+
+    def get_option_value(type, nice_name, switch)
+      case type
+        when :required
+          shift
+        when :string
+          value = shift
+          if (values = @option_attributes[nice_name][:values].sort_by {|e| e.to_s} rescue nil)
+            (val = values.find {|v| v.to_s =~ /^#{value}/ }) && value = val
+          end
+          value
+        when :boolean
+          (!@switches.key?(switch) && nice_name =~ /^no-(\w+)$/) ? (nice_name.replace($1) && false) : true
+        when :numeric
+          peek.index('.') ? shift.to_f : shift.to_i
+        when :array
+          array = shift.split(',')
+          if values = @option_attributes[nice_name][:values].sort_by {|e| e.to_s } rescue nil
+            array.each_with_index {|e,i|
+              (value = values.find {|v| v.to_s =~ /^#{e}/ }) && array[i] = value
+            }
+          end
+          array
+      end
+    end
+
+    def validate_option_value(type, nice_name)
+      assert_value!(nice_name) unless type == :boolean
+      case type
+      when :required, :string
+        raise Error, "cannot pass '#{peek}' as an argument to option '#{nice_name}'" if valid?(peek)
+      when :numeric
+        unless peek =~ NUMERIC and $& == peek
+          raise Error, "expected numeric value for option '#{nice_name}'; got #{peek.inspect}"
+        end
+      end
     end
 
     def delete_invalid_opts
