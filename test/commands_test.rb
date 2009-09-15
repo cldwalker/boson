@@ -32,14 +32,9 @@ module Boson
         @higgs.libraries
       end
 
-      test "searches by name field by default" do
-        render_expects {|*args| args[0] == [Boson.library('blah')]}
-        @higgs.libraries 'blah'
-      end
-
       test "searches with a given search field" do
         render_expects {|*args| args[0] == [Boson.library('another')]}
-        @higgs.libraries('Cool', :field=>:module)
+        @higgs.libraries('Cool', :query_field=>:module)
       end
     end
 
@@ -54,14 +49,9 @@ module Boson
         @higgs.commands
       end
 
-      test "searches by name field by default" do
-        render_expects {|*args| args[0] == [Boson.command('some')]}
-        @higgs.commands('some')
-      end
-
       test "searches with a given search field" do
         render_expects {|*args| args[0] == [Boson.command('and')]}
-        @higgs.commands('this', :field=>:lib)
+        @higgs.commands('this', :query_field=>:lib)
       end
     end
   end

@@ -11,23 +11,25 @@ module Boson::Commands::Core
       :usage=>"Print a command's usage"
     }
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
-    commands['commands'][:options] = {:field=>:string, :sort=>:string}
-    commands['libraries'][:options] = {:field=>:string, :sort=>:string}
+    command_attributes = Boson::Command::ATTRIBUTES + [:usage]
+    commands['commands'][:options] = {:query_field=>{:default=>'name', :values=>command_attributes},
+      :sort=>{:type=>:string, :values=>command_attributes} }
+    commands['libraries'][:options] = {:query_field=>'name', :sort=>:string}
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
   def commands(query='', options={})
-    options = {:fields=>[:name, :lib, :alias, :usage, :description],:field=>:name}.merge(options)
-    search_field = options.delete(:field)
-    results = Boson.commands.select {|f| f.send(search_field).to_s =~ /#{query}/i rescue true }
+    options = {:fields=>[:name, :lib, :alias, :usage, :description]}.merge(options)
+    query_field = options.delete(:query_field)
+    results = Boson.commands.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
     render results, options
   end
 
   def libraries(query='', options={})
-    options = {:fields=>[:name, :commands, :gems, :library_type], :field=>:name,
+    options = {:fields=>[:name, :commands, :gems, :library_type],
       :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
-    search_field = options.delete(:field)
-    results = Boson.libraries.select {|f| f.send(search_field).to_s =~ /#{query}/i rescue true }
+    query_field = options.delete(:query_field)
+    results = Boson.libraries.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
     render results, options
   end
 
@@ -50,7 +52,7 @@ module Boson::Commands::Core
 
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
-    if object.is_a?(Array) && (sort = options.delete(:sort))
+    if object.is_a?(Array) && (sort = options.delete(:sort)) && sort = sort.to_s
       sort.sub!('!','') if (reverse_sort = sort[/^!/])
       begin
         object = object.sort_by {|e| e.send(sort).to_s }
