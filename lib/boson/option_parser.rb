@@ -149,7 +149,11 @@ module Boson
           raise Error, "cannot pass '#{peek}' as an argument to option '#{nice_name}'" if valid?(peek)
           hash[nice_name] = shift
         when :string
-          hash[nice_name] = (peek.nil? || valid?(peek)) ? '' : shift
+          value = (peek.nil? || valid?(peek)) ? '' : shift
+          if (values = @option_attributes[nice_name.to_s][:values].sort_by {|e| e.to_s} rescue nil) && !value.empty?
+            (val = values.find {|v| v.to_s =~ /^#{value}/ }) && value = val
+          end
+          hash[nice_name] = value
         when :boolean
           if !@switches.key?(switch) && nice_name.to_s =~ /^no-(\w+)$/
             hash[$1] = false
@@ -164,7 +168,13 @@ module Boson
           hash[nice_name] = $&.index('.') ? shift.to_f : shift.to_i
         when :array
           assert_value!(nice_name)
-          hash[nice_name] = shift.split(',')
+          array = shift.split(',')
+          if values = @option_attributes[nice_name.to_s][:values].sort_by {|e| e.to_s } rescue nil
+            array.each_with_index {|e,i|
+              (value = values.find {|v| v.to_s =~ /^#{e}/ }) && array[i] = value
+            }
+          end
+          hash[nice_name] = array
         end
       end
       

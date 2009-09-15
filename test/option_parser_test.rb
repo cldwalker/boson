@@ -171,6 +171,25 @@ module Boson
     opts = parse
     opts["foo"].should == nil
   end
+
+  context "string option with :values attribute" do
+    before(:each) { create :foo=>{:type=>:string, :values=>%w{angola abu abib}} }
+    it "auto aliases if a match exists" do
+      parse("-f", "an")[:foo].should == 'angola'
+    end
+
+    it "auto aliases first sorted match" do
+      parse("-f", "a")[:foo].should == 'abib'
+    end
+
+    it "doesn't auto alias if no match" do
+      parse("-f", "z")[:foo].should == 'z'
+    end
+
+    it "defaults to empty string" do
+      parse("-f")[:foo].should == ''
+    end
+  end
   
   context " with several string switches" do
     before :each do
@@ -267,7 +286,7 @@ module Boson
   end
 
   context ":array type" do
-    before(:each) { create :a=>:array, :b=>[1,2,3] }
+    before(:each) { create :a=>:array, :b=>[1,2,3], :c=>{:type=>:array, :values=>%w{foo fa bar zebra}} }
 
     it "supports array defaults" do
       parse[:b].should == [1,2,3]
@@ -279,6 +298,10 @@ module Boson
 
     it "raises error when option has no value" do
       assert_raises(OptionParser::Error) { parse("-a") }
+    end
+
+    it "auto aliases :values attribute" do
+      parse("-c","f,b,y")[:c].should == %w{fa bar y}
     end
   end
 
