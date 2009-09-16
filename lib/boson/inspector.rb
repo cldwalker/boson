@@ -11,10 +11,13 @@ module Boson::Inspector
   end
 
   def current_method_has_options?(meth, method_location)
-    method_location && options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
+    return false if meth == 'method_added' && method_location[0].include?('libraries/file_library.rb')
+    method_location && File.exists?(method_location[0]) &&
+      options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
   end
 
   def add_meta_methods
+    @enabled = true
     ::Module.module_eval %[
       def new_method_added(method)
         if @desc
@@ -67,7 +70,10 @@ module Boson::Inspector
       remove_method :options
       alias_method :method_added, :_old_method_added
     ]
+    @enabled = false
   end
+
+  def enabled?; @enabled; end
 
   def description_from_file(file_string, line)
     lines = file_string.split("\n")

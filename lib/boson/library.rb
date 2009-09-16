@@ -48,6 +48,8 @@ module Boson
       rescue Exception=>e
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" +
           e.backtrace.slice(0,3).join("\n"), options
+      ensure
+        Inspector.remove_meta_methods if Inspector.enabled?
       end
 
       def print_error_message(message, options)
