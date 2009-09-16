@@ -12,7 +12,14 @@ module Boson
       @file_cache[file]
     end
 
-    def self.reset_file_cache; @file_cache = nil; end
+    def self.reset_file_cache(name=nil)
+      if name && @file_cache
+        #td: tia other repos
+        @file_cache.delete(library_file(name, Boson.repo.dir))
+      else
+        @file_cache = nil
+      end
+    end
 
     handles {|source|
       @repo = Boson.repos.find {|e|

@@ -44,8 +44,10 @@ module Boson
         yield
       rescue AppendFeaturesFalseError
       rescue LoaderError=>e
+        FileLibrary.reset_file_cache(library.to_s)
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}", options
       rescue Exception=>e
+        FileLibrary.reset_file_cache(library.to_s)
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" +
           e.backtrace.slice(0,3).join("\n"), options
       ensure
