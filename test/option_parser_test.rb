@@ -39,17 +39,17 @@ module Boson
   end
 
   context "naming" do
-    it "automatically aliases long switches with their first letter" do
+    it "automatically aliases long options with their first letter" do
       create "--foo" => true
       parse("-f")["foo"].should == true
     end
     
-    it "doesn't auto-alias switches that have multiple names given" do
+    it "doesn't auto-alias options that have multiple names given" do
       create ["--foo", "--bar"] => :boolean
       parse("-f")["foo"].should == nil
     end
     
-    it "allows multiple aliases for a given switch" do
+    it "allows multiple aliases for a given opt" do
       create ["--foo", "--bar", "--baz"] => :string
       parse("--foo", "12")["foo"].should == "12"
       parse("--bar", "12")["foo"].should == "12"
@@ -66,22 +66,22 @@ module Boson
       parse("-f", "12").should == {:bar => "12"}
     end
     
-    it "allows humanized switch input" do
+    it "allows humanized opt input" do
       create 'foo' => :string, :bar => :required
       parse("-f", "1", "-b", "2").should == {:foo => "1", :bar => "2"}
     end
 
-    it "allows humanized symbol switch input" do
+    it "allows humanized symbol opt input" do
       create :foo=>:string
       parse('-f','1').should == {:foo=>'1'}
     end
 
-    it "only creates short for first switch if multiple switches start with same letter" do
+    it "only creates alias for first opt if multiple options start with same letter" do
       create :verbose=>:boolean, :vertical=>:string
       parse('-v', '2').should == {:verbose=>true}
     end
     
-    it "doesn't recognize long switch format for a switch that is originally short" do
+    it "doesn't recognize long opt format for a opt that is originally short" do
       create 'f' => :string
       parse("-f", "1").should == {:f => "1"}
       parse("--f", "1").should == {}
@@ -100,7 +100,7 @@ module Boson
     
   end
   
-  it "accepts a switch=<value> assignment" do
+  it "accepts a opt=<value> assignment" do
     create "--foo" => :required
     parse("--foo=12")["foo"].should == "12"
     parse("-f=12")["foo"].should == "12"
@@ -113,7 +113,7 @@ module Boson
     parse("-n12")["num"].should == "12"
   end
   
-  it "accepts conjoined short switches" do
+  it "accepts conjoined short options" do
     create "--foo" => true, "--bar" => true, "--app" => true
     opts = parse "-fba"
     opts["foo"].should == true
@@ -121,7 +121,7 @@ module Boson
     opts["app"].should == true
   end
   
-  it "accepts conjoined short switches with argument" do
+  it "accepts conjoined short options with argument" do
     create "--foo" => true, "--bar" => true, "--app" => :required
     opts = parse "-fba", "12"
     opts["foo"].should == true
@@ -149,23 +149,23 @@ module Boson
   end
   
   context "with no arguments" do
-    it "and no switches returns an empty hash" do
+    it "and no options returns an empty hash" do
       create({})
       parse.should == {}
     end
   
-    it "and several switches returns an empty hash" do
+    it "and several options returns an empty hash" do
       create "--foo" => :boolean, "--bar" => :string
       parse.should == {}
     end
   
-    it "and a required switch raises an error" do
+    it "and a required opt raises an error" do
       create "--foo" => :required
       assert_raises(OptionParser::Error, "no value provided for required option '--foo'") { parse }
     end
   end
   
-  it "doesn't set nonexistant switches" do
+  it "doesn't set nonexistant options" do
     create "--foo" => :boolean
     parse("--foo")["bar"].should == nil
     opts = parse
@@ -192,7 +192,7 @@ module Boson
       create "--foo" => :string, "--bar" => :string
     end
 
-    it "doesn't set nonexistant switches" do
+    it "doesn't set nonexistant options" do
       parse("--bling")[:bar].should == nil
     end
 
@@ -214,21 +214,21 @@ module Boson
     end
   end
   
-  context " with one required and one string switch" do
+  context " with one required and one string opt" do
     before :each do
       create "--foo" => :required, "--bar" => :string
     end
   
-    it "raises an error if the required switch has no argument" do
+    it "raises an error if the required opt has no argument" do
       assert_raises(OptionParser::Error) { parse("--foo") }
     end
   
-    it "raises an error if the required switch isn't given" do
+    it "raises an error if the required opt isn't given" do
       assert_raises(OptionParser::Error) { parse("--bar") }
     end
   
-    it "raises an error if a switch name is given as the argument to the required switch" do
-	  assert_raises(OptionParser::Error, "cannot pass switch '--bar' as an argument") { parse("--foo", "--bar") }
+    it "raises an error if a opt name is given as the argument to the required opt" do
+	  assert_raises(OptionParser::Error, "cannot pass opt '--bar' as an argument") { parse("--foo", "--bar") }
     end
   end
   
@@ -273,7 +273,7 @@ module Boson
 	  assert_raises(OptionParser::Error, "expected numeric value for '-n'; got \"foo\"") { parse("-n", "foo") }
     end
     
-    it "raises error when switch is present without value" do
+    it "raises error when opt is present without value" do
 	    assert_raises(OptionParser::Error, "no value provided for option '-n'") { parse("-n") }
     end
   end

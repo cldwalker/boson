@@ -123,8 +123,8 @@ module Boson
       def print_usage
         puts "boson [GLOBAL OPTIONS] [COMMAND] [ARGS] [COMMAND OPTIONS]\n\n"
         puts "GLOBAL OPTIONS"
-        shorts = @option_parser.shorts.invert
-        option_help = option_descriptions.sort_by {|k,v| k.to_s }.map {|e| ["--#{e[0]}", shorts["--#{e[0]}"], e[1]] }
+        aliases = @option_parser.opt_aliases.invert
+        option_help = option_descriptions.sort_by {|k,v| k.to_s }.map {|e| ["--#{e[0]}", aliases["--#{e[0]}"], e[1]] }
         Library.load [Boson::Commands::Core]
         Boson.invoke :render, option_help, :headers=>["Option", "Alias", "Description"]
         if @options[:verbose]

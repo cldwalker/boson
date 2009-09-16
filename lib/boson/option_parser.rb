@@ -37,20 +37,20 @@ module Boson
     SHORT_SQ_RE = /^-([a-z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-z])#{NUMERIC}$/i
     
-    attr_reader :leading_non_opts, :trailing_non_opts, :shorts
+    attr_reader :leading_non_opts, :trailing_non_opts, :opt_aliases
     
     def non_opts
       leading_non_opts + trailing_non_opts
     end
 
-    # Takes an array of switches. Each array consists of up to three
-    # elements that indicate the name and type of switch. Returns a hash
-    # containing each switch name, minus the '-', as a key. The value
-    # for each key depends on the type of switch and/or the value provided
+    # Takes an array of options. Each array consists of up to three
+    # elements that indicate the name and type of option. Returns a hash
+    # containing each option name, minus the '-', as a key. The value
+    # for each key depends on the type of option and/or the value provided
     # by the user.
     #
-    # The long switch _must_ be provided. The short switch defaults to the
-    # first letter of the short switch. The default type is :boolean.
+    # The long option _must_ be provided. The short option defaults to the
+    # first letter of the option. The default type is :boolean.
     #
     # Example:
     #
@@ -60,22 +60,22 @@ module Boson
     #      ["--level", "-l"] => :numeric
     #   ).parse(args)
     #
-    def initialize(switches)
+    def initialize(opts)
       @defaults = {}
       # hash of single dash aliases to double dash options
-      @shorts = {}
+      @opt_aliases = {}
       
       @leading_non_opts, @trailing_non_opts = [], []
 
       # build hash of dasherized options to option types
-      @switches = switches.inject({}) do |mem, (name, type)|
+      @opt_types = opts.inject({}) do |mem, (name, type)|
         if name.is_a?(Array)
-          name, *shorts = name
+          name, *aliases = name
         else
           name = name.to_s
-          shorts = []
+          aliases = []
         end
-        # we need both nice and dasherized form of switch name
+        # we need both nice and dasherized form of option name
         if name.index('-') == 0
           nice_name = undasherize name
         else
@@ -90,9 +90,9 @@ module Boson
           type = determine_option_type(type[:default]) || type[:type] || :boolean
         end
 
-        # if there are no shortcuts specified, generate one using the first character
-        shorts << "-" + nice_name[0,1] if shorts.empty? and nice_name.length > 1
-        shorts.each { |short| @shorts[short] = name }
+        # if there are no aliases specified, generate one using the first character
+        aliases << "-" + nice_name[0,1] if aliases.empty? and nice_name.length > 1
+        aliases.each { |e| @opt_aliases[e] = name }
         
         # set defaults
         case type
@@ -103,19 +103,19 @@ module Boson
         mem[name] = determine_option_type(type) || type
         mem
       end
-      # remove shortcuts that happen to coincide with any of the main switches
-      @shorts.keys.each do |short|
-        @shorts.delete(short) if @switches.key?(short)
+      # remove aliases that happen to coincide with any of the main options
+      @opt_aliases.keys.each do |e|
+        @opt_aliases.delete(e) if @opt_types.key?(e)
       end
     end
 
-    def parse(args, options={})
+    def parse(args, flags={})
       @args = args
       # start with defaults
       hash = IndifferentAccessHash.new @defaults
       
       @leading_non_opts = []
-      unless options[:opts_before_args]
+      unless flags[:opts_before_args]
         @leading_non_opts << shift until current_is_option? || @args.empty?
       end
 
@@ -126,30 +126,30 @@ module Boson
           next
         when EQ_RE, SHORT_NUM
           unshift $2
-          switch = $1
+          option = $1
         when LONG_RE, SHORT_RE
-          switch = $1
+          option = $1
         end
         
-        switch    = normalize_switch(switch)
-        @current_option = undasherize(switch)
-        type      = switch_type(switch)
+        option    = normalize_option(option)
+        @current_option = undasherize(option)
+        type      = option_type(option)
 
         validate_option_value(type)
-        value = get_option_value(type, switch)
+        value = get_option_value(type, option)
         # set on different line since current_option may change
         hash[@current_option.to_sym] = value
       end
 
       @trailing_non_opts = @args
       check_required! hash
-      delete_invalid_opts if options[:delete_invalid_opts]
+      delete_invalid_opts if flags[:delete_invalid_opts]
       hash
     end
 
     def formatted_usage
-      return "" if @switches.empty?
-      @switches.map do |opt, type|
+      return "" if @opt_types.empty?
+      @opt_types.map do |opt, type|
         case type
         when :boolean
           "[#{opt}]"
@@ -179,7 +179,7 @@ module Boson
       end
     end
 
-    def get_option_value(type, switch)
+    def get_option_value(type, opt)
       case type
         when :required
           shift
@@ -190,7 +190,7 @@ module Boson
           end
           value
         when :boolean
-          (!@switches.key?(switch) && @current_option =~ /^no-(\w+)$/) ? (@current_option.replace($1) && false) : true
+          (!@opt_types.key?(opt) && @current_option =~ /^no-(\w+)$/) ? (@current_option.replace($1) && false) : true
         when :numeric
           peek.index('.') ? shift.to_f : shift.to_i
         when :array
@@ -260,9 +260,9 @@ module Boson
     
     def valid?(arg)
       if arg.to_s =~ /^--no-(\w+)$/
-        @switches.key?(arg) or (@switches["--#{$1}"] == :boolean)
+        @opt_types.key?(arg) or (@opt_types["--#{$1}"] == :boolean)
       else
-        @switches.key?(arg) or @shorts.key?(arg)
+        @opt_types.key?(arg) or @opt_aliases.key?(arg)
       end
     end
 
@@ -275,20 +275,20 @@ module Boson
       end
     end
     
-    def normalize_switch(switch)
-      @shorts.key?(switch) ? @shorts[switch] : switch
+    def normalize_option(opt)
+      @opt_aliases.key?(opt) ? @opt_aliases[opt] : opt
     end
     
-    def switch_type(switch)
-      if switch =~ /^--no-(\w+)$/
-        @switches[switch] || @switches["--#{$1}"]
+    def option_type(opt)
+      if opt =~ /^--no-(\w+)$/
+        @opt_types[opt] || @opt_types["--#{$1}"]
       else
-        @switches[switch]
+        @opt_types[opt]
       end
     end
     
     def check_required!(hash)
-      for name, type in @switches
+      for name, type in @opt_types
         if type == :required and !hash[undasherize(name)]
           raise Error, "no value provided for required option '#{name}'"
         end
