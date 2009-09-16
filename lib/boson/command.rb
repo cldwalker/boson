@@ -85,7 +85,7 @@ module Boson
           parsed_options = command.option_parser.parse(args.pop.split(/\s+/), :delete_invalid_opts=>true)
           args += command.option_parser.non_opts
         # default options
-        elsif command.args && args.size == command.args.size - 1
+        elsif command.args && args.size <= command.args.size - 1
           parsed_options = command.option_parser.parse([], :delete_invalid_opts=>true)
         end
         if parsed_options
