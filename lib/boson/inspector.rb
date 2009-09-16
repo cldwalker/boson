@@ -81,13 +81,18 @@ module Boson::Inspector
     (lines[line] =~ /^\s*#\s*(?!\s*options)(.*)/) ? $1 : nil
   end
 
-  def options_from_file(file_string, line)
+  def options_from_file(file_string, line, mod=nil)
     lines = file_string.split("\n")
     start_line = line - 3
     (start_line..start_line +1).find {|line|
       if options = (lines[line] =~ /^\s*#\s*options\s*(.*)/) ? $1 : nil
-        options = "{#{options}}" unless options[/^\s*\{/]
-        return begin eval(options); rescue(Exception); nil end
+        val = if mod
+          options = "{#{options}}" if !options[/^\s*\{/] && options[/=>/]
+          begin mod.module_eval(options); rescue(Exception); nil end
+        else
+          !!options
+        end
+        return val
       end
     }
   end

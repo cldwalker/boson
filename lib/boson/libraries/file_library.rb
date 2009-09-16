@@ -102,7 +102,7 @@ module Boson
             end
           end
           if no_command_config_for(cmd, :options)
-            if (options = Inspector.options_from_file(self.class.read_library_file(file), lineno))
+            if (options = Inspector.options_from_file(self.class.read_library_file(file), lineno, @module))
               (@commands_hash[cmd] ||= {})[:options] = options
             end
           end
