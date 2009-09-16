@@ -13,21 +13,23 @@ module Boson::Commands::Core
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
     command_attributes = Boson::Command::ATTRIBUTES + [:usage]
     commands['commands'][:options] = {:query_field=>{:default=>'name', :values=>command_attributes},
-      :sort=>{:type=>:string, :values=>command_attributes} }
-    commands['libraries'][:options] = {:query_field=>'name', :sort=>:string}
+      :sort=>{:type=>:string, :values=>command_attributes}, :reverse_sort=>:boolean,
+      :fields=>{:default=>[:name, :lib, :alias, :usage, :description], :values=>command_attributes} }
+    library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
+    commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes},
+      :sort=>{:type=>:string, :values=>library_attributes}, :reverse_sort=>:boolean,
+      :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes} }
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
   def commands(query='', options={})
-    options = {:fields=>[:name, :lib, :alias, :usage, :description]}.merge(options)
     query_field = options.delete(:query_field)
     results = Boson.commands.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
     render results, options
   end
 
   def libraries(query='', options={})
-    options = {:fields=>[:name, :commands, :gems, :library_type],
-      :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
+    options = {:filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
     query_field = options.delete(:query_field)
     results = Boson.libraries.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
     render results, options
@@ -53,10 +55,9 @@ module Boson::Commands::Core
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
     if object.is_a?(Array) && (sort = options.delete(:sort)) && sort = sort.to_s
-      sort.sub!('!','') if (reverse_sort = sort[/^!/])
       begin
         object = object.sort_by {|e| e.send(sort).to_s }
-        object = object.reverse if reverse_sort
+        object = object.reverse if options[:reverse_sort]
       rescue NoMethodError, ArgumentError
         $stderr.puts "Sort failed with nonexistant method '#{sort}'"
       end

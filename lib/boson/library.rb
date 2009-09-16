@@ -83,7 +83,8 @@ module Boson
       #:startdoc:
     end
 
-    attr_reader :gems, :dependencies, :commands, :loaded, :module, :name, :library_file, :commands_hash
+    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :library_file]
+    attr_reader *(ATTRIBUTES << :commands_hash)
     def initialize(hash)
       @name = set_name hash.delete(:name)
       @options = hash.delete(:options) || {}
