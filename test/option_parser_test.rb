@@ -182,8 +182,8 @@ module Boson
       parse("-f", "a")[:foo].should == 'abib'
     end
 
-    it "doesn't auto alias if no match" do
-      parse("-f", "z")[:foo].should == 'z'
+    it "raises error if auto alias doesn't match" do
+      assert_raises(OptionParser::Error) { parse("-f", "z") }
     end
   end
   
@@ -294,7 +294,7 @@ module Boson
     end
 
     it "auto aliases :values attribute" do
-      parse("-c","f,b,y")[:c].should == %w{fa bar y}
+      parse("-c","f,b")[:c].should == %w{fa bar}
     end
   end
 

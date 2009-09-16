@@ -62,10 +62,12 @@ module Boson
     #
     def initialize(switches)
       @defaults = {}
+      # hash of single dash aliases to double dash options
       @shorts = {}
       
       @leading_non_opts, @trailing_non_opts = [], []
 
+      # build hash of dasherized options to option types
       @switches = switches.inject({}) do |mem, (name, type)|
         if name.is_a?(Array)
           name, *shorts = name
@@ -107,16 +109,6 @@ module Boson
       end
     end
 
-    def determine_option_type(value)
-      case value
-        when TrueClass, FalseClass then :boolean
-        when String                then :string
-        when Numeric               then :numeric
-        when Array                 then :array
-        else nil
-      end
-    end
-
     def parse(args, options={})
       @args = args
       # start with defaults
@@ -140,13 +132,13 @@ module Boson
         end
         
         switch    = normalize_switch(switch)
-        nice_name = undasherize(switch)
+        @current_option = undasherize(switch)
         type      = switch_type(switch)
 
-        validate_option_value(type, nice_name)
-        value = get_option_value(type, nice_name, switch)
-        # set on different line since nice_name may change
-        hash[nice_name.to_sym] = value
+        validate_option_value(type)
+        value = get_option_value(type, switch)
+        # set on different line since current_option may change
+        hash[@current_option.to_sym] = value
       end
 
       @trailing_non_opts = @args
@@ -155,53 +147,6 @@ module Boson
       hash
     end
 
-    def get_option_value(type, nice_name, switch)
-      case type
-        when :required
-          shift
-        when :string
-          value = shift
-          if (values = @option_attributes[nice_name][:values].sort_by {|e| e.to_s} rescue nil)
-            (val = values.find {|v| v.to_s =~ /^#{value}/ }) && value = val
-          end
-          value
-        when :boolean
-          (!@switches.key?(switch) && nice_name =~ /^no-(\w+)$/) ? (nice_name.replace($1) && false) : true
-        when :numeric
-          peek.index('.') ? shift.to_f : shift.to_i
-        when :array
-          array = shift.split(',')
-          if values = @option_attributes[nice_name][:values].sort_by {|e| e.to_s } rescue nil
-            array.each_with_index {|e,i|
-              (value = values.find {|v| v.to_s =~ /^#{e}/ }) && array[i] = value
-            }
-          end
-          array
-      end
-    end
-
-    def validate_option_value(type, nice_name)
-      assert_value!(nice_name) unless type == :boolean
-      case type
-      when :required, :string
-        raise Error, "cannot pass '#{peek}' as an argument to option '#{nice_name}'" if valid?(peek)
-      when :numeric
-        unless peek =~ NUMERIC and $& == peek
-          raise Error, "expected numeric value for option '#{nice_name}'; got #{peek.inspect}"
-        end
-      end
-    end
-
-    def delete_invalid_opts
-      [@leading_non_opts, @trailing_non_opts].each do |args|
-        args.delete_if {|e|
-          invalid = e.to_s[/^-/]
-          $stderr.puts "Invalid option '#{e}'" if invalid
-          invalid
-        }
-      end
-    end
-    
     def formatted_usage
       return "" if @switches.empty?
       @switches.map do |opt, type|
@@ -220,15 +165,75 @@ module Boson
         end
       end.join(" ")
     end
-    
+
     alias :to_s :formatted_usage
 
     private
-    
-    def assert_value!(nice_name)
-      raise Error, "no value provided for option '#{nice_name}'" if peek.nil?
+    def determine_option_type(value)
+      case value
+        when TrueClass, FalseClass then :boolean
+        when String                then :string
+        when Numeric               then :numeric
+        when Array                 then :array
+        else nil
+      end
     end
-    
+
+    def get_option_value(type, switch)
+      case type
+        when :required
+          shift
+        when :string
+          value = shift
+          if (values = @option_attributes[@current_option][:values].sort_by {|e| e.to_s} rescue nil)
+            (val = auto_alias_value(values, value)) && value = val
+          end
+          value
+        when :boolean
+          (!@switches.key?(switch) && @current_option =~ /^no-(\w+)$/) ? (@current_option.replace($1) && false) : true
+        when :numeric
+          peek.index('.') ? shift.to_f : shift.to_i
+        when :array
+          array = shift.split(',')
+          if values = @option_attributes[@current_option][:values].sort_by {|e| e.to_s } rescue nil
+            array.each_with_index {|e,i|
+              (value = auto_alias_value(values, e)) && array[i] = value
+            }
+          end
+          array
+      end
+    end
+
+    def auto_alias_value(values, possible_value)
+      values.find {|v| v.to_s =~ /^#{possible_value}/ } or
+        raise Error, "Invalid value '#{possible_value}' for option '#{@current_option}'"
+    end
+
+    def validate_option_value(type)
+      if type != :boolean && peek.nil?
+        raise Error, "no value provided for option '#{@current_option}'"
+      end
+
+      case type
+      when :required, :string
+        raise Error, "cannot pass '#{peek}' as an argument to option '#{@current_option}'" if valid?(peek)
+      when :numeric
+        unless peek =~ NUMERIC and $& == peek
+          raise Error, "expected numeric value for option '#{@current_option}'; got #{peek.inspect}"
+        end
+      end
+    end
+
+    def delete_invalid_opts
+      [@leading_non_opts, @trailing_non_opts].each do |args|
+        args.delete_if {|e|
+          invalid = e.to_s[/^-/]
+          $stderr.puts "Invalid option '#{e}'" if invalid
+          invalid
+        }
+      end
+    end
+
     def undasherize(str)
       str.sub(/^-{1,2}/, '')
     end
