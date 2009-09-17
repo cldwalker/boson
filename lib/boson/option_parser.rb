@@ -199,7 +199,8 @@ module Boson
         when :numeric
           peek.index('.') ? shift.to_f : shift.to_i
         when :array
-          array = shift.split(',')
+          splitter = (@option_attributes[@current_option][:split] rescue nil) || ','
+          array = shift.split(splitter)
           if values = @option_attributes[@current_option][:values].sort_by {|e| e.to_s } rescue nil
             array.each_with_index {|e,i|
               (value = auto_alias_value(values, e)) && array[i] = value
