@@ -126,10 +126,10 @@ module Boson
         aliases = @option_parser.opt_aliases.invert
         option_help = option_descriptions.sort_by {|k,v| k.to_s }.map {|e| ["--#{e[0]}", aliases["--#{e[0]}"], e[1]] }
         Library.load [Boson::Commands::Core]
-        Boson.invoke :render, option_help, :headers=>["Option", "Alias", "Description"]
+        Boson.invoke :render, option_help, :headers=>["Option", "Alias", "Description"], :description=>false
         if @options[:verbose]
           puts "\n\nDEFAULT COMMANDS"
-          Boson.invoke :commands, "", :fields=>["name", "usage", "description"]
+          Boson.invoke :commands, "", :fields=>["name", "usage", "description"], :description=>false
         end
       end
     end
