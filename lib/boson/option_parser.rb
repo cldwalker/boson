@@ -62,12 +62,11 @@ module Boson
     #
     def initialize(opts)
       @defaults = {}
-      # hash of single dash aliases to double dash options
       @opt_aliases = {}
-      
       @leading_non_opts, @trailing_non_opts = [], []
 
-      # build hash of dasherized options to option types
+      # build hash of dashed options to option types
+      # type can be a hash of opt attributes, a default value or a type symbol
       @opt_types = opts.inject({}) do |mem, (name, type)|
         name, *aliases = name if name.is_a?(Array)
         name = name.to_s
@@ -78,6 +77,8 @@ module Boson
           nice_name = name
           name = dasherize name
         end
+        # store for later
+        @opt_aliases[nice_name] = aliases || []
 
         if type.is_a?(Hash)
           @option_attributes ||= {}
@@ -86,26 +87,31 @@ module Boson
           type = determine_option_type(type[:default]) || type[:type] || :boolean
         end
 
-        # allow for aliases as symbols
-        (aliases ||= []).map! {|e| e.to_s.index('-') != 0 ? dasherize(e.to_s) : e }
-        # if there are no aliases specified, generate one using the first character
-        aliases << "-" + nice_name[0,1] if aliases.empty? and nice_name.length > 1
-        aliases.each { |e| @opt_aliases[e] = name unless @opt_aliases[e] && @opt_aliases[e] < name }
-        
         # set defaults
         case type
-          when TrueClass, FalseClass  then  @defaults[nice_name] ||= (type ? true : false)
-          when String, Numeric, Array then  @defaults[nice_name] ||= type
+          when TrueClass               then  @defaults[nice_name] = true
+          when FalseClass              then  @defaults[nice_name] = false
+          when String, Numeric, Array  then  @defaults[nice_name] = type
         end
         
         mem[name] = determine_option_type(type) || type
         mem
       end
 
-      # remove aliases that happen to coincide with any of the main options
-      @opt_aliases.keys.each do |e|
-        @opt_aliases.delete(e) if @opt_types.key?(e)
-      end
+      # generate hash of dashed aliases to dashed options
+      @opt_aliases = @opt_aliases.sort.inject({}) {|h, (nice_name, aliases)|
+        name = dasherize nice_name
+        # allow for aliases as symbols
+        aliases.map! {|e| e.to_s.index('-') != 0 ? dasherize(e.to_s) : e }
+        if aliases.empty? and nice_name.length > 1
+          opt_alias = nice_name[0,1]
+          opt_alias = h.key?("-"+opt_alias) ? "-"+opt_alias.capitalize : "-"+opt_alias
+          h[opt_alias] ||= name unless @opt_types.key?(opt_alias)
+        else
+          aliases.each { |e| h[e] = name unless @opt_types.key?(e) }
+        end
+        h
+      }
     end
 
     def parse(args, flags={})
@@ -130,12 +136,11 @@ module Boson
           option = $1
         end
         
-        option    = normalize_option(option)
-        @current_option = undasherize(option)
-        type      = option_type(option)
-
+        dashed_option = normalize_option(option)
+        @current_option = undasherize(dashed_option)
+        type = option_type(dashed_option)
         validate_option_value(type)
-        value = get_option_value(type, option)
+        value = get_option_value(type, dashed_option)
         # set on different line since current_option may change
         hash[@current_option.to_sym] = value
       end

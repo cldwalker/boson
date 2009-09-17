@@ -43,6 +43,11 @@ module Boson
       create "--foo" => true
       parse("-f")["foo"].should == true
     end
+
+    it "automatically aliases two options with same first letters by aliasing alphabetical first with lowercase and second with uppercase" do
+      create :verbose=>:boolean, :vertical=>:string, :verz=>:boolean
+      parse('-v', '-V','2').should == {:verbose=>true, :vertical=>'2'}
+    end
     
     it "doesn't auto-alias options that have multiple names given" do
       create ["--foo", "--bar"] => :boolean
@@ -79,7 +84,7 @@ module Boson
       parse("-A", "bar")[:awesome].should == 'bar'
     end
 
-    it "allows custom short-name aliases" do
+    it "allows custom short aliases" do
       create ["--bar", "-f"] => :string
       parse("-f", "12").should == {:bar => "12"}
     end
@@ -94,11 +99,11 @@ module Boson
       parse('-f','1').should == {:foo=>'1'}
     end
 
-    it "only creates alias for first opt if multiple options start with same letter" do
-      create :verbose=>:boolean, :vertical=>:string
-      parse('-v', '2').should == {:verbose=>true}
+    it "doesn't allow alias to override another option" do
+      create :foo=>:string, [:bar, :foo]=>:boolean
+      parse("--foo", "boo")[:foo].should == 'boo'
     end
-    
+
     it "doesn't recognize long opt format for a opt that is originally short" do
       create 'f' => :string
       parse("-f", "1").should == {:f => "1"}
