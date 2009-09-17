@@ -4,9 +4,9 @@ module Boson
   class RunnerTest < Test::Unit::TestCase
     before(:all) { require 'boson/runners/bin_runner' }
     context "repl_runner" do
-      def activate(*args)
+      def start(*args)
         Hirb.stubs(:enable)
-        Boson.activate(*args)
+        Boson.start(*args)
       end
 
       before(:all) { reset }
@@ -15,7 +15,7 @@ module Boson
       test "loads default irb library when irb exists" do
         eval %[module ::IRB; module ExtendCommandBundle; end; end]
         Library.expects(:load).with {|*args| args[0].include?(Boson::Commands::IrbCore) }
-        activate
+        start
         IRB.send :remove_const, "ExtendCommandBundle"
       end
 
@@ -23,20 +23,20 @@ module Boson
         defaults = Boson::Runner.boson_libraries + ['yo']
         with_config(:defaults=>['yo']) do
           Library.expects(:load).with {|*args| args[0] == defaults }
-          activate
+          start
         end
       end
 
       test "doesn't call init twice" do
-        activate
+        start
         ReplRunner.expects(:init).never
-        activate
+        start
       end
 
       test "loads multiple libraries with :libraries option" do
         ReplRunner.expects(:init)
         Library.expects(:load).with([:lib1,:lib2], anything)
-        activate(:libraries=>[:lib1, :lib2])
+        start(:libraries=>[:lib1, :lib2])
       end
     end
 

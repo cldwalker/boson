@@ -54,7 +54,7 @@ module Boson
     @main_object = value.extend(Universe)
   end
 
-  def activate(options={})
+  def start(options={})
     ReplRunner.start(options)
   end
 
