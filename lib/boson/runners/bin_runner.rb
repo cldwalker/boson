@@ -83,7 +83,7 @@ module Boson
 
       def default_options
         {:discover=>:boolean, :verbose=>:boolean, :index_create=>:boolean, :execute=>:boolean,:repl=>:boolean, :help=>:boolean,
-          :load=>{:type=>:array, :values=>all_libraries}}
+          :load=>{:type=>:array, :values=>all_libraries, :enum=>false}}
       end
 
       def option_descriptions

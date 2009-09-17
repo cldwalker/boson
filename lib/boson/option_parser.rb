@@ -84,6 +84,7 @@ module Boson
           @option_attributes ||= {}
           @option_attributes[nice_name] = type
           @defaults[nice_name] = type[:default] if type[:default]
+          @option_attributes[nice_name][:enum] = true if type.key?(:values) && !type.key?(:enum)
           type = determine_option_type(type[:default]) || type[:type] || :boolean
         end
 
@@ -209,8 +210,8 @@ module Boson
     end
 
     def auto_alias_value(values, possible_value)
-      values.find {|v| v.to_s =~ /^#{possible_value}/ } or
-        raise Error, "Invalid value '#{possible_value}' for option '#{@current_option}'"
+      values.find {|v| v.to_s =~ /^#{possible_value}/ } or (@option_attributes[@current_option][:enum] ?
+        raise(Error, "Invalid value '#{possible_value}' for option '#{@current_option}'") : possible_value)
     end
 
     def validate_option_value(type)

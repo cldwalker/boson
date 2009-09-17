@@ -196,7 +196,7 @@ module Boson
   end
 
   context "string option with :values attribute" do
-    before(:each) { create :foo=>{:type=>:string, :values=>%w{angola abu abib}} }
+    before(:all ) { create :foo=>{:type=>:string, :values=>%w{angola abu abib}} }
     it "auto aliases if a match exists" do
       parse("-f", "an")[:foo].should == 'angola'
     end
@@ -207,6 +207,11 @@ module Boson
 
     it "raises error if auto alias doesn't match" do
       assert_raises(OptionParser::Error) { parse("-f", "z") }
+    end
+
+    it "doesn't raise error for a nonmatch if enum is false" do
+      create :foo=>{:type=>:string, :values=>%w{angola abu abib}, :enum=>false}
+      parse("-f", "z")[:foo].should == 'z'
     end
   end
   
