@@ -14,6 +14,17 @@ module Boson
         description.should == "some comments yay"
       end
 
+      test "with explicit description returns it" do
+        @lines[1] = '#@desc   some comments yay'
+        description.should == "some comments yay"
+      end
+
+      test "with multi line description returns it" do
+        @lines.delete_at(1)
+        @lines.insert(1, '#@options :b=>1', '#@desc here be', '# comments')
+        description(:line=>5).should == "here be comments"
+      end
+
       test "with no description returns nil" do
         @lines[1] = ""
         description.should == nil
@@ -65,6 +76,12 @@ module Boson
 
         test "and local value options returns options" do
           options(:value=>'#@options bling').should == {:a=>'bling'}
+        end
+
+        test "and multi line options returns options" do
+          @lines.delete_at(1)
+          @lines.insert(1, '#@options {:a =>', " # 1}", "# some comments")
+          Inspector.options_from_file(@lines.join("\n"), 5, Optional).should == {:a=>1}
         end
 
         test "and failed eval returns nil" do

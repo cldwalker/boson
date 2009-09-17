@@ -75,26 +75,57 @@ module Boson::Inspector
 
   def enabled?; @enabled; end
 
-  def description_from_file(file_string, line)
+  def splitter(lines)
+    hash = {}
+    i = 0
+    unless lines.any? {|e| e =~  /^\s*#\s*@desc/ }
+      last_line = lines.pop
+      hash[:desc] = (last_line =~ /^\s*#\s*([^@\s].*)/) ? [$1] : nil
+      lines << last_line unless hash[:desc]
+    end
+
+    while i < lines.size
+      while lines[i] =~ /^\s*#\s*@(\w+)\s*(.*)/
+        key = $1.to_sym
+        hash[key] = [$2]
+        i += 1
+        while lines[i] =~ /^\s*#\s*([^@\s].*)/
+          hash[key] << $1
+          i+= 1
+        end
+      end
+      i += 1
+    end
+    hash
+  end
+
+  def scraper(file_string, line)
     lines = file_string.split("\n")
-    line -= 2
-    (lines[line] =~ /^\s*#\s*(?!\s*@options)(.*)/) ? $1 : nil
+    saved = []
+    i = line -2
+    while lines[i] =~ /^\s*#\s*(\S+)/ && i >= 0
+      saved << lines[i]
+      i -= 1
+    end
+    saved.empty? ? nil : saved.reverse
+  end
+
+  def description_from_file(file_string, line)
+    if (lines = scraper(file_string, line)) && (hash = splitter(lines))[:desc]
+      hash[:desc].join(" ")
+    end
   end
 
   def options_from_file(file_string, line, mod=nil)
-    lines = file_string.split("\n")
-    start_line = line - 3
-    (start_line..start_line +1).find {|line|
-      if options = (lines[line] =~ /^\s*#\s*@options\s*(.*)/) ? $1 : nil
-        val = if mod
-          options = "{#{options}}" if !options[/^\s*\{/] && options[/=>/]
-          begin mod.module_eval(options); rescue(Exception); nil end
-        else
-          !!options
-        end
-        return val
+    if (lines = scraper(file_string, line)) && (hash = splitter(lines)).key?(:options)
+      options = hash[:options].join(" ")
+      if mod
+        options = "{#{options}}" if !options[/^\s*\{/] && options[/=>/]
+        begin mod.module_eval(options); rescue(Exception); nil end
+      else
+        !!options
       end
-    }
+    end
   end
 
   # produces same argument arrays as determine_method_args
