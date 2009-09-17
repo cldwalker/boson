@@ -48,6 +48,13 @@ module Boson
       create ["--foo", "--bar"] => :boolean
       parse("-f")["foo"].should == nil
     end
+
+    it "allows aliases to be symbols or strings" do
+      create [:foo, :bar, 'baz'] =>:string
+      parse("--foo", "12")[:foo].should == "12"
+      parse("--bar", "12")[:foo].should == "12"
+      parse("--baz", "12")[:foo].should == "12"
+    end
     
     it "allows multiple aliases for a given opt" do
       create ["--foo", "--bar", "--baz"] => :string

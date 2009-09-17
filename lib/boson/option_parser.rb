@@ -69,12 +69,8 @@ module Boson
 
       # build hash of dasherized options to option types
       @opt_types = opts.inject({}) do |mem, (name, type)|
-        if name.is_a?(Array)
-          name, *aliases = name
-        else
-          name = name.to_s
-          aliases = []
-        end
+        name, *aliases = name if name.is_a?(Array)
+        name = name.to_s
         # we need both nice and dasherized form of option name
         if name.index('-') == 0
           nice_name = undasherize name
@@ -90,9 +86,11 @@ module Boson
           type = determine_option_type(type[:default]) || type[:type] || :boolean
         end
 
+        # allow for aliases as symbols
+        (aliases ||= []).map! {|e| e.to_s.index('-') != 0 ? dasherize(e.to_s) : e }
         # if there are no aliases specified, generate one using the first character
         aliases << "-" + nice_name[0,1] if aliases.empty? and nice_name.length > 1
-        aliases.each { |e| @opt_aliases[e] = name }
+        aliases.each { |e| @opt_aliases[e] = name unless @opt_aliases[e] && @opt_aliases[e] < name }
         
         # set defaults
         case type
@@ -103,6 +101,7 @@ module Boson
         mem[name] = determine_option_type(type) || type
         mem
       end
+
       # remove aliases that happen to coincide with any of the main options
       @opt_aliases.keys.each do |e|
         @opt_aliases.delete(e) if @opt_types.key?(e)
