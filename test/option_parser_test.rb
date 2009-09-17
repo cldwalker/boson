@@ -67,7 +67,18 @@ module Boson
       create "-f" => :string
       parse("-f", "12").should == {:f => "12"}
     end
-    
+
+    it "allows capital short names" do
+      create :A => :boolean
+      parse("-A")[:A].should == true
+    end
+
+    it "allows capital short aliases" do
+      create [:awesome, :A] => :string
+      parse("--awesome", "bar")[:awesome].should == 'bar'
+      parse("-A", "bar")[:awesome].should == 'bar'
+    end
+
     it "allows custom short-name aliases" do
       create ["--bar", "-f"] => :string
       parse("-f", "12").should == {:bar => "12"}
