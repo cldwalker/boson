@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
-  class InspectorTest < Test::Unit::TestCase
+  class ScraperTest < Test::Unit::TestCase
     context "description_from_file" do
       before(:each) { 
         @lines = ["module Foo", "  # some comments yay", "  def foo", "  end", "end"]

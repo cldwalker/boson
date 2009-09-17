@@ -75,49 +75,12 @@ module Boson::Inspector
 
   def enabled?; @enabled; end
 
-  def splitter(lines)
-    hash = {}
-    i = 0
-    unless lines.any? {|e| e =~  /^\s*#\s*@desc/ }
-      last_line = lines.pop
-      hash[:desc] = (last_line =~ /^\s*#\s*([^@\s].*)/) ? [$1] : nil
-      lines << last_line unless hash[:desc]
-    end
-
-    while i < lines.size
-      while lines[i] =~ /^\s*#\s*@(\w+)\s*(.*)/
-        key = $1.to_sym
-        hash[key] = [$2]
-        i += 1
-        while lines[i] =~ /^\s*#\s*([^@\s].*)/
-          hash[key] << $1
-          i+= 1
-        end
-      end
-      i += 1
-    end
-    hash
-  end
-
-  def scraper(file_string, line)
-    lines = file_string.split("\n")
-    saved = []
-    i = line -2
-    while lines[i] =~ /^\s*#\s*(\S+)/ && i >= 0
-      saved << lines[i]
-      i -= 1
-    end
-    saved.empty? ? nil : saved.reverse
-  end
-
   def description_from_file(file_string, line)
-    if (lines = scraper(file_string, line)) && (hash = splitter(lines))[:desc]
-      hash[:desc].join(" ")
-    end
+    (hash = Boson::Scraper.scrape(file_string, line))[:desc] && hash[:desc].join(" ")
   end
 
   def options_from_file(file_string, line, mod=nil)
-    if (lines = scraper(file_string, line)) && (hash = splitter(lines)).key?(:options)
+    if (hash = Boson::Scraper.scrape(file_string, line)).key?(:options)
       options = hash[:options].join(" ")
       if mod
         options = "{#{options}}" if !options[/^\s*\{/] && options[/=>/]

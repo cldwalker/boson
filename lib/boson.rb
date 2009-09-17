@@ -8,6 +8,7 @@ require 'boson/runners/repl_runner'
 require 'boson/repo'
 require 'boson/loader'
 require 'boson/inspector'
+require 'boson/scraper'
 require 'boson/library'
 # order of library subclasses matters
 require 'boson/libraries/module_library'
