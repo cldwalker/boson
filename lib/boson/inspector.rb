@@ -11,9 +11,30 @@ module Boson::Inspector
   end
 
   def current_method_has_options?(meth, method_location)
-    return false if meth == 'method_added' && method_location[0].include?('libraries/file_library.rb')
+    return false if method_location.nil? || (meth == 'method_added' && method_location[0].include?('libraries/file_library.rb'))
     method_location && File.exists?(method_location[0]) &&
       options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
+  end
+
+  def attribute?(mod, attribute)
+    attribute = translate_attr(attribute)
+    mod.instance_variable_defined?("@#{attribute}")
+  end
+
+  def translate_attr(attribute)
+    case attribute.to_sym
+    when :descriptions then :_descriptions
+    when :options then :_options
+    when :method_locations then :_method_locations
+    when :method_args then :_method_args
+    else
+      attribute
+    end
+  end
+
+  def get_attribute(mod, attribute)
+    attribute = translate_attr(attribute)
+    mod.instance_variable_get("@#{attribute}")
   end
 
   def add_meta_methods
@@ -43,7 +64,7 @@ module Boson::Inspector
           o = Object.new
           o.extend(self)
           # private methods return nil
-          if (val = Boson::Inspector.determine_method_args(method, self, o))
+          if (val = Boson::ArgumentInspector.determine_method_args(method, self, o))
             @_method_args[method.to_s] = val
           end
         end
@@ -97,80 +118,5 @@ module Boson::Inspector
     if match = /^#{tabspace}*def#{tabspace}+#{meth}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
       (match.to_a[2] || '').split(/\s*,\s*/).map {|e| e.split('=')}
     end
-  end
-
-  MAX_ARGS = 10 # max number of arguments extracted for a method
-  # from http://eigenclass.org/hiki/method+arguments+via+introspection
-  # returns argument arrays which have an optional 2nd element with an argument's default value
-  def determine_method_args(meth, klass, object)
-    unless %w[initialize].include?(meth.to_s)
-      return if class << object; private_instance_methods(true) end.include?(meth.to_s)
-    end
-    params, values, arity, num_args = trace_method_args(meth, klass, object)
-    return if local_variables == params # nothing new found
-    format_arguments(params, values, arity, num_args)
-    rescue Exception
-      #puts "#{klass}.#{methd}: #{$!.message}"
-    ensure
-      set_trace_func(nil)
-  end
-
-  # process params + values to return array of argument arrays
-  def format_arguments(params, values, arity, num_args)
-    params ||= []
-    params = params[0,num_args]
-    params.inject([[], 0]) do |(a, i), x|
-      if Array === values[i]
-        [a << ["*#{x}"], i+1]
-      else
-        if arity < 0 && i >= arity.abs - 1
-          [a << [x, values[i]], i + 1]
-        else
-          [a << [x], i+1]
-        end
-      end
-    end.first
-  end
-
-  def trace_method_args(meth, klass, object)
-    file = line = params = values = nil
-    arity = klass.instance_method(meth).arity
-    set_trace_func lambda{|event, file, line, id, binding, classname|
-      begin
-        if event[/call/] && classname == klass && id == meth
-          params = eval("local_variables", binding)
-          values = eval("local_variables.map{|x| eval(x)}", binding)
-          throw :done
-        end
-      rescue Exception
-      end
-    }
-    if arity >= 0
-      num_args = arity
-      catch(:done){ object.send(meth, *(0...arity)) }
-    else
-      num_args = 0
-      # determine number of args (including splat & block)
-      MAX_ARGS.downto(arity.abs - 1) do |i|
-        catch(:done) do 
-          begin
-            object.send(meth, *(0...i)) 
-          rescue Exception
-          end
-        end
-        # all nils if there's no splat and we gave too many args
-        next if !values || values.compact.empty? 
-        k = nil
-        values.each_with_index{|x,j| break (k = j) if Array === x}
-        num_args = k ? k+1 : i
-        break
-      end
-      args = (0...arity.abs-1).to_a
-      catch(:done) do 
-        args.empty? ? object.send(meth) : object.send(meth, *args)
-      end
-    end
-    set_trace_func(nil)
-    return [params, values, arity, num_args]
   end
 end
