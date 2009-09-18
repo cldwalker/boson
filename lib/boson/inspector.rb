@@ -32,52 +32,73 @@ module Boson::Inspector
     end
   end
 
+  def set_attribute(mod, attribute, val)
+    attribute = translate_attr(attribute)
+    mod.instance_variable_set("@#{attribute}", val)
+  end
+
   def get_attribute(mod, attribute)
     attribute = translate_attr(attribute)
     mod.instance_variable_get("@#{attribute}")
+  end
+
+  def new_method_added(mod, meth)
+    if get_attribute(mod, :desc)
+      get_attribute(mod, :descriptions)[meth.to_s] = get_attribute(mod, :desc)
+      set_attribute(mod, :desc, nil)
+    end
+
+    if get_attribute(mod, :opts)
+      get_attribute(mod, :options)[meth.to_s] = get_attribute(mod, :opts)
+      set_attribute(mod, :opts, nil)
+    end
+
+    if get_attribute(mod, :opts).nil? || get_attribute(mod, :desc).nil?
+      set_attribute(mod, :method_locations, {}) unless attribute?(mod, :method_locations)
+      if (result = find_method_locations(caller))
+        get_attribute(mod, :method_locations)[meth.to_s] = result
+      end
+    end
+    scrape_arguments(mod, meth)
+  end
+
+  def scrape_arguments(mod, meth)
+    if mod.instance_of?(Module) && (get_attribute(mod, :options) && get_attribute(mod, :options).key?(meth.to_s)) ||
+      get_attribute(mod, :method_locations) && current_method_has_options?(meth.to_s, get_attribute(mod, :method_locations)[meth.to_s])
+      set_attribute(mod, :method_args, {}) unless Boson::Inspector.attribute?(mod, :method_args)
+
+      o = Object.new
+      o.extend(mod)
+      # private methods return nil
+      if (val = Boson::ArgumentInspector.determine_method_args(meth, mod, o))
+        get_attribute(mod, :method_args)[meth.to_s] = val
+      end
+    end
+  end
+
+  def options(mod, opts)
+    set_attribute(mod, :options, {}) unless Boson::Inspector.attribute?(mod, :options)
+    set_attribute mod, :opts, opts
+  end
+
+  def desc(mod, description)
+    set_attribute(mod, :descriptions, {}) unless Boson::Inspector.attribute?(mod, :descriptions)
+    set_attribute mod, :desc, description
   end
 
   def add_meta_methods
     @enabled = true
     ::Module.module_eval %[
       def new_method_added(method)
-        if @desc
-          @_descriptions[method.to_s] = @desc
-          @desc = nil
-        end
-        if @opts
-          @_options[method.to_s] = @opts
-          @opts = nil
-        end
-        if @opts.nil? || @desc.nil?
-          @_method_locations ||= {}
-          if (result = Boson::Inspector.find_method_locations(caller))
-            @_method_locations[method.to_s] = result
-          end
-        end
-
-        # if module && options exists for method
-        if instance_of?(Module) && (@_options && @_options.key?(method.to_s)) ||
-          (@_method_locations && Boson::Inspector.current_method_has_options?(method.to_s, @_method_locations[method.to_s]))
-
-          @_method_args ||= {}
-          o = Object.new
-          o.extend(self)
-          # private methods return nil
-          if (val = Boson::ArgumentInspector.determine_method_args(method, self, o))
-            @_method_args[method.to_s] = val
-          end
-        end
+        Boson::Inspector.new_method_added(self, method)
       end
 
       def options(opts)
-        @_options ||= {}
-        @opts = opts
+        Boson::Inspector.options(self, opts)
       end
 
       def desc(description)
-        @_descriptions ||= {}
-        @desc = description
+        Boson::Inspector.desc(self, description)
       end
 
       alias_method :_old_method_added, :method_added
