@@ -70,15 +70,18 @@ module Boson
 
     def before_create_commands
       if @module
-        add_command_descriptions(commands) if Inspector.attribute?(:descriptions, @module)
-        add_command_options if Inspector.attribute?(:options, @module)
-        add_comment_metadata if Inspector.attribute?(:method_locations, @module)
-        add_command_args if Inspector.attribute?(:method_args, @module)
+        Inspector.current_module = @module
+        @store = Inspector.store
+        add_command_descriptions(commands) if @store.key?(:descriptions)
+        add_command_options if @store.key?(:options)
+        add_comment_metadata if @store.key?(:method_locations)
+        add_command_args if @store.key?(:method_args)
+        @store = nil
       end
     end
 
     def add_command_args
-      Inspector.get_attribute(:method_args, @module).each do |cmd, args|
+      @store[:method_args].each do |cmd, args|
         if no_command_config_for(cmd, :args)
           (@commands_hash[cmd] ||= {})[:args] = args
         end
@@ -86,7 +89,7 @@ module Boson
     end
 
     def add_command_options
-      Inspector.get_attribute(:options, @module).each do |cmd, options|
+      @store[:options].each do |cmd, options|
         if no_command_config_for(cmd, :options)
           (@commands_hash[cmd] ||= {})[:options] = options
         end
@@ -94,7 +97,7 @@ module Boson
     end
 
     def add_comment_metadata
-      Inspector.get_attribute(:method_locations, @module).each do |cmd, (file, lineno)|
+      @store[:method_locations].each do |cmd, (file, lineno)|
         if file == library_file
           if no_command_config_for(cmd, :description)
             if (description = Inspector.description_from_file(self.class.read_library_file(file), lineno))
@@ -111,7 +114,7 @@ module Boson
     end
 
     def add_command_descriptions(commands)
-      Inspector.get_attribute(:descriptions, @module).each do |cmd, description|
+      @store[:descriptions].each do |cmd, description|
         if no_command_config_for(cmd, :description)
           (@commands_hash[cmd] ||= {})[:description] = description
         end

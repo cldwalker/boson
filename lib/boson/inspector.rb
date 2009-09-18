@@ -16,61 +16,59 @@ module Boson::Inspector
       options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
   end
 
-  def attribute?(attribute, mod=@current_mod)
-    mod.instance_variable_defined?("@#{attribute}")
+  @mod_store ||= {}
+  def store(mod=@current_module)
+    @mod_store[mod]
   end
 
-  def set_attribute(attribute, val, mod=@current_mod)
-    mod.instance_variable_set("@#{attribute}", val)
-  end
-
-  def get_attribute(attribute, mod=@current_mod)
-    mod.instance_variable_get("@#{attribute}")
+  def current_module=(mod)
+    @current_module = mod
+    @mod_store[mod] ||= {}
   end
 
   def new_method_added(mod, meth)
-    @current_mod = mod
-    if get_attribute(:desc)
-      get_attribute(:descriptions)[meth.to_s] = get_attribute(:desc)
-      set_attribute(:desc, nil)
+    self.current_module = mod
+    if store[:desc]
+      store[:descriptions][meth.to_s] = store[:desc]
+      store[:desc] = nil
     end
 
-    if get_attribute(:opts)
-      get_attribute(:options)[meth.to_s] = get_attribute(:opts)
-      set_attribute(:opts, nil)
+    if store[:opts]
+      store[:options][meth.to_s] = store[:opts]
+      store[:opts] = nil
     end
 
-    if get_attribute(:opts).nil? || get_attribute(:desc).nil?
-      set_attribute(:method_locations, {}) unless attribute?(:method_locations)
+    if store[:opts].nil? || store[:desc].nil?
+      store[:method_locations] ||= {}
       if (result = find_method_locations(caller))
-        get_attribute(:method_locations)[meth.to_s] = result
+        store[:method_locations][meth.to_s] = result
       end
     end
     scrape_arguments(meth)
   end
 
   def scrape_arguments(meth)
-    if @current_mod.instance_of?(Module) && (get_attribute(:options) && get_attribute(:options).key?(meth.to_s)) ||
-      get_attribute(:method_locations) && current_method_has_options?(meth.to_s, get_attribute(:method_locations)[meth.to_s])
-      set_attribute(:method_args, {}) unless attribute?(:method_args)
+    if @current_module.instance_of?(Module) && (store[:options] && store[:options].key?(meth.to_s)) ||
+      store[:method_locations] && current_method_has_options?(meth.to_s, store[:method_locations][meth.to_s])
+      store[:method_args] ||= {}
 
       o = Object.new
-      o.extend(@current_mod)
+      o.extend(@current_module)
       # private methods return nil
-      if (val = Boson::ArgumentInspector.determine_method_args(meth, @current_mod, o))
-        get_attribute(:method_args)[meth.to_s] = val
+      if (val = Boson::ArgumentInspector.determine_method_args(meth, @current_module, o))
+        store[:method_args][meth.to_s] = val
       end
     end
   end
 
   def options(mod, opts)
-    set_attribute(:options, {}, mod) unless attribute?(:options, mod)
-    set_attribute :opts, opts, mod
+    store(mod)[:options] ||= {}
+    store(mod)[:opts] = opts
   end
 
   def desc(mod, description)
-    set_attribute(:descriptions, {}, mod) unless attribute?(:descriptions, mod)
-    set_attribute :desc, description, mod
+    store(mod)[:descriptions] ||= {}
+    store(mod)[:desc] = description
   end
 
   def add_meta_methods

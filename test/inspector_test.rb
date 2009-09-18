@@ -8,18 +8,16 @@ module Boson
       Inspector.remove_meta_methods
     end
 
-    before(:all) { eval "module Blah; end" }
+    before(:all) { eval "module Blah; end"; Inspector.current_module = Blah }
     before(:each) { Blah.instance_eval "@_method_locations = nil" }
     test "desc sets descriptions" do
       introspect "desc 'test'; def m1; end; desc 'one'; desc 'more'; def m2; end"
-      Inspector.get_attribute(:descriptions, Blah).should == {"m1"=>"test", "m2"=>"more"}
-      Inspector.attribute?(:descriptions, Blah).should == true
+      Inspector.store[:descriptions].should == {"m1"=>"test", "m2"=>"more"}
     end
 
     test "options sets options" do
       introspect "options :z=>'b'; def zee; end"
-      Inspector.get_attribute(:options, Blah).should == {"zee"=>{:z=>'b'}}
-      Inspector.attribute?(:options, Blah).should == true
+      Inspector.store[:options].should == {"zee"=>{:z=>'b'}}
     end
   end
 end
