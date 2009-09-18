@@ -16,74 +16,61 @@ module Boson::Inspector
       options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
   end
 
-  def attribute?(mod, attribute)
-    attribute = translate_attr(attribute)
+  def attribute?(attribute, mod=@current_mod)
     mod.instance_variable_defined?("@#{attribute}")
   end
 
-  def translate_attr(attribute)
-    case attribute.to_sym
-    when :descriptions then :_descriptions
-    when :options then :_options
-    when :method_locations then :_method_locations
-    when :method_args then :_method_args
-    else
-      attribute
-    end
-  end
-
-  def set_attribute(mod, attribute, val)
-    attribute = translate_attr(attribute)
+  def set_attribute(attribute, val, mod=@current_mod)
     mod.instance_variable_set("@#{attribute}", val)
   end
 
-  def get_attribute(mod, attribute)
-    attribute = translate_attr(attribute)
+  def get_attribute(attribute, mod=@current_mod)
     mod.instance_variable_get("@#{attribute}")
   end
 
   def new_method_added(mod, meth)
-    if get_attribute(mod, :desc)
-      get_attribute(mod, :descriptions)[meth.to_s] = get_attribute(mod, :desc)
-      set_attribute(mod, :desc, nil)
+    @current_mod = mod
+    if get_attribute(:desc)
+      get_attribute(:descriptions)[meth.to_s] = get_attribute(:desc)
+      set_attribute(:desc, nil)
     end
 
-    if get_attribute(mod, :opts)
-      get_attribute(mod, :options)[meth.to_s] = get_attribute(mod, :opts)
-      set_attribute(mod, :opts, nil)
+    if get_attribute(:opts)
+      get_attribute(:options)[meth.to_s] = get_attribute(:opts)
+      set_attribute(:opts, nil)
     end
 
-    if get_attribute(mod, :opts).nil? || get_attribute(mod, :desc).nil?
-      set_attribute(mod, :method_locations, {}) unless attribute?(mod, :method_locations)
+    if get_attribute(:opts).nil? || get_attribute(:desc).nil?
+      set_attribute(:method_locations, {}) unless attribute?(:method_locations)
       if (result = find_method_locations(caller))
-        get_attribute(mod, :method_locations)[meth.to_s] = result
+        get_attribute(:method_locations)[meth.to_s] = result
       end
     end
-    scrape_arguments(mod, meth)
+    scrape_arguments(meth)
   end
 
-  def scrape_arguments(mod, meth)
-    if mod.instance_of?(Module) && (get_attribute(mod, :options) && get_attribute(mod, :options).key?(meth.to_s)) ||
-      get_attribute(mod, :method_locations) && current_method_has_options?(meth.to_s, get_attribute(mod, :method_locations)[meth.to_s])
-      set_attribute(mod, :method_args, {}) unless Boson::Inspector.attribute?(mod, :method_args)
+  def scrape_arguments(meth)
+    if @current_mod.instance_of?(Module) && (get_attribute(:options) && get_attribute(:options).key?(meth.to_s)) ||
+      get_attribute(:method_locations) && current_method_has_options?(meth.to_s, get_attribute(:method_locations)[meth.to_s])
+      set_attribute(:method_args, {}) unless attribute?(:method_args)
 
       o = Object.new
-      o.extend(mod)
+      o.extend(@current_mod)
       # private methods return nil
-      if (val = Boson::ArgumentInspector.determine_method_args(meth, mod, o))
-        get_attribute(mod, :method_args)[meth.to_s] = val
+      if (val = Boson::ArgumentInspector.determine_method_args(meth, @current_mod, o))
+        get_attribute(:method_args)[meth.to_s] = val
       end
     end
   end
 
   def options(mod, opts)
-    set_attribute(mod, :options, {}) unless Boson::Inspector.attribute?(mod, :options)
-    set_attribute mod, :opts, opts
+    set_attribute(:options, {}, mod) unless attribute?(:options, mod)
+    set_attribute :opts, opts, mod
   end
 
   def desc(mod, description)
-    set_attribute(mod, :descriptions, {}) unless Boson::Inspector.attribute?(mod, :descriptions)
-    set_attribute mod, :desc, description
+    set_attribute(:descriptions, {}, mod) unless attribute?(:descriptions, mod)
+    set_attribute :desc, description, mod
   end
 
   def add_meta_methods

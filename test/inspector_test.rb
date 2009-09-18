@@ -12,14 +12,14 @@ module Boson
     before(:each) { Blah.instance_eval "@_method_locations = nil" }
     test "desc sets descriptions" do
       introspect "desc 'test'; def m1; end; desc 'one'; desc 'more'; def m2; end"
-      Inspector.get_attribute(Blah, :descriptions).should == {"m1"=>"test", "m2"=>"more"}
-      Inspector.attribute?(Blah, :descriptions).should == true
+      Inspector.get_attribute(:descriptions, Blah).should == {"m1"=>"test", "m2"=>"more"}
+      Inspector.attribute?(:descriptions, Blah).should == true
     end
 
     test "options sets options" do
       introspect "options :z=>'b'; def zee; end"
-      Inspector.get_attribute(Blah, :options).should == {"zee"=>{:z=>'b'}}
-      Inspector.attribute?(Blah, :options).should == true
+      Inspector.get_attribute(:options, Blah).should == {"zee"=>{:z=>'b'}}
+      Inspector.attribute?(:options, Blah).should == true
     end
   end
 end
