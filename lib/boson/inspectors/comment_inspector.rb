@@ -1,6 +1,25 @@
 module Boson
-  module Scraper
+  # Scrapes a method's comments for metadata.
+  # Inspired by http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da
+  module CommentInspector
     extend self
+
+    def description_from_file(file_string, line)
+      (hash = scrape(file_string, line))[:desc] && hash[:desc].join(" ")
+    end
+
+    def options_from_file(file_string, line, mod=nil)
+      if (hash = scrape(file_string, line)).key?(:options)
+        options = hash[:options].join(" ")
+        if mod
+          options = "{#{options}}" if !options[/^\s*\{/] && options[/=>/]
+          begin mod.module_eval(options); rescue(Exception); nil end
+        else
+          !!options
+        end
+      end
+    end
+
     # Scrapes a given string for commented @keywords, starting with the line above the given line
     def scrape(file_string, line)
       (lines = scraper(file_string, line)) ? splitter(lines) : {}
@@ -9,7 +28,7 @@ module Boson
     def splitter(lines)
       hash = {}
       i = 0
-      # to give us a magic
+      # to magically make the last comment a description
       unless lines.any? {|e| e =~  /^\s*#\s*@desc/ }
         last_line = lines.pop
         hash[:desc] = (last_line =~ /^\s*#\s*([^@\s].*)/) ? [$1] : nil

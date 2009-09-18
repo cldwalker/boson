@@ -70,8 +70,8 @@ module Boson
 
     def before_create_commands
       if @module
-        Inspector.current_module = @module
-        @store = Inspector.store
+        MethodInspector.current_module = @module
+        @store = MethodInspector.store
         add_command_descriptions(commands) if @store.key?(:descriptions)
         add_command_options if @store.key?(:options)
         add_comment_metadata if @store.key?(:method_locations)
@@ -100,12 +100,12 @@ module Boson
       @store[:method_locations].each do |cmd, (file, lineno)|
         if file == library_file
           if no_command_config_for(cmd, :description)
-            if (description = Inspector.description_from_file(self.class.read_library_file(file), lineno))
+            if (description = CommentInspector.description_from_file(self.class.read_library_file(file), lineno))
               (@commands_hash[cmd] ||= {})[:description] = description
             end
           end
           if no_command_config_for(cmd, :options)
-            if (options = Inspector.options_from_file(self.class.read_library_file(file), lineno, @module))
+            if (options = CommentInspector.options_from_file(self.class.read_library_file(file), lineno, @module))
               (@commands_hash[cmd] ||= {})[:options] = options
             end
           end

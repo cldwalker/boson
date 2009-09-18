@@ -1,7 +1,17 @@
+# Extracts arguments and their default values from methods either at method_added time
+# compliments of http://eigenclass.org/hiki/method+arguments+via+introspection
+# or by simply scraping a file.
 module Boson::ArgumentInspector
   extend self
+  # produces same argument arrays as determine_method_args
+  def arguments_from_file(file_string, meth)
+    tabspace = "[ \t]"
+    if match = /^#{tabspace}*def#{tabspace}+#{meth}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
+      (match.to_a[2] || '').split(/\s*,\s*/).map {|e| e.split('=')}
+    end
+  end
+
   MAX_ARGS = 10 # max number of arguments extracted for a method
-  # from http://eigenclass.org/hiki/method+arguments+via+introspection
   # returns argument arrays which have an optional 2nd element with an argument's default value
   def determine_method_args(meth, klass, object)
     unless %w[initialize].include?(meth.to_s)

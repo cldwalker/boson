@@ -7,7 +7,7 @@ module Boson
         @lines = ["module Foo", "  # some comments yay", "  def foo", "  end", "end"]
       }
       def description(options={})
-        Inspector.description_from_file(@lines.join("\n"), options[:line] || 3)
+        CommentInspector.description_from_file(@lines.join("\n"), options[:line] || 3)
       end
 
       test "with description directly above returns it" do
@@ -50,7 +50,7 @@ module Boson
         @lines[1] = opts[:value] if opts[:value]
         args = [@lines.join("\n"), 3, Optional]
         args.pop if opts[:no_module]
-        Inspector.options_from_file(*args)
+        CommentInspector.options_from_file(*args)
       end
 
       test "with no module and options detects options" do
@@ -81,7 +81,7 @@ module Boson
         test "and multi line options returns options" do
           @lines.delete_at(1)
           @lines.insert(1, '#@options {:a =>', " # 1}", "# some comments")
-          Inspector.options_from_file(@lines.join("\n"), 5, Optional).should == {:a=>1}
+          CommentInspector.options_from_file(@lines.join("\n"), 5, Optional).should == {:a=>1}
         end
 
         test "and failed eval returns nil" do
