@@ -1,26 +1,10 @@
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
-require 'yaml'
-require 'hirb'
-require 'alias'
-require 'fileutils'
-require 'boson/runner'
-require 'boson/runners/repl_runner'
-require 'boson/repo'
-require 'boson/loader'
-require 'boson/inspector'
-require 'boson/inspectors/argument_inspector'
-require 'boson/inspectors/method_inspector'
-require 'boson/inspectors/comment_inspector'
-require 'boson/library'
+%w{yaml hirb alias fileutils}.each {|e| require e }
+%w{runner runners/repl_runner repo loader inspector library}.each {|e| require "boson/#{e}" }
+%w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
-require 'boson/libraries/module_library'
-require 'boson/libraries/file_library'
-require 'boson/libraries/gem_library'
-require 'boson/libraries/require_library'
-require 'boson/command'
-require 'boson/util'
-require 'boson/commands'
-require 'boson/option_parser'
+%w{module file gem require}.each {|e| require "boson/libraries/#{e}_library" }
+%w{boson/command boson/util boson/commands boson/option_parser}.each {|e| require e }
 
 module Boson
   module Universe; end

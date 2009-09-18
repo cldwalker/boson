@@ -1,5 +1,5 @@
-# Handles processing and storing method metadata acquired by inspectors i.e.
-# explicit method calls before methods or comment metadata above methods.
+# Serves as dealer between libraries and inspectors of method metadata
+# acquired by inspectors i.e. comment metadata or method calls before methods.
 module Boson::Inspector
   extend self
   attr_reader :enabled
