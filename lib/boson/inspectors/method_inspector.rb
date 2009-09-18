@@ -1,6 +1,7 @@
 module Boson
   module MethodInspector
     extend self
+    attr_accessor :current_module
     @mod_store ||= {}
 
     # Hash of a module's method attributes i.e. descriptions, options by method and then attribute
