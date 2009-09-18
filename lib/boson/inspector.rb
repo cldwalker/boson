@@ -10,12 +10,6 @@ module Boson::Inspector
     end
   end
 
-  def current_method_has_options?(meth, method_location)
-    return false if method_location.nil? || (meth == 'method_added' && method_location[0].include?('libraries/file_library.rb'))
-    method_location && File.exists?(method_location[0]) &&
-      options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
-  end
-
   @mod_store ||= {}
   def store(mod=@current_module)
     @mod_store[mod]
@@ -28,15 +22,8 @@ module Boson::Inspector
 
   def new_method_added(mod, meth)
     self.current_module = mod
-    if store[:desc]
-      store[:descriptions][meth.to_s] = store[:desc]
-      store[:desc] = nil
-    end
-
-    if store[:opts]
-      store[:options][meth.to_s] = store[:opts]
-      store[:opts] = nil
-    end
+    store[:descriptions][meth.to_s] = store[:desc] if store[:desc]
+    store[:options][meth.to_s] = store[:opts] if store[:opts]
 
     if store[:opts].nil? || store[:desc].nil?
       store[:method_locations] ||= {}
@@ -44,12 +31,14 @@ module Boson::Inspector
         store[:method_locations][meth.to_s] = result
       end
     end
+    store[:desc] = nil if store[:desc]
+    store[:opts] = nil if store[:opts]
     scrape_arguments(meth)
   end
 
   def scrape_arguments(meth)
-    if @current_module.instance_of?(Module) && (store[:options] && store[:options].key?(meth.to_s)) ||
-      store[:method_locations] && current_method_has_options?(meth.to_s, store[:method_locations][meth.to_s])
+    if @current_module.instance_of?(Module) && ((store[:options] && store[:options].key?(meth.to_s)) ||
+      options_in_file?(meth.to_s))
       store[:method_args] ||= {}
 
       o = Object.new
@@ -59,6 +48,11 @@ module Boson::Inspector
         store[:method_args][meth.to_s] = val
       end
     end
+  end
+
+  def options_in_file?(meth)
+    return false if !(method_location = store[:method_locations] && store[:method_locations][meth])
+    File.exists?(method_location[0]) && options_from_file(Boson::FileLibrary.read_library_file(method_location[0]), method_location[1])
   end
 
   def options(mod, opts)
