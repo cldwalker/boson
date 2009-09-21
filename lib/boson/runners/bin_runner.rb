@@ -55,30 +55,14 @@ module Boson
       end
 
       def load_command_by_index
-        find_lambda = @subcommand ? method(:is_namespace_command) : lambda {|e| [e.name, e.alias].include?(@command)}
-        load_index(@options[:index_create]) unless @command == 'index' && @subcommand.nil?
-        if !command_defined?(@command) && (found = Boson.commands.find(&find_lambda))
-          Library.load_library found.lib, load_options
+        Index.load(@options[:index_create]) unless @command == 'index' && @subcommand.nil?
+        if lib = Index.find_library(@command, @subcommand)
+          Library.load_library lib, load_options
         end
       end
 
       def load_options
         @load_options ||= {:verbose=>@options[:verbose]}
-      end
-
-      def load_index(force=false)
-        if !File.exists?(marshal_file) || force
-          puts "Indexing commands ..."
-          index_commands(load_options)
-        else
-          marshal_read
-        end
-      end
-
-      def is_namespace_command(cmd)
-        [cmd.name, cmd.alias].include?(@subcommand) &&
-        (command = Boson.commands.find {|f| f.name == @command && f.lib == 'namespace'} || Boson.command(@command, :alias)) &&
-        cmd.lib[/\w+$/] == command.name
       end
 
       def default_options

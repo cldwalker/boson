@@ -26,28 +26,6 @@ module Boson
       def all_libraries
         (detected_libraries + Boson.repos.map {|e| e.config[:libraries].keys}.flatten).uniq
       end
-
-      def marshal_file
-        File.join(Boson.repo.config_dir, 'commands.db')
-      end
-
-      def marshal_write
-        marshal_string = Marshal.dump [Boson.libraries.map {|e| e.dup.marshalize }, Boson.commands]
-        File.open(marshal_file, 'w') {|f| f.write marshal_string }
-      end
-
-      def marshal_read
-        new_libraries, new_commands = Marshal.load(File.read(marshal_file))
-        existing_libraries = Boson.libraries.map {|e| e.name}
-        Boson.libraries += new_libraries.select {|e| !existing_libraries.include?(e.name)}
-        existing_commands = Boson.commands.map {|e| e.name}
-        Boson.commands += new_commands.select {|e| !existing_commands.include?(e.name)}
-      end
-
-      def index_commands(options={})
-        Library.load(all_libraries, options.merge(:index=>true))
-        marshal_write
-      end
     end
   end
 end
