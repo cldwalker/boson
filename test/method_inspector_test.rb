@@ -12,51 +12,48 @@ module Boson
       MethodInspector.store[:options].empty?.should == true
     end
 
-    context "commands module" do
-      def introspect(string)
+    context "commands module with" do
+      def parse(string)
         Inspector.add_meta_methods
         ::Boson::Commands::Zzz.module_eval(string)
         Inspector.remove_meta_methods
+        MethodInspector.store
       end
 
       before(:all) { eval "module ::Boson::Commands::Zzz; end" }
-      before(:each) { MethodInspector.instance_eval "@mod_store[::Boson::Commands::Zzz] = {}" }
+      before(:each) { MethodInspector.mod_store[::Boson::Commands::Zzz] = {} }
 
       test "desc sets descriptions" do
-        introspect "desc 'test'; def m1; end; desc 'one'; desc 'more'; def m2; end"
-        MethodInspector.store[:descriptions].should == {"m1"=>"test", "m2"=>"more"}
+        parsed = parse "desc 'test'; def m1; end; desc 'one'; desc 'more'; def m2; end"
+        parsed[:descriptions].should == {"m1"=>"test", "m2"=>"more"}
       end
 
       test "options sets options" do
-        introspect "options :z=>'b'; def zee; end"
-        MethodInspector.store[:options].should == {"zee"=>{:z=>'b'}}
+        parse("options :z=>'b'; def zee; end")[:options].should == {"zee"=>{:z=>'b'}}
       end
 
-      test "method_locations set if options and desc aren't set" do
+      test "neither options or desc set, sets method_locations" do
         MethodInspector.stubs(:find_method_locations).returns(["/some/path", 10])
-        introspect "desc 'yo'; def yo; end; options :yep=>1; def yep; end; desc 'z'; options :a=>1; def az; end"
-        MethodInspector.store[:method_locations].key?('yo').should == true
-        MethodInspector.store[:method_locations].key?('yep').should == true
-        MethodInspector.store[:method_locations].key?('az').should == false
+        parsed = parse "desc 'yo'; def yo; end; options :yep=>1; def yep; end; desc 'z'; options :a=>1; def az; end"
+        parsed[:method_locations].key?('yo').should == true
+        parsed[:method_locations].key?('yep').should == true
+        parsed[:method_locations].key?('az').should == false
       end
 
-      test "method_locations not set if find_method_locations returns nil" do
+      test "no find_method_locations doesn't set method_locations" do
         MethodInspector.stubs(:find_method_locations).returns(nil)
-        introspect "def bluh; end"
-        MethodInspector.store[:method_locations].key?('bluh').should == false
+        parse("def bluh; end")[:method_locations].key?('bluh').should == false
       end
 
-      test "determine_method_args called if options set" do
+      test "options calls determine_method_args" do
         ArgumentInspector.expects(:determine_method_args).returns([['arg1']])
-        introspect "desc 'desc'; options :some=>:opts; def doy(arg1); end"
-        MethodInspector.store[:method_args]['doy'].should == [['arg1']]
+        parse("desc 'desc'; options :some=>:opts; def doy(arg1); end")[:method_args]['doy'].should == [['arg1']]
       end
 
-      test "determine_method_args called if options in file" do
+      test "options in file calls determine_method_args" do
         MethodInspector.expects(:options_in_file?).returns(true)
         ArgumentInspector.expects(:determine_method_args).returns([['arg1']])
-        introspect "desc 'desc'; def doz(arg1); end"
-        MethodInspector.store[:method_args]['doz'].should == [['arg1']]
+        parse("desc 'desc'; def doz(arg1); end")[:method_args]['doz'].should == [['arg1']]
       end
     end
   end

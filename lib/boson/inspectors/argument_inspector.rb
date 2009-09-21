@@ -7,7 +7,7 @@ module Boson::ArgumentInspector
   def arguments_from_file(file_string, meth)
     tabspace = "[ \t]"
     if match = /^#{tabspace}*def#{tabspace}+#{meth}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
-      (match.to_a[2] || '').split(/\s*,\s*/).map {|e| e.split('=')}
+      (match.to_a[2] || '').split(/\s*,\s*/).map {|e| e.split(/\s*=\s*/)}
     end
   end
 
