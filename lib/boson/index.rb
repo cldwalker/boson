@@ -28,25 +28,25 @@ module Boson
     end
 
     def find_library(command, subcommand)
-      read unless @read
+      read
       find_lambda = subcommand ? lambda {|e| method(:is_namespace_command).call(e, command, subcommand) } :
         lambda {|e| [e.name, e.alias].include?(command)}
       (found = @commands.find(&find_lambda)) && found.lib
     end
 
     def write
-      marshal_string = Marshal.dump [Boson.libraries.map {|e| e.dup.marshalize }, Boson.commands]
+      marshal_string = Marshal.dump [Boson.libraries.map {|e| e.dup.marshalize }, Boson.commands, latest_hashes]
       File.open(marshal_file, 'w') {|f| f.write marshal_string }
-      write_hashes
     end
 
     def read
-      @libraries, @commands = exists? ? Marshal.load(File.read(marshal_file)) : [[], []]
+      return if @read
+      @libraries, @commands, @lib_hashes = exists? ? Marshal.load(File.read(marshal_file)) : [[], [], {}]
       @read = true
     end
 
     def marshal_file
-      File.join(Boson.repo.config_dir, 'commands.db')
+      File.join(Boson.repo.config_dir, 'index.marshal')
     end
 
     def is_namespace_command(current_command, command, subcommand)
@@ -55,17 +55,9 @@ module Boson
       current_command.lib[/\w+$/] == namespace_command.name
     end
 
-    def write_hashes
-      File.open(hash_file, 'w') {|f| f.write(latest_hashes.to_yaml)}
-    end
-
     def changed_libraries
-      old_hashes = YAML::load_file hash_file rescue {}
-      latest_hashes.select {|lib, hash| old_hashes[lib] != hash}.map {|e| e[0]}
-    end
-
-    def hash_file
-      hash_file = File.join(Boson.repo.config_dir, "library_hashes.yml")
+      read
+      latest_hashes.select {|lib, hash| @lib_hashes[lib] != hash}.map {|e| e[0]}
     end
 
     def latest_hashes
