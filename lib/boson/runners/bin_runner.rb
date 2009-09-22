@@ -55,9 +55,12 @@ module Boson
       end
 
       def load_command_by_index
-        Index.update if @options[:index_create] || !Index.exists?
-        if !command_defined?(@command) && (lib = Index.find_library(@command, @subcommand))
-          Library.load_library lib, load_options
+        Index.update if @options[:index]
+        if !command_defined?(@command)
+          if (lib = Index.find_library(@command, @subcommand)) ||
+            (Index.update && (lib = Index.find_library(@command, @subcommand)))
+            Library.load_library lib, load_options
+          end
         elsif command_defined?(@command)
           Index.read_and_transfer
         end
@@ -68,14 +71,14 @@ module Boson
       end
 
       def default_options
-        {:discover=>:boolean, :verbose=>:boolean, :index_create=>:boolean, :execute=>:boolean,:repl=>:boolean, :help=>:boolean,
+        {:discover=>:boolean, :verbose=>:boolean, :index=>:boolean, :execute=>:boolean,:repl=>:boolean, :help=>:boolean,
           :load=>{:type=>:array, :values=>all_libraries, :enum=>false}}
       end
 
       def option_descriptions
         {:discover=>"Loads given command by loading libraries until it discovers the correct library",
           :verbose=>"Verbose description of loading libraries or help",
-          :index_create=>"Loads/indexes all libraries before executing command",
+          :index=>"Forces index update before looking for a command",
           :execute=>"Executes given arguments as a one line script",
           :load=>"A comma delimited array of libraries to load",
           :repl=>"Drops into irb or another given repl/shell with default and explicit libraries loaded",
