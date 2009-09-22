@@ -55,9 +55,11 @@ module Boson
       end
 
       def load_command_by_index
-        Index.load(@options[:index_create]) unless @command == 'index' && @subcommand.nil?
-        if lib = Index.find_library(@command, @subcommand)
+        Index.update if @options[:index_create] || !Index.exists?
+        if !command_defined?(@command) && (lib = Index.find_library(@command, @subcommand))
           Library.load_library lib, load_options
+        elsif command_defined?(@command)
+          Index.read_and_transfer
         end
       end
 

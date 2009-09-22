@@ -48,7 +48,7 @@ module Boson::Commands::Core
   end
 
   def index
-    Boson::Index.index_commands
+    Boson::Index.update
     puts "Indexed #{Boson.libraries.size} libraries and #{Boson.commands.size} commands."
   end
 
