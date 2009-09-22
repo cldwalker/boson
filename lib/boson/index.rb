@@ -16,9 +16,11 @@ module Boson
       options[:all] = true if !exists? && !options.key?(:all)
       libraries_to_update = options[:all] ? Runner.all_libraries : changed_libraries
       read_and_transfer(libraries_to_update)
-      puts options[:all] ? "Generating index for all #{libraries_to_update.size} libraries. Patience ... is a bitch" :
-        (libraries_to_update.empty? ? "No libraries need to be indexed" :
-        "Indexing the following libraries: #{libraries_to_update.join(', ')}")
+      if options[:verbose]
+        puts options[:all] ? "Generating index for all #{libraries_to_update.size} libraries. Patience ... is a bitch" :
+          (libraries_to_update.empty? ? "No libraries indexed" :
+          "Indexing the following libraries: #{libraries_to_update.join(', ')}")
+      end
       Library.load(libraries_to_update, options.merge(:index=>true))
       write
     end
