@@ -9,7 +9,7 @@ require 'test_benchmark' if ENV['BENCHMARK']
 
 class Test::Unit::TestCase
   # make local so it doesn't pick up my real boson dir
-  Boson.repo.dir = File.expand_path('.')
+  Boson.repo.dir = File.dirname(__FILE__)
   Boson.instance_variable_set "@repos", [Boson.repo]
 
   def reset
