@@ -41,8 +41,7 @@ module Boson
       def init
         super
         Library.load boson_libraries, load_options
-        @options[:load] ? load_command_by_option : (@options[:discover] ?
-          load_command_by_discovery : load_command_by_index)
+        @options[:load] ? load_command_by_option : load_command_by_index
         command_defined? @command
       end
 
@@ -71,25 +70,18 @@ module Boson
       end
 
       def default_options
-        {:discover=>:boolean, :verbose=>:boolean, :index=>:boolean, :execute=>:boolean,:repl=>:boolean, :help=>:boolean,
+        {:verbose=>:boolean, :index=>:boolean, :execute=>:boolean,:repl=>:boolean, :help=>:boolean,
           :load=>{:type=>:array, :values=>all_libraries, :enum=>false}}
       end
 
       def option_descriptions
-        {:discover=>"Loads given command by loading libraries until it discovers the correct library",
+        {
           :verbose=>"Verbose description of loading libraries or help",
           :index=>"Forces index update before looking for a command",
           :execute=>"Executes given arguments as a one line script",
           :load=>"A comma delimited array of libraries to load",
           :repl=>"Drops into irb or another given repl/shell with default and explicit libraries loaded",
           :help=>"Displays this help message or a command's help if given a command"
-        }
-      end
-
-      def load_command_by_discovery
-        all_libraries.partition {|e| e =~ /^#{@command}/ }.flatten.find {|e|
-          Library.load [e], load_options
-          command_defined? @command
         }
       end
 
