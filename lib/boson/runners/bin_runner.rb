@@ -4,39 +4,19 @@ module Boson
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
         return print_usage if args.empty? || (@command.nil? && !@options[:repl] && !@options[:execute])
-        @options[:repl] ? ReplRunner.bin_start(@options[:repl], @options[:load]) : load_command
-      rescue OptionParser::Error
-        $stderr.puts "Error: "+ $!.message
-      end
+        return ReplRunner.bin_start(@options[:repl], @options[:load]) if @options[:repl]
+        return $stderr.puts("Error: Command #{@command} not found.") unless init
 
-      def load_command
-        @command, @subcommand = @command.split('.', 2) if @command.to_s.include?('.')
-        init ? execute_command : $stderr.puts("Error: Command #{@command} not found.")
-      end
-
-      def execute_command
         if @options[:help]
           print_command_help
         elsif @options[:execute]
-          begin
-            Boson.main_object.instance_eval @options[:execute]
-          rescue Exception
-            $stderr.puts "Error: #{$!.message}"
-          end
+          Boson.main_object.instance_eval @options[:execute]
         else
-          begin
-            dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
-            output = dispatcher.send(@subcommand || @command, *@args)
-            render_output(output)
-          rescue ArgumentError
-            puts "Wrong number of arguments given"
-            print_command_help
-          end
+          execute_command
         end
-      end
-
-      def print_command_help
-        puts Boson.invoke('usage', @command)
+      rescue Exception
+        $stderr.puts "Error: #{$!.message}"
+        $stderr.puts $!.backtrace.inspect if @options && @options[:verbose]
       end
 
       def init
@@ -44,7 +24,21 @@ module Boson
         Library.load boson_libraries, load_options
         @options[:load] ? load_command_by_option : (@options[:execute] ? define_autoloader :
           load_command_by_index)
-        @options[:execute] || command_defined?(@command)
+        @options[:execute] || command_defined?(@command[/\w+/])
+      end
+
+      def execute_command
+        command, subcommand = @command.include?('.') ? @command.split('.', 2) : [@command, nil]
+        dispatcher = subcommand ? Boson.invoke(command) : Boson.main_object
+        output = dispatcher.send(subcommand || command, *@args)
+        render_output(output)
+      rescue ArgumentError
+        puts "Wrong number of arguments for #{@command}\n\n"
+        print_command_help
+      end
+
+      def print_command_help
+        puts Boson.invoke('usage', @command)
       end
 
       def command_defined?(command)
@@ -57,8 +51,8 @@ module Boson
 
       def load_command_by_index
         Index.update(:verbose=>@options[:index]) if @options[:index] || (command_defined?(@command) && !@options.key?(:help))
-        if !command_defined?(@command) && ((lib = Index.find_library(@command, @subcommand)) ||
-          (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command, @subcommand))))
+        if !command_defined?(@command) && ((lib = Index.find_library(@command)) ||
+          (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
           Library.load_library lib, load_options
         end
       end

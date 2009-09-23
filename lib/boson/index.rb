@@ -30,6 +30,7 @@ module Boson
     end
 
     def find_library(command, subcommand=nil)
+      command, subcommand = command.split('.', 2) if subcommand.nil? && command.include?('.')
       read
       find_lambda = subcommand ? lambda {|e| method(:is_namespace_command).call(e, command, subcommand) } :
         lambda {|e| [e.name, e.alias].include?(command)}
