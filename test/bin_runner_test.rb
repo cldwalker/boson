@@ -11,30 +11,61 @@ module Boson
     before(:each) {|e|
       Boson::BinRunner.instance_variables.each {|e| Boson::BinRunner.instance_variable_set(e, nil)}
     }
-    context "bin_runner" do
+    context "at commandline" do
       before(:all) { reset }
 
-      test "with no arguments prints usage" do
+      test "no arguments prints usage" do
         capture_stdout { start }.should =~ /^boson/
       end
 
-      test "with option but no arguments prints usage" do
-        capture_stdout { start '-v' }.should =~ /^boson/
+      test "invalid option value prints error" do
+        capture_stderr { start("-l") }.should =~ /Error:/
       end
 
-      test "with undiscovered command prints error" do
+      test "help option but no arguments prints usage" do
+        capture_stdout { start '-h' }.should =~ /^boson/
+      end
+
+      test "help option and command prints command help" do
+        capture_stdout { start('-h', 'commands') } =~ /^commands/
+      end
+
+      test "load option loads libraries" do
+        Library.expects(:load).with {|*args| args[0][0].is_a?(Module) ? true : args[0][0] == 'blah'}.times(2)
+        BinRunner.stubs(:execute_command)
+        start('-l', 'blah', 'libraries')
+      end
+
+      test "repl option starts repl" do
+        ReplRunner.expects(:start)
+        Util.expects(:which).returns("/usr/bin/irb")
+        Kernel.expects(:load).with("/usr/bin/irb")
+        start("--repl")
+      end
+
+      test "repl option but no repl found prints error" do
+        ReplRunner.expects(:start)
+        Util.expects(:which).returns(nil)
+        capture_stderr { start("--repl") } =~ /Repl not found/
+      end
+
+      test "command and too many arguments prints error" do
+        capture_stdout { start('commands','1','2','3') }.should =~ /Wrong number/
+      end
+
+      test "undiscovered command prints error" do
          BinRunner.expects(:load_command_by_index).returns(false)
         capture_stderr { start('blah') }.should =~ /Error.*blah/
       end
 
-      test "executes basic command" do
+      test "basic command executes" do
         BinRunner.expects(:init).returns(true)
         BinRunner.stubs(:render_output)
         Boson.main_object.expects(:send).with('kick','it')
         start 'kick','it'
       end
 
-      test "executes sub command" do
+      test "sub command executes" do
         obj = Object.new
         Boson.main_object.extend Module.new { def phone; Struct.new(:home).new('done'); end }
         BinRunner.expects(:init).returns(true)

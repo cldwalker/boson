@@ -30,7 +30,7 @@ module Boson
           render_output(output)
         end
       rescue ArgumentError
-        puts "Incorrect number of arguments given"
+        puts "Wrong number of arguments given"
         print_command_help
       end
 
@@ -54,7 +54,7 @@ module Boson
       end
 
       def load_command_by_index
-        Index.update(:verbose=>@options[:index]) if @options[:index] || command_defined?(@command)
+        Index.update(:verbose=>@options[:index]) if @options[:index] || (command_defined?(@command) && !@options.key?(:help))
         if !command_defined?(@command) && ((lib = Index.find_library(@command, @subcommand)) ||
           (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command, @subcommand))))
           Library.load_library lib, load_options

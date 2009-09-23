@@ -10,7 +10,7 @@ module Boson
       def bin_start(repl, libraries)
         start :no_defaults=>true, :libraries=>libraries
         repl = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb' unless repl.is_a?(String)
-        unless repl[/./] == '/' || (repl = Util.which(repl))
+        unless repl.index('/') == 0 || (repl = Util.which(repl))
           $stderr.puts "Repl not found. Please specify full path of repl."
           return
         end
