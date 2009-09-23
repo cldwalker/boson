@@ -26,7 +26,7 @@ module Boson::Commands::Core
     query_field = options.delete(:query_field)
     Boson::Index.read if options[:index]
     commands = options[:index] ? Boson::Index.commands : Boson.commands
-    results = commands.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
+    results = commands.select {|f| f.send(query_field).to_s =~ /#{query}/i }
     render results, options
   end
 
@@ -35,7 +35,7 @@ module Boson::Commands::Core
     query_field = options.delete(:query_field)
     Boson::Index.read if options[:index]
     libraries = options[:index] ? Boson::Index.libraries : Boson.libraries
-    results = libraries.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
+    results = libraries.select {|f| f.send(query_field).to_s =~ /#{query}/i }
     render results, options
   end
 

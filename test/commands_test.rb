@@ -4,8 +4,9 @@ module Boson
   class CommandsTest < Test::Unit::TestCase
     before(:all) {
       reset_boson
-      @higgs = Object.new.extend Boson::Commands::Core
+      @higgs = Boson.main_object
     }
+
     test "unloaded_libraries detects libraries under commands directory" do
       Dir.stubs(:[]).returns(['./commands/lib.rb', './commands/lib2.rb'])
       @higgs.unloaded_libraries.should == ['lib', 'lib2']
