@@ -60,6 +60,11 @@ module Boson
         Index.find_library('bl', 's').should == 'bling'
       end
 
+      test "finds namespace command aliased or not without a subcommand" do
+        Index.find_library('bling', nil).should == 'bling'
+        Index.find_library('bl', nil).should == 'bling'
+      end
+
       test "doesn't find a subcommand" do
         Index.find_library('d', 'd').should == nil
       end

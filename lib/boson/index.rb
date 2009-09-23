@@ -33,7 +33,9 @@ module Boson
       read
       find_lambda = subcommand ? lambda {|e| method(:is_namespace_command).call(e, command, subcommand) } :
         lambda {|e| [e.name, e.alias].include?(command)}
-      (found = @commands.find(&find_lambda)) && found.lib
+      if (found = @commands.find(&find_lambda))
+        (found.lib == 'namespace') ? find_namespace_library(found.name) : found.lib
+      end
     end
 
     def write
@@ -55,6 +57,11 @@ module Boson
       [current_command.name, current_command.alias].include?(subcommand) &&
       (namespace_command = @commands.find {|f| [f.name, f.alias].include?(command) && f.lib == 'namespace'}) &&
       current_command.lib[/\w+$/] == namespace_command.name
+    end
+
+    def find_namespace_library(name)
+      (namespace_command = @commands.find {|f| [f.name, f.alias].include?(name) && f.lib == 'namespace'}) &&
+        (lib = @libraries.find {|e| e.namespace_command == namespace_command.name }) && lib.name
     end
 
     def changed_libraries
