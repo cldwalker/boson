@@ -13,25 +13,29 @@ module Boson::Commands::Core
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
     command_attributes = Boson::Command::ATTRIBUTES + [:usage]
     commands['commands'][:options] = {:query_field=>{:default=>'name', :values=>command_attributes},
-      :sort=>{:type=>:string, :values=>command_attributes}, :reverse_sort=>:boolean,
+      :sort=>{:type=>:string, :values=>command_attributes}, :reverse_sort=>:boolean, :index=>:boolean,
       :fields=>{:default=>[:name, :lib, :alias, :usage, :description], :values=>command_attributes} }
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
     commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes},
-      :sort=>{:type=>:string, :values=>library_attributes}, :reverse_sort=>:boolean,
+      :sort=>{:type=>:string, :values=>library_attributes}, :reverse_sort=>:boolean, :index=>:boolean,
       :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes} }
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
   def commands(query='', options={})
     query_field = options.delete(:query_field)
-    results = Boson.commands.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
+    Boson::Index.read if options[:index]
+    commands = options[:index] ? Boson::Index.commands : Boson.commands
+    results = commands.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
     render results, options
   end
 
   def libraries(query='', options={})
     options = {:filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}.merge(options)
     query_field = options.delete(:query_field)
-    results = Boson.libraries.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
+    Boson::Index.read if options[:index]
+    libraries = options[:index] ? Boson::Index.libraries : Boson.libraries
+    results = libraries.select {|f| f.send(query_field).to_s =~ /#{query}/i rescue true }
     render results, options
   end
 
