@@ -69,7 +69,7 @@ module Boson::Commands::Core
   end
 
   def usage(name)
-    (command = Boson.command(name.to_s) || Boson.command(name.to_s, :alias)) ?
+    (command = Boson::Index.find_command(name.to_s, nil, Boson.commands)) ?
       "#{name} #{command.usage}" : "Command '#{name}' not found"
   end
 

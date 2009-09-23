@@ -29,16 +29,6 @@ module Boson
       File.exists? marshal_file
     end
 
-    def find_library(command, subcommand=nil)
-      command, subcommand = command.split('.', 2) if subcommand.nil? && command.include?('.')
-      read
-      find_lambda = subcommand ? lambda {|e| method(:is_namespace_command).call(e, command, subcommand) } :
-        lambda {|e| [e.name, e.alias].include?(command)}
-      if (found = @commands.find(&find_lambda))
-        (found.lib == 'namespace') ? find_namespace_library(found.name) : found.lib
-      end
-    end
-
     def write
       save_marshal_index Marshal.dump([Boson.libraries, Boson.commands, latest_hashes])
     end
@@ -57,9 +47,25 @@ module Boson
       File.join(Boson.repo.config_dir, 'index.marshal')
     end
 
-    def is_namespace_command(current_command, command, subcommand)
+    # td: move find* cmds out of here
+    def find_command(command, subcommand=nil, commands=nil)
+      command, subcommand = command.split('.', 2) if subcommand.nil? && command.include?('.')
+      read
+      commands ||= @commands
+      find_lambda = subcommand ? lambda {|e| method(:is_namespace_command).call(commands, e, command, subcommand) } :
+        lambda {|e| [e.name, e.alias].include?(command)}
+      commands.find(&find_lambda)
+    end
+
+    def find_library(command, subcommand=nil, commands=nil)
+      if (found = find_command(command, subcommand, commands))
+        (found.lib == 'namespace') ? find_namespace_library(found.name) : found.lib
+      end
+    end
+
+    def is_namespace_command(commands, current_command, command, subcommand)
       [current_command.name, current_command.alias].include?(subcommand) &&
-      (namespace_command = @commands.find {|f| [f.name, f.alias].include?(command) && f.lib == 'namespace'}) &&
+      (namespace_command = commands.find {|f| [f.name, f.alias].include?(command) && f.lib == 'namespace'}) &&
       current_command.lib[/\w+$/] == namespace_command.name
     end
 

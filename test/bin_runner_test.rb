@@ -26,7 +26,7 @@ module Boson
         capture_stdout { start '-h' }.should =~ /^boson/
       end
 
-      test "help option and command prints command help" do
+      test "help option and command prints help" do
         capture_stdout { start('-h', 'commands') } =~ /^commands/
       end
 
