@@ -47,11 +47,6 @@ module Boson::Commands::Core
     Boson::Library.reload_library(name, {:verbose=>true}.merge!(options))
   end
 
-  def index
-    Boson::Index.update
-    puts "Indexed #{Boson.libraries.size} libraries and #{Boson.commands.size} commands."
-  end
-
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
     if object.is_a?(Array) && (sort = options.delete(:sort)) && sort = sort.to_s
