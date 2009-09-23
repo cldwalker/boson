@@ -39,7 +39,10 @@ module Boson
     end
 
     def write
-      marshal_string = Marshal.dump [Boson.libraries.map {|e| e.dup.marshalize }, Boson.commands, latest_hashes]
+      save_marshal_index Marshal.dump([Boson.libraries, Boson.commands, latest_hashes])
+    end
+
+    def save_marshal_index(marshal_string)
       File.open(marshal_file, 'w') {|f| f.write marshal_string }
     end
 

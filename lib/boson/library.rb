@@ -210,11 +210,12 @@ module Boson
       str.downcase.to_sym
     end
 
-    def marshalize
-      @options = @commands_hash = @namespace_object = nil
-      @module = @module.to_s
-      @loaded = false
-      self
+    def marshal_dump
+      [@name, @commands, @gems, @module.to_s, @repo_dir]
+    end
+
+    def marshal_load(ary)
+      @name, @commands, @gems, @module, @repo_dir = ary
     end
   end
 end

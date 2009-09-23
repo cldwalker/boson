@@ -21,7 +21,7 @@ module Boson::ArgumentInspector
     return if local_variables == params # nothing new found
     format_arguments(params, values, arity, num_args)
     rescue Exception
-      #puts "#{klass}.#{methd}: #{$!.message}"
+      # puts "#{klass}.#{meth}: #{$!.message}"
     ensure
       set_trace_func(nil)
   end

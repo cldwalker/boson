@@ -93,5 +93,26 @@ module Boson
         changed("state1").should == []
       end
     end
+
+    context "write" do
+      before(:all) {
+        reset_boson
+        Boson.commands << Command.new(:name=>'blah', :lib=>'blah', :args=>[['arg1', {}], ['arg2', self.class]])
+        Boson.libraries << Library.new(:name=>'blah', :module=>self.class)
+        Index.expects(:latest_hashes)
+        libraries = commands = []
+        Index.expects(:save_marshal_index).with {|str| libraries, commands, hashes = Marshal.load(str) ; true}
+        Index.write
+        @index = {:libraries=>libraries, :commands=>commands}
+      }
+
+      test "saves library module constants as strings" do
+        @index[:libraries][0].module.class.should == String
+      end
+
+      test "save commands with arg values as strings" do
+        @index[:commands][0].args.each {|e| e[1].class.should == String}
+      end
+    end
   end
 end

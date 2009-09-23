@@ -71,6 +71,18 @@ module Boson
       str + option_help
     end
 
+    def marshal_dump
+      if @args && @args.any? {|e| e[1].is_a?(Module) }
+        @args.map! {|e| e.size == 2 ? [e[0], e[1].inspect] : e }
+        @file_parsed_args = true
+      end
+      [@name, @alias, @lib, @description, @options, @args]
+    end
+
+    def marshal_load(ary)
+      @name, @alias, @lib, @description, @options, @args = ary
+    end
+
     def create_option_command_block
       command = self
       options = @options.delete(:options) || {}
