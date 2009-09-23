@@ -49,6 +49,15 @@ module Boson
         capture_stderr { start("--repl") } =~ /Repl not found/
       end
 
+      test "execute option executes string" do
+        BinRunner.expects(:define_autoloader)
+        capture_stdout { start("-e", "p 1 + 1") }.should == "2\n"
+      end
+
+      test "execute option errors are caught" do
+        capture_stderr { start("-e", "raise 'blah'") }.should =~ /^Error:/
+      end
+
       test "command and too many arguments prints error" do
         capture_stdout { start('commands','1','2','3') }.should =~ /Wrong number/
       end

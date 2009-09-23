@@ -47,12 +47,12 @@ module Boson
       }
 
       test "finds command aliased or not" do
-        Index.find_library('blurb', nil).should == 'blah'
-        Index.find_library('bb', nil).should == 'blah'
+        Index.find_library('blurb').should == 'blah'
+        Index.find_library('bb').should == 'blah'
       end
 
       test "doesn't find command" do
-        Index.find_library('blah', nil).should == nil
+        Index.find_library('blah').should == nil
       end
 
       test "finds a subcommand aliased or not" do
@@ -61,8 +61,8 @@ module Boson
       end
 
       test "finds namespace command aliased or not without a subcommand" do
-        Index.find_library('bling', nil).should == 'bling'
-        Index.find_library('bl', nil).should == 'bling'
+        Index.find_library('bling').should == 'bling'
+        Index.find_library('bl').should == 'bling'
       end
 
       test "doesn't find a subcommand" do

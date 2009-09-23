@@ -3,35 +3,36 @@ module Boson
     class <<self
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
-        return print_usage if args.empty? || (!@options[:repl] && @command.nil?)
+        return print_usage if args.empty? || (@command.nil? && !@options[:repl] && !@options[:execute])
         @options[:repl] ? ReplRunner.bin_start(@options[:repl], @options[:load]) : load_command
       rescue OptionParser::Error
         $stderr.puts "Error: "+ $!.message
       end
 
       def load_command
-        @original_command = @command
-        @command, @subcommand = @command.split('.', 2) if @command.include?('.')
-        if init || @options[:execute]
-          execute_command
-        else
-          $stderr.puts "Error: Command #{@command} not found."
-        end
+        @command, @subcommand = @command.split('.', 2) if @command.to_s.include?('.')
+        init ? execute_command : $stderr.puts("Error: Command #{@command} not found.")
       end
 
       def execute_command
         if @options[:help]
           print_command_help
         elsif @options[:execute]
-          Boson.main_object.instance_eval "#{@original_command} #{@args.join(' ')}"
+          begin
+            Boson.main_object.instance_eval @options[:execute]
+          rescue Exception
+            $stderr.puts "Error: #{$!.message}"
+          end
         else
-          dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
-          output = dispatcher.send(@subcommand || @command, *@args)
-          render_output(output)
+          begin
+            dispatcher = @subcommand ? Boson.invoke(@command) : Boson.main_object
+            output = dispatcher.send(@subcommand || @command, *@args)
+            render_output(output)
+          rescue ArgumentError
+            puts "Wrong number of arguments given"
+            print_command_help
+          end
         end
-      rescue ArgumentError
-        puts "Wrong number of arguments given"
-        print_command_help
       end
 
       def print_command_help
@@ -41,8 +42,9 @@ module Boson
       def init
         super
         Library.load boson_libraries, load_options
-        @options[:load] ? load_command_by_option : load_command_by_index
-        command_defined? @command
+        @options[:load] ? load_command_by_option : (@options[:execute] ? define_autoloader :
+          load_command_by_index)
+        @options[:execute] || command_defined?(@command)
       end
 
       def command_defined?(command)
@@ -66,7 +68,7 @@ module Boson
       end
 
       def default_options
-        {:verbose=>:boolean, :index=>:boolean, :execute=>:boolean,:repl=>:boolean, :help=>:boolean,
+        {:verbose=>:boolean, :index=>:boolean, :execute=>:string,:repl=>:boolean, :help=>:boolean,
           :load=>{:type=>:array, :values=>all_libraries, :enum=>false}}
       end
 

@@ -37,6 +37,14 @@ module Boson
         Library.expects(:load).with([:lib1,:lib2], anything)
         start(:libraries=>[:lib1, :lib2])
       end
+
+      test "autoloader autoloads libraries" do
+        start(:autoload_libraries=>true)
+        Index.expects(:read)
+        Index.expects(:find_library).with('blah').returns('blah')
+        Library.expects(:load_library).with('blah', :verbose=>true)
+        Boson.main_object.blah
+      end
     end
   end
 end

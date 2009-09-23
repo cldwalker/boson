@@ -29,7 +29,7 @@ module Boson
       File.exists? marshal_file
     end
 
-    def find_library(command, subcommand)
+    def find_library(command, subcommand=nil)
       read
       find_lambda = subcommand ? lambda {|e| method(:is_namespace_command).call(e, command, subcommand) } :
         lambda {|e| [e.name, e.alias].include?(command)}

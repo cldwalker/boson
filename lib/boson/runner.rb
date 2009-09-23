@@ -26,6 +26,21 @@ module Boson
       def all_libraries
         (detected_libraries + Boson.repos.map {|e| e.config[:libraries].keys}.flatten).uniq
       end
+
+      def define_autoloader
+        class << ::Boson.main_object
+          def method_missing(method, *args, &block)
+            Boson::Index.read
+            if lib = Boson::Index.find_library(method.to_s)
+              Boson::Library.load_library lib, :verbose=>true
+              send(method, *args, &block) if respond_to?(method)
+            else
+              super
+            end
+          end
+        end
+      end
+
     end
   end
 end

@@ -23,6 +23,7 @@ module Boson
         defaults = boson_libraries
         defaults += Boson.repos.map {|e| e.config[:defaults] }.flatten unless @options[:no_defaults]
         Library.load(defaults, @options)
+        define_autoloader if @options[:autoload_libraries]
         @initialized = true
       end
     end
