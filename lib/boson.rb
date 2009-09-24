@@ -1,5 +1,5 @@
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
-%w{yaml hirb alias fileutils}.each {|e| require e }
+%w{hirb alias}.each {|e| require e }
 %w{runner runners/repl_runner repo loader inspector library}.each {|e| require "boson/#{e}" }
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
@@ -30,8 +30,9 @@ module Boson
 
   def local_repo
     @local_repo ||= begin
-      ["lib/boson", ".boson"].find {|e| File.directory?(e) &&
+      dir = ["lib/boson", ".boson"].find {|e| File.directory?(e) &&
          File.expand_path(e) != repo.dir }
+      Repo.new(dir) if dir
     end
   end
 

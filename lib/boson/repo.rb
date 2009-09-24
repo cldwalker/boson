@@ -1,3 +1,4 @@
+%w{yaml fileutils}.each {|e| require e }
 module Boson
   class Repo
     def self.commands_dir(dir)
