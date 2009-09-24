@@ -172,22 +172,13 @@ module Boson
       before_create_commands
       commands.each {|e| Boson.commands << Command.create(e, self)}
       create_command_aliases(commands) if commands.size > 0 && !@no_alias_creation
-      create_option_commands(commands)
+      command_objects(commands).select {|e| e.options}.each {|cmd|
+        Higgs.create_option_command(namespace_object, cmd)
+      }
     end
 
-    def command(name)
-      Boson.commands.find {|e| e.name == name && e.lib == self.name }
-    end
-
-    def create_option_commands(commands)
-      commands.each do |cmd|
-        if (command = command(cmd)) && command.options
-          cmd_block = command.create_option_command_block
-          [command.name, command.alias].compact.each {|e|
-            namespace_object.instance_eval("class<<self;self;end").send(:define_method, e, cmd_block)
-          }
-        end
-      end
+    def command_objects(names)
+      Boson.commands.select {|e| names.include?(e.name) && e.lib == self.name }
     end
 
     def add_library
