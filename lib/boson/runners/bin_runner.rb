@@ -23,6 +23,7 @@ module Boson
 
       def init
         super
+        Index.update(:verbose=>true) if @options[:index]
         if @options[:load]
           Library.load @options[:load], load_options
         elsif @options[:execute]
@@ -33,7 +34,7 @@ module Boson
       end
 
       def load_command_by_index
-        Index.update(:verbose=>@options[:index]) if @options[:index] || (command_defined?(@command) && !@options.key?(:help))
+        Index.update(:verbose=>@options[:verbose]) if !@options[:index] && command_defined?(@command) && !@options[:help]
         if !command_defined?(@command) && ((lib = Index.find_library(@command)) ||
           (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
           Library.load_library lib, load_options
@@ -70,7 +71,7 @@ module Boson
       def option_descriptions
         {
           :verbose=>"Verbose description of loading libraries or help",
-          :index=>"Forces index update before looking for a command",
+          :index=>"Updates index",
           :execute=>"Executes given arguments as a one line script",
           :load=>"A comma delimited array of libraries to load",
           :repl=>"Drops into irb or another given repl/shell with default and explicit libraries loaded",
