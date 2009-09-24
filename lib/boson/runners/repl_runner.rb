@@ -4,7 +4,13 @@ module Boson
       def start(options={})
         @options = options
         init unless @initialized
-        Library.load(@options[:libraries], @options) if @options[:libraries]
+        Library.load(@options[:libraries], load_options) if @options[:libraries]
+      end
+
+      def init
+        super
+        define_autoloader if @options[:autoload_libraries]
+        @initialized = true
       end
 
       def bin_start(repl, libraries)
@@ -18,13 +24,10 @@ module Boson
         Kernel.load $0 = repl
       end
 
-      def init
-        super
-        defaults = boson_libraries
+      def default_libraries
+        defaults = super
         defaults += Boson.repos.map {|e| e.config[:defaults] }.flatten unless @options[:no_defaults]
-        Library.load(defaults, @options)
-        define_autoloader if @options[:autoload_libraries]
-        @initialized = true
+        defaults
       end
     end
   end

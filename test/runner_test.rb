@@ -19,7 +19,7 @@ module Boson
       end
 
       test "loads default libraries and libraries in :defaults config" do
-        defaults = Boson::Runner.boson_libraries + ['yo']
+        defaults = Boson::Runner.default_libraries + ['yo']
         with_config(:defaults=>['yo']) do
           Library.expects(:load).with {|*args| args[0] == defaults }
           start

@@ -23,10 +23,25 @@ module Boson
 
       def init
         super
-        Library.load boson_libraries, load_options
-        Library.load Boson.repo.config[:bin_defaults], load_options if Boson.repo.config[:bin_defaults]
-        @options[:load] ? load_command_by_option : (@options[:execute] ? define_autoloader :
-          load_command_by_index)
+        if @options[:load]
+          Library.load @options[:load], load_options
+        elsif @options[:execute]
+          define_autoloader
+        else
+          load_command_by_index
+        end
+      end
+
+      def load_command_by_index
+        Index.update(:verbose=>@options[:index]) if @options[:index] || (command_defined?(@command) && !@options.key?(:help))
+        if !command_defined?(@command) && ((lib = Index.find_library(@command)) ||
+          (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
+          Library.load_library lib, load_options
+        end
+      end
+
+      def default_libraries
+        super + (Boson.repo.config[:bin_defaults] || [])
       end
 
       def execute_command
@@ -45,22 +60,6 @@ module Boson
 
       def command_defined?(command)
         Boson.main_object.respond_to? command
-      end
-
-      def load_command_by_option
-        Library.load @options[:load], load_options
-      end
-
-      def load_command_by_index
-        Index.update(:verbose=>@options[:index]) if @options[:index] || (command_defined?(@command) && !@options.key?(:help))
-        if !command_defined?(@command) && ((lib = Index.find_library(@command)) ||
-          (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
-          Library.load_library lib, load_options
-        end
-      end
-
-      def load_options
-        @load_options ||= {:verbose=>@options[:verbose]}
       end
 
       def default_options

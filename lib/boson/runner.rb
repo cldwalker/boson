@@ -4,6 +4,7 @@ module Boson
       def init
         Hirb.enable(:config_file=>File.join(Boson.repo.config_dir, 'hirb.yml'))
         add_load_path
+        Library.load default_libraries, load_options
       end
 
       def add_load_path
@@ -14,7 +15,11 @@ module Boson
         }
       end
 
-      def boson_libraries
+      def load_options
+        {:verbose=>@options[:verbose]}
+      end
+
+      def default_libraries
         [Boson::Commands::Core, Boson::Commands::WebCore, Boson::Commands::Namespace, Boson::Commands::IrbCore]
       end
 

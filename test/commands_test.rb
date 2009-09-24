@@ -5,6 +5,9 @@ module Boson
     before(:all) {
       reset_boson
       @higgs = Boson.main_object
+      ancestors = class <<Boson.main_object; self end.ancestors
+      # allows running just this test file
+      Library.load Runner.default_libraries unless ancestors.include?(Boson::Commands::Core)
     }
 
     test "unloaded_libraries detects libraries under commands directory" do

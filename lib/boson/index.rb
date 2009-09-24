@@ -21,7 +21,7 @@ module Boson
           (libraries_to_update.empty? ? "No libraries indexed" :
           "Indexing the following libraries: #{libraries_to_update.join(', ')}")
       end
-      Library.load(libraries_to_update, options.merge(:index=>true))
+      Library.load(libraries_to_update, options.merge(:index=>true)) unless libraries_to_update.empty?
       write
     end
 
