@@ -28,9 +28,15 @@ module Boson
     @repo ||= Repo.new("#{ENV['HOME']}/.boson")
   end
 
+  def local_repo
+    @local_repo ||= begin
+      ["lib/boson", ".boson"].find {|e| File.directory?(e) &&
+         File.expand_path(e) != repo.dir }
+    end
+  end
+
   def repos
-    @repos ||= [repo] + ["lib/boson", ".boson"].select {|e|
-      File.directory?(e)}.map {|e| Repo.new(File.expand_path(e))}
+    @repos ||= [repo, local_repo].compact
   end
 
   def main_object=(value)
