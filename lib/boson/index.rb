@@ -47,26 +47,11 @@ module Boson
       File.join(Boson.repo.config_dir, 'index.marshal')
     end
 
-    # td: move find* cmds out of here
-    def find_command(command, subcommand=nil, commands=nil)
-      command, subcommand = command.split('.', 2) if subcommand.nil? && command.include?('.')
+    def find_library(command)
       read
-      commands ||= @commands
-      find_lambda = subcommand ? lambda {|e| method(:is_namespace_command).call(commands, e, command, subcommand) } :
-        lambda {|e| [e.name, e.alias].include?(command)}
-      commands.find(&find_lambda)
-    end
-
-    def find_library(command, subcommand=nil, commands=nil)
-      if (found = find_command(command, subcommand, commands))
+      if (found = Command.find(command, @commands))
         (found.lib == 'namespace') ? find_namespace_library(found.name) : found.lib
       end
-    end
-
-    def is_namespace_command(commands, current_command, command, subcommand)
-      [current_command.name, current_command.alias].include?(subcommand) &&
-      (namespace_command = commands.find {|f| [f.name, f.alias].include?(command) && f.lib == 'namespace'}) &&
-      current_command.lib[/\w+$/] == namespace_command.name
     end
 
     def find_namespace_library(name)

@@ -69,9 +69,6 @@ module Boson::Commands::Core
   end
 
   def usage(name)
-    (command = Boson::Index.find_command(name.to_s, nil, Boson.commands)) ?
-      "#{name} #{command.usage}" : "Command '#{name}' not found"
+    (command = Boson::Command.find(name)) ? "#{name} #{command.usage}" : "Command '#{name}' not found"
   end
-
-  private
 end

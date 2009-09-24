@@ -34,7 +34,7 @@ class Test::Unit::TestCase
   end
 
   def command_exists?(name, bool=true)
-    !!Boson.command(name).should == bool
+    !!Boson::Command.find(name).should == bool
   end
 
   def library_loaded?(name, bool=true)

@@ -24,10 +24,6 @@ module Boson
     @commands ||= Array.new
   end
 
-  def command(query, attribute='name')
-    commands.find {|e| e.send(attribute) == query }
-  end
-
   def repo
     @repo ||= Repo.new("#{ENV['HOME']}/.boson")
   end
