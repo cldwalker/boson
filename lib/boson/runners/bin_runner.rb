@@ -5,7 +5,7 @@ module Boson
         @command, @options, @args = parse_args(args)
         return print_usage if args.empty? || (@command.nil? && !@options[:repl] && !@options[:execute])
         return ReplRunner.bin_start(@options[:repl], @options[:load]) if @options[:repl]
-        return $stderr.puts("Error: Command #{@command} not found.") unless init
+        init
 
         if @options[:help]
           print_command_help
@@ -15,16 +15,18 @@ module Boson
           execute_command
         end
       rescue Exception
-        $stderr.puts "Error: #{$!.message}"
-        $stderr.puts $!.backtrace.inspect if @options && @options[:verbose]
+        message = ($!.is_a?(NameError) && !@command.nil?) ?
+          "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
+        message += "\n" + $!.backtrace.inspect if @options && @options[:verbose]
+        $stderr.puts message
       end
 
       def init
         super
         Library.load boson_libraries, load_options
+        Library.load Boson.repo.config[:bin_defaults], load_options if Boson.repo.config[:bin_defaults]
         @options[:load] ? load_command_by_option : (@options[:execute] ? define_autoloader :
           load_command_by_index)
-        @options[:execute] || command_defined?(@command[/\w+/])
       end
 
       def execute_command
