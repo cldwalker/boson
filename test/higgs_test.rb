@@ -11,6 +11,10 @@ module Boson
         def splat_blah(*args)
           args
         end
+        def default_blah(arg1, arg2=default, options={})
+          [arg1, arg2, options]
+        end
+        def default; 'some default'; end
       end
       EOF
       @opt_cmd = Object.new.extend Blah
@@ -20,6 +24,7 @@ module Boson
       def command(hash, args)
         hash = {:name=>'blah', :lib=>'bling', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
         @cmd = Command.new hash
+        @cmd.instance_variable_set("@file_parsed_args", true) if hash[:file_parsed_args]
         Higgs.create_option_command(@opt_cmd, @cmd)
         @opt_cmd.send(hash[:name], *args)
       end
@@ -36,10 +41,33 @@ module Boson
         command({:name=>'splat_blah', :args=>[['*args']]}, args)
       end
 
+      def command_with_arg_defaults(*args)
+        arg_defaults = [%w{arg1}, %w{arg2 default}, %w{options {}}]
+        command({:name=>'default_blah', :file_parsed_args=>true, :args=>arg_defaults}, args)
+      end
+
       def args_are_equal(args, array)
         command_with_args(*args).should == array
         command_with_arg_size(*args).should == array
         command_with_splat_args(*args).should == array
+      end
+
+      context "with arg defaults" do
+        test "sets defaults with stringified args" do
+          command_with_arg_defaults('1').should == ["1", "some default", {:level=>2}]
+        end
+
+        test "sets defaults with normal args" do
+          command_with_arg_defaults(1).should == [1, "some default", {:level=>2}]
+        end
+
+        test "doesn't set defaults if not needed" do
+          command_with_arg_defaults(1, 'nada').should == [1, "nada", {:level=>2}]
+        end
+      end
+
+      test "translated stringfied args + options starting at second arg" do
+        command_with_arg_defaults(1, 'nada -l3').should == [1, "nada", {:level=>3}]
       end
 
       context "for all cases" do
