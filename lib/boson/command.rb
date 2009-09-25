@@ -40,19 +40,26 @@ module Boson
       @alias = hash[:alias] if hash[:alias]
       @description = hash[:description] if hash[:description]
       @options = hash[:options] if hash[:options]
-      @args = hash[:args] if hash[:args]
-      @arg_size = hash[:arg_size] if hash[:arg_size]
+      if hash[:args]
+        if hash[:args].is_a?(Array)
+          @args = hash[:args]
+        elsif hash[:args].to_s[/^\d+/]
+          @arg_size = hash[:args].to_i
+        elsif hash[:args] == '*'
+          @args = [['*args']]
+        end
+      end
     end
 
     def library
       @library ||= Boson.library(@lib)
     end
 
-    def args
+    def args(lib=library)
       @args ||= begin
-        if library && File.exists?(library.library_file || '')
+        if lib && File.exists?(lib.library_file || '')
           @file_parsed_args = true
-          file_string = Boson::FileLibrary.read_library_file(library.library_file)
+          file_string = Boson::FileLibrary.read_library_file(lib.library_file)
           ArgumentInspector.arguments_from_file(file_string, @name)
         end
       end

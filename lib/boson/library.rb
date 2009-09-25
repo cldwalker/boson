@@ -172,9 +172,17 @@ module Boson
       before_create_commands
       commands.each {|e| Boson.commands << Command.create(e, self)}
       create_command_aliases(commands) if commands.size > 0 && !@no_alias_creation
-      command_objects(commands).select {|e| e.options }.each {|cmd|
-        Higgs.create_option_command(namespace_object, cmd)
-      }
+      create_option_commands(commands)
+    end
+
+    def create_option_commands(commands)
+      option_commands = command_objects(commands).select {|e| e.options }
+      accepted, rejected = option_commands.partition {|e| e.args(self) || e.arg_size }
+      if @options[:verbose] && rejected.size > 0
+        puts "Following commands cannot have options until their arguments are configured: " +
+          rejected.map {|e| e.name}.join(', ')
+      end
+      accepted.each {|cmd| Higgs.create_option_command(namespace_object, cmd) }
     end
 
     def command_objects(names)

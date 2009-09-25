@@ -93,6 +93,28 @@ module Boson
       end
     end
 
+    context "option commands without args" do
+      before(:all) {
+        reset_boson
+        @library = Library.new(:name=>'blah', :commands=>['foo', 'bar'])
+        Boson.libraries << @library
+        @foo = Command.new(:name=>'foo', :lib=>'blah', :options=>{:fool=>:string}, :args=>'*')
+        Boson.commands << @foo
+        Boson.commands << Command.new(:name=>'bar', :lib=>'blah', :options=>{:bah=>:string})
+      }
+
+      test "are deleted" do
+        Higgs.expects(:create_option_command).with(anything, @foo)
+        @library.create_option_commands(@library.commands)
+      end
+
+      test "are deleted and printed when verbose" do
+        Higgs.expects(:create_option_command).with(anything, @foo)
+        @library.instance_eval("@options = {:verbose=>true}")
+        capture_stdout { @library.create_option_commands(@library.commands) } =~ /options.*blah/
+      end
+    end
+
     context "loaded" do
       before(:each) { reset_libraries }
 

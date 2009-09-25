@@ -30,7 +30,7 @@ module Boson
       end
 
       def command_with_arg_size(*args)
-        command({:arg_size=>2}, args)
+        command({:args=>2}, args)
       end
 
       def command_with_args(*args)
@@ -38,7 +38,7 @@ module Boson
       end
 
       def command_with_splat_args(*args)
-        command({:name=>'splat_blah', :args=>[['*args']]}, args)
+        command({:name=>'splat_blah', :args=>'*'}, args)
       end
 
       def command_with_arg_defaults(*args)
