@@ -2,6 +2,7 @@ require 'shellwords'
 module Boson
   module Higgs
     extend self
+    class Error < StandardError; end
 
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
@@ -15,7 +16,7 @@ module Boson
         begin
           args = Boson::Higgs.translate_args(obj, command, args)
           super(*args)
-        rescue OptionParser::Error
+        rescue OptionParser::Error, Error
           $stderr.puts "Error: " + $!.message
         end
       }
@@ -32,6 +33,10 @@ module Boson
         end
       end
       args
+    rescue Error, ArgumentError
+      raise
+    rescue Exception
+      raise Error, $!.message
     end
 
     def parse_options(args)
@@ -59,6 +64,7 @@ module Boson
           begin
             args[i] = @command.file_parsed_args? ? @obj.instance_eval(arr[1]) : arr[1]
           rescue Exception
+            raise Error, "Unable to set default argument at position #{i+1}.\nReason: #{$!.message}"
           end
         }
       end

@@ -70,6 +70,22 @@ module Boson
         command_with_arg_defaults(1, 'nada -l3').should == [1, "nada", {:level=>3}]
       end
 
+      test "with invalid option syntax prints error" do
+        capture_stderr { command_with_args('a1 -l') }.should =~ /Error.*level/
+      end
+
+      test "with invalid default args prints error" do
+        arg_defaults = [%w{arg1}, %w{arg2 invalidzzz}, %w{options {}}]
+        capture_stderr {
+          command({:name=>'default_blah', :file_parsed_args=>true, :args=>arg_defaults}, [1])
+        }.should =~ /Error.*position 2/
+      end
+
+      test "with unexpected error in option mapping catches and prints it" do
+        Higgs.stubs(:parse_options).raises("unexpected")
+        capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
+      end
+
       context "for all cases" do
         test "translates arg and options as one string" do
           args_are_equal ['a1 -f'], ['a1', {:force=>true, :level=>2}]
