@@ -15,8 +15,10 @@ class Test::Unit::TestCase
   def assert_error(error, message=nil)
     yield
   rescue error=>e
-    e.message.should =~ /#{message}/ if message
     e.class.should == error
+    e.message.should =~ Regexp.new(message) if message
+  else
+    nil.should == error
   end
 
   def reset

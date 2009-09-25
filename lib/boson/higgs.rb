@@ -13,10 +13,16 @@ module Boson
     def create_option_command_block(command)
       lambda {|*args|
         begin
-          args = Boson::Higgs.translate_args(command, args)
+          args, parsed_options = Boson::Higgs.translate_args(command, args)
           super(*args)
         rescue OptionParser::Error
           $stderr.puts "Error: " + $!.message
+        rescue ArgumentError
+          if command.args && parsed_options && $!.message =~ /(\d+) for \d+/ && (num = $1.to_i)
+            raise ArgumentError, $!.message.sub(/\d+ for/, "#{num -1} for")
+          else
+            raise
+          end
         end
       }
     end
@@ -38,10 +44,11 @@ module Boson
         add_default_args(command, args)
         args << parsed_options
         if command.args && args.size != command.args.size && !command.has_splat_args?
-          raise ArgumentError, "wrong number of arguments (#{args.size - 1} for #{command.args.size})"
+          command_size = args.size > command.args.size ? command.args.size : command.args.size - 1
+          raise ArgumentError, "wrong number of arguments (#{args.size - 1} for #{command_size})"
         end
       end
-      args
+      [args, parsed_options]
     end
 
     def add_default_args(command, args)

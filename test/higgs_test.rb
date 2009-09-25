@@ -42,8 +42,8 @@ module Boson
       end
 
       test "with not enough args raises error" do
-        assert_error(ArgumentError, '0 for 2') { option_command }
-        assert_error(ArgumentError, '0 for 2') { option_command '' }
+        assert_error(ArgumentError, '0 for 1') { option_command }
+        assert_error(ArgumentError, '0 for 1') { option_command '' }
       end
 
       test "with too many args raises error" do
