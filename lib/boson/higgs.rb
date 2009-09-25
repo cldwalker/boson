@@ -13,16 +13,10 @@ module Boson
     def create_option_command_block(command)
       lambda {|*args|
         begin
-          args, parsed_options = Boson::Higgs.translate_args(command, args)
+          args = Boson::Higgs.translate_args(command, args)
           super(*args)
         rescue OptionParser::Error
           $stderr.puts "Error: " + $!.message
-        rescue ArgumentError
-          if command.args && parsed_options && $!.message =~ /(\d+) for \d+/ && (num = $1.to_i)
-            raise ArgumentError, $!.message.sub(/\d+ for/, "#{num -1} for")
-          else
-            raise
-          end
         end
       }
     end
@@ -37,18 +31,18 @@ module Boson
         parsed_options = command.option_parser.parse(args.pop.split(/\s+/), :delete_invalid_opts=>true)
         args += command.option_parser.non_opts
       # default options
-      elsif command.args && args.size <= command.args.size - 1
+      elsif (args.size <= command.arg_size - 1) || (command.has_splat_args? && !args[-1].is_a?(Hash))
         parsed_options = command.option_parser.parse([], :delete_invalid_opts=>true)
       end
       if parsed_options
         add_default_args(command, args)
         args << parsed_options
-        if command.args && args.size != command.args.size && !command.has_splat_args?
-          command_size = args.size > command.args.size ? command.args.size : command.args.size - 1
+        if args.size != command.arg_size && !command.has_splat_args?
+          command_size = args.size > command.arg_size ? command.arg_size : command.arg_size - 1
           raise ArgumentError, "wrong number of arguments (#{args.size - 1} for #{command_size})"
         end
       end
-      [args, parsed_options]
+      args
     end
 
     def add_default_args(command, args)

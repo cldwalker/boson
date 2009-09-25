@@ -41,6 +41,7 @@ module Boson
       @description = hash[:description] if hash[:description]
       @options = hash[:options] if hash[:options]
       @args = hash[:args] if hash[:args]
+      @arg_size = hash[:arg_size] if hash[:arg_size]
     end
 
     def library
@@ -55,6 +56,11 @@ module Boson
           ArgumentInspector.arguments_from_file(file_string, @name)
         end
       end
+    end
+
+    def arg_size
+      @arg_size = args ? args.size : nil unless instance_variable_defined?("@arg_size")
+      @arg_size
     end
 
     def file_parsed_args?

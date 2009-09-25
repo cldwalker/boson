@@ -172,7 +172,7 @@ module Boson
       before_create_commands
       commands.each {|e| Boson.commands << Command.create(e, self)}
       create_command_aliases(commands) if commands.size > 0 && !@no_alias_creation
-      command_objects(commands).select {|e| e.options}.each {|cmd|
+      command_objects(commands).select {|e| e.options }.each {|cmd|
         Higgs.create_option_command(namespace_object, cmd)
       }
     end
