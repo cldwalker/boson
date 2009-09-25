@@ -111,10 +111,15 @@ module Boson
           expected = ['cool', {:force=>true, :level=>2}]
           [:command_with_args, :command_with_arg_size, :command_with_splat_args].each do |meth|
             capture_stderr {
-              send(meth, 'cool -z -f').should == expected
+              send(meth, 'cool -f -z').should == expected
             }.should =~/Invalid.*z/
           end
         end
+      end
+
+      test "with option-like args before valid opts are kept as arguments" do
+        command_with_args('-z -f').should == ["-z", {:force=>true, :level=>2}]
+        command_with_args('--verbose -l3').should == ['--verbose', {:level=>3}]
       end
 
       test "with splat args does not raise error for too few or many args" do

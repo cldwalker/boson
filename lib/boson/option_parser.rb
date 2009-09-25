@@ -231,7 +231,7 @@ module Boson
     end
 
     def delete_invalid_opts
-      [@leading_non_opts, @trailing_non_opts].each do |args|
+      [@trailing_non_opts].each do |args|
         args.delete_if {|e|
           invalid = e.to_s[/^-/]
           $stderr.puts "Invalid option '#{e}'" if invalid
