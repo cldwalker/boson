@@ -12,6 +12,13 @@ class Test::Unit::TestCase
   Boson.repo.dir = File.dirname(__FILE__)
   Boson.instance_variable_set "@repos", [Boson.repo]
 
+  def assert_error(error, message=nil)
+    yield
+  rescue error=>e
+    e.message.should =~ /#{message}/ if message
+    e.class.should == error
+  end
+
   def reset
     reset_main_object
     reset_boson
