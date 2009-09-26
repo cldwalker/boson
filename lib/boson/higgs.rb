@@ -20,8 +20,7 @@ module Boson
 
     def translate_and_render(obj, command, args)
       args = translate_args(obj, command, args)
-      result = yield(args)
-      render(result, command)
+      render yield(args)
     rescue ThrowGlobalOption
       Boson.invoke(:usage, command.name) if global_options[:help]
     rescue OptionParser::Error, Error
@@ -45,20 +44,10 @@ module Boson
       raise Error, $!.message
     end
 
-    def command_options(args)
-      if args.size == 1 && args[0].is_a?(String)
-        args.replace Shellwords.shellwords(args.join(" "))
-        parsed_options, new_args = parse_options args
-        args.replace new_args
-      # last string argument interpreted as args + options
-      elsif args.size > 1 && args[-1].is_a?(String)
-        parsed_options, new_args = parse_options args.pop.split(/\s+/)
-        args.replace args + new_args
-      # default options
-      elsif (args.size <= @command.arg_size - 1) || (@command.has_splat_args? && !args[-1].is_a?(Hash))
-        parsed_options, new_args = parse_options []
-      end
-      parsed_options
+    def render(result)
+      render? ? Boson.invoke(:render, result, global_render_options) : result
+    rescue Exception
+      raise Error, $!.message
     end
 
     def option_parser
@@ -76,7 +65,7 @@ module Boson
     end
 
     def default_options
-      {:help=>:boolean, :render=>:boolean}.merge(render_options)
+      {:help=>:boolean, :render=>:boolean, :debug=>:boolean}.merge(render_options)
     end
 
     def render_options
@@ -87,16 +76,28 @@ module Boson
       global_options.dup.delete_if {|k,v| !render_options.keys.include?(k) }
     end
 
-    def render(result, command)
-      render?(command) ? Boson.invoke(:render, result, global_render_options) : result
-    end
-
-    def render?(command)
-      (command.render_options && !global_options[:render]) || (!command.render_options && global_options[:render])
+    def render?
+      (@command.render_options && !global_options[:render]) || (!@command.render_options && global_options[:render])
     end
 
     def global_options
       @global_options ||= {}
+    end
+
+    def command_options(args)
+      if args.size == 1 && args[0].is_a?(String)
+        args.replace Shellwords.shellwords(args.join(" "))
+        parsed_options, new_args = parse_options args
+        args.replace new_args
+      # last string argument interpreted as args + options
+      elsif args.size > 1 && args[-1].is_a?(String)
+        parsed_options, new_args = parse_options args.pop.split(/\s+/)
+        args.replace args + new_args
+      # default options
+      elsif (args.size <= @command.arg_size - 1) || (@command.has_splat_args? && !args[-1].is_a?(Hash))
+        parsed_options, new_args = parse_options []
+      end
+      parsed_options
     end
 
     def parse_options(args)
