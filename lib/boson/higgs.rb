@@ -15,7 +15,9 @@ module Boson
       lambda {|*args|
         begin
           args = Boson::Higgs.translate_args(obj, command, args)
-          super(*args)
+          return Boson.invoke(:usage, command.name) if Boson::Higgs.global_options[:help]
+          result = super(*args)
+          Boson::Higgs.render(result)
         rescue OptionParser::Error, Error
           $stderr.puts "Error: " + $!.message
         end
@@ -24,7 +26,7 @@ module Boson
 
     def translate_args(obj, command, args)
       @obj, @command = obj, command
-      if parsed_options = parse_options(args)
+      if parsed_options = command_options(args)
         add_default_args(args)
         args << parsed_options
         if args.size != command.arg_size && !command.has_splat_args?
@@ -39,20 +41,63 @@ module Boson
       raise Error, $!.message
     end
 
-    def parse_options(args)
+    def command_options(args)
       if args.size == 1 && args[0].is_a?(String)
         args.replace Shellwords.shellwords(args.join(" "))
-        parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
-        args.replace @command.option_parser.non_opts
+        parsed_options, new_args = parse_options args
+        args.replace new_args
       # last string argument interpreted as args + options
       elsif args.size > 1 && args[-1].is_a?(String)
-        parsed_options = @command.option_parser.parse(args.pop.split(/\s+/), :delete_invalid_opts=>true)
-        args.replace args + @command.option_parser.non_opts
+        parsed_options, new_args = parse_options args.pop.split(/\s+/)
+        args.replace args + new_args
       # default options
       elsif (args.size <= @command.arg_size - 1) || (@command.has_splat_args? && !args[-1].is_a?(Hash))
-        parsed_options = @command.option_parser.parse([], :delete_invalid_opts=>true)
+        parsed_options, new_args = parse_options []
       end
       parsed_options
+    end
+
+    def option_parser
+      @command.render_options ? command_option_parser : default_option_parser
+    end
+
+    def command_option_parser
+      (@option_parsers ||= {})[@command] ||= OptionParser.new(default_options.merge(@command.render_options))
+    end
+
+    def default_option_parser
+      @default_option_parser ||= OptionParser.new(default_options)
+    end
+
+    def default_options
+      {:help=>:boolean, :render=>:boolean}.merge(render_options)
+    end
+
+    def render_options
+      {:fields=>:array, :sort=>:string, :as=>:string, :reverse_sort=>:boolean}
+    end
+
+    def global_render_options
+      global_options.dup.delete_if {|k,v| !render_options.keys.include?(k) }
+    end
+
+    def render(result)
+      render? ? Boson.invoke(:render, result, global_render_options) : result
+    end
+
+    def render?
+      !global_options[:render].is_a?(FalseClass) && !(global_options.keys & render_options.keys).empty?
+    end
+
+    def global_options
+      @global_options ||= {}
+    end
+
+    def parse_options(args)
+      parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
+      @global_options = option_parser.parse @command.option_parser.leading_non_opts
+      new_args = (option_parser.non_opts + @command.option_parser.non_opts).uniq
+      [parsed_options, new_args]
     end
 
     def add_default_args(args)

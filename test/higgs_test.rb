@@ -82,7 +82,7 @@ module Boson
       end
 
       test "with unexpected error in option mapping catches and prints it" do
-        Higgs.stubs(:parse_options).raises("unexpected")
+        Higgs.stubs(:command_options).raises("unexpected")
         capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
       end
 
