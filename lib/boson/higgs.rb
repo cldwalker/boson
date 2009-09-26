@@ -3,6 +3,7 @@ module Boson
   module Higgs
     extend self
     class Error < StandardError; end
+    class ThrowGlobalOption < StandardError; end
 
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
@@ -13,15 +14,18 @@ module Boson
 
     def create_option_command_block(obj, command)
       lambda {|*args|
-        begin
-          args = Boson::Higgs.translate_args(obj, command, args)
-          return Boson.invoke(:usage, command.name) if Boson::Higgs.global_options[:help]
-          result = super(*args)
-          Boson::Higgs.render(result)
-        rescue OptionParser::Error, Error
-          $stderr.puts "Error: " + $!.message
-        end
+        Boson::Higgs.translate_and_render(obj, command, args) {|args| super(*args) }
       }
+    end
+
+    def translate_and_render(obj, command, args)
+      args = translate_args(obj, command, args)
+      result = yield(args)
+      render(result, command)
+    rescue ThrowGlobalOption
+      Boson.invoke(:usage, command.name) if global_options[:help]
+    rescue OptionParser::Error, Error
+      $stderr.puts "Error: " + $!.message
     end
 
     def translate_args(obj, command, args)
@@ -35,7 +39,7 @@ module Boson
         end
       end
       args
-    rescue Error, ArgumentError
+    rescue Error, ArgumentError, ThrowGlobalOption
       raise
     rescue Exception
       raise Error, $!.message
@@ -62,7 +66,9 @@ module Boson
     end
 
     def command_option_parser
-      (@option_parsers ||= {})[@command] ||= OptionParser.new(default_options.merge(@command.render_options))
+      (@option_parsers ||= {})[@command] ||= begin
+        OptionParser.new Util.recursive_hash_merge(default_options, @command.render_options)
+      end
     end
 
     def default_option_parser
@@ -74,19 +80,19 @@ module Boson
     end
 
     def render_options
-      {:fields=>:array, :sort=>:string, :as=>:string, :reverse_sort=>:boolean}
+      {:fields=>{:type=>:array}, :sort=>{:type=>:string}, :as=>:string, :reverse_sort=>:boolean}
     end
 
     def global_render_options
       global_options.dup.delete_if {|k,v| !render_options.keys.include?(k) }
     end
 
-    def render(result)
-      render? ? Boson.invoke(:render, result, global_render_options) : result
+    def render(result, command)
+      render?(command) ? Boson.invoke(:render, result, global_render_options) : result
     end
 
-    def render?
-      !global_options[:render].is_a?(FalseClass) && !(global_options.keys & render_options.keys).empty?
+    def render?(command)
+      (command.render_options && !global_options[:render]) || (!command.render_options && global_options[:render])
     end
 
     def global_options
@@ -96,6 +102,7 @@ module Boson
     def parse_options(args)
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
       @global_options = option_parser.parse @command.option_parser.leading_non_opts
+      raise ThrowGlobalOption if @global_options[:help]
       new_args = (option_parser.non_opts + @command.option_parser.non_opts).uniq
       [parsed_options, new_args]
     end

@@ -13,14 +13,14 @@ module Boson::Commands::Core
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
     command_attributes = Boson::Command::ATTRIBUTES + [:usage]
     commands['commands'][:options] = {:query_field=>{:default=>'name', :values=>command_attributes}, :index=>:boolean}
-    commands['commands'][:render_options] = { :sort=>{:type=>:string, :values=>command_attributes},
+    commands['commands'][:render_options] = { :sort=>{:values=>command_attributes},
       :fields=>{:default=>[:name, :lib, :alias, :usage, :description], :values=>command_attributes}
     }
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
     commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes}, :index=>:boolean}
-    commands['libraries'][:render_options] = { :sort=>{:type=>:string, :values=>library_attributes},
-      :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
-      :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}
+    commands['libraries'][:render_options] = { :sort=>{:values=>library_attributes},
+      :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes}}
+      # td: :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
