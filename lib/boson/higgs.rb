@@ -69,7 +69,7 @@ module Boson
     end
 
     def default_options
-      {:help=>:boolean, :render=>:boolean, :debug=>:boolean}.merge(render_options)
+      {:help=>:boolean, :render=>:boolean, :debug=>:boolean, :global=>:string}.merge(render_options)
     end
 
     def render_options
@@ -101,8 +101,12 @@ module Boson
     def parse_options(args)
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
       @global_options = option_parser.parse @command.option_parser.leading_non_opts
+      new_args = option_parser.non_opts.dup + @command.option_parser.trailing_non_opts
+      if @global_options[:global]
+        global_opts = Shellwords.shellwords(@global_options[:global]).map {|str| (str.length > 1 ? "--" : "-") + str }
+        @global_options.merge! option_parser.parse(global_opts)
+      end
       raise EscapeGlobalOption if @global_options[:help]
-      new_args = option_parser.non_opts + @command.option_parser.trailing_non_opts
       [parsed_options, new_args]
     end
 

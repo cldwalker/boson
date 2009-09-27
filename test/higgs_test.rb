@@ -232,19 +232,27 @@ module Boson
       end
 
       test "global option before local one is valid" do
-        ['--dude -f', '--dude doh -f', '--dude -f doh', [:doh, '--dude -f']].each_with_index do |args, i|
+        args_arr = ['--dude -f', '--dude doh -f', '--dude -f doh', [:doh, '--dude -f']]
+        args_arr.each_with_index do |args, i|
           local_and_global(*args).should == [{:foo=>true}, {:dude=>true}]
           @non_opts.should == @expected_non_opts[i]
         end
       end
 
       test "global option after local one is invalid" do
-        ['-f --dude', '-f doh --dude', '-f --dude doh', [:doh, '-f --dude'] ].each_with_index do |args, i|
+        args_arr = ['-f --dude', '-f doh --dude', '-f --dude doh', [:doh, '-f --dude'] ]
+        args_arr.each_with_index do |args, i|
           capture_stderr {
             local_and_global(*args).should == [{:foo=>true}, {}]
             @non_opts.should == @expected_non_opts[i]
           }.should =~ /Invalid.*dude/
         end
+      end
+
+      test "--global option adds additional global options" do
+        local_and_global('-g=D -d').should == [{:do=>true}, {:dude=>true, :global=>'D'}]
+        local_and_global('-g "r dude" -d').should == [{:do=>true},
+          {:global=>"r dude", :dude=>true, :render=>true}]
       end
     end
 
