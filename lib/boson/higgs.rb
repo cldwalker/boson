@@ -4,6 +4,7 @@ module Boson
     extend self
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
+    attr_reader :global_options
 
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
@@ -101,7 +102,7 @@ module Boson
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
       @global_options = option_parser.parse @command.option_parser.leading_non_opts
       raise EscapeGlobalOption if @global_options[:help]
-      new_args = (option_parser.non_opts + @command.option_parser.non_opts).uniq
+      new_args = option_parser.non_opts + @command.option_parser.trailing_non_opts
       [parsed_options, new_args]
     end
 

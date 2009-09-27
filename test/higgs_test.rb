@@ -21,7 +21,7 @@ module Boson
     }
 
     def command(hash, args)
-      hash = {:name=>'blah', :lib=>'bling', :args=>'*', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
+      hash = {:name=>'blah', :lib=>'bling', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
       @cmd = Command.new hash
       @cmd.instance_variable_set("@file_parsed_args", true) if hash[:file_parsed_args]
       Higgs.create_option_command(@opt_cmd, @cmd)
@@ -34,6 +34,10 @@ module Boson
 
     def command_with_args(*args)
       command({:args=>[['arg1'],['options', {}]]}, args)
+    end
+
+    def basic_command(hash, args)
+      command({:name=>'splat_blah', :args=>'*'}.merge(hash), args)
     end
 
     def command_with_splat_args(*args)
@@ -169,7 +173,7 @@ module Boson
     end
 
     def command_with_render(*args)
-      command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
+      basic_command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
     end
 
     context "render" do
@@ -203,8 +207,46 @@ module Boson
       test "passed without non-render options" do
         Boson.expects(:invoke).with(:render, anything, {:fields=>['f1']})
         args = ["--foo --fields f1 ab"]
-        command({:render_options=>{:foo=>:boolean, :fields=>{:values=>['f1', 'f2']}} }, args)
+        basic_command({:render_options=>{:foo=>:boolean, :fields=>{:values=>['f1', 'f2']}} }, args)
       end
     end
+
+    context "global options:" do
+      def local_and_global(*args)
+        Higgs.stubs(:render?).returns(false) # turn off rendering caused by :render_options
+        @non_opts = basic_command(@command_options, args)
+        @non_opts.slice!(-1,1) << Higgs.global_options
+      end
+
+      before(:all) {
+        @command_options = {:options=>{:do=>:boolean, :foo=>:boolean},
+        :render_options=>{:dude=>:boolean}}
+        @expected_non_opts = [[], ['doh'], ['doh'], [:doh]]
+      }
+
+      test "local option overrides global one" do
+        ['-d', 'doh -d','-d doh', [:doh, '-d']].each_with_index do |args, i|
+          local_and_global(*args).should == [{:do=>true}, {}]
+          @non_opts.should == @expected_non_opts[i]
+        end
+      end
+
+      test "global option before local one is valid" do
+        ['--dude -f', '--dude doh -f', '--dude -f doh', [:doh, '--dude -f']].each_with_index do |args, i|
+          local_and_global(*args).should == [{:foo=>true}, {:dude=>true}]
+          @non_opts.should == @expected_non_opts[i]
+        end
+      end
+
+      test "global option after local one is invalid" do
+        ['-f --dude', '-f doh --dude', '-f --dude doh', [:doh, '-f --dude'] ].each_with_index do |args, i|
+          capture_stderr {
+            local_and_global(*args).should == [{:foo=>true}, {}]
+            @non_opts.should == @expected_non_opts[i]
+          }.should =~ /Invalid.*dude/
+        end
+      end
+    end
+
   end
 end
