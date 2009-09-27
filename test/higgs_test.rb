@@ -21,7 +21,7 @@ module Boson
     }
 
     def command(hash, args)
-      hash = {:name=>'blah', :lib=>'bling', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
+      hash = {:name=>'blah', :lib=>'bling', :args=>'*', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
       @cmd = Command.new hash
       @cmd.instance_variable_set("@file_parsed_args", true) if hash[:file_parsed_args]
       Higgs.create_option_command(@opt_cmd, @cmd)
@@ -147,6 +147,10 @@ module Boson
         end
       end
 
+      test "with debug option prints debug" do
+        capture_stdout { command_with_args("-d ok") } =~ /Debug.*ok/
+      end
+
       test "with not enough args raises ArgumentError" do
         args = [ArgumentError, '0 for 1']
         assert_error(*args) { command_with_args }
@@ -165,7 +169,7 @@ module Boson
     end
 
     def command_with_render(*args)
-      command({:args=>'*', :render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
+      command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
     end
 
     context "render" do
@@ -198,7 +202,8 @@ module Boson
 
       test "passed without non-render options" do
         Boson.expects(:invoke).with(:render, anything, {:fields=>['f1']})
-        command_with_render("--debug --fields f1 ab")
+        args = ["--foo --fields f1 ab"]
+        command({:render_options=>{:foo=>:boolean, :fields=>{:values=>['f1', 'f2']}} }, args)
       end
     end
   end
