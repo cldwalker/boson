@@ -19,8 +19,8 @@ module Boson::Commands::Core
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
     commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes}, :index=>:boolean}
     commands['libraries'][:render_options] = { :sort=>{:values=>library_attributes},
-      :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes}}
-      # td: :filters=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}}
+      :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
+      :filters=>{:default=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}} }
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 

@@ -59,21 +59,24 @@ module Boson
     end
 
     def command_option_parser
-      (@option_parsers ||= {})[@command] ||= begin
-        OptionParser.new Util.recursive_hash_merge(default_options, @command.render_options)
-      end
+      (@option_parsers ||= {})[@command] ||= OptionParser.new render_options.merge(default_options)
     end
 
     def default_option_parser
-      @default_option_parser ||= OptionParser.new(default_options)
+      @default_option_parser ||= OptionParser.new default_render_options.merge(default_options)
     end
 
     def default_options
-      {:help=>:boolean, :render=>:boolean, :debug=>:boolean, :global=>:string}.merge(render_options)
+      {:help=>:boolean, :render=>:boolean, :debug=>:boolean, :global=>:string}
+    end
+
+    def default_render_options
+      {:fields=>{:type=>:array}, :sort=>{:type=>:string}, :as=>:string, :reverse_sort=>:boolean}
     end
 
     def render_options
-      {:fields=>{:type=>:array}, :sort=>{:type=>:string}, :as=>:string, :reverse_sort=>:boolean}
+      @command.render_options ? Util.recursive_hash_merge(default_render_options, @command.render_options) :
+        default_render_options
     end
 
     def global_render_options

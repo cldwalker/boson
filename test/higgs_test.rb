@@ -206,6 +206,13 @@ module Boson
 
       test "passed without non-render options" do
         Boson.expects(:invoke).with(:render, anything, {:fields=>['f1']})
+        Higgs.expects(:render?).returns(true)
+        args = ["--render --fields f1 ab"]
+        basic_command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
+      end
+
+      test "passed with user-defined render options" do
+        Boson.expects(:invoke).with(:render, anything, {:fields=>['f1'], :foo=>true})
         args = ["--foo --fields f1 ab"]
         basic_command({:render_options=>{:foo=>:boolean, :fields=>{:values=>['f1', 'f2']}} }, args)
       end
