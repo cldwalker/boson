@@ -89,12 +89,12 @@ module Boson
       parse("-f", "12").should == {:bar => "12"}
     end
     
-    it "allows humanized opt input" do
+    it "allows humanized opt name" do
       create 'foo' => :string, :bar => :required
       parse("-f", "1", "-b", "2").should == {:foo => "1", :bar => "2"}
     end
 
-    it "allows humanized symbol opt input" do
+    it "allows humanized symbol opt name" do
       create :foo=>:string
       parse('-f','1').should == {:foo=>'1'}
     end
@@ -122,100 +122,98 @@ module Boson
     end
     
   end
-  
-  it "accepts a opt=<value> assignment" do
-    create "--foo" => :required
-    parse("--foo=12")["foo"].should == "12"
-    parse("-f=12")["foo"].should == "12"
-    parse("--foo=bar=baz")["foo"].should == "bar=baz"
-    parse("--foo=sentence with spaces")["foo"].should == "sentence with spaces"
-  end
-  
-  it "accepts a -nXY assignment" do
-    create "--num" => :required
-    parse("-n12")["num"].should == "12"
-  end
-  
-  it "accepts conjoined short options" do
-    create "--foo" => true, "--bar" => true, "--app" => true
-    opts = parse "-fba"
-    opts["foo"].should == true
-    opts["bar"].should == true
-    opts["app"].should == true
-  end
-  
-  it "accepts conjoined short options with argument" do
-    create "--foo" => true, "--bar" => true, "--app" => :required
-    opts = parse "-fba", "12"
-    opts["foo"].should == true
-    opts["bar"].should == true
-    opts["app"].should == "12"
-  end
-  
-  it "makes hash keys available as symbols as well" do
-    create "--foo" => :string
-    parse("--foo", "12")[:foo].should == "12"
-  end
 
-  it "deletes and warns of invalid options with :delete_invalid_opts" do
-    create(:foo=>:boolean)
-    capture_stderr {
-      @opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
-    }.should =~ /Deleted invalid option '-d'/
-    @opt.non_opts.should == ['ok']
-  end
-
-  it "only allows options before args with :opts_before_args" do
-    create(:foo=>:boolean)
-    @opt.parse(%w{ok -f}, :opts_before_args=>true).should == {}
-    @opt.parse(%w{-f ok}, :opts_before_args=>true).should == {:foo=>true}
-  end
-  
-  context "with no arguments" do
-    it "and no options returns an empty hash" do
-      create({})
-      parse.should == {}
-    end
-  
-    it "and several options returns an empty hash" do
-      create "--foo" => :boolean, "--bar" => :string
-      parse.should == {}
-    end
-  
-    it "and a required opt raises an error" do
+  context "option values can be set with" do
+    it "a opt=<value> assignment" do
       create "--foo" => :required
-      assert_error(OptionParser::Error, "no value provided for required option 'foo'") { parse }
+      parse("--foo=12")["foo"].should == "12"
+      parse("-f=12")["foo"].should == "12"
+      parse("--foo=bar=baz")["foo"].should == "bar=baz"
+      parse("--foo=sentence with spaces")["foo"].should == "sentence with spaces"
     end
+  
+    it "a -nXY assignment" do
+      create "--num" => :required
+      parse("-n12")["num"].should == "12"
+    end
+  
+    it "conjoined short options" do
+      create "--foo" => true, "--bar" => true, "--app" => true
+      opts = parse "-fba"
+      opts["foo"].should == true
+      opts["bar"].should == true
+      opts["app"].should == true
+    end
+  
+    it "conjoined short options with argument" do
+      create "--foo" => true, "--bar" => true, "--app" => :required
+      opts = parse "-fba", "12"
+      opts["foo"].should == true
+      opts["bar"].should == true
+      opts["app"].should == "12"
+    end
+  end
+
+  context "parse" do
+    it "extracts non-option arguments" do
+      create "--foo" => :required, "--bar" => true
+      parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").should == {
+        :foo => "12", :bar => true
+      }
+      @opt.leading_non_opts.should == ["foo", "bar", "--baz"]
+      @opt.trailing_non_opts.should == ["-T", "bang"]
+      @opt.non_opts.should == ["foo", "bar", "--baz", "-T", "bang"]
+    end
+
+    context "with parse flag" do
+      it ":delete_invalid_opts deletes and warns of invalid options" do
+        create(:foo=>:boolean)
+        capture_stderr {
+          @opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
+        }.should =~ /Deleted invalid option '-d'/
+        @opt.non_opts.should == ['ok']
+      end
+
+      it ":opts_before_args only allows options before args" do
+        create(:foo=>:boolean)
+        @opt.parse(%w{ok -f}, :opts_before_args=>true).should == {}
+        @opt.parse(%w{-f ok}, :opts_before_args=>true).should == {:foo=>true}
+      end
+    end
+
+    context "with no arguments" do
+      it "and no options returns an empty hash" do
+        create({})
+        parse.should == {}
+      end
+
+      it "and several options returns an empty hash" do
+        create "--foo" => :boolean, "--bar" => :string
+        parse.should == {}
+      end
+    end
+  end
+
+  context "option hashes" do
+    it "make hash keys available as symbols as well" do
+      create "--foo" => :string
+      parse("--foo", "12")[:foo].should == "12"
+    end
+
+    it "don't set nonexistant options" do
+      create "--foo" => :boolean
+      parse("--foo")["bar"].should == nil
+      opts = parse
+      opts["foo"].should == nil
+    end
+  end
+
+  it ":required type raises an error if it isn't given" do
+    create "--foo" => :required, "--bar" => :string
+    assert_error(OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str") }
   end
   
-  it "doesn't set nonexistant options" do
-    create "--foo" => :boolean
-    parse("--foo")["bar"].should == nil
-    opts = parse
-    opts["foo"].should == nil
-  end
-
-  context "string option with :values attribute" do
-    before(:all ) { create :foo=>{:type=>:string, :values=>%w{angola abu abib}} }
-    it "auto aliases if a match exists" do
-      parse("-f", "an")[:foo].should == 'angola'
-    end
-
-    it "auto aliases first sorted match" do
-      parse("-f", "a")[:foo].should == 'abib'
-    end
-
-    it "raises error if option doesn't auto alias or match given values" do
-      assert_error(OptionParser::Error, "invalid.*'z'") { parse("-f", "z") }
-    end
-
-    it "doesn't raise error for a nonmatch if enum is false" do
-      create :foo=>{:type=>:string, :values=>%w{angola abu abib}, :enum=>false}
-      parse("-f", "z")[:foo].should == 'z'
-    end
-  end
-  
-  context "string option" do
+  context ":string type" do
     before :each do
       create "--foo" => :string, "--bar" => :string
     end
@@ -242,22 +240,27 @@ module Boson
     end
   end
   
-  it "required option raises an error if it isn't given" do
-    create "--foo" => :required, "--bar" => :string
-    assert_error(OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str") }
+  context ":string type with :values attribute" do
+    before(:all ) { create :foo=>{:type=>:string, :values=>%w{angola abu abib}} }
+    it "auto aliases if a match exists" do
+      parse("-f", "an")[:foo].should == 'angola'
+    end
+
+    it "auto aliases first sorted match" do
+      parse("-f", "a")[:foo].should == 'abib'
+    end
+
+    it "raises error if option doesn't auto alias or match given values" do
+      assert_error(OptionParser::Error, "invalid.*'z'") { parse("-f", "z") }
+    end
+
+    it "doesn't raise error for a nonmatch if enum is false" do
+      create :foo=>{:type=>:string, :values=>%w{angola abu abib}, :enum=>false}
+      parse("-f", "z")[:foo].should == 'z'
+    end
   end
   
-  it "extracts non-option arguments" do
-    create "--foo" => :required, "--bar" => true
-    parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").should == {
-      :foo => "12", :bar => true
-    }
-    @opt.leading_non_opts.should == ["foo", "bar", "--baz"]
-    @opt.trailing_non_opts.should == ["-T", "bang"]
-    @opt.non_opts.should == ["foo", "bar", "--baz", "-T", "bang"]
-  end
-  
-  context "string arguments with default values" do
+  context ":string type with default value" do
     before(:each) do
       create "--branch" => "master"
     end
