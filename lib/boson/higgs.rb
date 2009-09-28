@@ -28,11 +28,11 @@ module Boson
       Boson.invoke(:usage, command.name) if @global_options[:help]
     rescue OptionParser::Error, Error
       $stderr.puts "Error: " + $!.message
-      $stderr.puts $!.backtrace.inspect if @global_options[:debug]
     end
 
     def translate_args(obj, command, args)
       @obj, @command, @args = obj, command, args
+      @command.options ||= {}
       if parsed_options = command_options
         add_default_args(@args)
         @args << parsed_options
@@ -45,13 +45,15 @@ module Boson
     rescue Error, ArgumentError, EscapeGlobalOption
       raise
     rescue Exception
-      raise Error, $!.message
+      message = @global_options[:debug] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
+      raise Error, message
     end
 
     def render(result)
       render? ? Boson.invoke(:render, result, global_render_options) : result
     rescue Exception
-      raise Error, $!.message
+      message = @global_options[:debug] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
+      raise Error, message
     end
 
     def option_parser
