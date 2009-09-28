@@ -22,7 +22,7 @@ module Boson
     def translate_and_render(obj, command, args)
       @global_options = {}
       args = translate_args(obj, command, args)
-      puts "Debug: #{args.inspect}" if @global_options[:debug]
+      puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}" if @global_options[:debug]
       render yield(args)
     rescue EscapeGlobalOption
       Boson.invoke(:usage, command.name) if @global_options[:help]
@@ -77,8 +77,15 @@ module Boson
     end
 
     def render_options
-      @command.render_options ? Util.recursive_hash_merge(default_render_options, @command.render_options) :
-        default_render_options
+      @command.render_options ? command_render_options : default_render_options
+    end
+
+    def command_render_options
+      (@command_render_options ||= {})[@command] ||= begin
+        opts = Util.recursive_hash_merge(default_render_options, @command.render_options)
+        opts[:sort][:values] ||= opts[:fields][:values] if opts[:fields][:values]
+        opts
+      end
     end
 
     def global_render_options

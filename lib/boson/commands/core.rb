@@ -13,12 +13,11 @@ module Boson::Commands::Core
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
     command_attributes = Boson::Command::ATTRIBUTES + [:usage]
     commands['commands'][:options] = {:query_field=>{:default=>'name', :values=>command_attributes}, :index=>:boolean}
-    commands['commands'][:render_options] = { :sort=>{:values=>command_attributes},
-      :fields=>{:default=>[:name, :lib, :alias, :usage, :description], :values=>command_attributes}
-    }
+    commands['commands'][:render_options] = {
+      :fields=>{:default=>[:name, :lib, :alias, :usage, :description], :values=>command_attributes} }
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
     commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes}, :index=>:boolean}
-    commands['libraries'][:render_options] = { :sort=>{:values=>library_attributes},
+    commands['libraries'][:render_options] = {
       :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
       :filters=>{:default=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}} }
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
@@ -54,7 +53,11 @@ module Boson::Commands::Core
     options[:class] = options.delete(:as) || :auto_table
     if object.is_a?(Array) && (sort = options.delete(:sort)) && sort = sort.to_s
       begin
-        object = object.sort_by {|e| e.send(sort).to_s }
+        sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?
+          lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :
+          (object[0].send(sort).respond_to?(:<=>) ? lambda {|e| e.send(sort)} :
+          lambda {|e| e.send(sort).to_s })
+        object = object.sort_by &sort_lambda
         object = object.reverse if options[:reverse_sort]
       rescue NoMethodError, ArgumentError
         $stderr.puts "Sort failed with nonexistant method '#{sort}'"

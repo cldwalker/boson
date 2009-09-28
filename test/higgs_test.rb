@@ -152,7 +152,7 @@ module Boson
       end
 
       test "with debug option prints debug" do
-        capture_stdout { command_with_args("-d ok") } =~ /Debug.*ok/
+        capture_stdout { command_with_args("-d ok") } =~ /Arguments.*ok/
       end
 
       test "with not enough args raises ArgumentError" do
