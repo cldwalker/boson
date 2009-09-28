@@ -212,7 +212,7 @@ module Boson
 
     def auto_alias_value(values, possible_value)
       values.find {|v| v.to_s =~ /^#{possible_value}/ } or (@option_attributes[@current_option][:enum] ?
-        raise(Error, "Invalid value '#{possible_value}' for option '#{@current_option}'") : possible_value)
+        raise(Error, "invalid value '#{possible_value}' for option '#{@current_option}'") : possible_value)
     end
 
     def validate_option_value(type)
@@ -234,7 +234,7 @@ module Boson
       [@trailing_non_opts].each do |args|
         args.delete_if {|e|
           invalid = e.to_s[/^-/]
-          $stderr.puts "Invalid option '#{e}'" if invalid
+          $stderr.puts "Deleted invalid option '#{e}'" if invalid
           invalid
         }
       end
@@ -296,7 +296,7 @@ module Boson
     def check_required!(hash)
       for name, type in @opt_types
         if type == :required and !hash[undasherize(name)]
-          raise Error, "no value provided for required option '#{name}'"
+          raise Error, "no value provided for required option '#{undasherize(name)}'"
         end
       end
     end

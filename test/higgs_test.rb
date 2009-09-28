@@ -82,7 +82,7 @@ module Boson
         ALL_COMMANDS.each do |cmd|
           capture_stderr {
             send(cmd, 'cool -f -z').should == ['cool', {:force=>true, :level=>2}]
-          }.should =~/Invalid.*z/
+          }.should =~/invalid.*z/
         end
       end
 
@@ -245,7 +245,7 @@ module Boson
           capture_stderr {
             local_and_global(*args).should == [{:foo=>true}, {}]
             @non_opts.should == @expected_non_opts[i]
-          }.should =~ /Invalid.*dude/
+          }.should =~ /invalid.*dude/
         end
       end
 

@@ -161,7 +161,7 @@ module Boson
     create(:foo=>:boolean)
     capture_stderr {
       @opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
-    }.should =~ /Invalid option '-d'/
+    }.should =~ /Deleted invalid option '-d'/
     @opt.non_opts.should == ['ok']
   end
 
@@ -184,7 +184,7 @@ module Boson
   
     it "and a required opt raises an error" do
       create "--foo" => :required
-      assert_raises(OptionParser::Error, "no value provided for required option '--foo'") { parse }
+      assert_error(OptionParser::Error, "no value provided for required option 'foo'") { parse }
     end
   end
   
@@ -205,8 +205,8 @@ module Boson
       parse("-f", "a")[:foo].should == 'abib'
     end
 
-    it "raises error if auto alias doesn't match" do
-      assert_raises(OptionParser::Error) { parse("-f", "z") }
+    it "raises error if option doesn't auto alias or match given values" do
+      assert_error(OptionParser::Error, "invalid.*'z'") { parse("-f", "z") }
     end
 
     it "doesn't raise error for a nonmatch if enum is false" do
@@ -230,11 +230,11 @@ module Boson
     end
 
     it "raises error if passed another valid option" do
-      assert_raises(OptionParser::Error) { parse("--foo", "--bar") }
+      assert_error(OptionParser::Error, "cannot pass.*'foo'") { parse("--foo", "--bar") }
     end
 
     it "raises error if not passed a value" do
-      assert_raises(OptionParser::Error) { parse("--foo") }
+      assert_error(OptionParser::Error, "no value.*'foo'") { parse("--foo") }
     end
 
     it "overwrites earlier values with later values" do
@@ -242,22 +242,9 @@ module Boson
     end
   end
   
-  context " with one required and one string opt" do
-    before :each do
-      create "--foo" => :required, "--bar" => :string
-    end
-  
-    it "raises an error if the required opt has no argument" do
-      assert_raises(OptionParser::Error) { parse("--foo") }
-    end
-  
-    it "raises an error if the required opt isn't given" do
-      assert_raises(OptionParser::Error) { parse("--bar") }
-    end
-  
-    it "raises an error if a opt name is given as the argument to the required opt" do
-	  assert_raises(OptionParser::Error, "cannot pass opt '--bar' as an argument") { parse("--foo", "--bar") }
-    end
+  it "required option raises an error if it isn't given" do
+    create "--foo" => :required, "--bar" => :string
+    assert_error(OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str") }
   end
   
   it "extracts non-option arguments" do
@@ -298,11 +285,11 @@ module Boson
     end
     
     it "raises error when value isn't numeric" do
-	  assert_raises(OptionParser::Error, "expected numeric value for '-n'; got \"foo\"") { parse("-n", "foo") }
+	  assert_error(OptionParser::Error, "expected numeric value for.*'n'") { parse("-n", "foo") }
     end
     
     it "raises error when opt is present without value" do
-	    assert_raises(OptionParser::Error, "no value provided for option '-n'") { parse("-n") }
+	    assert_error(OptionParser::Error, "no value.*'n'") { parse("-n") }
     end
   end
 
@@ -321,7 +308,7 @@ module Boson
     end
 
     it "raises error when option has no value" do
-      assert_raises(OptionParser::Error) { parse("-a") }
+      assert_error(OptionParser::Error, "no value.*'a'") { parse("-a") }
     end
 
     it "auto aliases :values attribute" do
