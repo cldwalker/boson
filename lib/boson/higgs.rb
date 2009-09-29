@@ -24,7 +24,10 @@ module Boson
     def translate_and_render(obj, command, args)
       @global_options = {}
       args = translate_args(obj, command, args)
-      puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}" if @global_options[:debug]
+      if @global_options[:debug] || @global_options[:pretend]
+        puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
+      end
+      return @rendered = true if @global_options[:pretend]
       render_or_raw yield(args)
     rescue EscapeGlobalOption
       Boson.invoke(:usage, command.name) if @global_options[:help]
@@ -77,7 +80,7 @@ module Boson
     end
 
     def default_options
-      {:help=>:boolean, :render=>:boolean, :debug=>:boolean, :global=>:string}
+      {:help=>:boolean, :render=>:boolean, :debug=>:boolean, :global=>:string, :pretend=>:boolean}
     end
 
     def default_render_options

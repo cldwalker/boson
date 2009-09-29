@@ -159,6 +159,11 @@ module Boson
         capture_stdout { command_with_args("-d ok") } =~ /Arguments.*ok/
       end
 
+      test "with pretend option prints debug and returns early" do
+        Higgs.expects(:render_or_raw).never
+        capture_stdout { command_with_args("-p ok") } =~ /Arguments.*ok/
+      end
+
       test "with not enough args raises ArgumentError" do
         args = [ArgumentError, '0 for 1']
         assert_error(*args) { command_with_args }
