@@ -38,7 +38,12 @@ module Boson
         @args << parsed_options
         if @args.size != command.arg_size && !command.has_splat_args?
           command_size = @args.size > command.arg_size ? command.arg_size : command.arg_size - 1
-          raise ArgumentError, "wrong number of arguments (#{@args.size - 1} for #{command_size})"
+          if @args.size - 1 == command_size
+            raise Error, "Arguments are misaligned. Possible causes are incorrect argument "+
+              "size or no argument for this method's options."
+          else
+            raise ArgumentError, "wrong number of arguments (#{@args.size - 1} for #{command_size})"
+          end
         end
       end
       @args
@@ -73,7 +78,8 @@ module Boson
     end
 
     def default_render_options
-      {:fields=>{:type=>:array}, :sort=>{:type=>:string}, :as=>:string, :reverse_sort=>:boolean}
+      {:fields=>{:type=>:array}, :sort=>{:type=>:string}, :as=>{:type=>:string},
+        :reverse_sort=>{:type=>:boolean}}
     end
 
     def render_options
@@ -82,7 +88,12 @@ module Boson
 
     def command_render_options
       (@command_render_options ||= {})[@command] ||= begin
-        opts = Util.recursive_hash_merge(default_render_options, @command.render_options)
+        @command.render_options.each {|k,v|
+          if !v.is_a?(Hash) && !v.is_a?(Symbol) && default_render_options.keys.include?(k)
+            @command.render_options[k] = {:default=>v}
+          end
+        }
+        opts = Util.recursive_hash_merge(@command.render_options, default_render_options)
         opts[:sort][:values] ||= opts[:fields][:values] if opts[:fields][:values]
         opts
       end

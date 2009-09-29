@@ -134,6 +134,10 @@ module Boson
           Higgs.expects(:render?).raises("unexpected")
           capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
         end
+
+        test "with no argument defined for options" do
+          capture_stderr { command({:args=>1}, 'ok') }.should =~ /misaligned/
+        end
       end
 
       test "translates stringfied args + options starting at second arg" do
@@ -215,6 +219,12 @@ module Boson
         Boson.expects(:invoke).with(:render, anything, {:fields=>['f1'], :foo=>true})
         args = ["--foo --fields f1 ab"]
         basic_command({:render_options=>{:foo=>:boolean, :fields=>{:values=>['f1', 'f2']}} }, args)
+      end
+
+      test "passed with non-hash user-defined render options" do
+        Boson.expects(:invoke).with(:render, anything, {:fields=>['f1'], :foo=>true})
+        args = ["--foo --fields f1 ab"]
+        basic_command({:render_options=>{:foo=>:boolean, :fields=>%w{f1 f2 f3}} }, args)
       end
     end
 
