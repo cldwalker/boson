@@ -85,7 +85,7 @@ module Boson
 
     def default_render_options
       {:fields=>{:type=>:array}, :sort=>{:type=>:string}, :as=>{:type=>:string},
-        :reverse_sort=>{:type=>:boolean}}
+        :reverse_sort=>{:type=>:boolean}, :max_width=>{:type=>:numeric}}
     end
 
     def render_options
