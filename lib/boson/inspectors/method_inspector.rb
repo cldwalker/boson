@@ -4,6 +4,7 @@ module Boson
     attr_accessor :current_module
     attr_reader :mod_store
     @mod_store ||= {}
+    METHODS = [:desc, :options, :render_options]
 
     # Hash of a module's method attributes i.e. descriptions, options by method and then attribute
     def store(mod=@current_module)
@@ -18,28 +19,26 @@ module Boson
     def new_method_added(mod, meth)
       return unless mod.name[/^Boson::Commands::/]
       self.current_module = mod
-      store[:descriptions][meth.to_s] = store[:desc] if store[:desc]
-      store[:options][meth.to_s] = store[:opts] if store[:opts]
+      store[:temp] ||= {}
+      METHODS.each do |e|
+        store[e][meth.to_s] = store[:temp][e] if store[:temp][e]
+      end
 
-      if store[:opts].nil? || store[:desc].nil?
+      if store[:temp].size < METHODS.size
         store[:method_locations] ||= {}
         if (result = find_method_locations(caller))
           store[:method_locations][meth.to_s] = result
         end
       end
-      store[:desc] = nil if store[:desc]
-      store[:opts] = nil if store[:opts]
+      store[:temp] = {}
       scrape_arguments(meth) if (store[:options] && store[:options].key?(meth.to_s)) || options_in_file?(meth.to_s)
     end
 
-    def options(mod, opts)
-      store(mod)[:options] ||= {}
-      store(mod)[:opts] = opts
-    end
-
-    def desc(mod, description)
-      store(mod)[:descriptions] ||= {}
-      store(mod)[:desc] = description
+    METHODS.each do |e|
+      define_method(e) do |mod, val|
+        store(mod)[e] ||= {}
+        (store(mod)[:temp] ||= {})[e] = val
+      end
     end
 
     def scrape_arguments(meth)
@@ -55,8 +54,8 @@ module Boson
 
     def options_in_file?(meth)
       return false if !(file_line = store[:method_locations] && store[:method_locations][meth])
-      if File.exists?(file_line[0]) && (options =
-        CommentInspector.scrape(FileLibrary.read_library_file(file_line[0]), file_line[1], self.current_module, :options))
+      if File.exists?(file_line[0]) && (options = CommentInspector.scrape(
+        FileLibrary.read_library_file(file_line[0]), file_line[1], @current_module, :options) )
         (store[:options] ||= {})[meth] = options
       end
     end

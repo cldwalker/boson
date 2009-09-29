@@ -8,7 +8,7 @@ module Boson
       Inspector.add_meta_methods
       Blah.module_eval("desc 'test'; def test; end; options :a=>1; def test2; end")
       Inspector.remove_meta_methods
-      MethodInspector.store[:descriptions].empty?.should == true
+      MethodInspector.store[:desc].empty?.should == true
       MethodInspector.store[:options].empty?.should == true
     end
 
@@ -25,16 +25,20 @@ module Boson
 
       test "desc sets descriptions" do
         parsed = parse "desc 'test'; def m1; end; desc 'one'; desc 'more'; def m2; end"
-        parsed[:descriptions].should == {"m1"=>"test", "m2"=>"more"}
+        parsed[:desc].should == {"m1"=>"test", "m2"=>"more"}
       end
 
       test "options sets options" do
         parse("options :z=>'b'; def zee; end")[:options].should == {"zee"=>{:z=>'b'}}
       end
 
+      test "render_options sets render_options" do
+        parse("render_options :z=>true; def zee; end")[:render_options].should == {"zee"=>{:z=>true}}
+      end
+
       test "neither options or desc set, sets method_locations" do
         MethodInspector.stubs(:find_method_locations).returns(["/some/path", 10])
-        parsed = parse "desc 'yo'; def yo; end; options :yep=>1; def yep; end; desc 'z'; options :a=>1; def az; end"
+        parsed = parse "desc 'yo'; def yo; end; options :yep=>1; def yep; end; render_options :a=>1; desc 'z'; options :a=>1; def az; end"
         parsed[:method_locations].key?('yo').should == true
         parsed[:method_locations].key?('yep').should == true
         parsed[:method_locations].key?('az').should == false
