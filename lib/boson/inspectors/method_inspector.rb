@@ -31,7 +31,7 @@ module Boson
         end
       end
       store[:temp] = {}
-      scrape_arguments(meth) if (store[:options] && store[:options].key?(meth.to_s)) || options_in_file?(meth.to_s)
+      scrape_arguments(meth) if has_inspector_method?(meth, :options) || has_inspector_method?(meth,:render_options)
     end
 
     METHODS.each do |e|
@@ -52,11 +52,15 @@ module Boson
       end
     end
 
-    def options_in_file?(meth)
+    def has_inspector_method?(meth, inspector)
+      (store[inspector] && store[inspector].key?(meth.to_s)) || inspector_in_file?(meth.to_s, inspector)
+    end
+
+    def inspector_in_file?(meth, inspector_method)
       return false if !(file_line = store[:method_locations] && store[:method_locations][meth])
       if File.exists?(file_line[0]) && (options = CommentInspector.scrape(
-        FileLibrary.read_library_file(file_line[0]), file_line[1], @current_module, :options) )
-        (store[:options] ||= {})[meth] = options
+        FileLibrary.read_library_file(file_line[0]), file_line[1], @current_module, inspector_method) )
+        (store[inspector_method] ||= {})[meth] = options
       end
     end
 

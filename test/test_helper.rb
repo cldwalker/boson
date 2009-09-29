@@ -73,7 +73,7 @@ class Test::Unit::TestCase
 
   def load(lib, options={})
     # prevent conflicts with existing File.read stubs
-    Boson::MethodInspector.stubs(:options_in_file?).returns(false)
+    Boson::MethodInspector.stubs(:inspector_in_file?).returns(false)
     mock_library(lib, options) unless options.delete(:no_mock)
     result = Boson::Library.load([lib], options)
     Boson::FileLibrary.reset_file_cache

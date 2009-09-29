@@ -5,9 +5,11 @@ module Boson
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
     attr_reader :global_options
+    @no_option_commands ||= []
 
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
+      @no_option_commands << command if command.options.nil?
       [command.name, command.alias].compact.each {|e|
         obj.instance_eval("class<<self;self;end").send(:define_method, e, cmd_block)
       }
@@ -35,6 +37,7 @@ module Boson
       @command.options ||= {}
       if parsed_options = command_options
         add_default_args(@args)
+        return @args if @no_option_commands.include?(@command)
         @args << parsed_options
         if @args.size != command.arg_size && !command.has_splat_args?
           command_size = @args.size > command.arg_size ? command.arg_size : command.arg_size - 1

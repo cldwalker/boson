@@ -55,7 +55,7 @@ module Boson
       end
 
       test "options in file calls determine_method_args" do
-        MethodInspector.expects(:options_in_file?).returns(true)
+        MethodInspector.expects(:inspector_in_file?).returns(true)
         ArgumentInspector.expects(:determine_method_args).returns([['arg1']])
         parse("desc 'desc'; def doz(arg1); end")[:method_args]['doz'].should == [['arg1']]
       end

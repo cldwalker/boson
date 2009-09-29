@@ -180,14 +180,18 @@ module Boson
       basic_command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
     end
 
+    def render_expected(options=nil)
+      Boson.expects(:invoke).with(:render, anything, options || anything)
+    end
+
     context "render" do
       test "called for command with render_options" do
-        Boson.expects(:invoke).with(:render, anything, anything)
+        render_expected
         command_with_render('1')
       end
 
       test "called for command without render_options and --render" do
-        Boson.expects(:invoke).with(:render, anything, anything)
+        render_expected
         command_with_args('--render 1')
       end
 
@@ -202,30 +206,35 @@ module Boson
       end
     end
 
-    context "render options" do
-      test "passed correctly to render" do
+    context "command renders" do
+      test "with basic render options" do
         Boson.expects(:invoke).with(:render, anything, {:fields => ['f1', 'f2']})
         command_with_render("--fields f1,f2 ab")
       end
 
-      test "passed without non-render options" do
-        Boson.expects(:invoke).with(:render, anything, {:fields=>['f1']})
+      test "without non-render options" do
+        render_expected :fields=>['f1']
         Higgs.expects(:render?).returns(true)
         args = ["--render --fields f1 ab"]
         basic_command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
       end
 
-      test "passed with user-defined render options" do
-        Boson.expects(:invoke).with(:render, anything, {:fields=>['f1'], :foo=>true})
+      test "with user-defined render options" do
+        render_expected :fields=>['f1'], :foo=>true
         args = ["--foo --fields f1 ab"]
         basic_command({:render_options=>{:foo=>:boolean, :fields=>{:values=>['f1', 'f2']}} }, args)
       end
 
-      test "passed with non-hash user-defined render options" do
-        Boson.expects(:invoke).with(:render, anything, {:fields=>['f1'], :foo=>true})
+      test "with non-hash user-defined render options" do
+        render_expected :fields=>['f1'], :foo=>true
         args = ["--foo --fields f1 ab"]
         basic_command({:render_options=>{:foo=>:boolean, :fields=>%w{f1 f2 f3}} }, args)
       end
+    end
+
+    test "optionless command renders" do
+      render_expected :fields=>['f1']
+      command({:args=>2, :options=>nil, :render_options=>{:fields=>:array}}, ["--fields f1 ab ok"])
     end
 
     context "global options:" do
