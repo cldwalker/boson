@@ -62,23 +62,12 @@ module Boson
     end
 
     def add_comment_metadata
-      @store[:method_locations].each do |cmd, (file, lineno)|
-        if file == @library_file
-          if no_command_config_for(cmd, :description)
-            if (description = CommentInspector.description_from_file(FileLibrary.read_library_file(file), lineno))
-              (@commands_hash[cmd] ||= {})[:description] = description
-            end
-          end
-          if no_command_config_for(cmd, :options)
-            if (options = CommentInspector.options_from_file(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module))
-              (@commands_hash[cmd] ||= {})[:options] = options
-            end
-          end
-
-          if no_command_config_for(cmd, :render_options)
-            if (render_options = CommentInspector.render_options_from_file(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module))
-              (@commands_hash[cmd] ||= {})[:render_options] = render_options
-            end
+      @store[:method_locations].select {|k,(f,l)| f == @library_file }.each do |cmd, (file, lineno)|
+        scraped = CommentInspector.scrape(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module)
+        attr_map = {:description=>:desc}
+        [:description, :options, :render_options].each do |e|
+          if no_command_config_for(cmd, e)
+            (@commands_hash[cmd] ||= {})[e] = scraped[attr_map[e] || e]
           end
         end
       end

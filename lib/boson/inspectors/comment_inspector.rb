@@ -3,33 +3,32 @@ module Boson
   # Inspired by http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da
   module CommentInspector
     extend self
+    EVAL_ATTRIBUTES = [:options, :render_options]
 
-    def description_from_file(file_string, line)
-      (hash = scrape(file_string, line))[:desc] && hash[:desc].join(" ")
-    end
-
-    def render_options_from_file(file_string, line, mod=nil)
-      if (hash = scrape(file_string, line))[:render_options]
-        val = hash[:render_options].join(" ")
-        mod ? eval_metadata(val, mod) : !!val
+    def scrape(file_string, line, mod, attribute=nil)
+      hash = scrape_file(file_string, line) || {}
+      hash.select {|k,v| v && (attribute.nil? || attribute == k) }.each do |k,v|
+        hash[k] = EVAL_ATTRIBUTES.include?(k) ? eval_comment(v.join(' '), mod) : v.join(' ')
       end
+      attribute ? hash[attribute] : hash
     end
 
-    def options_from_file(file_string, line, mod=nil)
-      if (hash = scrape(file_string, line)).key?(:options)
-        options = hash[:options].join(" ")
-        mod ? eval_metadata(options, mod) : !!options
-      end
-    end
-
-    def eval_metadata(value, mod)
+    def eval_comment(value, mod)
       value = "{#{value}}" if !value[/^\s*\{/] && value[/=>/]
       begin mod.module_eval(value); rescue(Exception); nil end
     end
 
     # Scrapes a given string for commented @keywords, starting with the line above the given line
-    def scrape(file_string, line)
-      (lines = scraper(file_string, line)) ? splitter(lines) : {}
+    def scrape_file(file_string, line)
+      lines = file_string.split("\n")
+      saved = []
+      i = line -2
+      while lines[i] =~ /^\s*#\s*(\S+)/ && i >= 0
+        saved << lines[i]
+        i -= 1
+      end
+
+      saved.empty? ? {} : splitter(saved.reverse)
     end
 
     def splitter(lines)
@@ -55,17 +54,6 @@ module Boson
         i += 1
       end
       hash
-    end
-
-    def scraper(file_string, line)
-      lines = file_string.split("\n")
-      saved = []
-      i = line -2
-      while lines[i] =~ /^\s*#\s*(\S+)/ && i >= 0
-        saved << lines[i]
-        i -= 1
-      end
-      saved.empty? ? nil : saved.reverse
     end
   end
 end

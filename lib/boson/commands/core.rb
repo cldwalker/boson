@@ -51,7 +51,7 @@ module Boson::Commands::Core
 
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
-    if object.is_a?(Array) && (sort = options.delete(:sort)) && sort = sort.to_s
+    if object.is_a?(Array) && (sort = options.delete(:sort))
       begin
         sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?
           lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :

@@ -54,9 +54,9 @@ module Boson
     end
 
     def options_in_file?(meth)
-      return false if !(method_location = store[:method_locations] && store[:method_locations][meth])
-      if File.exists?(method_location[0]) && (options =
-        CommentInspector.options_from_file(FileLibrary.read_library_file(method_location[0]), method_location[1], self.current_module))
+      return false if !(file_line = store[:method_locations] && store[:method_locations][meth])
+      if File.exists?(file_line[0]) && (options =
+        CommentInspector.scrape(FileLibrary.read_library_file(file_line[0]), file_line[1], self.current_module, :options))
         (store[:options] ||= {})[meth] = options
       end
     end
