@@ -48,6 +48,7 @@ module Boson
       def execute_command
         command, subcommand = @command.include?('.') ? @command.split('.', 2) : [@command, nil]
         dispatcher = subcommand ? Boson.invoke(command) : Boson.main_object
+        @args = @args.join(" ") if ((com = Boson::Command.find(@command)) && com.option_command?)
         output = dispatcher.send(subcommand || command, *@args)
         render_output(output)
       rescue ArgumentError

@@ -87,6 +87,10 @@ module Boson
       @args && @args.any? {|e| e[0][/^\*/] }
     end
 
+    def option_command?
+      options || render_options
+    end
+
     def usage
       return '' if options.nil? && args.nil?
       usage_args = args && @options ? args[0..-2] : args
