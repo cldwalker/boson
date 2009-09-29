@@ -110,7 +110,7 @@ module Boson
       test "with core command updates index and doesn't print index message" do
         Index.expects(:write)
         Boson.main_object.expects(:send).with('libraries')
-        capture_stdout { start 'libraries'}.should == ''
+        capture_stdout { start 'libraries'}.should_not =~ /index/i
       end
 
       test "with non-core command finding library doesn't update index" do

@@ -4,7 +4,7 @@ module Boson
     extend self
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
-    attr_reader :global_options
+    attr_reader :global_options, :rendered
     @no_option_commands ||= []
 
     def create_option_command(obj, command)
@@ -25,7 +25,7 @@ module Boson
       @global_options = {}
       args = translate_args(obj, command, args)
       puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}" if @global_options[:debug]
-      render yield(args)
+      render_or_raw yield(args)
     rescue EscapeGlobalOption
       Boson.invoke(:usage, command.name) if @global_options[:help]
     rescue OptionParser::Error, Error
@@ -57,8 +57,8 @@ module Boson
       raise Error, message
     end
 
-    def render(result)
-      render? ? Boson.invoke(:render, result, global_render_options) : result
+    def render_or_raw(result)
+      (@rendered = render?) ? View.render(result, global_render_options) : result
     rescue Exception
       message = @global_options[:debug] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message

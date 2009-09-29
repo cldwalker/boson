@@ -49,8 +49,7 @@ module Boson
         command, subcommand = @command.include?('.') ? @command.split('.', 2) : [@command, nil]
         dispatcher = subcommand ? Boson.invoke(command) : Boson.main_object
         @args = @args.join(" ") if ((com = Boson::Command.find(@command)) && com.option_command?)
-        output = dispatcher.send(subcommand || command, *@args)
-        render_output(output)
+        render_output dispatcher.send(subcommand || command, *@args)
       rescue ArgumentError
         puts "Wrong number of arguments for #{@command}\n\n"
         print_command_help
@@ -88,13 +87,10 @@ module Boson
       end
 
       def render_output(output)
-        return if output.nil?
         if Higgs.global_options
-          puts output.inspect
-        elsif output.is_a?(Array)
-          Boson.invoke :render, output
+          puts output.inspect unless Higgs.rendered
         else
-          puts Hirb::View.render_output(output) || output
+          View.render(output)
         end
       end
 
@@ -104,7 +100,7 @@ module Boson
         aliases = @option_parser.opt_aliases.invert
         option_help = option_descriptions.sort_by {|k,v| k.to_s }.map {|e| ["--#{e[0]}", aliases["--#{e[0]}"], e[1]] }
         Library.load [Boson::Commands::Core]
-        Boson.invoke :render, option_help, :headers=>["Option", "Alias", "Description"], :description=>false
+        View.render option_help, :headers=>["Option", "Alias", "Description"], :description=>false
         if @options[:verbose]
           puts "\n\nDEFAULT COMMANDS"
           Boson.invoke :commands, "", :fields=>["name", "usage", "description"], :description=>false

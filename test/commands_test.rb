@@ -22,7 +22,7 @@ module Boson
     end
 
     def render_expects(&block)
-      @higgs.expects(:render).with(&block)
+      View.expects(:render).with(&block)
     end
 
     context "libraries" do

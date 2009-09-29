@@ -181,7 +181,7 @@ module Boson
     end
 
     def render_expected(options=nil)
-      Boson.expects(:invoke).with(:render, anything, options || anything)
+      View.expects(:render).with(anything, options || anything)
     end
 
     context "render" do
@@ -208,7 +208,7 @@ module Boson
 
     context "command renders" do
       test "with basic render options" do
-        Boson.expects(:invoke).with(:render, anything, {:fields => ['f1', 'f2']})
+        render_expected :fields => ['f1', 'f2']
         command_with_render("--fields f1,f2 ab")
       end
 
