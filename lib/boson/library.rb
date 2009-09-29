@@ -176,7 +176,7 @@ module Boson
     end
 
     def create_option_commands(commands)
-      option_commands = command_objects(commands).select {|e| e.options }
+      option_commands = command_objects(commands).select {|e| e.options || e.render_options }
       accepted, rejected = option_commands.partition {|e| e.args(self) || e.arg_size }
       if @options[:verbose] && rejected.size > 0
         puts "Following commands cannot have options until their arguments are configured: " +

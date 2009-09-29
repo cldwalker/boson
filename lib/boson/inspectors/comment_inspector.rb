@@ -8,16 +8,23 @@ module Boson
       (hash = scrape(file_string, line))[:desc] && hash[:desc].join(" ")
     end
 
+    def render_options_from_file(file_string, line, mod=nil)
+      if (hash = scrape(file_string, line))[:render_options]
+        val = hash[:render_options].join(" ")
+        mod ? eval_metadata(val, mod) : !!val
+      end
+    end
+
     def options_from_file(file_string, line, mod=nil)
       if (hash = scrape(file_string, line)).key?(:options)
         options = hash[:options].join(" ")
-        if mod
-          options = "{#{options}}" if !options[/^\s*\{/] && options[/=>/]
-          begin mod.module_eval(options); rescue(Exception); nil end
-        else
-          !!options
-        end
+        mod ? eval_metadata(options, mod) : !!options
       end
+    end
+
+    def eval_metadata(value, mod)
+      value = "{#{value}}" if !value[/^\s*\{/] && value[/=>/]
+      begin mod.module_eval(value); rescue(Exception); nil end
     end
 
     # Scrapes a given string for commented @keywords, starting with the line above the given line

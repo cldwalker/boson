@@ -74,6 +74,12 @@ module Boson
               (@commands_hash[cmd] ||= {})[:options] = options
             end
           end
+
+          if no_command_config_for(cmd, :render_options)
+            if (render_options = CommentInspector.render_options_from_file(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module))
+              (@commands_hash[cmd] ||= {})[:render_options] = render_options
+            end
+          end
         end
       end
     end
