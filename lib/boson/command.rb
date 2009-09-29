@@ -101,11 +101,11 @@ module Boson
         @args.map! {|e| e.size == 2 ? [e[0], e[1].inspect] : e }
         @file_parsed_args = true
       end
-      [@name, @alias, @lib, @description, @options, @args]
+      [@name, @alias, @lib, @description, @options, @render_options, @args]
     end
 
     def marshal_load(ary)
-      @name, @alias, @lib, @description, @options, @args = ary
+      @name, @alias, @lib, @description, @options, @render_options, @args = ary
     end
   end
 end

@@ -88,7 +88,9 @@ module Boson
 
       def render_output(output)
         return if output.nil?
-        if output.is_a?(Array)
+        if Higgs.global_options
+          puts output.inspect
+        elsif output.is_a?(Array)
           Boson.invoke :render, output
         else
           puts Hirb::View.render_output(output) || output

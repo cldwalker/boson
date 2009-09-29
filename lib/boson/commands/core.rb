@@ -19,7 +19,7 @@ module Boson::Commands::Core
     commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes}, :index=>:boolean}
     commands['libraries'][:render_options] = {
       :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
-      :filters=>{:default=>{:gems=>lambda {|e| e.join(',')},:commands=>:size}} }
+      :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}} }
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
@@ -51,7 +51,7 @@ module Boson::Commands::Core
 
   def render(object, options={})
     options[:class] = options.delete(:as) || :auto_table
-    if object.is_a?(Array) && (sort = options.delete(:sort))
+    if object.is_a?(Array) && object.size > 0 && (sort = options.delete(:sort))
       begin
         sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?
           lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :
