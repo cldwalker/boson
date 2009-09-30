@@ -20,6 +20,7 @@ module Boson::Commands::Core
     commands['libraries'][:render_options] = {
       :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
       :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}} }
+    commands['usage'][:options] = {:verbose=>:boolean}
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
