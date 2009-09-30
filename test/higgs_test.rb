@@ -88,7 +88,7 @@ module Boson
 
       test "print help with help option" do
         ALL_COMMANDS.each do |cmd|
-          Boson.expects(:invoke).with(:usage, anything)
+          Boson.expects(:invoke).with(:usage, anything, anything)
           send(cmd, '-h')
         end
       end

@@ -60,9 +60,13 @@ module Boson::Commands::Core
   def usage(name, options={})
     msg = (command = Boson::Command.find(name)) ? "#{name} #{command.usage}" : "Command '#{name}' not found"
     puts msg
-    if command && options[:verbose] && command.option_parser
-      puts "\nCOMMAND OPTIONS"
-      command.option_parser.print_usage_table
+    if command && options[:verbose]
+      unless command.options.empty?
+        puts "\nCOMMAND OPTIONS"
+        command.option_parser.print_usage_table
+      end
+      puts "\nGLOBAL/RENDER OPTIONS"
+      Boson::Higgs.render_option_parser(command).print_usage_table
     end
   end
 end

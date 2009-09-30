@@ -6,6 +6,21 @@ module Boson
     class EscapeGlobalOption < StandardError; end
     attr_reader :global_options, :rendered
     @no_option_commands ||= []
+    GLOBAL_OPTIONS = {
+      :help=>{:type=>:boolean, :desc=>"Display a command's help"},
+      :render=>{:type=>:boolean, :desc=>"Toggle a command's default render behavior"},
+      :debug=>{:type=>:boolean, :desc=>"Print what a command executes along with more verbose error messages"},
+      :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes i.e. '-p -f=f1,f2' -> 'p f=f1,f2'"},
+      :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"}
+    }
+    RENDER_OPTIONS = {
+      :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
+      :sort=>{:type=>:string, :desc=>"Sort by given field"},
+      :as=>{:type=>:string, :desc=>"Hirb helper class which renders"},
+      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
+      :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
+      :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"}
+    }
 
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
@@ -30,7 +45,7 @@ module Boson
       return @rendered = true if @global_options[:pretend]
       render_or_raw yield(args)
     rescue EscapeGlobalOption
-      Boson.invoke(:usage, command.name) if @global_options[:help]
+      Boson.invoke(:usage, command.name, :verbose=>@global_options[:debug]) if @global_options[:help]
     rescue OptionParser::Error, Error
       $stderr.puts "Error: " + $!.message
     end
@@ -72,34 +87,30 @@ module Boson
     end
 
     def command_option_parser
-      (@option_parsers ||= {})[@command] ||= OptionParser.new render_options.merge(default_options)
+      (@option_parsers ||= {})[@command] ||= OptionParser.new render_options.merge(GLOBAL_OPTIONS)
+    end
+
+    def render_option_parser(cmd)
+      @command = cmd
+      option_parser
     end
 
     def default_option_parser
-      @default_option_parser ||= OptionParser.new default_render_options.merge(default_options)
-    end
-
-    def default_options
-      {:help=>:boolean, :render=>:boolean, :debug=>:boolean, :global=>:string, :pretend=>:boolean}
-    end
-
-    def default_render_options
-      {:fields=>{:type=>:array}, :sort=>{:type=>:string}, :as=>{:type=>:string},
-        :reverse_sort=>{:type=>:boolean}, :max_width=>{:type=>:numeric}}
+      @default_option_parser ||= OptionParser.new RENDER_OPTIONS.merge(GLOBAL_OPTIONS)
     end
 
     def render_options
-      @command.render_options ? command_render_options : default_render_options
+      @command.render_options ? command_render_options : RENDER_OPTIONS
     end
 
     def command_render_options
       (@command_render_options ||= {})[@command] ||= begin
         @command.render_options.each {|k,v|
-          if !v.is_a?(Hash) && !v.is_a?(Symbol) && default_render_options.keys.include?(k)
+          if !v.is_a?(Hash) && !v.is_a?(Symbol) && RENDER_OPTIONS.keys.include?(k)
             @command.render_options[k] = {:default=>v}
           end
         }
-        opts = Util.recursive_hash_merge(@command.render_options, default_render_options)
+        opts = Util.recursive_hash_merge(@command.render_options, RENDER_OPTIONS)
         opts[:sort][:values] ||= opts[:fields][:values] if opts[:fields][:values]
         opts
       end

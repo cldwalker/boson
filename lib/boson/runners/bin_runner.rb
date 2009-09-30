@@ -26,7 +26,7 @@ module Boson
       rescue Exception
         message = ($!.is_a?(NameError) && !@command.nil?) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
-        message += "\n" + $!.backtrace.inspect if @options && @options[:verbose]
+        message += "\nActual error: #{$!}\n" + $!.backtrace.inspect if @options && @options[:verbose]
         $stderr.puts message
       end
 

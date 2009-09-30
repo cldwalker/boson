@@ -176,14 +176,15 @@ module Boson
 
     def print_usage_table(render_options={})
       aliases = @opt_aliases.invert
-      additional = [:desc, :values].select {|e| @option_attributes.values.any? {|f| f.key?(e) } }
-      opts = @opt_types.keys.inject([]) {|t,e|
+      additional = [:desc, :values].select {|e| (@option_attributes || {}).values.any? {|f| f.key?(e) } }
+      opts = @opt_types.keys.sort.inject([]) {|t,e|
         h = {:name=>e, :aliases=>aliases[e] }
         additional.each {|f| h[f] = (@option_attributes[undasherize(e)] || {})[f]  }
         t << h
       }
       render_options = {:headers=>{:name=>"Option", :aliases=>"Alias", :desc=>'Description', :values=>'Values'},
-        :fields=>[:name, :aliases] + additional, :description=>false}.merge(render_options)
+        :fields=>[:name, :aliases] + additional, :description=>false, :filters=>{:values=>lambda {|e| (e || []).join(',')} }
+      }.merge(render_options)
       View.render opts, render_options
     end
 
