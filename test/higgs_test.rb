@@ -146,7 +146,7 @@ module Boson
 
       test "with leading option-like args are translated as arguments" do
         command_with_args('-z -f').should == ["-z", {:force=>true, :level=>2}]
-        command_with_args('--verbose -f').should == ['--verbose', {:force=>true, :level=>2}]
+        command_with_args('--blah -f').should == ['--blah', {:force=>true, :level=>2}]
       end
 
       test "with splat args does not raise error for too few or many args" do
@@ -156,10 +156,10 @@ module Boson
       end
 
       test "with debug option prints debug" do
-        capture_stdout { command_with_args("-d ok") } =~ /Arguments.*ok/
+        capture_stdout { command_with_args("-v ok") } =~ /Arguments.*ok/
       end
 
-      test "with pretend option prints debug and returns early" do
+      test "with pretend option prints arguments and returns early" do
         Higgs.expects(:render_or_raw).never
         capture_stdout { command_with_args("-p ok") } =~ /Arguments.*ok/
       end
@@ -281,7 +281,7 @@ module Boson
       end
 
       test "--global option adds additional global options" do
-        local_and_global('-g=D -d').should == [{:do=>true}, {:dude=>true, :global=>'D'}]
+        local_and_global('-g=d -d').should == [{:do=>true}, {:dude=>true, :global=>'d'}]
         local_and_global('-g "r dude" -d').should == [{:do=>true},
           {:global=>"r dude", :dude=>true, :render=>true}]
       end

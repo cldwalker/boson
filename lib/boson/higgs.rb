@@ -9,7 +9,7 @@ module Boson
     GLOBAL_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
       :render=>{:type=>:boolean, :desc=>"Toggle a command's default render behavior"},
-      :debug=>{:type=>:boolean, :desc=>"Print what a command executes along with more verbose error messages"},
+      :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
       :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes i.e. '-p -f=f1,f2' -> 'p f=f1,f2'"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"}
     }
@@ -39,13 +39,13 @@ module Boson
     def translate_and_render(obj, command, args)
       @global_options = {}
       args = translate_args(obj, command, args)
-      if @global_options[:debug] || @global_options[:pretend]
+      if @global_options[:verbose] || @global_options[:pretend]
         puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
       end
       return @rendered = true if @global_options[:pretend]
       render_or_raw yield(args)
     rescue EscapeGlobalOption
-      Boson.invoke(:usage, command.name, :verbose=>@global_options[:debug]) if @global_options[:help]
+      Boson.invoke(:usage, command.name, :verbose=>@global_options[:verbose]) if @global_options[:help]
     rescue OptionParser::Error, Error
       $stderr.puts "Error: " + $!.message
     end
@@ -71,14 +71,14 @@ module Boson
     rescue Error, ArgumentError, EscapeGlobalOption
       raise
     rescue Exception
-      message = @global_options[:debug] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
+      message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
     end
 
     def render_or_raw(result)
       (@rendered = render?) ? View.render(result, global_render_options) : result
     rescue Exception
-      message = @global_options[:debug] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
+      message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
     end
 
