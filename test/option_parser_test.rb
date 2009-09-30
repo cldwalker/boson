@@ -355,6 +355,11 @@ module Boson
       create "--iter" => :numeric
       usage.should == ["[--iter=N]"]
     end
+
+    it "outputs array args with sample value" do
+      create "--libs" => :array
+      usage.should == ["[--libs=A,B,C]"]
+    end
   end
 end
 end

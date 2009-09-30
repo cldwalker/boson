@@ -24,7 +24,7 @@ module Boson::Commands::Core
   end
 
   def commands(query='', options={})
-    query_field = options.delete(:query_field)
+    query_field = options.delete(:query_field) || 'name'
     Boson::Index.read if options[:index]
     commands = options[:index] ? Boson::Index.commands : Boson.commands
     commands.select {|f| f.send(query_field).to_s =~ /#{query}/i }
@@ -57,7 +57,12 @@ module Boson::Commands::Core
     Hirb::Console.format_output(output, options.merge(:class=>"Hirb::Menu"), &block)
   end
 
-  def usage(name)
-    (command = Boson::Command.find(name)) ? "#{name} #{command.usage}" : "Command '#{name}' not found"
+  def usage(name, options={})
+    msg = (command = Boson::Command.find(name)) ? "#{name} #{command.usage}" : "Command '#{name}' not found"
+    puts msg
+    if command && options[:verbose] && command.option_parser
+      puts "\nCOMMAND OPTIONS"
+      command.option_parser.print_usage_table
+    end
   end
 end

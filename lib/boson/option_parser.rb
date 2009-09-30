@@ -163,8 +163,9 @@ module Boson
         else
           sample = @defaults[undasherize(opt)]
           sample ||= case type
-            when :string then undasherize(opt).gsub(/\-/, "_").upcase
-            when :numeric  then "N"
+            when :string  then undasherize(opt).gsub(/\-/, "_").upcase
+            when :numeric then "N"
+            when :array   then "A,B,C"
             end
           "[" + opt + "=" + sample.to_s + "]"
         end
@@ -172,6 +173,19 @@ module Boson
     end
 
     alias :to_s :formatted_usage
+
+    def print_usage_table(render_options={})
+      aliases = @opt_aliases.invert
+      additional = [:desc, :values].select {|e| @option_attributes.values.any? {|f| f.key?(e) } }
+      opts = @opt_types.keys.inject([]) {|t,e|
+        h = {:name=>e, :aliases=>aliases[e] }
+        additional.each {|f| h[f] = (@option_attributes[undasherize(e)] || {})[f]  }
+        t << h
+      }
+      render_options = {:headers=>{:name=>"Option", :aliases=>"Alias", :desc=>'Description', :values=>'Values'},
+        :fields=>[:name, :aliases] + additional, :description=>false}.merge(render_options)
+      View.render opts, render_options
+    end
 
     private
     def determine_option_type(value)

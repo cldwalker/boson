@@ -2,7 +2,7 @@ module Boson
   class Runner
     class<<self
       def init
-        Hirb.enable(:config_file=>File.join(Boson.repo.config_dir, 'hirb.yml'))
+        View.enable
         add_load_path
         Library.load default_libraries, load_options
       end

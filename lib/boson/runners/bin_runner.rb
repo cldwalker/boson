@@ -1,5 +1,14 @@
 module Boson
   class BinRunner < Runner
+    GLOBAL_OPTIONS =  {
+      :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
+      :index=>{:type=>:boolean, :desc=>"Updates index"},
+      :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
+      :repl=>{:type=>:boolean, :desc=>"Drops into irb or another given repl/shell with default and explicit libraries loaded"},
+      :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
+      :load=>{:type=>:array, :values=>all_libraries, :enum=>false, :desc=>"A comma delimited array of libraries to load"}
+    }
+
     class <<self
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
@@ -56,31 +65,15 @@ module Boson
       end
 
       def print_command_help
-        puts Boson.invoke('usage', @command)
+        Boson.invoke(:usage, @command, :verbose=>@options[:verbose])
       end
 
       def command_defined?(command)
         Boson.main_object.respond_to? command
       end
 
-      def default_options
-        {:verbose=>:boolean, :index=>:boolean, :execute=>:string,:repl=>:boolean, :help=>:boolean,
-          :load=>{:type=>:array, :values=>all_libraries, :enum=>false}}
-      end
-
-      def option_descriptions
-        {
-          :verbose=>"Verbose description of loading libraries or help",
-          :index=>"Updates index",
-          :execute=>"Executes given arguments as a one line script",
-          :load=>"A comma delimited array of libraries to load",
-          :repl=>"Drops into irb or another given repl/shell with default and explicit libraries loaded",
-          :help=>"Displays this help message or a command's help if given a command"
-        }
-      end
-
       def parse_args(args)
-        @option_parser = OptionParser.new(default_options)
+        @option_parser = OptionParser.new(GLOBAL_OPTIONS)
         options = @option_parser.parse(args.dup, :opts_before_args=>true)
         new_args = @option_parser.non_opts
         [new_args.shift, options, new_args]
@@ -97,11 +90,10 @@ module Boson
       def print_usage
         puts "boson [GLOBAL OPTIONS] [COMMAND] [ARGS] [COMMAND OPTIONS]\n\n"
         puts "GLOBAL OPTIONS"
-        aliases = @option_parser.opt_aliases.invert
-        option_help = option_descriptions.sort_by {|k,v| k.to_s }.map {|e| ["--#{e[0]}", aliases["--#{e[0]}"], e[1]] }
-        Library.load [Boson::Commands::Core]
-        View.render option_help, :headers=>["Option", "Alias", "Description"], :description=>false
+        View.enable
+        @option_parser.print_usage_table
         if @options[:verbose]
+          Library.load [Boson::Commands::Core]
           puts "\n\nDEFAULT COMMANDS"
           Boson.invoke :commands, "", :fields=>["name", "usage", "description"], :description=>false
         end

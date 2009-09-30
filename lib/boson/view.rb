@@ -2,6 +2,11 @@ module Boson
   module View
     extend self
 
+    def enable
+      Hirb::View.enable(:config_file=>File.join(Boson.repo.config_dir, 'hirb.yml')) unless @enabled
+      @enabled = true
+    end
+
     def render(object, options={})
       [nil,false,true].include?(object) ? puts(object.inspect) : render_object(object, options)
     end
