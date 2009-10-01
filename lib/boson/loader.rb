@@ -12,7 +12,7 @@ module Boson
       module_callbacks if @module
       load_dependencies
       detect_additions { load_module_commands } if @module || @class_commands
-      @init_methods.each {|m| Boson.invoke(m) if Boson.main_object.respond_to?(m) } if @init_methods && !@options[:index]
+      @init_methods.each {|m| namespace_object.send(m) if namespace_object.respond_to?(m) } if @init_methods && !@options[:index]
       is_valid_library? && (@loaded = true)
     end
 
@@ -102,9 +102,11 @@ module Boson
     end
 
     def create_namespace_command
-      if @module.instance_methods.include?(namespace_command)
+      if @object_namespace && @module.instance_methods.include?(namespace_command)
         include_in_universe
         @namespace_delegate = true
+        namespace_object.instance_eval("class<<self;self;end").send(:define_method, :boson_commands) {
+          self.class.instance_methods(false) }
       else
         Commands::Namespace.create(namespace_command, @module)
         if (lib = Boson.library(Boson::Commands::Namespace, :module))

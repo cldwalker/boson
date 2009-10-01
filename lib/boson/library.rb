@@ -48,7 +48,7 @@ module Boson
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}", options
       rescue Exception=>e
         FileLibrary.reset_file_cache(library.to_s)
-        print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" +
+        print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" + "\n" +
           e.backtrace.slice(0,3).join("\n"), options
       ensure
         Inspector.remove_meta_methods if Inspector.enabled
@@ -100,6 +100,7 @@ module Boson
       set_config (repo.config[:libraries][@name] || {}).merge(hash)
       @commands_hash = repo.config[:commands].merge @commands_hash
       set_command_aliases(repo.config[:command_aliases])
+      @namespace = true if Boson.repo.config[:auto_namespace] && !Boson::Runner.default_libraries.include?(@module)
     end
 
     def set_name(name)
