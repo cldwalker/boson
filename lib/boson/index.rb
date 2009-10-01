@@ -56,7 +56,7 @@ module Boson
 
     def find_namespace_library(name)
       (namespace_command = @commands.find {|f| [f.name, f.alias].include?(name) && f.lib == 'namespace'}) &&
-        (lib = @libraries.find {|e| e.namespace_command == namespace_command.name }) && lib.name
+        (lib = @libraries.find {|e| e.namespace == namespace_command.name }) && lib.name
     end
 
     def changed_libraries

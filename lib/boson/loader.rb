@@ -39,8 +39,9 @@ module Boson
       if Boson.repo.config[:error_method_conflicts] || @namespace
         raise MethodConflictError, e.message
       else
-        $stderr.puts "#{e.message}. Attempting load into the namespace #{namespace_command}..."
-        (@namespace = true) && initialize_library_module
+        @namespace = clean_name
+        $stderr.puts "#{e.message}. Attempting load into the namespace #{@namespace}..."
+        initialize_library_module
       end
     end
 
@@ -69,11 +70,11 @@ module Boson
     end
 
     def initialize_library_module
-      @module = @module ? Util.constantize(@module) : Util.create_module(Boson::Commands, @name[/\w+$/])
+      @module = @module ? Util.constantize(@module) : Util.create_module(Boson::Commands, clean_name)
       raise(InvalidLibraryModuleError, "No module for library #{@name}") unless @module
       create_class_commands unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
-      @namespace ? create_namespace_command : include_in_universe
+      @namespace ? create_namespace : include_in_universe
     end
 
     def include_in_universe(lib_module=@module)
@@ -86,36 +87,32 @@ module Boson
     end
 
     def check_for_method_conflicts
-      conflicts = @namespace ? (Boson.main_object.respond_to?(namespace_command) ? [namespace_command] : []) :
+      conflicts = @namespace ? (Boson.main_object.respond_to?(@namespace) ? [@namespace] : []) :
         Util.common_instance_methods(@module, Boson::Universe)
       unless conflicts.empty?
         raise MethodConflictError,"The following commands conflict with existing commands: #{conflicts.join(', ')}"
       end
     end
 
-    def namespace_command
-      @namespace_command ||= @namespace.is_a?(String) ? @namespace : @name[/\w+$/]
-    end
-
     def namespace_object
-      @namespace_object ||= @namespace ? Boson.invoke(namespace_command) : Boson.main_object
+      @namespace_object ||= @namespace ? Boson.invoke(@namespace) : Boson.main_object
     end
 
-    def create_namespace_command
-      if @object_namespace && @module.instance_methods.include?(namespace_command)
+    def create_namespace
+      if @object_namespace && @module.instance_methods.include?(@namespace)
         include_in_universe
         @namespace_delegate = true
         namespace_object.instance_eval("class<<self;self;end").send(:define_method, :boson_commands) {
           self.class.instance_methods(false) }
       else
-        Commands::Namespace.create(namespace_command, @module)
+        Commands::Namespace.create(@namespace, @module)
         if (lib = Boson.library(Boson::Commands::Namespace, :module))
-          lib.commands << namespace_command
-          lib.create_commands([namespace_command])
+          lib.commands << @namespace
+          lib.create_commands([@namespace])
         end
         Commands::Namespace.add_universe(namespace_object)
       end
-      @commands += Boson.invoke(namespace_command).boson_commands
+      @commands += Boson.invoke(@namespace).boson_commands
     end
   end
 end

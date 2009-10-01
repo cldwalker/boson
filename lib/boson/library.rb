@@ -87,7 +87,7 @@ module Boson
       #:startdoc:
     end
 
-    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :library_file]
+    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :library_file, :namespace]
     attr_reader *(ATTRIBUTES << :commands_hash)
     def initialize(hash)
       @name = set_name hash.delete(:name)
@@ -100,7 +100,14 @@ module Boson
       set_config (repo.config[:libraries][@name] || {}).merge(hash)
       @commands_hash = repo.config[:commands].merge @commands_hash
       set_command_aliases(repo.config[:command_aliases])
-      @namespace = true if Boson.repo.config[:auto_namespace] && !Boson::Runner.default_libraries.include?(@module)
+      @namespace = true if Boson.repo.config[:auto_namespace] && @namespace.nil? &&
+        !Boson::Runner.default_libraries.include?(@module)
+      @namespace = clean_name if @namespace
+    end
+
+    # handles names under directories
+    def clean_name
+      @name[/\w+$/]
     end
 
     def set_name(name)
@@ -139,7 +146,7 @@ module Boson
         @commands_hash[e][:alias] rescue nil
       }.compact
       @commands -= aliases
-      @commands.delete(namespace_command) if @namespace && !@namespace_delegate
+      @commands.delete(@namespace) if @namespace && !@namespace_delegate
     end
 
     def after_load(options)
