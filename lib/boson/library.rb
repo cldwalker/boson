@@ -146,7 +146,7 @@ module Boson
         @commands_hash[e][:alias] rescue nil
       }.compact
       @commands -= aliases
-      @commands.delete(@namespace) if @namespace && !@namespace_delegate
+      @commands.delete(@namespace) if @namespace && !namespace_object.object_delegate?
     end
 
     def after_load(options)
