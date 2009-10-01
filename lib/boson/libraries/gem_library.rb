@@ -1,7 +1,7 @@
 module Boson
   class GemLibrary < Library
     def self.is_a_gem?(name)
-      Gem.searcher.find(name).is_a?(Gem::Specification)
+      Object.const_defined?(:Gem) && Gem.searcher.find(name).is_a?(Gem::Specification)
     end
 
     handles {|source| is_a_gem?(source.to_s) }
