@@ -11,7 +11,7 @@ module Boson
       load_source_and_set_module
       module_callbacks if @module
       load_dependencies
-      detect_additions { load_module_commands } if @module || @class_commands
+      (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = nil
       @init_methods.each {|m| namespace_object.send(m) if namespace_object.respond_to?(m) } if @init_methods && !@options[:index]
       is_valid_library? && (@loaded = true)
     end

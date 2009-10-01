@@ -11,10 +11,10 @@ module Boson::Commands::Core
       :usage=>"Print a command's usage"
     }
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
-    command_attributes = Boson::Command::ATTRIBUTES + [:usage]
+    command_attributes = Boson::Command::ATTRIBUTES + [:usage, :full_name]
     commands['commands'][:options] = {:query_field=>{:default=>'name', :values=>command_attributes}, :index=>:boolean}
     commands['commands'][:render_options] = {
-      :fields=>{:default=>[:name, :lib, :alias, :usage, :description], :values=>command_attributes} }
+      :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes} }
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
     commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes}, :index=>:boolean}
     commands['libraries'][:render_options] = {

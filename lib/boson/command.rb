@@ -1,7 +1,7 @@
 module Boson
   class Command
     def self.create(name, library)
-      new (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name})
+      new (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name, :namespace=>library.namespace})
     end
 
     def self.create_aliases(commands, lib_module)
@@ -41,6 +41,7 @@ module Boson
       @description = hash[:description] if hash[:description]
       @render_options = hash[:render_options] if hash[:render_options]
       @options = hash[:options] if hash[:options]
+      @namespace = hash[:namespace] if hash[:namespace]
       if hash[:args]
         if hash[:args].is_a?(Array)
           @args = hash[:args]
@@ -98,6 +99,10 @@ module Boson
         (e.size < 2) ? "[#{e[0]}]" : "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
       }.join(' ') : '[*unknown]'
       str + option_help
+    end
+
+    def full_name
+      @namespace ? "#{@namespace}.#{@name}" : @name
     end
 
     def marshal_dump
