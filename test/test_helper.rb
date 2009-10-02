@@ -28,7 +28,7 @@ class Test::Unit::TestCase
 
   def reset_main_object
     Boson.send :remove_const, "Universe"
-    eval "module ::Boson::Universe; end"
+    eval "module ::Boson::Universe; include ::Boson::Commands::Namespace; end"
     Boson::Commands.send :remove_const, "Blah" if Boson::Commands.const_defined?("Blah")
     Boson.main_object = Object.new
   end

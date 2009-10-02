@@ -105,10 +105,6 @@ module Boson
         Namespace.create_object_namespace(@namespace, namespace_object)
       else
         Namespace.create(@namespace, self)
-        if (lib = Boson.library(Boson::Commands::Namespace, :module))
-          lib.commands << @namespace
-          lib.create_commands([@namespace])
-        end
       end
       @commands += Boson.invoke(@namespace).boson_commands
     end

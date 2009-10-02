@@ -52,7 +52,6 @@ module Boson
           lib.namespace = (hash[:namespace] == true) ? lib.clean_name : hash[:namespace]
         end
       }
-      @namespaces = @libraries.map {|e| e.namespace}.compact
     end
 
     def marshal_file
@@ -64,16 +63,10 @@ module Boson
       namespace_command = command.split('.')[0]
       if (lib = @libraries.find {|e| e.namespace == namespace_command })
         lib.name
-      elsif (found = Command.find(command, @commands))
-        found.lib
+      elsif (cmd = Command.find(command, @commands))
+        cmd.lib
       end
     end
-
-    # def find_namespace_library(name)
-    #   (namespace_command = @commands.find {|f| [f.name, f.alias].include?(name) && f.lib == 'namespace'}) &&
-    #     (lib = @libraries.find {|e| e.namespace == namespace_command.name }) && lib.name
-    #   # @commands.find {|f| f.library && f.library.namespace == name}
-    # end
 
     def changed_libraries
       read

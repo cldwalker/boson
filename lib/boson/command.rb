@@ -25,10 +25,7 @@ module Boson
       is_namespace_command = lambda {|current_command|
         [current_command.name, current_command.alias].include?(subcommand) &&
         current_command.library && (current_command.library.namespace == command)
-        # (namespace_command = commands.find {|f| [f.name, f.alias].include?(command) && f.lib == 'namespace'}) &&
-        # current_command.lib[/\w+$/] == namespace_command.name
       }
-
       find_lambda = subcommand ? is_namespace_command : lambda {|e| [e.name, e.alias].include?(command)}
       commands.find(&find_lambda)
     end

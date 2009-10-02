@@ -71,7 +71,6 @@ module Boson
       end
 
       test "namespaces a library that has a method conflict" do
-        load_namespace_library
         load('blah', :file_string=>"module Blah; def chwhat; end; end")
         capture_stderr {
           load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
@@ -129,13 +128,12 @@ module Boson
     end
 
     context "library with namespace" do
-      before(:all) { reset_main_object; load_namespace_library }
+      before(:all) { reset_main_object }
       before(:each) { reset_boson }
 
       test "loads and defaults to library name" do
         with_config(:libraries=>{'blang'=>{:namespace=>true}}) do
           load 'blang', :file_string=>"module Blang; def bling; end; end"
-          library_has_command('namespace', 'blang')
           library_has_command('blang', 'bling')
         end
       end
@@ -143,7 +141,6 @@ module Boson
       test "loads with config namespace" do
         with_config(:libraries=>{'blung'=>{:namespace=>'dope'}}) do
           load 'blung', :file_string=>"module Blung; def bling; end; end"
-          library_has_command('namespace', 'dope')
           library_has_command('blung', 'bling')
           library('blung').commands.size.should == 1
         end
@@ -152,7 +149,6 @@ module Boson
       test "loads with config except" do
         with_config(:libraries=>{'blong'=>{:namespace=>true, :except=>['wrong']}}) do
           load 'blong', :file_string=>"module Blong; def bling; end; def wrong; end; end"
-          library_has_command('namespace', 'blong')
           library_has_command('blong', 'bling')
           library_has_command('blong', 'wrong', false)
           library('blong').commands.size.should == 1

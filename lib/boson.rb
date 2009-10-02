@@ -7,7 +7,7 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 %w{namespace view command util commands option_parser index higgs}.each {|e| require "boson/#{e}" }
 
 module Boson
-  module Universe; end
+  module Universe; include Commands::Namespace; end
   extend self
   attr_accessor :main_object, :commands, :libraries
   alias_method :higgs, :main_object
