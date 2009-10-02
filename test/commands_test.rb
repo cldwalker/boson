@@ -10,17 +10,6 @@ module Boson
       Library.load Runner.default_libraries unless ancestors.include?(Boson::Commands::Core)
     }
 
-    test "unloaded_libraries detects libraries under commands directory" do
-      Dir.stubs(:[]).returns(['./commands/lib.rb', './commands/lib2.rb'])
-      @higgs.unloaded_libraries.should == ['lib', 'lib2']
-    end
-
-    test "unloaded_libraries detect libraries in :libraries config" do
-      with_config :libraries=>{'yada'=>{}} do
-        @higgs.unloaded_libraries.should == ['yada']
-      end
-    end
-
     def render_expects(&block)
       View.expects(:render).with(&block)
     end

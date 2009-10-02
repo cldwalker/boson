@@ -1,31 +1,32 @@
 module Boson::Commands::Core
   def self.config
-    descriptions = {
-      :commands=>"List or search loaded commands",
-      :libraries=>"List or search loaded libraries",
-      :unloaded_libraries=>"List libraries that haven't been loaded yet",
-      :load_library=>"Load a library", :reload_library=>"Reload a library",
-      :index=>"Generate index of all libraries and commands",
-      :render=>"Render any object using Hirb",
-      :menu=>"Provide a menu to multi-select elements from a given array",
-      :usage=>"Print a command's usage"
-    }
-    commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
     command_attributes = Boson::Command::ATTRIBUTES + [:usage, :full_name]
-    commands['commands'][:options] = {:query_field=>{:default=>'name', :values=>command_attributes}, :index=>:boolean}
-    commands['commands'][:render_options] = {
-      :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes} }
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
-    commands['libraries'][:options] = {:query_field=>{:default=>'name', :values=>library_attributes}, :index=>:boolean}
-    commands['libraries'][:render_options] = {
-      :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
-      :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}} }
-    commands['usage'][:options] = {:verbose=>:boolean}
+
+    commands = {
+      'render'=>{:description=>"Render any object using Hirb"},
+      'menu'=>{:description=>"Provide a menu to multi-select elements from a given array"},
+      'usage'=>{:description=>"Print a command's usage", :options=>{:verbose=>:boolean}},
+      'commands'=>{ :description=>"List or search commands",
+        :options=>{:query_field=>{:default=>'full_name', :values=>command_attributes},
+          :index=>{:type=>:boolean, :desc=>"Searches index"}},
+        :render_options=>{:fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes} }
+      },
+      'libraries'=>{ :description=>"List or search libraries",
+        :options=>{:query_field=>{:default=>'name', :values=>library_attributes},
+          :index=>{:type=>:boolean, :desc=>"Searches index"} },
+        :render_options=>{
+          :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
+          :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}} }
+      },
+      'load_library'=>{:description=>"Load/reload a library", :options=>{:reload=>:boolean, :verbose=>true}}
+    }
+
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
   def commands(query='', options={})
-    query_field = options.delete(:query_field) || 'name'
+    query_field = options.delete(:query_field) || 'full_name'
     Boson::Index.read if options[:index]
     commands = options[:index] ? Boson::Index.commands : Boson.commands
     commands.select {|f| f.send(query_field).to_s =~ /#{query}/i }
@@ -38,16 +39,9 @@ module Boson::Commands::Core
     libraries.select {|f| f.send(query_field).to_s =~ /#{query}/i }
   end
 
-  def unloaded_libraries
-    (Boson::Runner.all_libraries - Boson.libraries.map {|e| e.name }).sort
-  end
-
   def load_library(library, options={})
-    Boson::Library.load_library(library, {:verbose=>true}.merge!(options))
-  end
-
-  def reload_library(name, options={})
-    Boson::Library.reload_library(name, {:verbose=>true}.merge!(options))
+    options[:reload] ? Boson::Library.reload_library(library, options) :
+      Boson::Library.load_library(library, options)
   end
 
   def render(object, options={})
