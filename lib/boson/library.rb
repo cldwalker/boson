@@ -89,6 +89,7 @@ module Boson
 
     ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :library_file, :namespace]
     attr_reader *(ATTRIBUTES << :commands_hash)
+    attr_writer :namespace
     def initialize(hash)
       @name = set_name hash.delete(:name)
       @options = hash.delete(:options) || {}

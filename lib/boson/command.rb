@@ -24,8 +24,9 @@ module Boson
       command, subcommand = command.to_s.split('.', 2)
       is_namespace_command = lambda {|current_command|
         [current_command.name, current_command.alias].include?(subcommand) &&
-        (namespace_command = commands.find {|f| [f.name, f.alias].include?(command) && f.lib == 'namespace'}) &&
-        current_command.lib[/\w+$/] == namespace_command.name
+        current_command.library && (current_command.library.namespace == command)
+        # (namespace_command = commands.find {|f| [f.name, f.alias].include?(command) && f.lib == 'namespace'}) &&
+        # current_command.lib[/\w+$/] == namespace_command.name
       }
 
       find_lambda = subcommand ? is_namespace_command : lambda {|e| [e.name, e.alias].include?(command)}

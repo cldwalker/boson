@@ -40,7 +40,19 @@ module Boson
     def read
       return if @read
       @libraries, @commands, @lib_hashes = exists? ? Marshal.load(File.read(marshal_file)) : [[], [], {}]
+      set_namespaces
       @read = true
+    end
+
+    def set_namespaces
+      namespace_libs = Boson.repo.config[:auto_namespace] ? @libraries.map {|e| [e.name, {:namespace=>true}]} :
+        Boson.repo.config[:libraries].select {|k,v| v && v[:namespace] }
+      namespace_libs.each {|name, hash|
+        if (lib = @libraries.find {|l| l.name == name})
+          lib.namespace = (hash[:namespace] == true) ? lib.clean_name : hash[:namespace]
+        end
+      }
+      @namespaces = @libraries.map {|e| e.namespace}.compact
     end
 
     def marshal_file
@@ -49,15 +61,19 @@ module Boson
 
     def find_library(command)
       read
-      if (found = Command.find(command, @commands))
-        (found.lib == 'namespace') ? find_namespace_library(found.name) : found.lib
+      namespace_command = command.split('.')[0]
+      if (lib = @libraries.find {|e| e.namespace == namespace_command })
+        lib.name
+      elsif (found = Command.find(command, @commands))
+        found.lib
       end
     end
 
-    def find_namespace_library(name)
-      (namespace_command = @commands.find {|f| [f.name, f.alias].include?(name) && f.lib == 'namespace'}) &&
-        (lib = @libraries.find {|e| e.namespace == namespace_command.name }) && lib.name
-    end
+    # def find_namespace_library(name)
+    #   (namespace_command = @commands.find {|f| [f.name, f.alias].include?(name) && f.lib == 'namespace'}) &&
+    #     (lib = @libraries.find {|e| e.namespace == namespace_command.name }) && lib.name
+    #   # @commands.find {|f| f.library && f.library.namespace == name}
+    # end
 
     def changed_libraries
       read

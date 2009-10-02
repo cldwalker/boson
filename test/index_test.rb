@@ -44,7 +44,7 @@ module Boson
         ]
         Index.instance_variable_set "@commands", commands
       }
-      before(:each) { Index.instance_variable_set "@libraries", [Library.new(:name=>'blah'), Library.new(:name=>'bling')] }
+      before(:each) { Index.instance_variable_set "@libraries", [Library.new(:name=>'blah'), Library.new(:name=>'bling', :namespace=>'bling')] }
 
       test "finds command aliased or not" do
         Index.find_library('blurb').should == 'blah'
@@ -61,7 +61,6 @@ module Boson
       end
 
       test "finds namespace command aliased or not without a subcommand" do
-        Index.instance_variable_set "@libraries", [Library.new(:name=>'blah'), Library.new(:name=>'bling', :namespace=>true)]
         Index.find_library('bling').should == 'bling'
         Index.find_library('bl').should == 'bling'
       end
