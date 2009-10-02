@@ -31,7 +31,7 @@ module Boson
     end
 
     ATTRIBUTES = [:name, :lib, :alias, :description, :options, :args]
-    attr_accessor *(ATTRIBUTES << :render_options)
+    attr_accessor *(ATTRIBUTES + [:render_options, :namespace])
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError

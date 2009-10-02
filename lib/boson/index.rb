@@ -40,18 +40,29 @@ module Boson
     def read
       return if @read
       @libraries, @commands, @lib_hashes = exists? ? Marshal.load(File.read(marshal_file)) : [[], [], {}]
-      set_namespaces
+      set_latest_namespaces
       @read = true
     end
 
-    def set_namespaces
+    # get latest namespaces from config files
+    def set_latest_namespaces
       namespace_libs = Boson.repo.config[:auto_namespace] ? @libraries.map {|e| [e.name, {:namespace=>true}]} :
         Boson.repo.config[:libraries].select {|k,v| v && v[:namespace] }
+      lib_commands = @commands.inject({}) {|t,e| (t[e.lib] ||= []) << e; t }
       namespace_libs.each {|name, hash|
         if (lib = @libraries.find {|l| l.name == name})
           lib.namespace = (hash[:namespace] == true) ? lib.clean_name : hash[:namespace]
+          (lib_commands[lib.name] || []).each {|e| e.namespace = lib.namespace }
         end
       }
+    end
+
+    def namespaces
+      @libraries.map {|e| e.namespace }.compact
+    end
+
+    def all_main_methods
+      @commands.map {|e| [e.name, e.alias]}.flatten.compact + namespaces
     end
 
     def marshal_file

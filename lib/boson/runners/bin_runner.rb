@@ -10,6 +10,7 @@ module Boson
     }
 
     class <<self
+      attr_accessor :command
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
         return print_usage if args.empty? || (@command.nil? && !@options[:repl] && !@options[:execute])
