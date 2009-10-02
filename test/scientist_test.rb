@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
-  class HiggsTest < Test::Unit::TestCase
+  class ScientistTest < Test::Unit::TestCase
     before(:all) {
       eval <<-EOF
       module Blah
@@ -24,7 +24,7 @@ module Boson
       hash = {:name=>'blah', :lib=>'bling', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
       @cmd = Command.new hash
       @cmd.instance_variable_set("@file_parsed_args", true) if hash[:file_parsed_args]
-      Higgs.create_option_command(@opt_cmd, @cmd)
+      Scientist.create_option_command(@opt_cmd, @cmd)
       @opt_cmd.send(hash[:name], *args)
     end
 
@@ -126,12 +126,12 @@ module Boson
         end
 
         test "with unexpected error in translation" do
-          Higgs.expects(:command_options).raises("unexpected")
+          Scientist.expects(:command_options).raises("unexpected")
           capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
         end
 
         test "with unexpected error in render" do
-          Higgs.expects(:render?).raises("unexpected")
+          Scientist.expects(:render?).raises("unexpected")
           capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
         end
 
@@ -160,7 +160,7 @@ module Boson
       end
 
       test "with pretend option prints arguments and returns early" do
-        Higgs.expects(:render_or_raw).never
+        Scientist.expects(:render_or_raw).never
         capture_stdout { command_with_args("-p ok") } =~ /Arguments.*ok/
       end
 
@@ -219,7 +219,7 @@ module Boson
 
       test "without non-render options" do
         render_expected :fields=>['f1']
-        Higgs.expects(:render?).returns(true)
+        Scientist.expects(:render?).returns(true)
         args = ["--render --fields f1 ab"]
         basic_command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
       end
@@ -244,9 +244,9 @@ module Boson
 
     context "global options:" do
       def local_and_global(*args)
-        Higgs.stubs(:render?).returns(false) # turn off rendering caused by :render_options
+        Scientist.stubs(:render?).returns(false) # turn off rendering caused by :render_options
         @non_opts = basic_command(@command_options, args)
-        @non_opts.slice!(-1,1) << Higgs.global_options
+        @non_opts.slice!(-1,1) << Scientist.global_options
       end
 
       before(:all) {

@@ -104,12 +104,12 @@ module Boson
       }
 
       test "are deleted" do
-        Higgs.expects(:create_option_command).with(anything, @foo)
+        Scientist.expects(:create_option_command).with(anything, @foo)
         @library.create_option_commands(@library.commands)
       end
 
       test "are deleted and printed when verbose" do
-        Higgs.expects(:create_option_command).with(anything, @foo)
+        Scientist.expects(:create_option_command).with(anything, @foo)
         @library.instance_eval("@options = {:verbose=>true}")
         capture_stdout { @library.create_option_commands(@library.commands) } =~ /options.*blah/
       end

@@ -1,6 +1,6 @@
 require 'shellwords'
 module Boson
-  module Higgs
+  module Scientist
     extend self
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
@@ -32,7 +32,7 @@ module Boson
 
     def create_option_command_block(obj, command)
       lambda {|*args|
-        Boson::Higgs.translate_and_render(obj, command, args) {|args| super(*args) }
+        Boson::Scientist.translate_and_render(obj, command, args) {|args| super(*args) }
       }
     end
 

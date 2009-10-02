@@ -192,7 +192,7 @@ module Boson
         puts "Following commands cannot have options until their arguments are configured: " +
           rejected.map {|e| e.name}.join(', ')
       end
-      accepted.each {|cmd| Higgs.create_option_command(namespace_object, cmd) }
+      accepted.each {|cmd| Scientist.create_option_command(namespace_object, cmd) }
     end
 
     def command_objects(names)

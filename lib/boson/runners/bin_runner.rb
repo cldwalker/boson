@@ -81,8 +81,8 @@ module Boson
       end
 
       def render_output(output)
-        if Higgs.global_options
-          puts output.inspect unless Higgs.rendered
+        if Scientist.global_options
+          puts output.inspect unless Scientist.rendered
         else
           View.render(output)
         end

@@ -60,7 +60,7 @@ module Boson::Commands::Core
         command.option_parser.print_usage_table
       end
       puts "\nGLOBAL/RENDER OPTIONS"
-      Boson::Higgs.render_option_parser(command).print_usage_table
+      Boson::Scientist.render_option_parser(command).print_usage_table
     end
   end
 end
