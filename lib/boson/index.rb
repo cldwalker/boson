@@ -62,7 +62,7 @@ module Boson
     end
 
     def all_main_methods
-      @commands.map {|e| [e.name, e.alias]}.flatten.compact + namespaces
+      @commands.reject {|e| e.namespace }.map {|e| [e.name, e.alias]}.flatten.compact + namespaces
     end
 
     def marshal_file
