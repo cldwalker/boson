@@ -74,7 +74,8 @@ module Boson
       raise(InvalidLibraryModuleError, "No module for library #{@name}") unless @module
       create_class_commands unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
-      (@namespace || @object_namespace) ? create_namespace : include_in_universe
+      @namespace = clean_name if @object_namespace
+      @namespace ? create_namespace : include_in_universe
     end
 
     def include_in_universe(lib_module=@module)
@@ -99,13 +100,7 @@ module Boson
     end
 
     def create_namespace
-      @namespace = clean_name if @object_namespace
-      if @object_namespace && @module.instance_methods.include?(@namespace)
-        include_in_universe
-        Namespace.create_object_namespace(@namespace, namespace_object)
-      else
-        Namespace.create(@namespace, self)
-      end
+      Namespace.create(@namespace, self)
       @commands += Boson.invoke(@namespace).boson_commands
     end
   end

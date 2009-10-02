@@ -1,6 +1,7 @@
 module Boson
   class Namespace
-    def self.create_object_namespace(name, obj)
+    def self.create_object_namespace(name, library)
+      obj = library.namespace_object
       obj.instance_eval("class<<self;self;end").send(:define_method, :boson_commands) {
         self.class.instance_methods(false) }
       obj.instance_eval("class<<self;self;end").send(:define_method, :object_delegate?) { true }
@@ -12,6 +13,15 @@ module Boson
     end
 
     def self.create(name, library)
+      if library.object_namespace && library.module.instance_methods.include?(name)
+        library.include_in_universe
+        create_object_namespace(name, library)
+      else
+        create_basic_namespace(name, library)
+      end
+    end
+
+    def self.create_basic_namespace(name, library)
       namespaces[name.to_s] = new(name, library)
       Commands::Namespace.send(:define_method, name) { Boson::Namespace.namespaces[name.to_s] }
     end
