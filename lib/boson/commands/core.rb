@@ -55,7 +55,7 @@ module Boson::Commands::Core
     msg = (command = Boson::Command.find(name)) ? "#{name} #{command.usage}" : "Command '#{name}' not found"
     puts msg
     if command && options[:verbose]
-      unless command.options.empty?
+      if command.options && !command.options.empty?
         puts "\nCOMMAND OPTIONS"
         command.option_parser.print_usage_table
       end
