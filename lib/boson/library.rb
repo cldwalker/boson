@@ -148,6 +148,7 @@ module Boson
       }.compact
       @commands -= aliases
       @commands.delete(@namespace) if @namespace && !namespace_object.object_delegate?
+      @commands += Boson.invoke(@namespace).boson_commands if @namespace
     end
 
     def after_load(options)
@@ -216,6 +217,10 @@ module Boson
     def library_type
       str = self.class.to_s[/::(\w+)Library$/, 1] || 'library'
       str.downcase.to_sym
+    end
+
+    def namespace_object
+      @namespace_object ||= @namespace ? Boson.invoke(@namespace) : Boson.main_object
     end
 
     def marshal_dump

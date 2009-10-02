@@ -75,7 +75,7 @@ module Boson
       create_class_commands unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
-      @namespace ? create_namespace : include_in_universe
+      @namespace ? Namespace.create(@namespace, self) : include_in_universe
     end
 
     def include_in_universe(lib_module=@module)
@@ -93,15 +93,6 @@ module Boson
       unless conflicts.empty?
         raise MethodConflictError,"The following commands conflict with existing commands: #{conflicts.join(', ')}"
       end
-    end
-
-    def namespace_object
-      @namespace_object ||= @namespace ? Boson.invoke(@namespace) : Boson.main_object
-    end
-
-    def create_namespace
-      Namespace.create(@namespace, self)
-      @commands += Boson.invoke(@namespace).boson_commands
     end
   end
 end
