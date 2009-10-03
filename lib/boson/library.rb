@@ -142,17 +142,7 @@ module Boson
       hash.each {|k,v| instance_variable_set("@#{k}", v) if instance_variable_get("@#{k}").nil? || force }
     end
 
-    def set_library_commands
-      aliases = @commands.map {|e|
-        @commands_hash[e][:alias] rescue nil
-      }.compact
-      @commands -= aliases
-      @commands.delete(@namespace) if @namespace && !namespace_object.object_delegate?
-      @commands += Boson.invoke(@namespace).boson_commands if @namespace
-    end
-
     def after_load(options)
-      set_library_commands
       create_commands
       add_library
       puts "Loaded library #{@name}" if options[:verbose]

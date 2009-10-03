@@ -13,6 +13,7 @@ module Boson
       load_dependencies
       (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = nil
       @init_methods.each {|m| namespace_object.send(m) if namespace_object.respond_to?(m) } if @init_methods && !@options[:index]
+      set_library_commands
       is_valid_library? && (@loaded = true)
     end
 
@@ -93,6 +94,15 @@ module Boson
       unless conflicts.empty?
         raise MethodConflictError,"The following commands conflict with existing commands: #{conflicts.join(', ')}"
       end
+    end
+
+    def set_library_commands
+      aliases = @commands.map {|e|
+        @commands_hash[e][:alias] rescue nil
+      }.compact
+      @commands -= aliases
+      @commands.delete(@namespace) if @namespace && !namespace_object.object_delegate?
+      @commands += Boson.invoke(@namespace).boson_commands if @namespace
     end
   end
 end
