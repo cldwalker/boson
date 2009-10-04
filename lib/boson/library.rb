@@ -7,7 +7,7 @@ module Boson
       end
 
       def create(libraries, attributes={})
-        libraries.map {|e| lib = new({:name=>e}.update(attributes)); lib.add_library; lib }
+        libraries.map {|e| lib = new({:name=>e}.update(attributes)); add_library(lib); lib }
       end
 
       # ==== Options:
@@ -36,6 +36,11 @@ module Boson
       end
 
       #:stopdoc:
+      def add_library(lib)
+        Boson.libraries.delete(Boson.library(lib.name))
+        Boson.libraries << lib
+      end
+
       def loaded?(lib_name)
         ((lib = Boson.library(lib_name)) && lib.loaded) ? true : false
       end
@@ -144,11 +149,11 @@ module Boson
 
     def after_load(options)
       create_commands
-      add_library
+      Library.add_library(self)
       puts "Loaded library #{@name}" if options[:verbose]
       @created_dependencies.each do |e|
         e.create_commands
-        e.add_library
+        Library.add_library(e)
         puts "Loaded library dependency #{e.name}" if options[:verbose]
       end
       remove_instance_variable("@created_dependencies")
@@ -165,7 +170,6 @@ module Boson
 
     def create_commands(commands=@commands)
       if @except
-        @commands -= @except
         commands -= @except
         @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
       end
@@ -187,11 +191,6 @@ module Boson
 
     def command_objects(names)
       Boson.commands.select {|e| names.include?(e.name) && e.lib == self.name }
-    end
-
-    def add_library
-      Boson.libraries.delete(Boson.library(@name))
-      Boson.libraries << self
     end
 
     def create_command_aliases(commands=@commands)

@@ -103,6 +103,7 @@ module Boson
       @commands -= aliases
       @commands.delete(@namespace) if @namespace && !namespace_object.object_delegate?
       @commands += Boson.invoke(@namespace).boson_commands if @namespace
+      @commands -= @except if @except
     end
   end
 end
