@@ -4,7 +4,7 @@ module Boson
       def init
         View.enable
         add_load_path
-        Library.load default_libraries, load_options
+        Manager.load default_libraries, load_options
       end
 
       def add_load_path
@@ -37,7 +37,7 @@ module Boson
           def method_missing(method, *args, &block)
             Boson::Index.read
             if lib = Boson::Index.find_library(method.to_s)
-              Boson::Library.load_library lib, :verbose=>true
+              Boson::Manager.load_library lib, :verbose=>true
               send(method, *args, &block) if respond_to?(method)
             else
               super

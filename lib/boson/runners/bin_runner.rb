@@ -35,7 +35,7 @@ module Boson
         super
         Index.update(:verbose=>true) if @options[:index]
         if @options[:load]
-          Library.load @options[:load], load_options
+          Manager.load @options[:load], load_options
         elsif @options[:execute]
           define_autoloader
         else
@@ -47,7 +47,7 @@ module Boson
         Index.update(:verbose=>@options[:verbose]) if !@options[:index] && command_defined?(@command) && !@options[:help]
         if !command_defined?(@command) && ((lib = Index.find_library(@command)) ||
           (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
-          Library.load_library lib, load_options
+          Manager.load_library lib, load_options
         end
       end
 
@@ -94,7 +94,7 @@ module Boson
         View.enable
         @option_parser.print_usage_table
         if @options[:verbose]
-          Library.load [Boson::Commands::Core]
+          Manager.load [Boson::Commands::Core]
           puts "\n\nDEFAULT COMMANDS"
           Boson.invoke :commands, "", :fields=>["name", "usage", "description"], :description=>false
         end

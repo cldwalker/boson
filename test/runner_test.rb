@@ -13,7 +13,7 @@ module Boson
 
       test "loads default irb library when irb exists" do
         eval %[module ::IRB; module ExtendCommandBundle; end; end]
-        Library.expects(:load).with {|*args| args[0].include?(Boson::Commands::IrbCore) }
+        Manager.expects(:load).with {|*args| args[0].include?(Boson::Commands::IrbCore) }
         start
         IRB.send :remove_const, "ExtendCommandBundle"
       end
@@ -21,7 +21,7 @@ module Boson
       test "loads default libraries and libraries in :defaults config" do
         defaults = Boson::Runner.default_libraries + ['yo']
         with_config(:defaults=>['yo']) do
-          Library.expects(:load).with {|*args| args[0] == defaults }
+          Manager.expects(:load).with {|*args| args[0] == defaults }
           start
         end
       end
@@ -34,7 +34,7 @@ module Boson
 
       test "loads multiple libraries with :libraries option" do
         ReplRunner.expects(:init)
-        Library.expects(:load).with([:lib1,:lib2], anything)
+        Manager.expects(:load).with([:lib1,:lib2], anything)
         start(:libraries=>[:lib1, :lib2])
       end
 
@@ -42,7 +42,7 @@ module Boson
         start(:autoload_libraries=>true)
         Index.expects(:read)
         Index.expects(:find_library).with('blah').returns('blah')
-        Library.expects(:load_library).with('blah', :verbose=>true)
+        Manager.expects(:load_library).with('blah', :verbose=>true)
         Boson.main_object.blah
       end
     end

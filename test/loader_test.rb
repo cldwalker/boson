@@ -4,7 +4,7 @@ module Boson
   class LoaderTest < Test::Unit::TestCase
 
     def load_namespace_library
-      Library.load([Boson::Commands::Namespace])
+      Manager.load([Boson::Commands::Namespace])
     end
 
     context "load" do
@@ -26,7 +26,7 @@ module Boson
       test "prints error and returns false for existing library" do
         lib = Library.new(:name=>'blah', :loaded=>true)
         Boson.libraries << lib
-        Library.stubs(:loader_create).returns(lib)
+        Manager.stubs(:loader_create).returns(lib)
         capture_stderr { load('blah', :no_mock=>true, :verbose=>true).should == false }.should =~ /already exists/
       end
 
@@ -169,13 +169,13 @@ module Boson
     context "reload_library" do
       before(:each) { reset }
       test "loads currently unloaded library" do
-        Library.create(['blah'])
-        Library.expects(:load_library).with('blah', anything)
-        Library.reload_library('blah')
+        Manager.create(['blah'])
+        Manager.expects(:load_library).with('blah', anything)
+        Manager.reload_library('blah')
       end
 
       test "doesn't load nonexistent library" do
-        capture_stdout { Library.reload_library('bling', :verbose=>true) }.should =~ /bling doesn't/
+        capture_stdout { Manager.reload_library('bling', :verbose=>true) }.should =~ /bling doesn't/
       end
     end
   end

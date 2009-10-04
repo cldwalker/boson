@@ -4,7 +4,7 @@ module Boson
       def start(options={})
         @options = options
         init unless @initialized
-        Library.load(@options[:libraries], load_options) if @options[:libraries]
+        Manager.load(@options[:libraries], load_options) if @options[:libraries]
       end
 
       def init

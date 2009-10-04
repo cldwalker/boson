@@ -7,7 +7,7 @@ module Boson
       @higgs = Boson.main_object
       ancestors = class <<Boson.main_object; self end.ancestors
       # allows running just this test file
-      Library.load Runner.default_libraries unless ancestors.include?(Boson::Commands::Core)
+      Manager.load Runner.default_libraries unless ancestors.include?(Boson::Commands::Core)
     }
 
     def render_expects(&block)

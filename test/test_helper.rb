@@ -47,7 +47,7 @@ class Test::Unit::TestCase
   end
 
   def library_loaded?(name, bool=true)
-    Boson::Library.loaded?(name).should == bool
+    Boson::Manager.loaded?(name).should == bool
   end
 
   def library(name)
@@ -55,7 +55,7 @@ class Test::Unit::TestCase
   end
 
   def library_has_module(lib, lib_module)
-    Boson::Library.loaded?(lib).should == true
+    Boson::Manager.loaded?(lib).should == true
     test_lib = library(lib)
     (test_lib.module.is_a?(Module) && (test_lib.module.to_s == lib_module)).should == true
   end
@@ -75,7 +75,7 @@ class Test::Unit::TestCase
     # prevent conflicts with existing File.read stubs
     Boson::MethodInspector.stubs(:inspector_in_file?).returns(false)
     mock_library(lib, options) unless options.delete(:no_mock)
-    result = Boson::Library.load([lib], options)
+    result = Boson::Manager.load([lib], options)
     Boson::FileLibrary.reset_file_cache
     result
   end

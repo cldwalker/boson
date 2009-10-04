@@ -39,8 +39,8 @@ module Boson::Commands::Core
   end
 
   def load_library(library, options={})
-    options[:reload] ? Boson::Library.reload_library(library, options) :
-      Boson::Library.load_library(library, options)
+    options[:reload] ? Boson::Manager.reload_library(library, options) :
+      Boson::Manager.load_library(library, options)
   end
 
   def render(object, options={})

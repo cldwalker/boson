@@ -6,8 +6,8 @@ module Boson
       def load_library(hash)
         new_attributes = {:name=>hash.delete(:name), :commands=>[], :created_dependencies=>[], :loaded=>true}
         [:module, :except, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
-        Library.expects(:load_once).returns(Library.new(new_attributes))
-        Library.load([hash[:name]])
+        Manager.expects(:load_once).returns(Library.new(new_attributes))
+        Manager.load([hash[:name]])
       end
 
       before(:each) { reset_boson }
@@ -64,7 +64,7 @@ module Boson
       end
 
       test "merges with existing created library" do
-        Library.create(['blah'])
+        Manager.create(['blah'])
         load_library :name=>'blah'
         library_loaded? 'blah'
         Boson.libraries.size.should == 1
@@ -74,21 +74,21 @@ module Boson
     context "create" do
       before(:each) { reset_libraries }
       test "creates library" do
-        Library.create(['blah'])
+        Manager.create(['blah'])
         library('blah').is_a?(Library).should == true
       end
 
       test "creates library with config" do
         with_config(:libraries => {'blah'=>{:dependencies=>['bluh']}}) do
-          Library.create(['blah'])
+          Manager.create(['blah'])
           library('blah').is_a?(Library).should be(true)
           library('blah').dependencies.should == ['bluh']
         end
       end
 
       test "only makes one library with the same name" do
-        Library.create(['doh'])
-        Library.create(['doh'])
+        Manager.create(['doh'])
+        Manager.create(['doh'])
         Boson.libraries.size.should == 1
       end
     end
@@ -119,13 +119,13 @@ module Boson
       before(:each) { reset_libraries }
 
       test "returns false when library isn't loaded" do
-        Library.create(['blah'])
-        Library.loaded?('blah').should be(false)
+        Manager.create(['blah'])
+        Manager.loaded?('blah').should be(false)
       end
 
       test "returns true when library is loaded" do
-        Library.create(['blah'], :loaded=>true)
-        Library.loaded?('blah').should be(true)
+        Manager.create(['blah'], :loaded=>true)
+        Manager.loaded?('blah').should be(true)
       end
     end
   end
