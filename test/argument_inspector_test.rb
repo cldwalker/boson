@@ -2,9 +2,9 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
   class ArgumentInspectorTest < Test::Unit::TestCase
-    context "arguments_from_file" do
+    context "scrape_with_text" do
       def args_from(file_string)
-        ArgumentInspector.arguments_from_file(file_string, "blah")
+        ArgumentInspector.scrape_with_text(file_string, "blah")
       end
 
       test "parses arguments with no spacing" do
@@ -20,7 +20,7 @@ module Boson
       end
     end
 
-    context "determine_method_args" do
+    context "scrape_with_eval" do
       def args_from(string)
         # methods need options to have their args parsed with ArgumentInspector
         string.gsub!(/(def blah)/, 'options :a=>1; \1')

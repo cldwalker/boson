@@ -1,5 +1,5 @@
-# Handles getting and setting method metadata acquired by inspectors for libraries.
 module Boson
+  # Handles getting and setting method metadata acquired by inspectors for libraries.
   module Inspector
     extend self
     attr_reader :enabled

@@ -1,6 +1,3 @@
-# This is a modified version of Daniel Berger's Getopt::Long class,
-# licensed under Ruby's license.
-
 module Boson
   # Simple Hash with indifferent access
   class IndifferentAccessHash < ::Hash
@@ -27,6 +24,8 @@ module Boson
       end
   end
 
+  # This is a modified version of Yehuda Katz's Thor::Options class which is a modified version
+  # of Daniel Berger's Getopt::Long class, licensed under Ruby's license.
   class OptionParser
     class Error < StandardError; end
 

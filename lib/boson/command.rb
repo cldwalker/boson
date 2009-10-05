@@ -44,7 +44,7 @@ module Boson
         if lib && File.exists?(lib.library_file || '')
           @file_parsed_args = true
           file_string = Boson::FileLibrary.read_library_file(lib.library_file)
-          ArgumentInspector.arguments_from_file(file_string, @name)
+          ArgumentInspector.scrape_with_text(file_string, @name)
         end
       end
     end

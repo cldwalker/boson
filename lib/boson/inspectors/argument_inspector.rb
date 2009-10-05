@@ -1,19 +1,24 @@
-# Extracts arguments and their default values from methods either at method_added time
-# compliments of http://eigenclass.org/hiki/method+arguments+via+introspection
-# or by simply scraping a file.
+# Extracts arguments and their default values from methods either by
+# by scraping a method's text or with method_added and brute force eval (thanks to
+# {eigenclass}[http://eigenclass.org/hiki/method+arguments+via+introspection]).
 module Boson::ArgumentInspector
   extend self
-  # produces same argument arrays as determine_method_args
-  def arguments_from_file(file_string, meth)
+  # Returns same argument arrays as scrape_with_eval given a method's file contents and method name.
+  def scrape_with_text(file_string, meth)
     tabspace = "[ \t]"
     if match = /^#{tabspace}*def#{tabspace}+#{meth}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
       (match.to_a[2] || '').split(/\s*,\s*/).map {|e| e.split(/\s*=\s*/)}
     end
   end
 
-  MAX_ARGS = 10 # max number of arguments extracted for a method
-  # returns argument arrays which have an optional 2nd element with an argument's default value
-  def determine_method_args(meth, klass, object)
+  # Max number of arguments extracted per method with scrape_with_eval
+  MAX_ARGS = 10
+  # Scrapes non-private methods for argument names and default values.
+  # Returns arguments as array of argument arrays with optional default value as a second element.
+  # Examples:
+  #   * def meth1(arg1, arg2='val', options={}) -> [['arg1'], ['arg2', 'val'], ['options', {}]]
+  #   * def meth2(*args) -> [['*args']]
+  def scrape_with_eval(meth, klass, object)
     unless %w[initialize].include?(meth.to_s)
       return if class << object; private_instance_methods(true) end.include?(meth.to_s)
     end
@@ -27,7 +32,7 @@ module Boson::ArgumentInspector
   end
 
   # process params + values to return array of argument arrays
-  def format_arguments(params, values, arity, num_args)
+  def format_arguments(params, values, arity, num_args) #:nodoc:
     params ||= []
     params = params[0,num_args]
     params.inject([[], 0]) do |(a, i), x|
@@ -43,7 +48,7 @@ module Boson::ArgumentInspector
     end.first
   end
 
-  def trace_method_args(meth, klass, object)
+  def trace_method_args(meth, klass, object) #:nodoc:
     file = line = params = values = nil
     arity = klass.instance_method(meth).arity
     set_trace_func lambda{|event, file, line, id, binding, classname|

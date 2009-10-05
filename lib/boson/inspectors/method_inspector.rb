@@ -47,7 +47,7 @@ module Boson
       o = Object.new
       o.extend(@current_module)
       # private methods return nil
-      if (val = ArgumentInspector.determine_method_args(meth, @current_module, o))
+      if (val = ArgumentInspector.scrape_with_eval(meth, @current_module, o))
         store[:method_args][meth.to_s] = val
       end
     end
