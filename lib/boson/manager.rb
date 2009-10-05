@@ -1,6 +1,8 @@
 module Boson
   class LoaderError < StandardError; end
   class LoadingDependencyError < LoaderError; end
+  class AppendFeaturesFalseError < StandardError; end
+
   class Manager
     class <<self
       def load(libraries, options={})
@@ -84,8 +86,8 @@ module Boson
 
       def load_dependencies(lib, options={})
         lib_dependencies[lib] = (lib.dependencies || []).map do |e|
-          next if Manager.loaded?(e)
-          Manager.load_once(e, options.merge(:dependency=>true)) ||
+          next if loaded?(e)
+          load_once(e, options.merge(:dependency=>true)) ||
             raise(LoadingDependencyError, "Can't load dependency #{e}")
         end.compact
       end
@@ -101,7 +103,7 @@ module Boson
         puts "Loaded library #{@library.name}" if options[:verbose]
         (lib_dependencies[@library] || []).each do |e|
           create_commands(e)
-          Manager.add_library(e)
+          add_library(e)
           puts "Loaded library dependency #{e.name}" if options[:verbose]
         end
         true

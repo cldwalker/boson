@@ -1,5 +1,4 @@
 module Boson
-  class AppendFeaturesFalseError < StandardError; end
   class MethodConflictError < LoaderError; end
   class InvalidLibraryModuleError < LoaderError; end
 
