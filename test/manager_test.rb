@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
-  class LibraryTest < Test::Unit::TestCase    
+  class ManagerTest < Test::Unit::TestCase
     context "after_load" do
       def load_library(hash)
         new_attributes = {:name=>hash.delete(:name), :commands=>[], :created_dependencies=>[], :loaded=>true}
@@ -38,7 +38,7 @@ module Boson
 
         test "created with command specific config" do
           with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
-            Command.expects(:generate_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
+            Manager.expects(:create_instance_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
             load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
             library_loaded? 'aquateen'
           end
@@ -46,7 +46,7 @@ module Boson
 
         test "created with config command_aliases" do
           with_config(:command_aliases=>{"frylock"=>"fr"}) do
-            Command.expects(:generate_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
+            Manager.expects(:create_instance_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
             load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
             library_loaded? 'aquateen'
           end

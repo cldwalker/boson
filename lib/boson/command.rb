@@ -4,22 +4,6 @@ module Boson
       new (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name, :namespace=>library.namespace})
     end
 
-    def self.create_aliases(commands, lib_module)
-      aliases_hash = {}
-      select_commands = Boson.commands.select {|e| commands.include?(e.name)}
-      select_commands.each do |e|
-        if e.alias
-          aliases_hash[lib_module.to_s] ||= {}
-          aliases_hash[lib_module.to_s][e.name] = e.alias
-        end
-      end
-      generate_aliases(aliases_hash)
-    end
-
-    def self.generate_aliases(aliases_hash)
-      Alias.manager.create_aliases(:instance_method, aliases_hash)
-    end
-
     def self.find(command, commands=Boson.commands)
       command, subcommand = command.to_s.split('.', 2)
       is_namespace_command = lambda {|current_command|

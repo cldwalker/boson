@@ -144,10 +144,31 @@ module Boson
       end
 
       def create_command_aliases(lib, commands)
-        lib.module ? Command.create_aliases(commands, lib.module) : check_for_uncreated_aliases(lib, commands)
+        lib.module ? prep_and_create_instance_aliases(commands, lib.module) : check_for_uncreated_aliases(lib, commands)
+      end
+
+      def prep_and_create_instance_aliases(commands, lib_module)
+        aliases_hash = {}
+        select_commands = Boson.commands.select {|e| commands.include?(e.name)}
+        select_commands.each do |e|
+          if e.alias
+            aliases_hash[lib_module.to_s] ||= {}
+            aliases_hash[lib_module.to_s][e.name] = e.alias
+          end
+        end
+        create_instance_aliases(aliases_hash)
+      end
+
+      def create_instance_aliases(aliases_hash)
+        Alias.manager.create_aliases(:instance_method, aliases_hash)
+      end
+
+      def create_class_aliases(mod, class_commands)
+        Alias.manager.create_aliases(:any_to_instance_method, mod.to_s=>class_commands.invert)
       end
 
       def check_for_uncreated_aliases(lib, commands)
+        return if lib.is_a?(GemLibrary)
         if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
           $stderr.puts "No aliases created for library #{lib.name} because it has no module"
         end

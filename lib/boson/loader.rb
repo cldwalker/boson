@@ -63,7 +63,7 @@ module Boson
     def initialize_library_module
       @module = @module ? Util.constantize(@module) : Util.create_module(Boson::Commands, clean_name)
       raise(InvalidLibraryModuleError, "No module for library #{@name}") unless @module
-      create_class_commands unless @class_commands.to_s.empty?
+      Manager.create_class_aliases(@module, @class_commands) unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
       @namespace ? Namespace.create(@namespace, self) : include_in_universe
@@ -72,10 +72,6 @@ module Boson
     def include_in_universe(lib_module=@module)
       Boson::Universe.send :include, lib_module
       Boson::Universe.send :extend_object, Boson.main_object
-    end
-
-    def create_class_commands
-      Alias.manager.create_aliases(:any_to_instance_method, @module.to_s=>@class_commands.invert)
     end
 
     def check_for_method_conflicts
