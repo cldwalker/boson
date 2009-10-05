@@ -1,12 +1,19 @@
 module Boson
+  # Base class for library loading errors. Raised mostly in Boson::Loader and rescued by Boson::Manager.
   class LoaderError < StandardError; end
-  class LoadingDependencyError < LoaderError; end
+  # Raised when a library's append_features returns false.
   class AppendFeaturesFalseError < StandardError; end
 
   class Manager
     class <<self
+      # Loads a library or an array of libraries with options. Manager loads the first library subclass
+      # to meet a library subclass' criteria in this order: ModuleLibrary, FileLibrary, GemLibrary, RequireLibrary.
+      # ==== Examples:
+      #   Manager.load 'my_commands'  -> Loads a FileLibrary object from ~/.boson/commands/my_commands.rb
+      #   Manager.load 'method_lister' -> Loads a GemLibrary object which requires the method_lister gem
       # ==== Options:
-      # [:verbose] Prints the status of each library as its loaded. Default is false.
+      # [:verbose] Boolean to print each library's loaded status along with more verbose errors. Default is false.
+      # [:index]   Boolean to load in index mode. Default is false.
       def load(libraries, options={})
         libraries = [libraries] unless libraries.is_a?(Array)
         libraries.map {|e|
@@ -14,6 +21,8 @@ module Boson
         }.all?
       end
 
+      # Reloads a library or an array of libraries with the following options:
+      # * :verbose: Boolean to print reload status. Default is false.
       def reload(source, options={})
         if (lib = Boson.library(source))
           if lib.loaded
@@ -88,7 +97,7 @@ module Boson
         lib_dependencies[lib] = (lib.dependencies || []).map do |e|
           next if loaded?(e)
           load_once(e, options.merge(:dependency=>true)) ||
-            raise(LoadingDependencyError, "Can't load dependency #{e}")
+            raise(LoaderError, "Can't load dependency #{e}")
         end.compact
       end
 
@@ -171,6 +180,7 @@ module Boson
           $stderr.puts "No aliases created for library #{lib.name} because it has no module"
         end
       end
+      #:startdoc:
     end
   end
 end

@@ -3,7 +3,7 @@
 # {eigenclass}[http://eigenclass.org/hiki/method+arguments+via+introspection]).
 module Boson::ArgumentInspector
   extend self
-  # Returns same argument arrays as scrape_with_eval given a method's file contents and method name.
+  # Returns same argument arrays as scrape_with_eval but argument defaults haven't been evaluated.
   def scrape_with_text(file_string, meth)
     tabspace = "[ \t]"
     if match = /^#{tabspace}*def#{tabspace}+#{meth}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
@@ -15,9 +15,9 @@ module Boson::ArgumentInspector
   MAX_ARGS = 10
   # Scrapes non-private methods for argument names and default values.
   # Returns arguments as array of argument arrays with optional default value as a second element.
-  # Examples:
-  #   * def meth1(arg1, arg2='val', options={}) -> [['arg1'], ['arg2', 'val'], ['options', {}]]
-  #   * def meth2(*args) -> [['*args']]
+  # ====Examples:
+  #   def meth1(arg1, arg2='val', options={}) -> [['arg1'], ['arg2', 'val'], ['options', {}]]
+  #   def meth2(*args) -> [['*args']]
   def scrape_with_eval(meth, klass, object)
     unless %w[initialize].include?(meth.to_s)
       return if class << object; private_instance_methods(true) end.include?(meth.to_s)

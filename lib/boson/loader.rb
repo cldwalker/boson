@@ -1,6 +1,6 @@
 module Boson
+  # Raised if a library has a method which conflicts with existing methods in Boson.main_object.
   class MethodConflictError < LoaderError; end
-  class InvalidLibraryModuleError < LoaderError; end
 
   module Loader
     def load
@@ -61,7 +61,7 @@ module Boson
 
     def initialize_library_module
       @module = @module ? Util.constantize(@module) : Util.create_module(Boson::Commands, clean_name)
-      raise(InvalidLibraryModuleError, "No module for library #{@name}") unless @module
+      raise(LoaderError, "No module for library #{@name}") unless @module
       Manager.create_class_aliases(@module, @class_commands) unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
