@@ -165,16 +165,16 @@ module Boson
       end
     end
 
-    context "reload_library" do
+    context "reload" do
       before(:each) { reset }
       test "loads currently unloaded library" do
         create_library('blah')
         Manager.expects(:load).with('blah', anything)
-        Manager.reload_library('blah')
+        Manager.reload('blah')
       end
 
       test "doesn't load nonexistent library" do
-        capture_stdout { Manager.reload_library('bling', :verbose=>true) }.should =~ /bling doesn't/
+        capture_stdout { Manager.reload('bling', :verbose=>true) }.should =~ /bling doesn't/
       end
     end
   end

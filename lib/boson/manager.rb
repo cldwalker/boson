@@ -14,7 +14,7 @@ module Boson
         }.all?
       end
 
-      def reload_library(source, options={})
+      def reload(source, options={})
         if (lib = Boson.library(source))
           if lib.loaded
             command_size = Boson.commands.size

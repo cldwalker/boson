@@ -29,7 +29,7 @@ module Boson
         load(:blah, :file_string=>"module Blah; def blah; end; end")
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Blah; def bling; end; end")
-        Manager.reload_library('blah').should == true
+        Manager.reload('blah').should == true
         command_exists?('bling')
         library('blah').commands.size.should == 2
       end
@@ -38,7 +38,7 @@ module Boson
         load(:blah, :file_string=>"module Blah; def blah; end; end")
         File.stubs(:exists?).returns(true)
         File.stubs(:read).returns("module Bling; def bling; end; end")
-        Manager.reload_library('blah').should == true
+        Manager.reload('blah').should == true
         library_has_module('blah', "Boson::Commands::Bling")
         command_exists?('bling')
         command_exists?('blah', false)
