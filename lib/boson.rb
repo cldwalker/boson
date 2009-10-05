@@ -1,6 +1,6 @@
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 %w{hirb alias}.each {|e| require e }
-%w{runner runners/repl_runner repo loader inspector library}.each {|e| require "boson/#{e}" }
+%w{runner runners/repl_runner repo loader inspector library manager}.each {|e| require "boson/#{e}" }
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
 %w{module file gem require}.each {|e| require "boson/libraries/#{e}_library" }

@@ -12,7 +12,7 @@ module Boson
       # ==== Options:
       # [:verbose] Prints the status of each library as its loaded. Default is false.
       def load_library(source, options={})
-        (lib = load_once(source, options)) ? lib.after_load(options) : false
+        (@library = load_once(source, options)) ? after_load(options) : false
       end
 
       def reload_library(source, options={})
@@ -20,7 +20,7 @@ module Boson
           if lib.loaded
             command_size = Boson.commands.size
             if (result = rescue_load_action(lib.name, :reload, options) { lib.reload })
-              lib.after_reload
+              after_reload(lib)
               puts "Reloaded library #{source}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
             end
             result
@@ -82,6 +82,60 @@ module Boson
       def loader_create(source, options={})
         lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or raise(LoaderError, "Library #{source} not found.")
         lib_class[0].new(:name=>source, :options=>options)
+      end
+
+      def after_load(options)
+        create_commands(@library)
+        add_library(@library)
+        puts "Loaded library #{@library.name}" if options[:verbose]
+        @library.created_dependencies.each do |e|
+          create_commands(e)
+          Manager.add_library(e)
+          puts "Loaded library dependency #{e.name}" if options[:verbose]
+        end
+        true
+      end
+
+      def after_reload(lib)
+        Boson.commands.delete_if {|e| e.lib == lib.name } if lib.new_module
+        create_commands(lib, lib.new_commands)
+      end
+
+      def before_create_commands(lib)
+        if lib.is_a?(FileLibrary) && lib.module
+          Inspector.add_scraped_data(lib.module, lib.commands_hash, lib.library_file)
+        end
+      end
+
+      def create_commands(lib, commands=lib.commands)
+        if lib.except
+          commands -= lib.except
+          lib.except.each {|e| lib.namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
+        end
+        before_create_commands(lib)
+        commands.each {|e| Boson.commands << Command.create(e, lib)}
+        create_command_aliases(lib, commands) if commands.size > 0 && !lib.no_alias_creation
+        create_option_commands(lib, commands)
+      end
+
+      def create_option_commands(lib, commands)
+        option_commands = lib.command_objects(commands).select {|e| e.option_command? }
+        accepted, rejected = option_commands.partition {|e| e.args(lib) || e.arg_size }
+        if lib.options[:verbose] && rejected.size > 0
+          puts "Following commands cannot have options until their arguments are configured: " +
+            rejected.map {|e| e.name}.join(', ')
+        end
+        accepted.each {|cmd| Scientist.create_option_command(lib.namespace_object, cmd) }
+      end
+
+      def create_command_aliases(lib, commands)
+        lib.module ? Command.create_aliases(commands, lib.module) : check_for_uncreated_aliases(lib, commands)
+      end
+
+      def check_for_uncreated_aliases(lib, commands)
+        if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
+          $stderr.puts "No aliases created for library #{lib.name} because it has no module"
+        end
       end
     end
   end

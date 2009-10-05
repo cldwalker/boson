@@ -67,9 +67,5 @@ module Boson
       end
       lib_module
     end
-
-    def before_create_commands
-      Inspector.add_scraped_data(@module, @commands_hash, library_file) if @module
-    end
   end
 end

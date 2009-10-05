@@ -105,13 +105,13 @@ module Boson
 
       test "are deleted" do
         Scientist.expects(:create_option_command).with(anything, @foo)
-        @library.create_option_commands(@library.commands)
+        Manager.create_option_commands(@library, @library.commands)
       end
 
       test "are deleted and printed when verbose" do
         Scientist.expects(:create_option_command).with(anything, @foo)
         @library.instance_eval("@options = {:verbose=>true}")
-        capture_stdout { @library.create_option_commands(@library.commands) } =~ /options.*blah/
+        capture_stdout { Manager.create_option_commands(@library, @library.commands) } =~ /options.*blah/
       end
     end
 

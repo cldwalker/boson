@@ -1,4 +1,3 @@
-require 'boson/manager'
 module Boson
   class Library
     include Loader
@@ -12,6 +11,7 @@ module Boson
 
     ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
+    attr_reader :created_dependencies, :except, :no_alias_creation, :options, :new_module, :new_commands
     attr_writer :namespace
     def initialize(hash)
       @name = set_name hash.delete(:name)
@@ -65,60 +65,8 @@ module Boson
       hash.each {|k,v| instance_variable_set("@#{k}", v) if instance_variable_get("@#{k}").nil? || force }
     end
 
-    def after_load(options)
-      create_commands
-      Manager.add_library(self)
-      puts "Loaded library #{@name}" if options[:verbose]
-      @created_dependencies.each do |e|
-        e.create_commands
-        Manager.add_library(e)
-        puts "Loaded library dependency #{e.name}" if options[:verbose]
-      end
-      remove_instance_variable("@created_dependencies")
-      true
-    end
-
-    def after_reload
-      Boson.commands.delete_if {|e| e.lib == @name } if @new_module
-      create_commands(@new_commands)
-    end
-
-    # callback method
-    def before_create_commands; end
-
-    def create_commands(commands=@commands)
-      if @except
-        commands -= @except
-        @except.each {|e| namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
-      end
-      before_create_commands
-      commands.each {|e| Boson.commands << Command.create(e, self)}
-      create_command_aliases(commands) if commands.size > 0 && !@no_alias_creation
-      create_option_commands(commands)
-    end
-
-    def create_option_commands(commands)
-      option_commands = command_objects(commands).select {|e| e.option_command? }
-      accepted, rejected = option_commands.partition {|e| e.args(self) || e.arg_size }
-      if @options[:verbose] && rejected.size > 0
-        puts "Following commands cannot have options until their arguments are configured: " +
-          rejected.map {|e| e.name}.join(', ')
-      end
-      accepted.each {|cmd| Scientist.create_option_command(namespace_object, cmd) }
-    end
-
     def command_objects(names)
       Boson.commands.select {|e| names.include?(e.name) && e.lib == self.name }
-    end
-
-    def create_command_aliases(commands=@commands)
-      @module ? Command.create_aliases(commands, @module) : check_for_uncreated_aliases
-    end
-
-    def check_for_uncreated_aliases
-      if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
-        $stderr.puts "No aliases created for library #{@name} because it has no module"
-      end
     end
 
     def library_type
