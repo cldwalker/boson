@@ -64,31 +64,9 @@ module Boson
       end
 
       test "merges with existing created library" do
-        Manager.create(['blah'])
+        create_library('blah')
         load_library :name=>'blah'
         library_loaded? 'blah'
-        Boson.libraries.size.should == 1
-      end
-    end
-
-    context "create" do
-      before(:each) { reset_libraries }
-      test "creates library" do
-        Manager.create(['blah'])
-        library('blah').is_a?(Library).should == true
-      end
-
-      test "creates library with config" do
-        with_config(:libraries => {'blah'=>{:dependencies=>['bluh']}}) do
-          Manager.create(['blah'])
-          library('blah').is_a?(Library).should be(true)
-          library('blah').dependencies.should == ['bluh']
-        end
-      end
-
-      test "only makes one library with the same name" do
-        Manager.create(['doh'])
-        Manager.create(['doh'])
         Boson.libraries.size.should == 1
       end
     end
@@ -119,12 +97,12 @@ module Boson
       before(:each) { reset_libraries }
 
       test "returns false when library isn't loaded" do
-        Manager.create(['blah'])
+        create_library('blah')
         Manager.loaded?('blah').should be(false)
       end
 
       test "returns true when library is loaded" do
-        Manager.create(['blah'], :loaded=>true)
+        create_library('blah', :loaded=>true)
         Manager.loaded?('blah').should be(true)
       end
     end

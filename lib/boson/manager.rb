@@ -7,10 +7,6 @@ module Boson
         libraries.map {|e| load_library(e, options) }.all?
       end
 
-      def create(libraries, attributes={})
-        libraries.map {|e| lib = Library.new({:name=>e}.update(attributes)); add_library(lib); lib }
-      end
-
       # ==== Options:
       # [:verbose] Prints the status of each library as its loaded. Default is false.
       def load_library(source, options={})

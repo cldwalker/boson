@@ -169,7 +169,7 @@ module Boson
     context "reload_library" do
       before(:each) { reset }
       test "loads currently unloaded library" do
-        Manager.create(['blah'])
+        create_library('blah')
         Manager.expects(:load_library).with('blah', anything)
         Manager.reload_library('blah')
       end

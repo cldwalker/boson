@@ -108,4 +108,12 @@ class Test::Unit::TestCase
     end
     fake.string
   end
+
+  def create_library(libraries, attributes={})
+    libraries = [libraries] unless libraries.is_a?(Array)
+    libraries.map {|e|
+      lib = Boson::Library.new({:name=>e}.update(attributes))
+      Boson::Manager.add_library(lib); lib
+    }
+  end
 end
