@@ -47,7 +47,7 @@ module Boson
         Index.update(:verbose=>@options[:verbose]) if !@options[:index] && command_defined?(@command) && !@options[:help]
         if !command_defined?(@command) && ((lib = Index.find_library(@command)) ||
           (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
-          Manager.load_library lib, load_options
+          Manager.load lib, load_options
         end
       end
 

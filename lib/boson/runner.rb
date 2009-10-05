@@ -37,7 +37,7 @@ module Boson
           def method_missing(method, *args, &block)
             Boson::Index.read
             if lib = Boson::Index.find_library(method.to_s)
-              Boson::Manager.load_library lib, :verbose=>true
+              Boson::Manager.load lib, :verbose=>true
               send(method, *args, &block) if respond_to?(method)
             else
               super

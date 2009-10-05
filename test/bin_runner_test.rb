@@ -115,14 +115,14 @@ module Boson
 
       test "with non-core command finding library doesn't update index" do
         Index.expects(:find_library).returns('sweet_lib')
-        Manager.expects(:load_library).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
+        Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
         Index.expects(:update).never
         capture_stderr { start("sweet") }.should =~ /sweet/
       end
 
       test "with non-core command not finding library, does update index" do
         Index.expects(:find_library).returns(nil, 'sweet_lib').times(2)
-        Manager.expects(:load_library).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
+        Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
         Index.expects(:update).returns(true)
         capture_stderr { start("sweet") }.should =~ /sweet/
       end

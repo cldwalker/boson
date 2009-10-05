@@ -24,9 +24,8 @@ module Boson
       end
 
       test "prints error and returns false for existing library" do
-        lib = Library.new(:name=>'blah', :loaded=>true)
-        Boson.libraries << lib
-        Manager.stubs(:loader_create).returns(lib)
+        libs = create_library('blah', :loaded=>true)
+        Manager.stubs(:loader_create).returns(libs[0])
         capture_stderr { load('blah', :no_mock=>true, :verbose=>true).should == false }.should =~ /already exists/
       end
 
@@ -170,7 +169,7 @@ module Boson
       before(:each) { reset }
       test "loads currently unloaded library" do
         create_library('blah')
-        Manager.expects(:load_library).with('blah', anything)
+        Manager.expects(:load).with('blah', anything)
         Manager.reload_library('blah')
       end
 

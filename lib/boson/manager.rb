@@ -5,28 +5,28 @@ module Boson
 
   class Manager
     class <<self
-      def load(libraries, options={})
-        libraries.map {|e| load_library(e, options) }.all?
-      end
-
       # ==== Options:
       # [:verbose] Prints the status of each library as its loaded. Default is false.
-      def load_library(source, options={})
-        (@library = load_once(source, options)) ? after_load(options) : false
+      def load(libraries, options={})
+        libraries = [libraries] unless libraries.is_a?(Array)
+        libraries.map {|e|
+          (@library = load_once(e, options)) ? after_load : false
+        }.all?
       end
 
       def reload_library(source, options={})
         if (lib = Boson.library(source))
           if lib.loaded
             command_size = Boson.commands.size
-            if (result = rescue_load_action(lib.name, :reload, options) { lib.reload })
+            @options = options
+            if (result = rescue_load_action(lib.name, :reload) { lib.reload })
               after_reload(lib)
               puts "Reloaded library #{source}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
             end
             result
           else
             puts "Library hasn't been loaded yet. Loading library #{source}..." if options[:verbose]
-            load_library(source, options)
+            load(source, options)
           end
         else
           puts "Library #{source} doesn't exist." if options[:verbose]
@@ -44,28 +44,28 @@ module Boson
         ((lib = Boson.library(lib_name)) && lib.loaded) ? true : false
       end
 
-      def rescue_load_action(library, load_method, options={})
+      def rescue_load_action(library, load_method)
         yield
       rescue AppendFeaturesFalseError
       rescue LoaderError=>e
         FileLibrary.reset_file_cache(library.to_s)
-        print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}", options
+        print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}"
       rescue Exception=>e
         FileLibrary.reset_file_cache(library.to_s)
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" + "\n" +
-          e.backtrace.slice(0,3).join("\n"), options
+          e.backtrace.slice(0,3).join("\n")
       ensure
         Inspector.remove_meta_methods if Inspector.enabled
       end
 
-      def print_error_message(message, options)
-        $stderr.puts message if !options[:index] || (options[:index] && options[:verbose])
+      def print_error_message(message)
+        $stderr.puts message if !@options[:index] || (@options[:index] && @options[:verbose])
       end
 
       def load_once(source, options={})
         @options = options
-        rescue_load_action(source, :load, options) do
-          lib = loader_create(source, options)
+        rescue_load_action(source, :load) do
+          lib = loader_create(source)
           if loaded?(lib.name)
             $stderr.puts "Library #{lib.name} already exists" if options[:verbose] && !options[:dependency]
             false
@@ -92,19 +92,19 @@ module Boson
         end.compact
       end
 
-      def loader_create(source, options={})
+      def loader_create(source)
         lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or raise(LoaderError, "Library #{source} not found.")
-        lib_class[0].new(:name=>source, :options=>options, :index=>options[:index])
+        lib_class[0].new(:name=>source, :index=>@options[:index])
       end
 
-      def after_load(options)
+      def after_load
         create_commands(@library)
         add_library(@library)
-        puts "Loaded library #{@library.name}" if options[:verbose]
+        puts "Loaded library #{@library.name}" if @options[:verbose]
         (lib_dependencies[@library] || []).each do |e|
           create_commands(e)
           add_library(e)
-          puts "Loaded library dependency #{e.name}" if options[:verbose]
+          puts "Loaded library dependency #{e.name}" if @options[:verbose]
         end
         true
       end
