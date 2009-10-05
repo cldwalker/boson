@@ -1,4 +1,6 @@
 module Boson
+  class LoaderError < StandardError; end
+  class LoadingDependencyError < LoaderError; end
   class Manager
     class <<self
       def load(libraries, options={})
@@ -63,13 +65,14 @@ module Boson
       end
 
       def load_once(source, options={})
+        @options = options
         rescue_load_action(source, :load, options) do
           lib = loader_create(source, options)
           if loaded?(lib.name)
             $stderr.puts "Library #{lib.name} already exists" if options[:verbose] && !options[:dependency]
             false
           else
-            if lib.load
+            if lib.load { load_dependencies(lib, options) }
               lib
             else
               $stderr.puts "Unable to load library #{lib.name}." if !options[:dependency]
@@ -79,16 +82,28 @@ module Boson
         end
       end
 
+      def lib_dependencies
+        @lib_dependencies ||= {}
+      end
+
+      def load_dependencies(lib, options={})
+        lib_dependencies[lib] = (lib.dependencies || []).map do |e|
+          next if Manager.loaded?(e)
+          Manager.load_once(e, options.merge(:dependency=>true)) ||
+            raise(LoadingDependencyError, "Can't load dependency #{e}")
+        end.compact
+      end
+
       def loader_create(source, options={})
         lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or raise(LoaderError, "Library #{source} not found.")
-        lib_class[0].new(:name=>source, :options=>options)
+        lib_class[0].new(:name=>source, :options=>options, :index=>options[:index])
       end
 
       def after_load(options)
         create_commands(@library)
         add_library(@library)
         puts "Loaded library #{@library.name}" if options[:verbose]
-        @library.created_dependencies.each do |e|
+        (lib_dependencies[@library] || []).each do |e|
           create_commands(e)
           Manager.add_library(e)
           puts "Loaded library dependency #{e.name}" if options[:verbose]
@@ -121,7 +136,7 @@ module Boson
       def create_option_commands(lib, commands)
         option_commands = lib.command_objects(commands).select {|e| e.option_command? }
         accepted, rejected = option_commands.partition {|e| e.args(lib) || e.arg_size }
-        if lib.options[:verbose] && rejected.size > 0
+        if @options[:verbose] && rejected.size > 0
           puts "Following commands cannot have options until their arguments are configured: " +
             rejected.map {|e| e.name}.join(', ')
         end

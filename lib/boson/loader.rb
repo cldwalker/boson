@@ -1,7 +1,5 @@
 module Boson
-  class LoaderError < StandardError; end
   class AppendFeaturesFalseError < StandardError; end
-  class LoadingDependencyError < LoaderError; end
   class MethodConflictError < LoaderError; end
   class InvalidLibraryModuleError < LoaderError; end
 
@@ -10,19 +8,11 @@ module Boson
       @gems ||= []
       load_source_and_set_module
       module_callbacks if @module
-      load_dependencies
+      yield if block_given?
       (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = nil
-      @init_methods.each {|m| namespace_object.send(m) if namespace_object.respond_to?(m) } if @init_methods && !@options[:index]
+      @init_methods.each {|m| namespace_object.send(m) if namespace_object.respond_to?(m) } if @init_methods && !@index
       set_library_commands
       is_valid_library? && (@loaded = true)
-    end
-
-    def load_dependencies
-      @created_dependencies = (@dependencies || []).map do |e|
-        next if Manager.loaded?(e)
-        Manager.load_once(e, @options.merge(:dependency=>true)) ||
-          raise(LoadingDependencyError, "Can't load dependency #{e}")
-      end.compact
     end
 
     def load_source_and_set_module; end

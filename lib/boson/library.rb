@@ -11,11 +11,10 @@ module Boson
 
     ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
-    attr_reader :created_dependencies, :except, :no_alias_creation, :options, :new_module, :new_commands
+    attr_reader :except, :no_alias_creation, :new_module, :new_commands
     attr_writer :namespace
     def initialize(hash)
       @name = set_name hash.delete(:name)
-      @options = hash.delete(:options) || {}
       @loaded = false
       repo = set_repo
       @repo_dir = repo.dir
