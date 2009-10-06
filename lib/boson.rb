@@ -62,6 +62,11 @@ module Boson
   def invoke(*args, &block)
     main_object.send(*args, &block)
   end
+
+  # Boolean indicating if the main object can invoke the given method/command.
+  def can_invoke?(meth)
+    Boson.main_object.respond_to? meth
+  end
 end
 
 Boson.main_object = self

@@ -25,7 +25,7 @@ module Boson
           execute_command
         end
       rescue Exception
-        message = ($!.is_a?(NameError) && !@command.nil?) ?
+        message = (@command && !Boson.can_invoke?(@command)) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
         message += "\nActual error: #{$!}\n" + $!.backtrace.inspect if @options && @options[:verbose]
         $stderr.puts message
@@ -44,8 +44,8 @@ module Boson
       end
 
       def load_command_by_index
-        Index.update(:verbose=>@options[:verbose]) if !@options[:index] && command_defined?(@command) && !@options[:help]
-        if !command_defined?(@command) && ((lib = Index.find_library(@command)) ||
+        Index.update(:verbose=>@options[:verbose]) if !@options[:index] && Boson.can_invoke?(@command) && !@options[:help]
+        if !Boson.can_invoke?(@command) && ((lib = Index.find_library(@command)) ||
           (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
           Manager.load lib, load_options
         end
@@ -67,10 +67,6 @@ module Boson
 
       def print_command_help
         Boson.invoke(:usage, @command, :verbose=>@options[:verbose])
-      end
-
-      def command_defined?(command)
-        Boson.main_object.respond_to? command
       end
 
       def parse_args(args)

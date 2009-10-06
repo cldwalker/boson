@@ -83,7 +83,7 @@ module Boson
     end
 
     def check_for_method_conflicts
-      conflicts = @namespace ? (Boson.main_object.respond_to?(@namespace) ? [@namespace] : []) :
+      conflicts = @namespace ? (Boson.can_invoke?(@namespace) ? [@namespace] : []) :
         Util.common_instance_methods(@module, Boson::Universe)
       unless conflicts.empty?
         raise MethodConflictError,"The following commands conflict with existing commands: #{conflicts.join(', ')}"

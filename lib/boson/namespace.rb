@@ -39,7 +39,7 @@ module Boson
     def object_delegate?; false; end
 
     def method_missing(method, *args, &block)
-      Boson.main_object.respond_to?(method) ? Boson.invoke(method, *args, &block) : super
+      Boson.can_invoke?(method) ? Boson.invoke(method, *args, &block) : super
     end
   end
 end
