@@ -124,9 +124,7 @@ module Boson
       end
 
       def before_create_commands(lib)
-        if lib.is_a?(FileLibrary) && lib.module
-          Inspector.add_scraped_data(lib.module, lib.commands_hash, lib.library_file)
-        end
+        lib.is_a?(FileLibrary) && lib.module && Inspector.add_method_data_to_library(lib)
       end
 
       def create_commands(lib, commands=lib.commands)

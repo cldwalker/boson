@@ -1,11 +1,12 @@
 module Boson
-  # Handles fetching method data with other inspectors (CommentInspector, ArgumentInspector,
-  # MethodInspector) and passing this collected data to FileLibrary objects. Method data
-  # is fetched by turning on method_added while a library file is loaded.
+  # Scrapes and processes method metadata with the inspectors (MethodInspector, CommentInspector
+  # and ArgumentInspector) and hands off the usable data to FileLibrary objects.
   module Inspector
     extend self
     attr_reader :enabled
 
+    # Enable scraping by overridding method_added to snoop on a library while it's
+    # loading its methods.
     def enable
       @enabled = true
       body = MethodInspector::METHODS.map {|e|
@@ -24,6 +25,7 @@ module Boson
     ::Module.module_eval body
     end
 
+    # Disable scraping method data.
     def disable
       ::Module.module_eval %[
         Boson::MethodInspector::METHODS.each {|e| remove_method e }
@@ -32,10 +34,11 @@ module Boson
       @enabled = false
     end
 
-    def add_scraped_data(mod, commands_hash, library_file)
-      @commands_hash = commands_hash
-      @library_file = library_file
-      MethodInspector.current_module = mod
+    # Adds method data scraped for the library's module to the library's commands.
+    def add_method_data_to_library(library)
+      @commands_hash = library.commands_hash
+      @library_file = library.library_file
+      MethodInspector.current_module = library.module
       @store = MethodInspector.store
       add_method_scraped_data
       add_comment_scraped_data

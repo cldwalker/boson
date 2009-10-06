@@ -1,4 +1,19 @@
 module Boson
+  # Allows for defining method metadata with new_method_added and the
+  # following Module methods:
+  # * desc: Defines a description for a method/command
+  # * options: Defines an OptionParser object for a method's options.
+  # * render_options: Defines an OptionParser object for a method's rendering options.
+  #
+  # These method calls must come immediately before a method i.e.:
+  #
+  #     desc "Does foo"
+  #     options :verbose=>:boolean
+  #     def foo(options={})
+  #
+  # This module also allows for defining method metadata as comments. Although the actual
+  # scraping of comments is handled by CommentInspector, MethodInspector gather's the method
+  # location it needs with with find_method_locations().
   module MethodInspector
     extend self
     attr_accessor :current_module
@@ -6,16 +21,7 @@ module Boson
     @mod_store ||= {}
     METHODS = [:desc, :options, :render_options]
 
-    # Hash of a module's method attributes i.e. descriptions, options by method and then attribute
-    def store(mod=@current_module)
-      @mod_store[mod]
-    end
-
-    def current_module=(mod)
-      @current_module = mod
-      @mod_store[mod] ||= {}
-    end
-  
+    # The method_added used while scraping method metadata.
     def new_method_added(mod, meth)
       return unless mod.name[/^Boson::Commands::/]
       self.current_module = mod
@@ -41,6 +47,7 @@ module Boson
       end
     end
 
+    # Scrapes a method's arguments using ArgumentInspector.
     def scrape_arguments(meth)
       store[:method_args] ||= {}
 
@@ -50,6 +57,25 @@ module Boson
       if (val = ArgumentInspector.scrape_with_eval(meth, @current_module, o))
         store[:method_args][meth.to_s] = val
       end
+    end
+
+    # Returns an array of the file and line number at which a method starts using
+    # a caller array. Necessary information for CommentInspector to function.
+    def find_method_locations(stack)
+      if (line = stack.find {|e| e =~ /in `load_source'/ })
+        (line =~ /^(.*):(\d+)/) ? [$1, $2.to_i] : nil
+      end
+    end
+
+    #:stopdoc:
+    # Hash of a module's method attributes i.e. descriptions, options by method and then attribute
+    def store(mod=@current_module)
+      @mod_store[mod]
+    end
+
+    def current_module=(mod)
+      @current_module = mod
+      @mod_store[mod] ||= {}
     end
 
     def has_inspector_method?(meth, inspector)
@@ -63,12 +89,6 @@ module Boson
         (store[inspector_method] ||= {})[meth] = options
       end
     end
-
-    # returns file and line no of method given caller array
-    def find_method_locations(stack)
-      if (line = stack.find {|e| e =~ /in `load_source'/ })
-        (line =~ /^(.*):(\d+)/) ? [$1, $2.to_i] : nil
-      end
-    end
+    #:startdoc:
   end
 end
