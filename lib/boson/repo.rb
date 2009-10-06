@@ -15,7 +15,7 @@ module Boson
     end
 
     def commands_dir
-      self.class.commands_dir(@dir)
+      @commands_dir ||= FileUtils.mkdir_p self.class.commands_dir(@dir)
     end
 
     # ==== Valid config keys:

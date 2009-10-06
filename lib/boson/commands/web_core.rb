@@ -17,11 +17,11 @@ module Boson::Commands::WebCore #:nodoc:
 
   def install(url, options={})
     options[:name] ||= strip_name_from_url(url)
-    return "Please give a library name with this url." unless options[:name]
+    return puts("Please give a library name with this url.") unless options[:name]
     filename = File.join Boson.repo.commands_dir, "#{options[:name]}.rb"
-    return "Library name #{options[:name]} already exists. Try a different name." if File.exists?(filename) && !options[:force]
+    return puts("Library name #{options[:name]} already exists. Try a different name.") if File.exists?(filename) && !options[:force]
     File.open(filename, 'w') {|f| f.write get(url) }
-    "Saved to #{filename}."
+    puts "Saved to #{filename}."
   end
 
   # non-mac users should override this with the launchy gem
