@@ -5,18 +5,18 @@ module Boson
     test "non commands module can't set anything" do
       eval "module Blah; end"
       MethodInspector.current_module = Blah
-      Inspector.add_meta_methods
+      Inspector.enable
       Blah.module_eval("desc 'test'; def test; end; options :a=>1; def test2; end")
-      Inspector.remove_meta_methods
+      Inspector.disable
       MethodInspector.store[:desc].empty?.should == true
       MethodInspector.store[:options].empty?.should == true
     end
 
     context "commands module with" do
       def parse(string)
-        Inspector.add_meta_methods
+        Inspector.enable
         ::Boson::Commands::Zzz.module_eval(string)
-        Inspector.remove_meta_methods
+        Inspector.disable
         MethodInspector.store
       end
 

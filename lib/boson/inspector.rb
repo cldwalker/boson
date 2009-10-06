@@ -1,10 +1,12 @@
 module Boson
-  # Handles getting and setting method metadata acquired by inspectors for libraries.
+  # Handles fetching method data with other inspectors (CommentInspector, ArgumentInspector,
+  # MethodInspector) and passing this collected data to FileLibrary objects. Method data
+  # is fetched by turning on method_added while a library file is loaded.
   module Inspector
     extend self
     attr_reader :enabled
 
-    def add_meta_methods
+    def enable
       @enabled = true
       body = MethodInspector::METHODS.map {|e|
         %[def #{e}(val)
@@ -22,7 +24,7 @@ module Boson
     ::Module.module_eval body
     end
 
-    def remove_meta_methods
+    def disable
       ::Module.module_eval %[
         Boson::MethodInspector::METHODS.each {|e| remove_method e }
         alias_method :method_added, :_old_method_added
@@ -39,6 +41,7 @@ module Boson
       add_comment_scraped_data
     end
 
+    #:stopdoc:
     def add_method_scraped_data
       (MethodInspector::METHODS + [:method_args]).each do |e|
         key = command_key(e)
@@ -69,5 +72,6 @@ module Boson
     def no_command_config_for(cmd, attribute)
       !@commands_hash[cmd] || (@commands_hash[cmd] && !@commands_hash[cmd].key?(attribute))
     end
+    #:startdoc:
   end
 end

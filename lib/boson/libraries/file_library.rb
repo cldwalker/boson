@@ -42,9 +42,9 @@ module Boson
 
     def load_source(reload=false)
       library_string = self.class.read_library_file(library_file, reload)
-      Inspector.add_meta_methods
+      Inspector.enable
       Commands.module_eval(library_string, library_file)
-      Inspector.remove_meta_methods
+      Inspector.disable
     end
 
     def load_source_and_set_module

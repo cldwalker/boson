@@ -64,7 +64,7 @@ module Boson
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" + "\n" +
           e.backtrace.slice(0,3).join("\n")
       ensure
-        Inspector.remove_meta_methods if Inspector.enabled
+        Inspector.disable if Inspector.enabled
       end
 
       def print_error_message(message)

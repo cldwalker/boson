@@ -24,9 +24,9 @@ module Boson
       def args_from(string)
         # methods need options to have their args parsed with ArgumentInspector
         string.gsub!(/(def blah)/, 'options :a=>1; \1')
-        Inspector.add_meta_methods
+        Inspector.enable
         ::Boson::Commands::Aaa.module_eval(string)
-        Inspector.remove_meta_methods
+        Inspector.disable
         MethodInspector.store[:method_args]['blah']
       end
 
