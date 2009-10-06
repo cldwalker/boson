@@ -67,6 +67,7 @@ module Boson
       if (commands = config.delete(:commands))
         if commands.is_a?(Array)
           @commands += commands
+          @pre_defined_commands = true
         elsif commands.is_a?(Hash)
           @commands += commands.keys
           @commands_hash = Util.recursive_hash_merge commands, @commands_hash

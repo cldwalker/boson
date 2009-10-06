@@ -93,8 +93,8 @@ module Boson
     def set_library_commands
       aliases = @commands_hash.select {|k,v| @commands.include?(k) }.map {|k,v| v[:alias]}.compact
       @commands -= aliases
-      @commands.delete(@namespace) if @namespace && !namespace_object.object_delegate?
-      @commands += Boson.invoke(@namespace).boson_commands if @namespace
+      @commands.delete(@namespace) if @namespace
+      @commands += Boson.invoke(@namespace).boson_commands if @namespace && !@pre_defined_commands
       @commands -= @except if @except
       @commands.uniq!
     end
