@@ -1,134 +1,133 @@
 == Description
-A command manager that could fundamentally change how you use irb or your ruby console/shell.
-For my irb libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
+A command/task framework similar to rake and thor that opens your ruby universe to the commandline
+and irb. For my libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
 
 == Features
-* Manages libraries and commands. Libraries can be as simple as a group of snippets to a set of
-  methods wrapped around any gem.
-* Commands are just methods that are extended by the default irb object, main.
-* Commands can be configured to have aliases.
-* Libraries can be configured to be loaded/unloaded at startup.
-* Libraries can be loaded within irb.
+* Commands are just methods that are extended by the toplevel object, main.
+* Commands are accessible from the commandline or irb.
+* Command libraries can be written as plain ruby which allows for easy testing and use outside of boson.
+* Commands can be full-blown commandline apps thanks to automatic views from hirb and powerful
+  options similar to thor's.
+* Command libraries are social as a user can install them from a url and then customize command
+  names and options without changing the original library.
+* Namespaces are optional and when used are methods which allows for method_missing magic.
 
-== Setup
-* Define a base directory for your irb commands and config, defaults to ~/.irb.
-* Define a config file in :base_directory/boson.yml.
-* Drop your libraries under :base_directory/libraries. For quick snippets drop them under
-  :base_directory/libraries.rb as methods.
+== Irb Example
 
+To use in irb, drop this in your irbrc:
+    require 'boson'
+    Boson.start :verbose=>true
+
+Let's start up irb:
+
+  bash> irb
+  Loaded library core
+  Loaded library web_core
+
+  # List default libraries
+  >> libraries
+  +----------+----------+------+--------------+
+  | name     | commands | gems | library_type |
+  +----------+----------+------+--------------+
+  | core     | 6        |      | module       |
+  | web_core | 3        |      | module       |
+  +----------+----------+------+--------------+
+  2 rows in set
+
+  # List default commands
+  >> commands
+  +--------------+----------+-------+--------------------------------------------+-----------------------------------------------------------------------------+
+  | full_name    | lib      | alias | usage                                      | description                                                                 |
+  +--------------+----------+-------+--------------------------------------------+-----------------------------------------------------------------------------+
+  | usage        | core     |       | [name][--verbose]                          | Print a command's usage                                                     |
+  | libraries    | core     |       | [query=''][--index] [--query_fields=A,B,C] | List or search libraries                                                    |
+  | render       | core     |       | [object] [options={}]                      | Render any object using Hirb                                                |
+  | load_library | core     |       | [library][--verbose] [--reload]            | Load/reload a library                                                       |
+  | commands     | core     |       | [query=''][--index] [--query_fields=A,B,C] | List or search commands                                                     |
+  | menu         | core     |       | [output] [options={}] [&block]             | Provide a menu to multi-select elements from a given array                  |
+  | get          | web_core |       | [url]                                      | Gets the body of a url                                                      |
+  | install      | web_core |       | [url][--force] [--name=NAME]               | Installs a library by url. Library should then be loaded with load_library. |
+  | browser      | web_core |       | [*urls]                                    | Opens urls in a browser                                                     |
+  +--------------+----------+-------+--------------------------------------------+-----------------------------------------------------------------------------+
+  9 rows in set
+
+  # Boson commands can behave like shell commands:
+
+  # Basic help
+  >> commands '-h'
+  commands [query=''][--index] [--query_fields=A,B,C]
+
+  # Search the lib column for web
+  >> commands 'web -q=lib' # or 'web --query_fields=lib'
+  +-----------+----------+-------+------------------------------+-----------------------------------------------------------------------------+
+  | full_name | lib      | alias | usage                        | description                                                                 |
+  +-----------+----------+-------+------------------------------+-----------------------------------------------------------------------------+
+  | get       | web_core |       | [url]                        | Gets the body of a url                                                      |
+  | install   | web_core |       | [url][--force] [--name=NAME] | Installs a library by url. Library should then be loaded with load_library. |
+  | browser   | web_core |       | [*urls]                      | Opens urls in a browser                                                     |
+  +-----------+----------+-------+------------------------------+-----------------------------------------------------------------------------+
+  3 rows in set
+
+== Commandline Example
+
+   # Just like in irb
+    bash> boson libraries
+    +----------+----------+------+--------------+
+    | name     | commands | gems | library_type |
+    +----------+----------+------+--------------+
+    | core     | 6        |      | module       |
+    | web_core | 3        |      | module       |
+    +----------+----------+------+--------------+
+    2 rows in set
+
+    # Let's install another library
+    bash> boson install http://github.com/cldwalker/irbfiles/raw/master/boson/commands/irb_core.rb
+    Saved to /Users/bozo/.boson/commands/irb_core.rb
+
+    # Let's start irb ...
+    bash> irb
+
+    >> commands
+    +-------------------------------+----------+------------+--------------------------------------------+-----------------------------------------------------------------------------+
+    | full_name                     | lib      | alias      | usage                                      | description                                                                 |
+    +-------------------------------+----------+------------+--------------------------------------------+-----------------------------------------------------------------------------+
+    | usage                         | core     |            | [name][--verbose]                          | Print a command's usage                                                     |
+    | libraries                     | core     |            | [query=''][--index] [--query_fields=name]  | List or search libraries                                                    |
+    | render                        | core     |            | [object] [options={}]                      | Render any object using Hirb                                                |
+    | load_library                  | core     |            | [library][--verbose] [--reload]            | Load/reload a library                                                       |
+    | commands                      | core     |            | [query=''][--index] [--query_fields=A,B,C] | List or search commands                                                     |
+    | menu                          | core     |            | [output] [options={}] [&block]             | Provide a menu to multi-select elements from a given array                  |
+    | get                           | web_core |            | [url]                                      | Gets the body of a url                                                      |
+    | install                       | web_core |            | [url][--force] [--name=NAME]               | Installs a library by url. Library should then be loaded with load_library. |
+    | browser                       | web_core |            | [*urls]                                    | Opens urls in a browser                                                     |
+    | irb_pop_workspace             | irb_core | popws      |                                            | Pops current workspace and changes to next workspace in context             |
+    | irb_require                   | irb_core |            |                                            | Evals file like require line by line                                        |
+    | public                        | irb_core |            |                                            | Works same as module#public                                                 |
+    | private                       | irb_core |            |                                            | Works same as module#private                                                |
+    | irb                           | irb_core |            |                                            | Starts a new workspace/subsession                                           |
+    | irb_push_workspace            | irb_core | pushws     |                                            | Creates a workspace for given object and pushes it into the current context |
+    | irb_load                      | irb_core |            |                                            | Evals file like load line by line                                           |
+    | irb_change_workspace          | irb_core | cws        |                                            | Changes current workspace to given object                                   |
+    | irb_source                    | irb_core | source     |                                            | Evals full path file line by line                                           |
+    | irb_jobs                      | irb_core | jobs       |                                            | List workspaces/subsessions                                                 |
+    | irb_fg                        | irb_core | fg         |                                            | Switch to a workspace/subsession                                            |
+    | irb_help                      | irb_core | help       |                                            | Ri based help                                                               |
+    | irb_kill                      | irb_core | kill       |                                            | Kills a given workspace/subsession                                          |
+    | include                       | irb_core |            |                                            | Works same as module#include                                                |
+    | irb_exit                      | irb_core | exit       |                                            | Kills the current workspace/subsession                                      |
+    | irb_workspaces                | irb_core | workspaces |                                            | Array of workspaces for current context                                     |
+    | irb_context                   | irb_core | conf       |                                            | Displays configuration for current workspace/subsession                     |
+    | install_alias_method          | irb_core |            |                                            | Aliases given method, allows lazy loading of dependent file                 |
+    | irb_current_working_workspace | irb_core | cwws       |                                            | Prints current workspace                                                    |
+    +-------------------------------+----------+------------+--------------------------------------------+-----------------------------------------------------------------------------+
+    28 rows in set
+
+    # Sweet! Now we have a list and description of commands that come with irb.
+
+== Creating commands
 TODO: Explain library format
 
-
-== Examples
-By default you get commands for listing/searching commands and libraries:
-
-  irb >> libraries
-  +---------------------------+--------+----------+--------------------------------------------------------------------------+
-  | name                      | loaded | commands | gems                                                                     |
-  +---------------------------+--------+----------+--------------------------------------------------------------------------+
-  | ansi                      | false  | 0        |                                                                          |
-  | browser                   | false  | 0        |                                                                          |
-  | core                      | true   | 2        | core                                                                     |
-  | delicious                 | false  | 0        |                                                                          |
-  | github                    | false  | 0        |                                                                          |
-  | google_reader             | false  | 0        |                                                                          |
-  | highline                  | false  | 0        |                                                                          |
-  | hirb                      | true   | 0        | hirb                                                                     |
-  | httparty                  | false  | 0        |                                                                          |
-  | irb_features              | true   | 6        | duration                                                                 |
-  | irb_history               | true   | 3        |                                                                          |
-  | misc                      | true   | 5        |                                                                          |
-  | pstore                    | false  | 0        |                                                                          |
-  | rake                      | false  | 0        |                                                                          |
-  | rest_client               | false  | 0        |                                                                          |
-  | tree                      | true   | 2        |                                                                          |
-  | utility_belt              | true   | 9        | utility_belt,mime-types,Platform,xml-simple,builder,aws-s3,activesupport |
-  | wirble                    | true   | 0        | wirble                                                                   |
-  | pp                        | false  | 0        |                                                                          |
-  | local_gem                 | true   | 3        | local_gem                                                                |
-  | what_methods              | false  | 0        |                                                                          |
-  | irb/extend_command_bundle | true   | 19       |                                                                          |
-  | and_and                   | false  | 0        |                                                                          |
-  | boson/commands            | true   | 3        |                                                                          |
-  | boson/object_commands     | true   | 0        |                                                                          |
-  | method_lister             | true   | 6        | matthew-method_lister                                                    |
-  | every                     | true   | 0        | mynyml-every                                                             |
-  +---------------------------+--------+----------+--------------------------------------------------------------------------+
-  27 rows in set
-  => nil
-
-  >> commands
-  +-------------------------------+---------------------------+------------+-----------------------------------------------------------------------------+
-  | name                          | lib                       | alias      | description                                                                 |
-  +-------------------------------+---------------------------+------------+-----------------------------------------------------------------------------+
-  | commands                      | boson/commands            | com        |                                                                             |
-  | libraries                     | boson/commands            | lib        |                                                                             |
-  | load_library                  | boson/commands            | ll         |                                                                             |
-  | irb_pop_workspace             | irb/extend_command_bundle | popws      | pops current workspace and changes to next workspace in context             |
-  | irb_source                    | irb/extend_command_bundle | source     | evals full path file line by line                                           |
-  | irb_help                      | irb/extend_command_bundle | help       | ri based help                                                               |
-  | irb_context                   | irb/extend_command_bundle | conf       | displays configuration for current workspace/subsession                     |
-  | irb_load                      | irb/extend_command_bundle |            | evals file like load line by line                                           |
-  | irb_jobs                      | irb/extend_command_bundle | jobs       | list workspaces/subsessions                                                 |
-  | irb_workspaces                | irb/extend_command_bundle | workspaces | array of workspaces for current context                                     |
-  | irb                           | irb/extend_command_bundle |            | starts a new workspace/subsession                                           |
-  | public                        | irb/extend_command_bundle |            | works same as Module#public                                                 |
-  | irb_exit                      | irb/extend_command_bundle | exit       | kills the current workspace/subsession                                      |
-  | irb_fg                        | irb/extend_command_bundle | fg         | switch to a workspace/subsession                                            |
-  | irb_require                   | irb/extend_command_bundle |            | evals file like require line by line                                        |
-  | irb_kill                      | irb/extend_command_bundle | kill       | kills a given workspace/subsession                                          |
-  | include                       | irb/extend_command_bundle |            | works same as Module#include                                                |
-  | install_alias_method          | irb/extend_command_bundle |            | aliases given method, allows lazy loading of dependent file                 |
-  | irb_current_working_workspace | irb/extend_command_bundle | cwws       | prints current workspace                                                    |
-  | irb_change_workspace          | irb/extend_command_bundle | cws        | changes current workspace to given object                                   |
-  | private                       | irb/extend_command_bundle |            | works same as Module#private                                                |
-  | irb_push_workspace            | irb/extend_command_bundle | pushws     | creates a workspace for given object and pushes it into the current context |
-  | duration                      | irb_features              |            |                                                                             |
-  | history                       | irb_features              |            |                                                                             |
-  | irb_options                   | irb_features              |            |                                                                             |
-  | railsrc                       | irb_features              |            |                                                                             |
-  | aliases                       | irb_features              |            |                                                                             |
-  | separate_rails_history        | irb_features              |            |                                                                             |
-  | local_gem                     | local_gem                 |            |                                                                             |
-  | local_require                 | local_gem                 |            |                                                                             |
-  | metaclass                     | core                      |            |                                                                             |
-  | local_methods                 | core                      |            |                                                                             |
-  | q                             | utility_belt              |            |                                                                             |
-  | quiet                         | utility_belt              |            |                                                                             |
-  | grep_methods                  | utility_belt              |            |                                                                             |
-  | not                           | utility_belt              |            |                                                                             |
-  | v                             | utility_belt              |            |                                                                             |
-  | grep_classes                  | utility_belt              |            |                                                                             |
-  | verbose                       | utility_belt              |            |                                                                             |
-  | clipboard_copy                | utility_belt              | pbc        |                                                                             |
-  | clipboard_paste               | utility_belt              | pbp        |                                                                             |
-  | print_history                 | irb_history               | ph         |                                                                             |
-  | edit_history                  | irb_history               | eh         |                                                                             |
-  | eval_history                  | irb_history               |            |                                                                             |
-  | nested_tree                   | tree                      | ntree      |                                                                             |
-  | inheritance_tree              | tree                      | itree      |                                                                             |
-  | toggle_hirb                   | hirb                      | th         |                                                                             |
-  | table                         | hirb                      |            |                                                                             |
-  | view                          | hirb                      |            |                                                                             |
-  | any_const_get                 | misc                      |            |                                                                             |
-  | detect                        | misc                      |            |                                                                             |
-  | backtick                      | misc                      |            |                                                                             |
-  | reload                        | misc                      |            |                                                                             |
-  | undetected_methods            | misc                      |            |                                                                             |
-  | mls                           | method_lister             |            |                                                                             |
-  | grep                          | method_lister             |            |                                                                             |
-  | ls                            | method_lister             |            |                                                                             |
-  | mgrep                         | method_lister             |            |                                                                             |
-  | which                         | method_lister             |            |                                                                             |
-  | mwhich                        | method_lister             |            |                                                                             |
-  +-------------------------------+---------------------------+------------+-----------------------------------------------------------------------------+
-  60 rows in set
-
 == Todo
-* Refactor + tests!
-* better method conflict resolution
-* gemify
-* Install commands by url
+* More docs
+* More tests
 * Add tags to libraries + commands
-* binary to wrap around irb to easily load groups of libraries
-* allow binary to execute any command from cmdline
