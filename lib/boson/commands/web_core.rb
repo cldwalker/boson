@@ -1,4 +1,4 @@
-module Boson::Commands::WebCore
+module Boson::Commands::WebCore #:nodoc:
   def self.config
     descriptions = {
       :install=>"Installs a library by url. Library should then be loaded with load_library.",

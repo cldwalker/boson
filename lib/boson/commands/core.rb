@@ -1,4 +1,4 @@
-module Boson::Commands::Core
+module Boson::Commands::Core #:nodoc:
   def self.config
     command_attributes = Boson::Command::ATTRIBUTES + [:usage, :full_name, :render_options]
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]

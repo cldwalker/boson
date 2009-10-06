@@ -1,9 +1,13 @@
 module Boson
+  # A command maps the functionality of a ruby method with the added benefits of options, render_options, etc.
   class Command
+    # Creates a command given its name and a library.
     def self.create(name, library)
       new (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name, :namespace=>library.namespace})
     end
 
+    # Finds a command, namespaced or not and aliased or not. If found returns the
+    # command object, otherwise returns nil.
     def self.find(command, commands=Boson.commands)
       command, subcommand = command.to_s.split('.', 2)
       is_namespace_command = lambda {|current_command|
@@ -16,6 +20,8 @@ module Boson
 
     ATTRIBUTES = [:name, :lib, :alias, :description, :options, :args]
     attr_accessor *(ATTRIBUTES + [:render_options, :namespace])
+    # A hash of attributes which map to instance variables and values. :name
+    # and :lib are required keys.
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
@@ -35,10 +41,12 @@ module Boson
       end
     end
 
+    # Library object a command belongs to.
     def library
       @library ||= Boson.library(@lib)
     end
 
+    # Array of array args with optional defaults. Scraped with ArgumentInspector.
     def args(lib=library)
       @args ||= begin
         if lib && File.exists?(lib.library_file || '')
@@ -49,31 +57,17 @@ module Boson
       end
     end
 
-    def arg_size
-      @arg_size = args ? args.size : nil unless instance_variable_defined?("@arg_size")
-      @arg_size
-    end
-
-    def file_parsed_args?
-      @file_parsed_args
-    end
-
+    # Option parser for command as defined by @options.
     def option_parser
       @option_parser ||= (@options ? OptionParser.new(@options) : nil)
     end
 
+    # Help string for options if a command has it.
     def option_help
       @options ? option_parser.to_s : ''
     end
 
-    def has_splat_args?
-      @args && @args.any? {|e| e[0][/^\*/] }
-    end
-
-    def option_command?
-      options || render_options
-    end
-
+    # Usage string for command, created from options and args.
     def usage
       return '' if options.nil? && args.nil?
       usage_args = args && @options ? args[0..-2] : args
@@ -83,8 +77,28 @@ module Boson
       str + option_help
     end
 
+    # Full name is only different than name if a command has a namespace.
+    # The full name should be what you would type to execute the command.
     def full_name
       @namespace ? "#{@namespace}.#{@name}" : @name
+    end
+
+    #:stopdoc:
+    def has_splat_args?
+      @args && @args.any? {|e| e[0][/^\*/] }
+    end
+
+    def option_command?
+      options || render_options
+    end
+
+    def arg_size
+      @arg_size = args ? args.size : nil unless instance_variable_defined?("@arg_size")
+      @arg_size
+    end
+
+    def file_parsed_args?
+      @file_parsed_args
     end
 
     def marshal_dump
@@ -98,5 +112,6 @@ module Boson
     def marshal_load(ary)
       @name, @alias, @lib, @description, @options, @render_options, @args = ary
     end
+    #:startdoc:
   end
 end
