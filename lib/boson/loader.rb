@@ -2,7 +2,11 @@ module Boson
   # Raised if a library has a method which conflicts with existing methods in Boson.main_object.
   class MethodConflictError < LoaderError; end
 
+  # This module is mixed into Library to give it load() and reload() functionality.
+  # When creating your own Library subclass, you should override load_source_and_set_module and
+  # reload_source_and_set_module. You can override other methods in this module as needed.
   module Loader
+    # Loads a library and its dependencies and returns true if library loads correctly.
     def load
       @gems ||= []
       load_source_and_set_module
@@ -11,11 +15,32 @@ module Boson
       (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = nil
       @init_methods.each {|m| namespace_object.send(m) if namespace_object.respond_to?(m) } if @init_methods && !@index
       set_library_commands
-      is_valid_library? && (@loaded = true)
+      loaded_correctly? && (@loaded = true)
     end
 
+    # Load the source and set instance variables necessary to make a library valid i.e. @module.
     def load_source_and_set_module; end
 
+    # Boolean which indicates if library loaded correctly.
+    def loaded_correctly?
+      !!@module
+    end
+
+    # Reloads a library from its source and adds new commands.
+    def reload
+      original_commands = @commands
+      reload_source_and_set_module
+      detect_additions { load_module_commands } if @new_module
+      @new_commands = @commands - original_commands
+      true
+    end
+
+    # Same as load_source_and_set_module except it reloads.
+    def reload_source_and_set_module
+      raise LoaderError, "Reload not implemented"
+    end
+
+    #:stopdoc:
     def module_callbacks
       set_config(@module.config) if @module.respond_to?(:config)
       if @module.respond_to?(:append_features)
@@ -33,22 +58,6 @@ module Boson
         $stderr.puts "#{e.message}. Attempting load into the namespace #{@namespace}..."
         initialize_library_module
       end
-    end
-
-    def is_valid_library?
-      !!@module
-    end
-
-    def reload
-      original_commands = @commands
-      reload_source_and_set_module
-      detect_additions { load_module_commands } if @new_module
-      @new_commands = @commands - original_commands
-      true
-    end
-
-    def reload_source_and_set_module
-      raise LoaderError, "Reload not implemented"
     end
 
     def detect_additions(options={}, &block)
@@ -90,5 +99,6 @@ module Boson
       @commands += Boson.invoke(@namespace).boson_commands if @namespace
       @commands -= @except if @except
     end
+    #:startdoc:
   end
 end

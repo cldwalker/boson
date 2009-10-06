@@ -1,5 +1,9 @@
 module Boson
+  # This library loads a file in the commands subdirectory of a Boson::Repo. This library looks for files
+  # in repositories in the order given by Boson.repos.
+  # TODO: explain file format, modules, inspectors
   class FileLibrary < Library
+    #:stopdoc:
     def self.library_file(library, dir)
       File.join(Repo.commands_dir(dir), library + ".rb")
     end
@@ -67,5 +71,6 @@ module Boson
       end
       lib_module
     end
+    #:startdoc:
   end
 end
