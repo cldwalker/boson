@@ -11,13 +11,6 @@ module Boson
       before(:all) { reset }
       before(:each) { Boson::ReplRunner.instance_eval("@initialized = false") }
 
-      test "loads default irb library when irb exists" do
-        eval %[module ::IRB; module ExtendCommandBundle; end; end]
-        Manager.expects(:load).with {|*args| args[0].include?(Boson::Commands::IrbCore) }
-        start
-        IRB.send :remove_const, "ExtendCommandBundle"
-      end
-
       test "loads default libraries and libraries in :defaults config" do
         defaults = Boson::Runner.default_libraries + ['yo']
         with_config(:defaults=>['yo']) do

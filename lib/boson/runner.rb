@@ -20,7 +20,7 @@ module Boson
       end
 
       def default_libraries
-        [Boson::Commands::Core, Boson::Commands::WebCore, Boson::Commands::IrbCore]
+        [Boson::Commands::Core, Boson::Commands::WebCore]
       end
 
       def detected_libraries
