@@ -68,6 +68,7 @@ module Boson
         if commands.is_a?(Array)
           @commands += commands
         elsif commands.is_a?(Hash)
+          @commands += commands.keys
           @commands_hash = Util.recursive_hash_merge commands, @commands_hash
         end
       end
