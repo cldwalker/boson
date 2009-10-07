@@ -20,7 +20,7 @@ module Boson::ArgumentInspector
   #   def meth2(*args) -> [['*args']]
   def scrape_with_eval(meth, klass, object)
     unless %w[initialize].include?(meth.to_s)
-      return if class << object; private_instance_methods(true) end.include?(meth.to_s)
+      return if class << object; private_instance_methods(true).map {|e| e.to_s } end.include?(meth.to_s)
     end
     params, values, arity, num_args = trace_method_args(meth, klass, object)
     return if local_variables == params # nothing new found

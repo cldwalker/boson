@@ -13,7 +13,7 @@ module Boson
     end
 
     def self.create(name, library)
-      if library.object_namespace && library.module.instance_methods.include?(name)
+      if library.object_namespace && library.module.instance_methods.map {|e| e.to_s}.include?(name)
         library.include_in_universe
         create_object_namespace(name, library)
       else
@@ -33,7 +33,7 @@ module Boson
     end
 
     def boson_commands
-      @library.module.instance_methods
+      @library.module.instance_methods.map {|e| e.to_s }
     end
 
     def object_delegate?; false; end

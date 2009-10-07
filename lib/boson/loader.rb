@@ -64,7 +64,7 @@ module Boson
       options[:object_methods] = @object_methods if !@object_methods.nil?
       detected = Util.detect(options, &block)
       @gems += detected[:gems] if detected[:gems]
-      @commands += detected[:methods]
+      @commands += detected[:methods].map {|e| e.to_s }
       detected
     end
 
