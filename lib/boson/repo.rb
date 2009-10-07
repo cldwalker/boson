@@ -11,11 +11,11 @@ module Boson
     end
 
     def config_dir
-      @config_dir ||= FileUtils.mkdir_p File.join(dir, 'config')
+      @config_dir ||= FileUtils.mkdir_p("#{dir}/config") && "#{dir}/config"
     end
 
     def commands_dir
-      @commands_dir ||= FileUtils.mkdir_p self.class.commands_dir(@dir)
+      @commands_dir ||= (cdir = self.class.commands_dir(@dir)) && FileUtils.mkdir_p(cdir) && cdir
     end
 
     # ==== Valid config keys:
