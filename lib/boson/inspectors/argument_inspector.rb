@@ -40,9 +40,9 @@ module Boson::ArgumentInspector
         [a << ["*#{x}"], i+1]
       else
         if arity < 0 && i >= arity.abs - 1
-          [a << [x, values[i]], i + 1]
+          [a << [x.to_s, values[i]], i + 1]
         else
-          [a << [x], i+1]
+          [a << [x.to_s], i+1]
         end
       end
     end.first
