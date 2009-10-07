@@ -3,7 +3,7 @@ module Boson
   class IndifferentAccessHash < ::Hash
     def initialize(hash)
       super()
-      update hash.each {|k,v| hash[convert_key(k)] = hash.delete(k) }
+      hash.each {|k,v| self[k] = v }
     end
 
     def [](key)
