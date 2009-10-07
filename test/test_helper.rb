@@ -1,8 +1,19 @@
 require 'rubygems'
-require 'test/unit'
-require 'context' #gem install jeremymcanally-context --source http://gems.github.com
-require 'matchy' #gem install jeremymcanally-matchy --source http://gems.github.com
 require 'mocha'
+if ENV['SPEC'] # run with rspec for ruby 1.9
+  require 'spec/test/unit'
+
+  module Spec::Example::ExampleGroupMethods
+    alias_method :test, :it
+  end
+  Spec::Runner.configure do |config|
+    config.mock_with :mocha
+  end
+else
+  require 'test/unit'
+  require 'context' #gem install jeremymcanally-context --source http://gems.github.com
+  require 'matchy' #gem install jeremymcanally-matchy --source http://gems.github.com
+end
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'boson'
 require 'test_benchmark' if ENV['BENCHMARK']

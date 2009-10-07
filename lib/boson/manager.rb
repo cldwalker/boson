@@ -62,7 +62,7 @@ module Boson
       rescue Exception=>e
         FileLibrary.reset_file_cache(library.to_s)
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" + "\n" +
-          e.backtrace.slice(0,3).join("\n")
+          e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
       ensure
         Inspector.disable if Inspector.enabled
       end
