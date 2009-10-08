@@ -1,5 +1,5 @@
 module Boson
-  # Simple Hash with indifferent access
+  # Simple Hash with indifferent access. Used by OptionParser.
   class IndifferentAccessHash < ::Hash
     def initialize(hash)
       super()
@@ -24,9 +24,21 @@ module Boson
       end
   end
 
+  # This class provides option parsing for boolean, string, numeric and array
+  # values given a simple hash of options. Setting option values should be straightforward for
+  # *nix people. By option type:
+  # * *:boolean*: These don't have values i.e. '--debug'. To toogle a boolean, prepend with --no- i.e. '--no-debug'.
+  #   Multiple booleans can be joined together i.e. '-d -f -t' == '-dft'.
+  # * *:string*: Separate name from value with space or '=' i.e. '--color red' or '--color=red'.
+  # * *:numeric*: Receives values as :string does or by appending number right after name i.e.
+  #   '-N3' == '-N=3'. 
+  # * *:array*: Receives values as :string does. Multiple values are split by ',' i.e.
+  #   '--fields 1,2,3' -> ['1','2','3']. The split character can be configured as explained at
+  #   OptionParser.new .
   # This is a modified version of Yehuda Katz's Thor::Options class which is a modified version
-  # of Daniel Berger's Getopt::Long class, licensed under Ruby's license.
+  # of Daniel Berger's Getopt::Long class (licensed under Ruby's license).
   class OptionParser
+    # Raised for all OptionParser errors
     class Error < StandardError; end
 
     NUMERIC     = /(\d*\.\d+|\d+)/
@@ -37,28 +49,54 @@ module Boson
     SHORT_NUM   = /^(-[a-zA-Z])#{NUMERIC}$/i
     
     attr_reader :leading_non_opts, :trailing_non_opts, :opt_aliases
-    
+
+    # Array of arguments left after defined options have been parsed out by parse.
     def non_opts
       leading_non_opts + trailing_non_opts
     end
 
-    # Takes an array of options. Each array consists of up to three
-    # elements that indicate the name and type of option. Returns a hash
-    # containing each option name, minus the '-', as a key. The value
-    # for each key depends on the type of option and/or the value provided
-    # by the user.
+    # Takes a hash of options. Each option, a key-value pair, must provide the option's
+    # name and type. Names longer than one character are accessed with '--' while
+    # one character names are accessed with '-'. Names can be symbols, strings
+    # or even dasherized strings:
     #
-    # The long option _must_ be provided. The short option defaults to the
-    # first letter of the option. The default type is :boolean.
+    #    Boson::OptionParser.new :debug=>:boolean, 'level'=>:numeric,
+    #      '--fields'=>:array
     #
-    # Example:
+    # Options can have default values and implicit types simply by changing the
+    # option type for the default value:
     #
-    #   opts = Boson::OptionParser.new(
-    #      "--debug" => true,
-    #      ["--verbose", "-v"] => true,
-    #      ["--level", "-l"] => :numeric
-    #   ).parse(args)
+    #    Boson::OptionParser.new :debug=>true, 'level'=>3.1, :fields=>%w{f1 f2}
     #
+    # By default every option name longer than one character is given an alias,
+    # the first character from its name. For example, the --fields option
+    # has -f as its alias. You can override the default alias by providing your own
+    # option aliases as an array in the option's key.
+    #
+    #    Boson::OptionParser.new [:debug, :damnit, :D]=>true
+    #
+    # Note that aliases are accessed the same way as option names. For the above,
+    # --debug, --damnit and -D all refer to the same option.
+    #
+    # Options can have additional attributes by passing a hash to the option value instead of
+    # a type or default:
+    # 
+    #    Boson::OptionParser.new :fields=>{:type=>:array, :values=>%w{f1 f2 f3},
+    #     :enum=>false}
+    #
+    # Here are the available option attributes:
+    #
+    # * *:type*: This or :default is required. Available types are :string, :boolean, :array, :numeric.
+    # * *:default*: This or :type is required. This is the default value an option has when not passed.
+    # * *:values*: An array of values an option can have. Available for :array and :string options.  Values here
+    #   can be aliased by typing a unique string it starts with. For example:
+    #      
+    #     For values foo, odd, optional: f refers to foo, o to odd and op to optional.
+    #
+    # * *:enum*: Boolean indicating if an option enforces values in :values. Default is true. Available for
+    #   :array and :string options.
+    # * *:split*: Only for :array options. A string or regular expression on which an array value should split
+    #   on to produce an array of values. Default is ','.
     def initialize(opts)
       @defaults = {}
       @opt_aliases = {}
@@ -114,6 +152,11 @@ module Boson
       }
     end
 
+    # Parses an array of arguments for defined options to return a hash. Once the parser
+    # recognizes a valid option, it continues to parse until an non option argument is detected.
+    # Flags that can be passed to the parser:
+    # * :opts_before_args: When true options must come before arguments. Default is false.
+    # * :delete_invalid_opts: When true deletes any invalid options left after parsing. Default is false.
     def parse(args, flags={})
       @args = args
       # start with defaults
@@ -151,6 +194,7 @@ module Boson
       hash
     end
 
+    # One-line option usage
     def formatted_usage
       return "" if @opt_types.empty?
       @opt_types.map do |opt, type|
@@ -173,6 +217,7 @@ module Boson
 
     alias :to_s :formatted_usage
 
+    # More verbose option help in the form of a table.
     def print_usage_table(render_options={})
       aliases = @opt_aliases.invert
       additional = [:desc, :values].select {|e| (@option_attributes || {}).values.any? {|f| f.key?(e) } }
