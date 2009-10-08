@@ -4,7 +4,7 @@ module Boson
 
   # This module is mixed into Library to give it load() and reload() functionality.
   # When creating your own Library subclass, you should override load_source_and_set_module and
-  # reload_source_and_set_module. You can override other methods in this module as needed.
+  # reload_source_and_set_module . You can override other methods in this module as needed.
   module Loader
     # Loads a library and its dependencies and returns true if library loads correctly.
     def load

@@ -1,6 +1,6 @@
 module Boson
   # Simple Hash with indifferent access. Used by OptionParser.
-  class IndifferentAccessHash < ::Hash
+  class IndifferentAccessHash < ::Hash #:nodoc:
     def initialize(hash)
       super()
       hash.each {|k,v| self[k] = v }

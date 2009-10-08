@@ -4,6 +4,7 @@ module Boson
   # Raised when a library's append_features returns false.
   class AppendFeaturesFalseError < StandardError; end
 
+  # Handles loading and reloading of libraries and commands.
   class Manager
     class <<self
       # Loads a library or an array of libraries with options. Manager loads the first library subclass

@@ -1,5 +1,5 @@
 module Boson
-  # A command maps the functionality of a ruby method with the added benefits of options, render_options, etc.
+  # A command starts with the functionality of a ruby method and adds benefits with options, render_options, etc.
   class Command
     # Creates a command given its name and a library.
     def self.create(name, library)
