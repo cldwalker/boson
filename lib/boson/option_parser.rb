@@ -95,8 +95,8 @@ module Boson
     #
     # * *:enum*: Boolean indicating if an option enforces values in :values. Default is true. Available for
     #   :array and :string options.
-    # * *:split*: Only for :array options. A string or regular expression on which an array value should split
-    #   on to produce an array of values. Default is ','.
+    # * *:split*: Only for :array options. A string or regular expression on which an array value splits
+    #   to produce an array of values. Default is ','.
     def initialize(opts)
       @defaults = {}
       @opt_aliases = {}

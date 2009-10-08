@@ -1,18 +1,23 @@
 module Boson
+  # Runner used when starting irb.
   class ReplRunner < Runner
     class <<self
+      # Starts Boson by loading configured libraries. If no default libraries are specified in the config,
+      # it will load up all detected libraries.
+      # ==== Options
+      # [:libraries] Array of libraries to load.
+      # [:verbose] Boolean to be verbose about libraries loading. Default is false.
+      # [:no_defaults] Boolean which turns off loading any default libraries. Default is false.
+      # [:autoload_libraries] Boolean which makes any command execution easier. It redefines
+      #                       method_missing on Boson.main_object so that commands with unloaded
+      #                       libraries are automatically loaded. Default is false.
       def start(options={})
         @options = options
         init unless @initialized
         Manager.load(@options[:libraries], load_options) if @options[:libraries]
       end
 
-      def init
-        super
-        define_autoloader if @options[:autoload_libraries]
-        @initialized = true
-      end
-
+      # Loads libraries and then starts irb from the commandline.
       def bin_start(repl, libraries)
         start :no_defaults=>true, :libraries=>libraries
         repl = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb' unless repl.is_a?(String)
@@ -24,7 +29,13 @@ module Boson
         Kernel.load $0 = repl
       end
 
-      def default_libraries
+      def init #:nodoc:
+        super
+        define_autoloader if @options[:autoload_libraries]
+        @initialized = true
+      end
+
+      def default_libraries #:nodoc:
         defaults = super
         unless @options[:no_defaults]
           new_defaults = Boson.repos.map {|e| e.config[:defaults] }.flatten

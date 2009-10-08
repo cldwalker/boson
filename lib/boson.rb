@@ -54,6 +54,7 @@ module Boson
   end
 
   # Start Boson by loading repositories and their configured libraries.
+  # See ReplRunner.start for its options.
   def start(options={})
     ReplRunner.start(options)
   end

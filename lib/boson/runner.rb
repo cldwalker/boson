@@ -1,12 +1,31 @@
 module Boson
+  # Base class for runners.
   class Runner
     class<<self
+      # Enables view, adds local load path and loads default_libraries
       def init
         View.enable
         add_load_path
         Manager.load default_libraries, load_options
       end
 
+      # Libraries that come with Boson
+      def default_libraries
+        [Boson::Commands::Core, Boson::Commands::WebCore]
+      end
+
+      # Libraries detected in repositories
+      def detected_libraries
+        Boson.repos.map {|repo| Dir[File.join(repo.commands_dir, '**/*.rb')].
+          map {|e| e.gsub(/.*commands\//,'').gsub('.rb','') } }.flatten
+      end
+
+      # Libraries specified in config files and detected_libraries
+      def all_libraries
+        (detected_libraries + Boson.repos.map {|e| e.config[:libraries].keys}.flatten).uniq
+      end
+
+      #:stopdoc:
       def add_load_path
         Boson.repos.each {|repo|
           if repo.config[:add_load_path] || File.exists?(File.join(repo.dir, 'lib'))
@@ -17,19 +36,6 @@ module Boson
 
       def load_options
         {:verbose=>@options[:verbose]}
-      end
-
-      def default_libraries
-        [Boson::Commands::Core, Boson::Commands::WebCore]
-      end
-
-      def detected_libraries
-        Boson.repos.map {|repo| Dir[File.join(repo.commands_dir, '**/*.rb')].
-          map {|e| e.gsub(/.*commands\//,'').gsub('.rb','') } }.flatten
-      end
-
-      def all_libraries
-        (detected_libraries + Boson.repos.map {|e| e.config[:libraries].keys}.flatten).uniq
       end
 
       def define_autoloader
@@ -45,7 +51,7 @@ module Boson
           end
         end
       end
-
+      #:startdoc:
     end
   end
 end

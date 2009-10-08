@@ -1,4 +1,5 @@
 module Boson
+  # Runs Boson from the commandline
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
@@ -11,6 +12,7 @@ module Boson
 
     class <<self
       attr_accessor :command
+      # Starts, processes and ends a commandline request.
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
         return print_usage if args.empty? || (@command.nil? && !@options[:repl] && !@options[:execute])
@@ -31,6 +33,7 @@ module Boson
         $stderr.puts message
       end
 
+      # Loads the given command.
       def init
         super
         Index.update(:verbose=>true) if @options[:index]
@@ -43,6 +46,7 @@ module Boson
         end
       end
 
+      #:stopdoc:
       def load_command_by_index
         Index.update(:verbose=>@options[:verbose]) if !@options[:index] && Boson.can_invoke?(@command) && !@options[:help]
         if !Boson.can_invoke?(@command) && ((lib = Index.find_library(@command)) ||
@@ -95,6 +99,7 @@ module Boson
           Boson.invoke :commands, "", :fields=>["name", "usage", "description"], :description=>false
         end
       end
+      #:startdoc:
     end
   end
 end
