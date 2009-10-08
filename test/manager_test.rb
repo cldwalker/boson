@@ -37,7 +37,7 @@ module Boson
         after(:each) { Object.send(:remove_const, "Aquateen") }
 
         test "created with command specific config" do
-          with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
+          with_config(:command_aliases=>{'frylock'=>'fr'}) do
             Manager.expects(:create_instance_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
             load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
             library_loaded? 'aquateen'
@@ -53,7 +53,7 @@ module Boson
         end
 
         test "not created and warns for commands with no module" do
-          with_config(:commands=>{'frylock'=>{:alias=>'fr'}}) do
+          with_config(:command_aliases=>{'frylock'=>'fr'}) do
             capture_stderr {
               load_library(:name=>'aquateen', :commands=>['frylock'])
             }.should =~ /No aliases/

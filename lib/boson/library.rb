@@ -35,7 +35,6 @@ module Boson
       @commands_hash = {}
       @commands = []
       set_config (repo.config[:libraries][@name] || {}).merge(hash)
-      @commands_hash = repo.config[:commands].merge @commands_hash
       set_command_aliases(repo.config[:command_aliases])
       @namespace = true if Boson.repo.config[:auto_namespace] && @namespace.nil? &&
         !Boson::Runner.default_libraries.include?(@module)

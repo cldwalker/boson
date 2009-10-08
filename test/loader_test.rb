@@ -30,7 +30,7 @@ module Boson
       end
 
       test "loads and strips aliases from a library's commands" do
-        with_config(:commands=>{"blah"=>{:alias=>'b'}}) do
+        with_config(:command_aliases=>{"blah"=>'b'}) do
           load :blah, :file_string=>"module Blah; def blah; end; alias_method(:b, :blah); end"
           library_loaded?('blah')
           library('blah').commands.should == ['blah']
