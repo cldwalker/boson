@@ -24,9 +24,10 @@ module Boson
     attr_reader :except, :no_alias_creation, :new_module, :new_commands
     # Optional namespace name for a library. When enabled defaults to a library's name.
     attr_writer :namespace
+
     # Creates a library object with a hash of attributes which must include a :name attribute.
     # Each hash pair maps directly to an instance variable and value. Defaults for attributes
-    # are read from config[:libraries][@library_name]. See Boson::Repo.config for more details.
+    # are read from config[:libraries][@library_name].
     def initialize(hash)
       @name = set_name hash.delete(:name)
       @loaded = false

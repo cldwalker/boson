@@ -16,7 +16,7 @@ class Boson::RepoTest < Test::Unit::TestCase
     end
 
     test "ignores nonexistent file and sets config defaults" do
-      assert @repo.config[:commands].is_a?(Hash) && @repo.config[:libraries].is_a?(Hash)
+      assert @repo.config[:command_aliases].is_a?(Hash) && @repo.config[:libraries].is_a?(Hash)
     end
   end
 end

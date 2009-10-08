@@ -1,6 +1,6 @@
 require 'digest/md5'
 module Boson
-  # Used in all things indexing i.e. saving state for boson's commandline
+  # Used in all things indexing i.e. saving state for boson's commandline.
   module Index
     extend self
     attr_reader :libraries, :commands
@@ -27,7 +27,7 @@ module Boson
       @read = true
     end
 
-    # Writes/saves current index.
+    # Writes/saves current index to config/index.marshal.
     def write
       save_marshal_index Marshal.dump([Boson.libraries, Boson.commands, latest_hashes])
     end

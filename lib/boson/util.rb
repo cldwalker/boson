@@ -1,7 +1,9 @@
 module Boson
+  # Collection of utility methods used throughout Boson.
   module Util
     extend self
-    #From Rails ActiveSupport
+    # From Rails ActiveSupport, converts a camelcased string to an underscored string:
+    # 'Boson::MethodInspector' -> 'boson/method_inspector'
     def underscore(camel_cased_word)
       camel_cased_word.to_s.gsub(/::/, '/').
        gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
@@ -10,11 +12,14 @@ module Boson
        downcase
     end
 
-    # from Rails ActiveSupport
+    # From Rails ActiveSupport, does the reverse of underscore:
+    # 'boson/method_inspector' -> 'Boson::MethodInspector'
     def camelize(string)
       string.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
     end
-    
+
+    # Converts a module/class string to the actual constant.
+    # Returns nil if not found.
     def constantize(string)
       any_const_get(camelize(string))
     end
@@ -40,6 +45,9 @@ module Boson
       end
     end
 
+    # Detects new object/kernel methods, gems and modules created within a block.
+    # Returns a hash of what's detected.
+    # Valid options and possible returned keys are :methods, :object_methods, :modules, :gems.
     def detect(options={}, &block)
       options = {:methods=>true, :object_methods=>true}.merge!(options)
       original_gems = Gem.loaded_specs.keys if Object.const_defined? :Gem
@@ -56,6 +64,7 @@ module Boson
       detected
     end
 
+    # Safely calls require, returning false if LoadError occurs.
     def safe_require(lib)
       begin
         require lib
@@ -64,16 +73,20 @@ module Boson
       end
     end
 
+    # Returns all modules that currently exist.
     def modules
       all_modules = []
       ObjectSpace.each_object(Module) {|e| all_modules << e}
       all_modules
     end
 
+    # Returns array of _all_ common instance methods between two modules/classes.
     def common_instance_methods(module1, module2)
       (module1.instance_methods + module1.private_instance_methods) & (module2.instance_methods + module2.private_instance_methods)
     end
 
+    # Creates a module under a given base module and possible name. If the module already exists, it attempts
+    # to create one with a number appended to the name.
     def create_module(base_module, name)
       desired_class = camelize(name)
       if (suffix = ([""] + (1..10).to_a).find {|e| !base_module.const_defined?(desired_class+e)})
@@ -81,6 +94,7 @@ module Boson
       end
     end
 
+    # Behaves just like the unix which command, returning the full path to an executable based on ENV['PATH'].
     def which(command)
       ENV['PATH'].split(File::PATH_SEPARATOR).map {|e| File.join(e, command) }.find {|e| File.exists?(e) }
     end
