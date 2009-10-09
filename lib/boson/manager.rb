@@ -104,7 +104,7 @@ module Boson
 
       def loader_create(source)
         lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or raise(LoaderError, "Library #{source} not found.")
-        lib_class[0].new(:name=>source, :index=>@options[:index])
+        lib_class[0].new(@options.merge(:name=>source))
       end
 
       def after_load

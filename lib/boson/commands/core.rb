@@ -6,7 +6,7 @@ module Boson::Commands::Core #:nodoc:
     commands = {
       'render'=>{:description=>"Render any object using Hirb"},
       'menu'=>{:description=>"Provide a menu to multi-select elements from a given array"},
-      'usage'=>{:description=>"Print a command's usage", :options=>{:verbose=>:boolean}},
+      'usage'=>{:description=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
       'commands'=>{ :description=>"List or search commands",
         :options=>{:query_fields=>{:default=>['full_name'], :values=>command_attributes},
           :index=>{:type=>:boolean, :desc=>"Searches index"}},
@@ -19,7 +19,7 @@ module Boson::Commands::Core #:nodoc:
           :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
           :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}} }
       },
-      'load_library'=>{:description=>"Load/reload a library", :options=>{:reload=>:boolean, :verbose=>true}}
+      'load_library'=>{:description=>"Load/reload a library", :options=>{:reload=>:boolean, [:verbose,:V]=>true}}
     }
 
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
