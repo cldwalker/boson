@@ -1,5 +1,5 @@
 module Boson
-  # A library which takes a module as a library's name. Reload for this library
+  # This library takes a module as a library's name. Reload for this library
   # subclass is disabled.
   class ModuleLibrary < Library
     #:stopdoc:

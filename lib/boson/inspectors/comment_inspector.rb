@@ -1,6 +1,6 @@
 module Boson
   # Scrapes comments right before a method for its metadata. Metadata attributes are the
-  # same as MethodInspector: desc, options, render_options. Attributes must begin with '@' i.e.:
+  # same as MethodInspector : desc, options, render_options. Attributes must begin with '@' i.e.:
   #
   #    # @desc Does foo
   #    # @options :verbose=>true

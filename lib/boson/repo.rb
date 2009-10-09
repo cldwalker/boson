@@ -24,6 +24,7 @@ module Boson
     end
 
     # A hash read from the YAML config file at config/boson.yml.
+    # {See here}[http://github.com/cldwalker/irbfiles/blob/master/boson/config/boson.yml] for an example config file.
     # ==== Valid config keys:
     # [:libraries] Hash of libraries mapping their name to attribute hashes. See Library.new for configurable attributes.
     #               Example:
@@ -34,8 +35,9 @@ module Boson
     #                    key of a library entry in :libraries.
     #                     Example:
     #                      :command_aliases=>{'libraries'=>'lib', 'commands'=>'com'}
-    # [:defaults] Array of libraries to load at start up when used in irb.
-    # [:bin_defaults] Array of libraries to load at start up when used from the commandline.
+    # [:defaults] Array of libraries to load at start up when used in irb. Default is to load all library files and libraries defined
+    #             in the config.
+    # [:bin_defaults] Array of libraries to load at start up when used from the commandline. Default is no libraries.
     # [:add_load_path] Boolean specifying whether to add a load path pointing to the lib subdirectory/. This is useful in sharing
     #                  classes between libraries without resorting to packaging them as gems. Defaults to false if the lib
     #                  subdirectory doesn't exist in the boson directory.

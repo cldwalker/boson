@@ -8,6 +8,7 @@ Works with Ruby 1.8.6 and 1.9.1.
 * Commands are accessible from the commandline or irb.
 * Command libraries, which are just modules, are written in non-dsl ruby which allows for easy testing
   and use outside of boson.
+* Comes with default commands to load, search, list and install commands and libraries.
 * Commands can be full-blown commandline apps thanks to automatic views from hirb and powerful
   options similar to thor's.
 * Command libraries are social as a user can install them from a url and then customize command
@@ -20,7 +21,7 @@ To use in irb, drop this in your irbrc:
     require 'boson'
     Boson.start :verbose=>true
 
-Let's start up irb:
+With the above in irbrc, let's start up irb:
 
   bash> irb
   Loaded library core
@@ -126,10 +127,22 @@ Let's start up irb:
 
     # Sweet! Now we have a list and description of commands that come with irb.
 
-== Creating commands
-TODO: Explain library format
+== Creating Command Libraries
+See File::Library or here[http://tagaholic.me/boson/doc/classes/Boson/FileLibrary.html].
 
 == Todo
 * More docs
 * More tests
+* Making commands out of existing gems easier and more powerful
+* Better local repositories, perhaps a BosonFile
 * Add tags to libraries + commands
+
+== Motivation
+My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby console.
+
+== Acknowledgements
+Boson stands on the shoulders of these people and their ideas:
+* Yehuda Katz and Daniel Berger for an awesome option parser (Boson::OptionParser)
+* Dave Thomas for scraping a method's comments (Boson::CommentInspector)
+* Mauricio Fernandez for scraping a method's arguments (Boson::ArgumentInspector)
+* Chris Wanstrath for inspiring Boson's libraries with Rip's packages.
