@@ -27,7 +27,9 @@ module Boson
 
     # Creates a library object with a hash of attributes which must include a :name attribute.
     # Each hash pair maps directly to an instance variable and value. Defaults for attributes
-    # are read from config[:libraries][@library_name][@attribute]. Attributes that should be configured:
+    # are read from config[:libraries][@library_name][@attribute].
+    #
+    # Attributes that can be configured:
     # * *:dependencies*: An array of libraries that this library depends on. A library won't load
     #   unless its dependencies are loaded first.
     # * *:commands*: A hash or array of commands that belong to this library. A hash configures command attributes
@@ -39,7 +41,7 @@ module Boson
     # * *:class_commands*: A hash of commands to create. Hash should map command names to any string of ruby code
     #   that ends with a method call.
     #     Example:
-    #       :class_commands=>{'spy'=>'Bond.spy', 'create'=>'Alias.manager.create_aliases'}
+    #       :class_commands=>{'spy'=>'Bond.spy', 'create'=>'Alias.manager.create'}
     # * *:force*: Boolean which forces a library to ignore when a library's methods are overriding existing ones.
     #   Use with caution. Default is false.
     # * *:object_methods*: Boolean which detects any Object/Kernel methods created when loading a library and automatically

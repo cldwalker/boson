@@ -1,11 +1,13 @@
 == Description
 A command/task framework similar to rake and thor that opens your ruby universe to the commandline
 and irb. For my libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
+Works with Ruby 1.8.6 and 1.9.1.
 
 == Features
-* Commands are just methods that are extended by the toplevel object, main.
+* Commands are just methods extended for a given object, the default being the top level object, main.
 * Commands are accessible from the commandline or irb.
-* Command libraries can be written as plain ruby which allows for easy testing and use outside of boson.
+* Command libraries, which are just modules, are written in non-dsl ruby which allows for easy testing
+  and use outside of boson.
 * Commands can be full-blown commandline apps thanks to automatic views from hirb and powerful
   options similar to thor's.
 * Command libraries are social as a user can install them from a url and then customize command

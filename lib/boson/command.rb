@@ -22,6 +22,16 @@ module Boson
     attr_accessor *(ATTRIBUTES + [:render_options, :namespace])
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
+    #
+    # Attributes that can be configured:
+    # * *:description*: Description that shows up in command listings
+    # * *:alias*: Alternative name for command
+    # * *:options*: Hash of options passed to OptionParser
+    # * *:render_options*: Hash of rendering options passed to OptionParser
+    # * *:args*: Should only be set if not automatically set. This attribute is only
+    #   important for commands that have options/render_options. Its value can be an array
+    #   (as ArgumentInspector.scrape_with_eval produces), a number representing
+    #   the number of arguments or '*' if the command has a variable number of arguments.
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError

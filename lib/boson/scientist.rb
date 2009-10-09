@@ -1,9 +1,32 @@
 require 'shellwords'
 module Boson
+  # Scientist redefines the methods of commands that have options and/or take global options. This redefinition
+  # allows a command to receive its arguments normally or as a commandline app does. For a command's
+  # method to be redefined correctly, its last argument _must_ expect a hash.
+  #
+  # Take for example this basic method with an options definition:
+  #   options :level=>:numeric, :verbose=>:boolean
+  #   def foo(arg='', options={})
+  #     [arg, options]
+  #   end
+  #
+  # When Scientist wraps around foo(), argument defaults are respected:
+  #    foo '', :verbose=>true   # normal call
+  #    foo '-v'                 # commandline call
+  #
+  #    Both calls return: ['', {:verbose=>true}]
+  #
+  # Non-string arguments can be passed in:
+  #    foo Object, :level=>1
+  #    foo Object, 'l1'
+  #
+  #    Both calls return: [Object, {:level=>1}]
   module Scientist
     extend self
+    # Handles all Scientist errors.
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
+
     attr_reader :global_options, :rendered
     @no_option_commands ||= []
     GLOBAL_OPTIONS = {
@@ -12,7 +35,7 @@ module Boson
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
       :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes i.e. '-p -f=f1,f2' -> 'p f=f1,f2'"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"}
-    }
+    } #:nodoc:
     RENDER_OPTIONS = {
       :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
       :sort=>{:type=>:string, :desc=>"Sort by given field"},
@@ -20,8 +43,9 @@ module Boson
       :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
       :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
       :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"}
-    }
+    } #:nodoc:
 
+    # Redefines a command's method for the given object.
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
       @no_option_commands << command if command.options.nil?
@@ -30,12 +54,14 @@ module Boson
       }
     end
 
+    # The actual method which replaces a command's original method
     def create_option_command_block(obj, command)
       lambda {|*args|
         Boson::Scientist.translate_and_render(obj, command, args) {|args| super(*args) }
       }
     end
 
+    #:stopdoc:
     def translate_and_render(obj, command, args)
       @global_options = {}
       args = translate_args(obj, command, args)
@@ -164,5 +190,6 @@ module Boson
         }
       end
     end
+    #:startdoc:
   end
 end
