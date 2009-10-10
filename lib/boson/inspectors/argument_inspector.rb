@@ -6,7 +6,7 @@ module Boson::ArgumentInspector
   # Returns same argument arrays as scrape_with_eval but argument defaults haven't been evaluated.
   def scrape_with_text(file_string, meth)
     tabspace = "[ \t]"
-    if match = /^#{tabspace}*def#{tabspace}+#{meth}#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
+    if match = /^#{tabspace}*def#{tabspace}+#{meth}\b#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/.match(file_string)
       (match.to_a[2] || '').split(/\s*,\s*/).map {|e| e.split(/\s*=\s*/)}
     end
   end
