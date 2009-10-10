@@ -10,16 +10,16 @@ module Boson
   # [:execute] Like ruby -e, this executes a string of ruby code. However, this has the advantage that all
   #            commands are available as normal methods, automatically loading as needed. This is a good
   #            way to call commands that take non-string arguments.
-  # [:interactive] This drops Boson into irb after having loaded default commands and any explict libraries with
+  # [:console] This drops Boson into irb after having loaded default commands and any explict libraries with
   #                :load option. This is a good way to start irb with only certain libraries loaded.
-  # [:load] Explicitly loads a list of libraries separated by commas. Most useful when used with :interactive option.
+  # [:load] Explicitly loads a list of libraries separated by commas. Most useful when used with :console option.
   #         Can also be used to explicitly load libraries that aren't being detected automatically.
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
-      [:index, :I]=>{:type=>:boolean, :desc=>"Updates index for libraries and commands"},
+      :index=>{:type=>:boolean, :desc=>"Updates index for libraries and commands"},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
-      :interactive=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
+      :console=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
       :load=>{:type=>:array, :values=>all_libraries, :enum=>false, :desc=>"A comma delimited array of libraries to load"}
     } #:nodoc:
@@ -29,8 +29,8 @@ module Boson
       # Starts, processes and ends a commandline request.
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
-        return print_usage if args.empty? || (@command.nil? && !@options[:interactive] && !@options[:execute])
-        return ReplRunner.bin_start(@options[:interactive], @options[:load]) if @options[:interactive]
+        return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
+        return ReplRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
         init
 
         if @options[:help]

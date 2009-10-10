@@ -36,17 +36,17 @@ module Boson
         start('-l', 'blah', 'libraries')
       end
 
-      test "interactive option starts irb" do
+      test "console option starts irb" do
         ReplRunner.expects(:start)
         Util.expects(:which).returns("/usr/bin/irb")
         Kernel.expects(:load).with("/usr/bin/irb")
-        start("--interactive")
+        start("--console")
       end
 
-      test "interactive option but no irb found prints error" do
+      test "console option but no irb found prints error" do
         ReplRunner.expects(:start)
         Util.expects(:which).returns(nil)
-        capture_stderr { start("--interactive") } =~ /Repl not found/
+        capture_stderr { start("--console") } =~ /Repl not found/
       end
 
       test "execute option executes string" do
