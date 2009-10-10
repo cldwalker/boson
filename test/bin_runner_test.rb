@@ -36,14 +36,14 @@ module Boson
         start('-l', 'blah', 'libraries')
       end
 
-      test "repl option starts repl" do
+      test "interactive option starts irb" do
         ReplRunner.expects(:start)
         Util.expects(:which).returns("/usr/bin/irb")
         Kernel.expects(:load).with("/usr/bin/irb")
         start("--interactive")
       end
 
-      test "repl option but no repl found prints error" do
+      test "interactive option but no irb found prints error" do
         ReplRunner.expects(:start)
         Util.expects(:which).returns(nil)
         capture_stderr { start("--interactive") } =~ /Repl not found/
@@ -62,9 +62,14 @@ module Boson
         capture_stdout { start('commands','1','2','3') }.should =~ /Wrong number/
       end
 
+      test "failed subcommand prints error and not command not found" do
+        BinRunner.expects(:execute_command).raises("bling")
+        capture_stderr { start("commands.blah") }.should =~ /Error: bling/
+      end
+
       test "undiscovered command prints error" do
          BinRunner.expects(:load_command_by_index).returns(false)
-        capture_stderr { start('blah') }.should =~ /Error.*blah/
+        capture_stderr { start('blah') }.should =~ /Error.*not found/
       end
 
       test "basic command executes" do

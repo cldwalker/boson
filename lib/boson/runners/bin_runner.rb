@@ -41,7 +41,7 @@ module Boson
           execute_command
         end
       rescue Exception
-        message = (@command && !Boson.can_invoke?(@command)) ?
+        message = (@command && !Boson.can_invoke?(@command[/\w+/])) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
         message += "\nActual error: #{$!}\n" + $!.backtrace.inspect if @options && @options[:verbose]
         $stderr.puts message
