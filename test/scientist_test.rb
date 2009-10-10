@@ -67,7 +67,7 @@ module Boson
       end
 
       test "translate arg and normal hash options" do
-        args_are_equal [:cool, {:ok=>true}], [:cool, {:ok=>true}]
+        args_are_equal [:cool, {:ok=>true}], [:cool, {:ok=>true, :level=>2}]
       end
 
       test "translate stringified arg without options sets default options" do
