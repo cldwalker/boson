@@ -1,5 +1,5 @@
 module Boson
-  # Handles {hirb-based}[http://tagaholic.me/hirb/] views.
+  # Handles {Hirb}[http://tagaholic.me/hirb/]-based views.
   module View
     extend self
 
@@ -9,7 +9,8 @@ module Boson
       @enabled = true
     end
 
-    # Render's any object via Hirb.
+    # Renders any object via Hirb. Options are passed directly to
+    # {Hirb::Console.render_output}[http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011].
     def render(object, options={})
       [nil,false,true].include?(object) ? puts(object.inspect) : render_object(object, options)
     end

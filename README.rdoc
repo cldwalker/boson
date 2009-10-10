@@ -128,14 +128,14 @@ With the above in irbrc, let's start up irb:
     # Sweet! Now we have a list and description of commands that come with irb.
 
 == Creating Command Libraries
-See File::Library or here[http://tagaholic.me/boson/doc/classes/Boson/FileLibrary.html].
+See Boson::FileLibrary or here[http://tagaholic.me/boson/doc/classes/Boson/FileLibrary.html].
 
 == Todo
 * More docs
 * More tests
 * Making commands out of existing gems easier and more powerful
 * Better local repositories, perhaps a BosonFile
-* Add tags to libraries + commands
+* Use tagging to organize libraries and commands
 
 == Motivation
 My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby console.

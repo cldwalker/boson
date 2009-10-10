@@ -4,7 +4,7 @@ module Boson
   # allows a command to receive its arguments normally or as a commandline app does. For a command's
   # method to be redefined correctly, its last argument _must_ expect a hash.
   #
-  # Take for example this basic method with an options definition:
+  # Take for example this basic method/command with an options definition:
   #   options :level=>:numeric, :verbose=>:boolean
   #   def foo(arg='', options={})
   #     [arg, options]
@@ -21,6 +21,51 @@ module Boson
   #    foo Object, 'l1'
   #
   #    Both calls return: [Object, {:level=>1}]
+  #
+  # === Global Options
+  # Any command with options comes with default global options. For example '-hv' on such a command
+  # prints a help summarizing a command's options as well as the global options.
+  # When using global options along with command options, global options _must_ precede command options.
+  # Take for example using the global --pretend option with the method above:
+  #   irb>> foo '-p -l=1'
+  #   Arguments: ["", {:level=>1}]
+  #   Global options: {:pretend=>true}
+  #
+  # If a global option conflicts with a command's option, the command's option takes precedence. You can get around
+  # this by passing a --global option which takes a string of options without their dashes. For example:
+  #   foo '-p --fields=f1,f2 -l=1'
+  #   # is the same as
+  #   foo ' -g "p fields=f1,f2" -l=1 '
+  #
+  # === Rendering Views With Global Options
+  # Perhaps the most important global option is --render. This option toggles the rendering of your command's output
+  # with Hirb[http://github.com/cldwalker/hirb]. Since Hirb can be customized to generate any view, this option allows
+  # you toggle a predefined view for a command without embedding view code in your command!
+  #
+  # Here's a simple example, toggling Hirb's table view:
+  #   # Defined in a library file:
+  #   #@options {}
+  #   def list(options={})
+  #     [1,2,3]
+  #   end
+  #
+  #   Using it in irb:
+  #   >> list
+  #   => [1,2,3]
+  #   >> list '-r'
+  #   +-------+
+  #   | value |
+  #   +-------+
+  #   | 1     |
+  #   | 2     |
+  #   | 3     |
+  #   +-------+
+  #   3 rows in set
+  #   => true
+  #
+  # If you wanted to default to rendering a view for a command, you could add a render_options call above list() along
+  # with any options you want to pass to your Hirb helper class. In this case, using '-r' would give you the command's
+  # returned object instead of a formatted view!
   module Scientist
     extend self
     # Handles all Scientist errors.
@@ -31,9 +76,9 @@ module Boson
     @no_option_commands ||= []
     GLOBAL_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
-      :render=>{:type=>:boolean, :desc=>"Toggle a command's default render behavior"},
+      :render=>{:type=>:boolean, :desc=>"Toggle a command's default rendering behavior"},
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
-      :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes i.e. '-p -f=f1,f2' -> 'p f=f1,f2'"},
+      :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"}
     } #:nodoc:
     RENDER_OPTIONS = {

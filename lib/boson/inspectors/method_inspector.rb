@@ -1,9 +1,10 @@
 module Boson
   # Allows for defining method metadata with new_method_added and the
   # following Module methods:
-  # * desc: Defines a description for a method/command
+  # * desc: Defines a description for a method/command.
   # * options: Defines an OptionParser object for a method's options.
-  # * render_options: Defines an OptionParser object for a method's rendering options.
+  # * render_options: Defines an OptionParser object for a method's rendering options. These options
+  #   are passed to View.render when rendering a command.
   #
   # These method calls must come immediately before a method i.e.:
   #
