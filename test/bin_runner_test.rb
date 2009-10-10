@@ -46,7 +46,7 @@ module Boson
       test "console option but no irb found prints error" do
         ReplRunner.expects(:start)
         Util.expects(:which).returns(nil)
-        capture_stderr { start("--console") } =~ /Repl not found/
+        capture_stderr { start("--console") }.should =~ /Console not found/
       end
 
       test "execute option executes string" do

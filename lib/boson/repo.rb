@@ -44,6 +44,7 @@ module Boson
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.
+    # [:console] Console to load when using --console from commandline. Default is irb.
     # [:auto_namespace] Boolean which automatically namespaces all user-defined libraries. Default is false.
     def config(reload=false)
       if reload || @config.nil?

@@ -22,9 +22,10 @@ module Boson
       # Loads libraries and then starts irb (or another given repl) from the commandline.
       def bin_start(repl, libraries)
         start :no_defaults=>true, :libraries=>libraries
+        repl = Boson.repo.config[:console] if Boson.repo.config[:console]
         repl = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb' unless repl.is_a?(String)
         unless repl.index('/') == 0 || (repl = Util.which(repl))
-          $stderr.puts "Repl not found. Please specify full path of repl."
+          $stderr.puts "Console not found. Please specify full path in config[:console]."
           return
         end
         ARGV.replace ['-f']
