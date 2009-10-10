@@ -40,13 +40,13 @@ module Boson
         ReplRunner.expects(:start)
         Util.expects(:which).returns("/usr/bin/irb")
         Kernel.expects(:load).with("/usr/bin/irb")
-        start("--repl")
+        start("--interactive")
       end
 
       test "repl option but no repl found prints error" do
         ReplRunner.expects(:start)
         Util.expects(:which).returns(nil)
-        capture_stderr { start("--repl") } =~ /Repl not found/
+        capture_stderr { start("--interactive") } =~ /Repl not found/
       end
 
       test "execute option executes string" do
