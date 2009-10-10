@@ -63,9 +63,9 @@ module Boson
   #   3 rows in set
   #   => true
   #
-  # If you wanted to default to rendering a view for a command, you could add a render_options call above list() along
-  # with any options you want to pass to your Hirb helper class. In this case, using '-r' would give you the command's
-  # returned object instead of a formatted view!
+  # To default to rendering a view for a command, add a render_options {method attribute}[link:classes/Boson/MethodInspector.html]
+  # above list() along with any options you want to pass to your Hirb helper class. In this case, using '-r' gives you the
+  # command's returned object instead of a formatted view!
   module Scientist
     extend self
     # Handles all Scientist errors.

@@ -1,5 +1,5 @@
 module Boson
-  # Allows for defining method metadata with new_method_added and the
+  # Gathers method attributes with new_method_added and the
   # following Module methods:
   # * desc: Defines a description for a method/command.
   # * options: Defines an OptionParser object for a method's options.
@@ -12,7 +12,7 @@ module Boson
   #     options :verbose=>:boolean
   #     def foo(options={})
   #
-  # This module also allows for defining method metadata as comments. Although the actual
+  # This module also allows for defining method attributes as comments. Although the actual
   # scraping of comments is handled by CommentInspector, MethodInspector gather's the method
   # location it needs with with find_method_locations().
   module MethodInspector
@@ -22,7 +22,7 @@ module Boson
     @mod_store ||= {}
     METHODS = [:desc, :options, :render_options]
 
-    # The method_added used while scraping method metadata.
+    # The method_added used while scraping method attributes.
     def new_method_added(mod, meth)
       return unless mod.name[/^Boson::Commands::/]
       self.current_module = mod

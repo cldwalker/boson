@@ -1,5 +1,5 @@
 module Boson
-  # Scrapes and processes method metadata with the inspectors (MethodInspector, CommentInspector
+  # Scrapes and processes method attributes with the inspectors (MethodInspector, CommentInspector
   # and ArgumentInspector) and hands off the usable data to FileLibrary objects.
   module Inspector
     extend self
@@ -34,7 +34,7 @@ module Boson
       @enabled = false
     end
 
-    # Adds method data scraped for the library's module to the library's commands.
+    # Adds method attributes scraped for the library's module to the library's commands.
     def add_method_data_to_library(library)
       @commands_hash = library.commands_hash
       @library_file = library.library_file

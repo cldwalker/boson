@@ -1,5 +1,5 @@
 module Boson
-  # Scrapes comments right before a method for its metadata. Metadata attributes are the
+  # Scrapes comments right before a method for its attributes. Metadata attributes are the
   # same as MethodInspector : desc, options, render_options. Attributes must begin with '@' i.e.:
   #
   #    # @desc Does foo
