@@ -1,5 +1,7 @@
 module Boson
-  # Runner used when starting irb.
+  # Runner used when starting irb. To use in irb, drop this in your ~/.irbrc:
+  #   require 'boson'
+  #   Boson.start :verbose=>true
   class ReplRunner < Runner
     class <<self
       # Starts Boson by loading configured libraries. If no default libraries are specified in the config,
@@ -17,7 +19,7 @@ module Boson
         Manager.load(@options[:libraries], load_options) if @options[:libraries]
       end
 
-      # Loads libraries and then starts irb from the commandline.
+      # Loads libraries and then starts irb (or another given repl) from the commandline.
       def bin_start(repl, libraries)
         start :no_defaults=>true, :libraries=>libraries
         repl = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb' unless repl.is_a?(String)

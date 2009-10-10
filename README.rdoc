@@ -5,23 +5,24 @@ Works with Ruby 1.8.6 and 1.9.1.
 
 == Features
 * Commands are just methods extended for a given object, the default being the top level object, main.
-* Commands are accessible from the commandline or irb.
+* Commands are accessible from the commandline (Boson::BinRunner) or irb (Boson::ReplRunner).
 * Command libraries, which are just modules, are written in non-dsl ruby which allows for easy testing
-  and use outside of boson.
-* Comes with default commands to load, search, list and install commands and libraries.
-* Commands can be full-blown commandline apps thanks to automatic views from hirb and powerful
-  options similar to thor's.
+  and use outside of boson (Boson::FileLibrary).
+* Comes with default commands to load, search, list and install commands and libraries (Boson::Commands::Core).
+* Commands can be full-blown commandline apps thanks to powerful options (Boson::OptionParser)
+  and hirb's views.
+* Commands can have views toggled without adding view code to your original command (Boson::Scientist).
 * Command libraries are social as a user can install them from a url and then customize command
   names and options without changing the original library.
-* Namespaces are optional and when used are methods which allows for method_missing magic.
+* Namespaces are optional and when used are methods which allow for method_missing magic.
 
 == Irb Example
 
-To use in irb, drop this in your irbrc:
+To use in irb, drop this in your ~/.irbrc:
     require 'boson'
     Boson.start :verbose=>true
 
-With the above in irbrc, let's start up irb:
+Having done that, let's start up irb:
 
   bash> irb
   Loaded library core

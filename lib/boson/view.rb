@@ -16,7 +16,7 @@ module Boson
     end
 
     def render_object(object, options={}) #:nodoc:
-      options[:class] = options.delete(:as) || :auto_table
+      options[:class] ||= :auto_table
       if object.is_a?(Array) && object.size > 0 && (sort = options.delete(:sort))
         begin
           sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?

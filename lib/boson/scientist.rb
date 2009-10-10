@@ -84,7 +84,7 @@ module Boson
     RENDER_OPTIONS = {
       :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
       :sort=>{:type=>:string, :desc=>"Sort by given field"},
-      :as=>{:type=>:string, :desc=>"Hirb helper class which renders"},
+      :class=>{:type=>:string, :desc=>"Hirb helper class which renders"},
       :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
       :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
       :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"}

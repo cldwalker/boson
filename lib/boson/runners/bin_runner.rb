@@ -8,7 +8,7 @@ module Boson
       :repl=>{:type=>:boolean, :desc=>"Drops into irb or another given repl/shell with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
       :load=>{:type=>:array, :values=>all_libraries, :enum=>false, :desc=>"A comma delimited array of libraries to load"}
-    }
+    } #:nodoc:
 
     class <<self
       attr_accessor :command
