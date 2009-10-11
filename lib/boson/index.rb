@@ -23,6 +23,7 @@ module Boson
     def read
       return if @read
       @libraries, @commands, @lib_hashes = exists? ? Marshal.load(File.read(marshal_file)) : [[], [], {}]
+      delete_stale_libraries_and_commands
       set_latest_namespaces
       @read = true
     end
@@ -47,6 +48,14 @@ module Boson
 
     def save_marshal_index(marshal_string)
       File.open(marshal_file, 'w') {|f| f.write marshal_string }
+    end
+
+    def delete_stale_libraries_and_commands
+      cached_libraries = @lib_hashes.keys
+      libs_to_delete = @libraries.select {|e| !cached_libraries.include?(e.name) && e.is_a?(FileLibrary) }
+      names_to_delete = libs_to_delete.map {|e| e.name }
+      libs_to_delete.each {|e| @libraries.delete(e) }
+      @commands.delete_if {|e| names_to_delete.include? e.lib }
     end
 
     # get latest namespaces from config files
