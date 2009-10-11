@@ -1,6 +1,6 @@
 $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirname(__FILE__))
 %w{hirb alias}.each {|e| require e }
-%w{runner runners/repl_runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
+%w{runner runners/console_runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
 %w{module file gem require}.each {|e| require "boson/libraries/#{e}_library" }
@@ -54,9 +54,9 @@ module Boson
   end
 
   # Start Boson by loading repositories and their configured libraries.
-  # See ReplRunner.start for its options.
+  # See ConsoleRunner.start for its options.
   def start(options={})
-    ReplRunner.start(options)
+    ConsoleRunner.start(options)
   end
 
   # Invoke an action on the main object.

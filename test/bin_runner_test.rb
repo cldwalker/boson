@@ -37,14 +37,14 @@ module Boson
       end
 
       test "console option starts irb" do
-        ReplRunner.expects(:start)
+        ConsoleRunner.expects(:start)
         Util.expects(:which).returns("/usr/bin/irb")
         Kernel.expects(:load).with("/usr/bin/irb")
         start("--console")
       end
 
       test "console option but no irb found prints error" do
-        ReplRunner.expects(:start)
+        ConsoleRunner.expects(:start)
         Util.expects(:which).returns(nil)
         capture_stderr { start("--console") }.should =~ /Console not found/
       end

@@ -30,7 +30,7 @@ module Boson
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
         return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
-        return ReplRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
+        return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
         init
 
         if @options[:help]

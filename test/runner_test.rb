@@ -9,7 +9,7 @@ module Boson
       end
 
       before(:all) { reset }
-      before(:each) { Boson::ReplRunner.instance_eval("@initialized = false") }
+      before(:each) { Boson::ConsoleRunner.instance_eval("@initialized = false") }
 
       test "loads default libraries and libraries in :defaults config" do
         defaults = Boson::Runner.default_libraries + ['yo']
@@ -21,12 +21,12 @@ module Boson
 
       test "doesn't call init twice" do
         start
-        ReplRunner.expects(:init).never
+        ConsoleRunner.expects(:init).never
         start
       end
 
       test "loads multiple libraries with :libraries option" do
-        ReplRunner.expects(:init)
+        ConsoleRunner.expects(:init)
         Manager.expects(:load).with([:lib1,:lib2], anything)
         start(:libraries=>[:lib1, :lib2])
       end
