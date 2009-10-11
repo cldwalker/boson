@@ -196,7 +196,8 @@ module Boson
         parsed_options, @args = parse_options Shellwords.shellwords(@args[0])
       # last string argument interpreted as args + options
       elsif @args.size > 1 && @args[-1].is_a?(String)
-        parsed_options, new_args = parse_options @args.pop.split(/\s+/)
+        args = caller.grep(/bin_runner.rb:/).empty? ? Shellwords.shellwords(@args.pop) : @args
+        parsed_options, new_args = parse_options args
         @args += new_args
       # add default options
       elsif (!@command.has_splat_args? && @args.size <= @command.arg_size - 1) ||
@@ -215,7 +216,8 @@ module Boson
       @global_options = option_parser.parse @command.option_parser.leading_non_opts
       new_args = option_parser.non_opts.dup + @command.option_parser.trailing_non_opts
       if @global_options[:global]
-        global_opts = Shellwords.shellwords(@global_options[:global]).map {|str| (str.length > 1 ? "--" : "-") + str }
+        global_opts = Shellwords.shellwords(@global_options[:global]).map {|str|
+          ((str[/^(.*?)=/,1] || str).length > 1 ? "--" : "-") + str }
         @global_options.merge! option_parser.parse(global_opts)
       end
       raise EscapeGlobalOption if @global_options[:help]

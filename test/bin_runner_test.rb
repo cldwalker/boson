@@ -54,6 +54,11 @@ module Boson
         capture_stdout { start("-e", "p 1 + 1") }.should == "2\n"
       end
 
+      test "global option takes value with whitespace" do
+        View.expects(:render).with(anything, {:sort => :lib, :fields => [:name, :lib]})
+        start('commands', '-g', 'f=name,lib s=lib')
+      end
+
       test "execute option errors are caught" do
         capture_stderr { start("-e", "raise 'blah'") }.should =~ /^Error:/
       end
