@@ -59,7 +59,7 @@ module Boson
       end
 
       test "command and too many arguments prints error" do
-        capture_stdout { start('commands','1','2','3') }.should =~ /Wrong number/
+        capture_stdout { start('commands','1','2','3') }.should =~ /'commands'.*incorrect/
       end
 
       test "failed subcommand prints error and not command not found" do

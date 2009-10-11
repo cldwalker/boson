@@ -129,13 +129,9 @@ module Boson
         return @args if @no_option_commands.include?(@command)
         @args << parsed_options
         if @args.size != command.arg_size && !command.has_splat_args?
-          command_size = @args.size > command.arg_size ? command.arg_size : command.arg_size - 1
-          if @args.size - 1 == command_size
-            raise Error, "Arguments are misaligned. Possible causes are incorrect argument "+
-              "size or no argument for this method's options."
-          else
-            raise ArgumentError, "wrong number of arguments (#{@args.size - 1} for #{command_size})"
-          end
+          command_size, args_size = @args.size > command.arg_size ? [command.arg_size, @args.size] :
+            [command.arg_size - 1, @args.size - 1]
+          raise ArgumentError, "wrong number of arguments (#{args_size} for #{command_size})"
         end
       end
       @args

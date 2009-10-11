@@ -79,7 +79,7 @@ module Boson
         @args = @args.join(" ") if ((com = Boson::Command.find(@command)) && com.option_command?)
         render_output dispatcher.send(subcommand || command, *@args)
       rescue ArgumentError
-        puts "Wrong number of arguments for #{@command}\n\n"
+        puts "'#{@command}' was called incorrectly."
         print_command_help
       end
 
