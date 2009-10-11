@@ -95,10 +95,10 @@ module Boson
       end
 
       def render_output(output)
-        if Scientist.global_options
-          puts output.inspect unless Scientist.rendered
-        else
-          View.render(output)
+        if Scientist.global_options && !Scientist.rendered && !View.silent_object?(output)
+          puts output.inspect
+        elsif !Scientist.global_options
+          View.render(output, :silence_booleans=>true)
         end
       end
 

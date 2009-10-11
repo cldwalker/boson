@@ -12,7 +12,15 @@ module Boson
     # Renders any object via Hirb. Options are passed directly to
     # {Hirb::Console.render_output}[http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011].
     def render(object, options={})
-      [nil,false,true].include?(object) ? puts(object.inspect) : render_object(object, options)
+      if silent_object?(object)
+        puts(object.inspect) unless options[:silence_booleans]
+      else
+        render_object(object, options)
+      end
+    end
+
+    def silent_object?(obj)
+      [nil,false,true].include?(obj)
     end
 
     def render_object(object, options={}) #:nodoc:
