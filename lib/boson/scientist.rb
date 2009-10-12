@@ -177,7 +177,7 @@ module Boson
             @command.render_options[k] = {:default=>v}
           end
         }
-        opts = Util.recursive_hash_merge(@command.render_options, RENDER_OPTIONS)
+        opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(RENDER_OPTIONS))
         opts[:sort][:values] ||= opts[:fields][:values] if opts[:fields][:values]
         opts
       end
