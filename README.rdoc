@@ -136,7 +136,7 @@ See Boson::FileLibrary or here[http://tagaholic.me/boson/doc/classes/Boson/FileL
 * More tests
 * Making commands out of existing gems easier and more powerful
 * Better local repositories, perhaps a BosonFile
-* Use tagging to organize libraries and commands
+* Consider managing extensions to core and standard libraries
 
 == Motivation
 My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby console.

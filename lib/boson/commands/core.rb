@@ -8,12 +8,12 @@ module Boson::Commands::Core #:nodoc:
       'menu'=>{:description=>"Provide a menu to multi-select elements from a given array"},
       'usage'=>{:description=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
       'commands'=>{ :description=>"List or search commands",
-        :options=>{:query_fields=>{:default=>['full_name'], :values=>command_attributes},
+        :options=>{:query_fields=>{:default=>['full_name'], :values=>command_attributes, :desc=>"Searchable fields"},
           :index=>{:type=>:boolean, :desc=>"Searches index"}},
         :render_options=>{:fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes} }
       },
       'libraries'=>{ :description=>"List or search libraries",
-        :options=>{:query_fields=>{:default=>['name'], :values=>library_attributes},
+        :options=>{:query_fields=>{:default=>['name'], :values=>library_attributes, :desc=>"Searchable fields"},
           :index=>{:type=>:boolean, :desc=>"Searches index"} },
         :render_options=>{
           :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
@@ -29,13 +29,13 @@ module Boson::Commands::Core #:nodoc:
     query_fields = options[:query_fields] || ['full_name']
     Boson::Index.read if options[:index]
     commands = options[:index] ? Boson::Index.commands : Boson.commands
-    query_fields.map {|e| commands.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten
+    query_fields.map {|e| commands.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten.uniq
   end
 
   def libraries(query='', options={})
     Boson::Index.read if options[:index]
     libraries = options[:index] ? Boson::Index.libraries : Boson.libraries
-    options[:query_fields].map {|e| libraries.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten
+    options[:query_fields].map {|e| libraries.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten.uniq
   end
 
   def load_library(library, options={})
