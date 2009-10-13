@@ -14,6 +14,7 @@ module Boson
   #                :load option. This is a good way to start irb with only certain libraries loaded.
   # [:load] Explicitly loads a list of libraries separated by commas. Most useful when used with :console option.
   #         Can also be used to explicitly load libraries that aren't being detected automatically.
+  # [:render] Pretty formats the results of commands without options. Handy for commands that return arrays.
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
@@ -21,7 +22,8 @@ module Boson
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
       :console=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
-      :load=>{:type=>:array, :values=>all_libraries, :enum=>false, :desc=>"A comma delimited array of libraries to load"}
+      :load=>{:type=>:array, :values=>all_libraries, :enum=>false, :desc=>"A comma delimited array of libraries to load"},
+      :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"}
     } #:nodoc:
 
     class <<self
@@ -96,7 +98,7 @@ module Boson
       def render_output(output)
         if Scientist.global_options && !Scientist.rendered && !View.silent_object?(output)
           puts output.inspect
-        elsif !Scientist.global_options
+        elsif !Scientist.global_options && @options[:render]
           View.render(output, :silence_booleans=>true)
         end
       end
