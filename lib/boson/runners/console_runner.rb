@@ -41,7 +41,7 @@ module Boson
       def default_libraries #:nodoc:
         defaults = super
         unless @options[:no_defaults]
-          new_defaults = Boson.repos.map {|e| e.config[:defaults] }.flatten
+          new_defaults = Boson.repos.map {|e| e.config[:console_defaults] }.flatten
           new_defaults = detected_libraries if new_defaults.empty?
           defaults += new_defaults
           defaults.uniq!

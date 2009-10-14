@@ -11,9 +11,9 @@ module Boson
       before(:all) { reset }
       before(:each) { Boson::ConsoleRunner.instance_eval("@initialized = false") }
 
-      test "loads default libraries and libraries in :defaults config" do
+      test "loads default libraries and libraries in :console_defaults config" do
         defaults = Boson::Runner.default_libraries + ['yo']
-        with_config(:defaults=>['yo']) do
+        with_config(:console_defaults=>['yo']) do
           Manager.expects(:load).with {|*args| args[0] == defaults }
           start
         end
