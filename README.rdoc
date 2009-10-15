@@ -20,7 +20,7 @@ Works with Ruby 1.8.6 and 1.9.1.
 
 To use in irb, drop this in your ~/.irbrc:
     require 'boson'
-    Boson.start :verbose=>true
+    Boson.start
 
 Having done that, let's start up irb:
 

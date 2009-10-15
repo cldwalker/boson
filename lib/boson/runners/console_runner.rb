@@ -1,20 +1,20 @@
 module Boson
   # Runner used when starting irb. To use in irb, drop this in your ~/.irbrc:
   #   require 'boson'
-  #   Boson.start :verbose=>true
+  #   Boson.start
   class ConsoleRunner < Runner
     class <<self
       # Starts Boson by loading configured libraries. If no default libraries are specified in the config,
       # it will load up all detected libraries.
       # ==== Options
       # [:libraries] Array of libraries to load.
-      # [:verbose] Boolean to be verbose about libraries loading. Default is false.
+      # [:verbose] Boolean to be verbose about libraries loading. Default is true.
       # [:no_defaults] Boolean which turns off loading any default libraries. Default is false.
       # [:autoload_libraries] Boolean which makes any command execution easier. It redefines
       #                       method_missing on Boson.main_object so that commands with unloaded
       #                       libraries are automatically loaded. Default is false.
       def start(options={})
-        @options = options
+        @options = {:verbose=>true}.merge options
         init unless @initialized
         Manager.load(@options[:libraries], load_options) if @options[:libraries]
       end

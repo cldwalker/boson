@@ -3,9 +3,9 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class RunnerTest < Test::Unit::TestCase
     context "repl_runner" do
-      def start(*args)
+      def start(hash={})
         Hirb.stubs(:enable)
-        Boson.start(*args)
+        Boson.start(hash.merge(:verbose=>false))
       end
 
       before(:all) { reset }
