@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../files/lib/boson/command_rb.html">lib/boson/command.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/index_rb.html">lib/boson/index.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/inspector_rb.html">lib/boson/inspector.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/inspectors/comment_inspector_rb.html">lib/boson/inspectors/comment_inspector.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/inspectors/method_inspector_rb.html">lib/boson/inspectors/method_inspector.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/libraries/file_library_rb.html">lib/boson/libraries/file_library.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/libraries/gem_library_rb.html">lib/boson/libraries/gem_library.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/libraries/module_library_rb.html">lib/boson/libraries/module_library.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/library_rb.html">lib/boson/library.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/loader_rb.html">lib/boson/loader.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/manager_rb.html">lib/boson/manager.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/namespace_rb.html">lib/boson/namespace.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/option_parser_rb.html">lib/boson/option_parser.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/repo_rb.html">lib/boson/repo.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/runner_rb.html">lib/boson/runner.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/runners/bin_runner_rb.html">lib/boson/runners/bin_runner.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/runners/console_runner_rb.html">lib/boson/runners/console_runner.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/util_rb.html">lib/boson/util.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/scientist_rb.html">lib/boson/scientist.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/view_rb.html">lib/boson/view.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson_rb.html">lib/boson.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            This module stores the libraries, commands, repos and main object used
+            throughout <a href="Boson.html">Boson</a>.
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000008">can_invoke?</a></li>
+              <li><a href="#M000002">commands</a></li>
+              <li><a href="#M000007">invoke</a></li>
+              <li><a href="#M000001">libraries</a></li>
+              <li><a href="#M000004">local_repo</a></li>
+              <li><a href="#M000003">repo</a></li>
+              <li><a href="#M000005">repos</a></li>
+              <li><a href="#M000006">start</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='class-list'>
+              <h2>Classes and Modules</h2>
+              Module <a href="Boson/ArgumentInspector.html" class="link">Boson::ArgumentInspector</a><br />
+              Module <a href="Boson/Commands.html" class="link">Boson::Commands</a><br />
+              Module <a href="Boson/CommentInspector.html" class="link">Boson::CommentInspector</a><br />
+              Module <a href="Boson/Index.html" class="link">Boson::Index</a><br />
+              Module <a href="Boson/Inspector.html" class="link">Boson::Inspector</a><br />
+              Module <a href="Boson/Loader.html" class="link">Boson::Loader</a><br />
+              Module <a href="Boson/MethodInspector.html" class="link">Boson::MethodInspector</a><br />
+              Module <a href="Boson/Scientist.html" class="link">Boson::Scientist</a><br />
+              Module <a href="Boson/Universe.html" class="link">Boson::Universe</a><br />
+              Module <a href="Boson/Util.html" class="link">Boson::Util</a><br />
+              Module <a href="Boson/View.html" class="link">Boson::View</a><br />
+              Class <a href="Boson/AppendFeaturesFalseError.html" class="link">Boson::AppendFeaturesFalseError</a><br />
+              Class <a href="Boson/BinRunner.html" class="link">Boson::BinRunner</a><br />
+              Class <a href="Boson/Command.html" class="link">Boson::Command</a><br />
+              Class <a href="Boson/ConsoleRunner.html" class="link">Boson::ConsoleRunner</a><br />
+              Class <a href="Boson/FileLibrary.html" class="link">Boson::FileLibrary</a><br />
+              Class <a href="Boson/GemLibrary.html" class="link">Boson::GemLibrary</a><br />
+              Class <a href="Boson/Library.html" class="link">Boson::Library</a><br />
+              Class <a href="Boson/LoaderError.html" class="link">Boson::LoaderError</a><br />
+              Class <a href="Boson/Manager.html" class="link">Boson::Manager</a><br />
+              Class <a href="Boson/MethodConflictError.html" class="link">Boson::MethodConflictError</a><br />
+              Class <a href="Boson/ModuleLibrary.html" class="link">Boson::ModuleLibrary</a><br />
+              Class <a href="Boson/Namespace.html" class="link">Boson::Namespace</a><br />
+              Class <a href="Boson/OptionParser.html" class="link">Boson::OptionParser</a><br />
+              Class <a href="Boson/Repo.html" class="link">Boson::Repo</a><br />
+              Class <a href="Boson/RequireLibrary.html" class="link">Boson::RequireLibrary</a><br />
+              Class <a href="Boson/Runner.html" class="link">Boson::Runner</a><br />
+            </div>
+            <div id='aliases-list'>
+              <h2>External Aliases</h2>
+              <div class='name-list'>
+                <table summary='External aliases'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>main_object</td>
+                    <td>-&gt;</td>
+                    <td class='context-item-value'>higgs</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>commands</td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>libraries</td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>main_object</td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      The object which holds and executes all command functionality
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000008'>
+                <a name='M000008'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>can_invoke?</span>
+                  <span class='arguments'>(meth)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Boolean indicating if the main object can invoke the given method/command.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000008-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000008-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 68</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">can_invoke?</span>(<span class="ruby-identifier">meth</span>)&#x000A;    <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">meth</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000002'>
+                <a name='M000002'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>commands</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Array of loaded <a href="Boson/Command.html">Boson::Command</a> objects.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000002-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000002-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 25</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commands</span>&#x000A;    <span class="ruby-ivar">@commands</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000007'>
+                <a name='M000007'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>invoke</span>
+                  <span class='arguments'>(*args, &amp;block)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Invoke an action on the main object.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000007-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000007-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 63</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">invoke</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000001'>
+                <a name='M000001'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>libraries</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Array of loaded <a href="Boson/Library.html">Boson::Library</a> objects.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000001-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000001-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 20</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">libraries</span>&#x000A;    <span class="ruby-ivar">@libraries</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000004'>
+                <a name='M000004'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>local_repo</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  An optional local repository which defaults to ./lib/boson or ./.boson.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000004-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000004-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 35</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">local_repo</span>&#x000A;    <span class="ruby-ivar">@local_repo</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">begin</span>&#x000A;      <span class="ruby-identifier">dir</span> = [<span class="ruby-value str">&quot;lib/boson&quot;</span>, <span class="ruby-value str">&quot;.boson&quot;</span>].<span class="ruby-identifier">find</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">&amp;&amp;</span>&#x000A;         <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">repo</span>.<span class="ruby-identifier">dir</span> }&#x000A;      <span class="ruby-constant">Repo</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">dir</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">dir</span>&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000003'>
+                <a name='M000003'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>repo</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  The main required repository which defaults to ~/.boson.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000003-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000003-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 30</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">repo</span>&#x000A;    <span class="ruby-ivar">@repo</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Repo</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{ENV['HOME']}/.boson&quot;</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000005'>
+                <a name='M000005'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>repos</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  The array of loaded repositories
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000005-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000005-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 44</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">repos</span>&#x000A;    <span class="ruby-ivar">@repos</span> <span class="ruby-operator">||=</span> [<span class="ruby-identifier">repo</span>, <span class="ruby-identifier">local_repo</span>].<span class="ruby-identifier">compact</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000006'>
+                <a name='M000006'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>start</span>
+                  <span class='arguments'>(options={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Start <a href="Boson.html">Boson</a> by loading repositories and their
+                  configured libraries. See <a
+                  href="Boson/ConsoleRunner.html#M000064">ConsoleRunner.start</a> for its
+                  options.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000006-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000006-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 58</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>={})&#x000A;    <span class="ruby-constant">ConsoleRunner</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

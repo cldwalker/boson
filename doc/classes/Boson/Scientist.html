@@ -1,0 +1,177 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::Scientist [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson::Scientist
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/scientist_rb.html">lib/boson/scientist.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            <a href="Scientist.html">Scientist</a> redefines the methods of commands
+            that have options and/or take global options. This redefinition allows a
+            command to receive its arguments normally or as a commandline app does. For
+            a command&#8217;s method to be redefined correctly, its last argument
+            <em>must</em> expect a hash.
+            </p>
+            <p>
+            Take for example this basic method/command with an options definition:
+            </p>
+            <pre>options :level=&gt;:numeric, :verbose=&gt;:boolean&#x000A;def foo(arg='', options={})&#x000A;  [arg, options]&#x000A;end</pre>
+            <p>
+            When <a href="Scientist.html">Scientist</a> wraps around foo(), argument
+            defaults are respected:
+            </p>
+            <pre>foo '', :verbose=&gt;true   # normal call&#x000A;foo '-v'                 # commandline call&#x000A;&#x000A;Both calls return: ['', {:verbose=&gt;true}]</pre>
+            <p>
+            Non-string arguments can be passed in:
+            </p>
+            <pre>foo Object, :level=&gt;1&#x000A;foo Object, 'l1'&#x000A;&#x000A;Both calls return: [Object, {:level=&gt;1}]</pre>
+            <h3>Global Options</h3>
+            <p>
+            Any command with options comes with default global options. For example
+            &#8217;-hv&#8217; on such a command prints a help summarizing a
+            command&#8217;s options as well as the global options. When using global
+            options along with command options, global options <em>must</em> precede
+            command options. Take for example using the global &#8212;pretend option
+            with the method above:
+            </p>
+            <pre>irb&gt;&gt; foo '-p -l=1'&#x000A;Arguments: [&quot;&quot;, {:level=&gt;1}]&#x000A;Global options: {:pretend=&gt;true}</pre>
+            <p>
+            If a global option conflicts with a command&#8217;s option, the
+            command&#8217;s option takes precedence. You can get around this by passing
+            a &#8212;global option which takes a string of options without their
+            dashes. For example:
+            </p>
+            <pre>foo '-p --fields=f1,f2 -l=1'&#x000A;# is the same as&#x000A;foo ' -g &quot;p fields=f1,f2&quot; -l=1 '</pre>
+            <h3>Rendering Views With Global Options</h3>
+            <p>
+            Perhaps the most important global option is &#8212;render. This option
+            toggles the rendering of your command&#8217;s output with <a
+            href="http://github.com/cldwalker/hirb">Hirb</a>. Since Hirb can be
+            customized to generate any view, this option allows you toggle a predefined
+            view for a command without embedding view code in your command!
+            </p>
+            <p>
+            Here&#8217;s a simple example, toggling Hirb&#8217;s table view:
+            </p>
+            <pre># Defined in a library file:&#x000A;#@options {}&#x000A;def list(options={})&#x000A;  [1,2,3]&#x000A;end&#x000A;&#x000A;Using it in irb:&#x000A;&gt;&gt; list&#x000A;=&gt; [1,2,3]&#x000A;&gt;&gt; list '-r'&#x000A;+-------+&#x000A;| value |&#x000A;+-------+&#x000A;| 1     |&#x000A;| 2     |&#x000A;| 3     |&#x000A;+-------+&#x000A;3 rows in set&#x000A;=&gt; true</pre>
+            <p>
+            To default to rendering a view for a command, add a render_options <a
+            href="MethodInspector.html">method attribute</a> above list() along with
+            any options you want to pass to your Hirb helper class. In this case, using
+            &#8217;-r&#8217; gives you the command&#8217;s returned object instead of a
+            formatted view!
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000023">create_option_command</a></li>
+              <li><a href="#M000024">create_option_command_block</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='class-list'>
+              <h2>Classes and Modules</h2>
+              Class <a href="Scientist/Error.html" class="link">Boson::Scientist::Error</a><br />
+              Class <a href="Scientist/EscapeGlobalOption.html" class="link">Boson::Scientist::EscapeGlobalOption</a><br />
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>global_options</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>rendered</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000023'>
+                <a name='M000023'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>create_option_command</span>
+                  <span class='arguments'>(obj, command)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Redefines a command&#8217;s method for the given object.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000023-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000023-source'><span class="ruby-comment cmt"># File lib/boson/scientist.rb, line 94</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_option_command</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-identifier">cmd_block</span> = <span class="ruby-identifier">create_option_command_block</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-ivar">@no_option_commands</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">command</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">command</span>.<span class="ruby-identifier">options</span>.<span class="ruby-identifier">nil?</span>&#x000A;      [<span class="ruby-identifier">command</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">command</span>.<span class="ruby-identifier">alias</span>].<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-value str">&quot;class&lt;&lt;self;self;end&quot;</span>).<span class="ruby-identifier">send</span>(<span class="ruby-identifier">:define_method</span>, <span class="ruby-identifier">e</span>, <span class="ruby-identifier">cmd_block</span>)&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000024'>
+                <a name='M000024'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>create_option_command_block</span>
+                  <span class='arguments'>(obj, command)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  The actual method which replaces a command&#8217;s original method
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000024-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000024-source'><span class="ruby-comment cmt"># File lib/boson/scientist.rb, line 103</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_option_command_block</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Scientist</span>.<span class="ruby-identifier">translate_and_render</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>, <span class="ruby-identifier">args</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>) }&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

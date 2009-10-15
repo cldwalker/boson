@@ -1,0 +1,125 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::FileLibrary [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Boson::FileLibrary
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/libraries/file_library_rb.html">lib/boson/libraries/file_library.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="Library.html">Boson::Library</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            This library is based on a file of the same name under the commands
+            directory of a repository. Since there can be multiple repositories, a
+            library&#8217;s file is looked for in the order given by <a
+            href="../Boson.html#M000005">Boson.repos</a>.
+            </p>
+            <p>
+            To create this library, simply create a file with a module and some
+            methods. Non-private methods are automatically loaded as a library&#8217;s
+            commands.
+            </p>
+            <p>
+            Take for example a library brain.rb:
+            </p>
+            <pre>module Brain&#x000A;  def take_over(destination)&#x000A;    puts &quot;Pinky, it's time to take over the #{destination}!&quot;&#x000A;  end&#x000A;end</pre>
+            <p>
+            Once loaded, this library can be run from the commandline or irb:
+            </p>
+            <pre>bash&gt; boson take_over world&#x000A;irb&gt;&gt; take_over 'world'</pre>
+            <p>
+            If the library is namespaced, the command would be run as brain.take_over.
+            </p>
+            <p>
+            Let&#8217;s give Brain an option in his conquest:
+            </p>
+            <pre>module Brain&#x000A;  options :execute=&gt;:string&#x000A;  def take_over(destination, options={})&#x000A;    puts &quot;Pinky, it's time to take over the #{destination}!&quot;&#x000A;    system(options[:execute]) if options[:execute]&#x000A;  end&#x000A;end</pre>
+            <p>
+            From the commandline and irb this runs as:
+            </p>
+            <pre>bash&gt; boson take_over world -e initiate_brainiac&#x000A;irb&gt;&gt; take_over 'world -e initiate_brainiac'</pre>
+            <p>
+            To learn more about the depth of option types available to a command, see
+            <a href="OptionParser.html">OptionParser</a>.
+            </p>
+            <p>
+            Since boson aims to make your libraries just standard ruby, we can achieve
+            the above by placing options in comments above a method:
+            </p>
+            <pre>module Brain&#x000A;  # @options :execute=&gt;:string&#x000A;  # Help Brain live the dream&#x000A;  def take_over(destination, options={})&#x000A;    puts &quot;Pinky, it's time to take over the #{destination}!&quot;&#x000A;    system(options[:execute]) if options[:execute]&#x000A;  end&#x000A;end</pre>
+            <p>
+            Some points about the above:
+            </p>
+            <ul>
+            <li>A &#8217;@&#8217; must prefix options and other method calls that become
+            comments.
+            
+            </li>
+            <li>Note the comment above the method. One-line comments right before a method
+            set a command&#8217;s description.
+            
+            </li>
+            <li>See <a href="MethodInspector.html">MethodInspector</a> for other command
+            attributes, like options, that can be placed above a method.
+            
+            </li>
+            <li>See <a href="CommentInspector.html">CommentInspector</a> for the rules
+            about commenting command attributes.
+            
+            </li>
+            </ul>
+            <p>
+            Once a command has a defined option, a command can also recognize a slew of
+            global options:
+            </p>
+            <pre>irb&gt;&gt; take_over '-h'&#x000A;take_over [destination] [--execute=STRING]&#x000A;&#x000A;# prints much more verbose help&#x000A;irb&gt;&gt; take_over '-hv'</pre>
+            <p>
+            For more about these global options see <a
+            href="Scientist.html">Scientist</a>.
+            </p>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

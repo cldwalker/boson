@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::Runner [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Boson::Runner
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/runner_rb.html">lib/boson/runner.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong>Object</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            Base class for runners.
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000058">all_libraries</a></li>
+              <li><a href="#M000056">default_libraries</a></li>
+              <li><a href="#M000057">detected_libraries</a></li>
+              <li><a href="#M000055">init</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='public-class method' id='method-M000058'>
+                <a name='M000058'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>all_libraries</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Libraries specified in config files and <a
+                  href="Runner.html#M000057">detected_libraries</a>
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000058-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000058-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 24</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">all_libraries</span>&#x000A;        (<span class="ruby-identifier">detected_libraries</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:libraries</span>].<span class="ruby-identifier">keys</span>}.<span class="ruby-identifier">flatten</span>).<span class="ruby-identifier">uniq</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-class method' id='method-M000056'>
+                <a name='M000056'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>default_libraries</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Libraries that come with <a href="../Boson.html">Boson</a>
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000056-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000056-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 13</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_libraries</span>&#x000A;        [<span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Commands</span><span class="ruby-operator">::</span><span class="ruby-constant">Core</span>, <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Commands</span><span class="ruby-operator">::</span><span class="ruby-constant">WebCore</span>]&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-class method' id='method-M000057'>
+                <a name='M000057'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>detected_libraries</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Libraries detected in repositories
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000057-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000057-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 18</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">detected_libraries</span>&#x000A;        <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">repo</span><span class="ruby-operator">|</span> <span class="ruby-constant">Dir</span>[<span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">commands_dir</span>, <span class="ruby-value str">'**/*.rb'</span>)].&#x000A;          <span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/.*commands\//</span>,<span class="ruby-value str">''</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-value str">'.rb'</span>,<span class="ruby-value str">''</span>) } }.<span class="ruby-identifier">flatten</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-class method' id='method-M000055'>
+                <a name='M000055'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>init</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Enables view, adds local load path and loads <a
+                  href="Runner.html#M000056">default_libraries</a>
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000055-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000055-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 6</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">init</span>&#x000A;        <span class="ruby-constant">View</span>.<span class="ruby-identifier">enable</span>&#x000A;        <span class="ruby-identifier">add_load_path</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">default_libraries</span>, <span class="ruby-identifier">load_options</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

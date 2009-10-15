@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::MethodInspector [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson::MethodInspector
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/inspectors/method_inspector_rb.html">lib/boson/inspectors/method_inspector.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            Gathers method attributes with <a
+            href="MethodInspector.html#M000009">new_method_added</a> and the following
+            Module methods:
+            </p>
+            <ul>
+            <li>desc: Defines a description for a method/command.
+            
+            </li>
+            <li>options: Defines an <a href="OptionParser.html">OptionParser</a> object for
+            a method&#8217;s options.
+            
+            </li>
+            <li>render_options: Defines an <a href="OptionParser.html">OptionParser</a>
+            object for a method&#8217;s rendering options. These options are passed to
+            <a href="View.html#M000042">View.render</a> when rendering a command.
+            
+            </li>
+            </ul>
+            <p>
+            These method calls must come immediately before a method i.e.:
+            </p>
+            <pre>desc &quot;Does foo&quot;&#x000A;options :verbose=&gt;:boolean&#x000A;def foo(options={})</pre>
+            <p>
+            This module also allows for defining method attributes as comments.
+            Although the actual scraping of comments is handled by <a
+            href="CommentInspector.html">CommentInspector</a>, <a
+            href="MethodInspector.html">MethodInspector</a> gather&#8217;s the method
+            location it needs with with <a
+            href="MethodInspector.html#M000011">find_method_locations</a>().
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000011">find_method_locations</a></li>
+              <li><a href="#M000009">new_method_added</a></li>
+              <li><a href="#M000010">scrape_arguments</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>METHODS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:desc, :options, :render_options]</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CALLER_REGEXP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>RUBY_VERSION &lt; '1.9' ? /in `load_source'/ : /in `&lt;module:.*&gt;'/</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>current_module</td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>mod_store</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000011'>
+                <a name='M000011'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>find_method_locations</span>
+                  <span class='arguments'>(stack)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns an array of the file and line number at which a method starts using
+                  a caller array. Necessary information for <a
+                  href="CommentInspector.html">CommentInspector</a> to function.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000011-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000011-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/method_inspector.rb, line 66</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find_method_locations</span>(<span class="ruby-identifier">stack</span>)&#x000A;      <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">line</span> = <span class="ruby-identifier">stack</span>.<span class="ruby-identifier">find</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">CALLER_REGEXP</span> })&#x000A;        (<span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^(.*):(\d+)/</span>) <span class="ruby-operator">?</span> [<span class="ruby-identifier">$1</span>, <span class="ruby-identifier">$2</span>.<span class="ruby-identifier">to_i</span>] <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000009'>
+                <a name='M000009'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>new_method_added</span>
+                  <span class='arguments'>(mod, meth)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  The method_added used while scraping method attributes.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000009-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000009-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/method_inspector.rb, line 26</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">new_method_added</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">name</span>[<span class="ruby-regexp re">/^Boson::Commands::/</span>]&#x000A;      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">current_module</span> = <span class="ruby-identifier">mod</span>&#x000A;      <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:temp</span>] <span class="ruby-operator">||=</span> {}&#x000A;      <span class="ruby-constant">METHODS</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">store</span>[<span class="ruby-identifier">e</span>][<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:temp</span>][<span class="ruby-identifier">e</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:temp</span>][<span class="ruby-identifier">e</span>]&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:temp</span>].<span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">METHODS</span>.<span class="ruby-identifier">size</span>&#x000A;        <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:method_locations</span>] <span class="ruby-operator">||=</span> {}&#x000A;        <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">result</span> = <span class="ruby-identifier">find_method_locations</span>(<span class="ruby-identifier">caller</span>))&#x000A;          <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:method_locations</span>][<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">result</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:temp</span>] = {}&#x000A;      <span class="ruby-identifier">scrape_arguments</span>(<span class="ruby-identifier">meth</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">has_inspector_method?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">:options</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">has_inspector_method?</span>(<span class="ruby-identifier">meth</span>,<span class="ruby-identifier">:render_options</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000010'>
+                <a name='M000010'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>scrape_arguments</span>
+                  <span class='arguments'>(meth)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Scrapes a method&#8217;s arguments using <a
+                  href="ArgumentInspector.html">ArgumentInspector</a>.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000010-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000010-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/method_inspector.rb, line 52</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape_arguments</span>(<span class="ruby-identifier">meth</span>)&#x000A;      <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:method_args</span>] <span class="ruby-operator">||=</span> {}&#x000A;&#x000A;      <span class="ruby-identifier">o</span> = <span class="ruby-constant">Object</span>.<span class="ruby-identifier">new</span>&#x000A;      <span class="ruby-identifier">o</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-ivar">@current_module</span>)&#x000A;      <span class="ruby-comment cmt"># private methods return nil</span>&#x000A;      <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">val</span> = <span class="ruby-constant">ArgumentInspector</span>.<span class="ruby-identifier">scrape_with_eval</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-ivar">@current_module</span>, <span class="ruby-identifier">o</span>))&#x000A;        <span class="ruby-identifier">store</span>[<span class="ruby-identifier">:method_args</span>][<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>] = <span class="ruby-identifier">val</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

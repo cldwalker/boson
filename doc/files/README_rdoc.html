@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>File: README.rdoc [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>README.rdoc</h1>
+        <div class='paths'>
+          README.rdoc
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>Wed Oct 14 23:12:45 -0400 2009</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <h2>Description</h2>
+            <p>
+            A command/task framework similar to rake and thor that opens your ruby
+            universe to the commandline and irb. For my libraries that use this, see <a
+            href="http://github.com/cldwalker/irbfiles">irbfiles</a>. Works with Ruby
+            1.8.6 and 1.9.1.
+            </p>
+            <h2>Features</h2>
+            <ul>
+            <li>Commands are just methods extended for a given object, the default being
+            the top level object, main.
+            
+            </li>
+            <li>Commands are accessible from the commandline (<a
+            href="../classes/Boson/BinRunner.html">Boson::BinRunner</a>) or irb (<a
+            href="../classes/Boson/ConsoleRunner.html">Boson::ConsoleRunner</a>).
+            
+            </li>
+            <li>Command libraries, which are just modules, are written in non-dsl ruby
+            which allows for easy testing and use outside of boson (<a
+            href="../classes/Boson/FileLibrary.html">Boson::FileLibrary</a>).
+            
+            </li>
+            <li>Comes with default commands to load, search, list and install commands and
+            libraries (Boson::Commands::Core).
+            
+            </li>
+            <li>Commands can be full-blown commandline apps thanks to powerful options (<a
+            href="../classes/Boson/OptionParser.html">Boson::OptionParser</a>) and
+            hirb&#8217;s views.
+            
+            </li>
+            <li>Commands can have views toggled without adding view code to your original
+            command (<a href="../classes/Boson/Scientist.html">Boson::Scientist</a>).
+            
+            </li>
+            <li>Command libraries are social as a user can install them from a url and then
+            customize command names and options without changing the original library.
+            
+            </li>
+            <li>Namespaces are optional and when used are methods which allow for
+            method_missing magic.
+            
+            </li>
+            </ul>
+            <h2>Irb Example</h2>
+            <p>
+            To use in irb, drop this in your ~/.irbrc:
+            </p>
+            <pre>require 'boson'&#x000A;Boson.start</pre>
+            <p>
+            Having done that, let&#8217;s start up irb:
+            </p>
+            <pre>bash&gt; irb&#x000A;Loaded library core&#x000A;Loaded library web_core&#x000A;&#x000A;# List default libraries&#x000A;&gt;&gt; libraries&#x000A;+----------+----------+------+--------------+&#x000A;| name     | commands | gems | library_type |&#x000A;+----------+----------+------+--------------+&#x000A;| core     | 6        |      | module       |&#x000A;| web_core | 3        |      | module       |&#x000A;+----------+----------+------+--------------+&#x000A;2 rows in set&#x000A;&#x000A;# List default commands&#x000A;&gt;&gt; commands&#x000A;+--------------+----------+-------+--------------------------------------------+-----------------------------------------------------------------------------+&#x000A;| full_name    | lib      | alias | usage                                      | description                                                                 |&#x000A;+--------------+----------+-------+--------------------------------------------+-----------------------------------------------------------------------------+&#x000A;| usage        | core     |       | [name][--verbose]                          | Print a command's usage                                                     |&#x000A;| libraries    | core     |       | [query=''][--index] [--query_fields=A,B,C] | List or search libraries                                                    |&#x000A;| render       | core     |       | [object] [options={}]                      | Render any object using Hirb                                                |&#x000A;| load_library | core     |       | [library][--verbose] [--reload]            | Load/reload a library                                                       |&#x000A;| commands     | core     |       | [query=''][--index] [--query_fields=A,B,C] | List or search commands                                                     |&#x000A;| menu         | core     |       | [output] [options={}] [&amp;block]             | Provide a menu to multi-select elements from a given array                  |&#x000A;| get          | web_core |       | [url]                                      | Gets the body of a url                                                      |&#x000A;| install      | web_core |       | [url][--force] [--name=NAME]               | Installs a library by url. Library should then be loaded with load_library. |&#x000A;| browser      | web_core |       | [*urls]                                    | Opens urls in a browser                                                     |&#x000A;+--------------+----------+-------+--------------------------------------------+-----------------------------------------------------------------------------+&#x000A;9 rows in set&#x000A;&#x000A;# Boson commands can behave like shell commands:&#x000A;&#x000A;# Basic help&#x000A;&gt;&gt; commands '-h'&#x000A;commands [query=''][--index] [--query_fields=A,B,C]&#x000A;&#x000A;# Search the lib column for web&#x000A;&gt;&gt; commands 'web -q=lib' # or 'web --query_fields=lib'&#x000A;+-----------+----------+-------+------------------------------+-----------------------------------------------------------------------------+&#x000A;| full_name | lib      | alias | usage                        | description                                                                 |&#x000A;+-----------+----------+-------+------------------------------+-----------------------------------------------------------------------------+&#x000A;| get       | web_core |       | [url]                        | Gets the body of a url                                                      |&#x000A;| install   | web_core |       | [url][--force] [--name=NAME] | Installs a library by url. Library should then be loaded with load_library. |&#x000A;| browser   | web_core |       | [*urls]                      | Opens urls in a browser                                                     |&#x000A;+-----------+----------+-------+------------------------------+-----------------------------------------------------------------------------+&#x000A;3 rows in set</pre>
+            <h2>Commandline Example</h2>
+            <pre># Just like in irb&#x000A; bash&gt; boson libraries&#x000A; +----------+----------+------+--------------+&#x000A; | name     | commands | gems | library_type |&#x000A; +----------+----------+------+--------------+&#x000A; | core     | 6        |      | module       |&#x000A; | web_core | 3        |      | module       |&#x000A; +----------+----------+------+--------------+&#x000A; 2 rows in set&#x000A;&#x000A; # Let's install another library&#x000A; bash&gt; boson install http://github.com/cldwalker/irbfiles/raw/master/boson/commands/irb_core.rb&#x000A; Saved to /Users/bozo/.boson/commands/irb_core.rb&#x000A;&#x000A; # Let's start irb ...&#x000A; bash&gt; irb&#x000A;&#x000A; &gt;&gt; commands&#x000A; +-------------------------------+----------+------------+--------------------------------------------+-----------------------------------------------------------------------------+&#x000A; | full_name                     | lib      | alias      | usage                                      | description                                                                 |&#x000A; +-------------------------------+----------+------------+--------------------------------------------+-----------------------------------------------------------------------------+&#x000A; | usage                         | core     |            | [name][--verbose]                          | Print a command's usage                                                     |&#x000A; | libraries                     | core     |            | [query=''][--index] [--query_fields=name]  | List or search libraries                                                    |&#x000A; | render                        | core     |            | [object] [options={}]                      | Render any object using Hirb                                                |&#x000A; | load_library                  | core     |            | [library][--verbose] [--reload]            | Load/reload a library                                                       |&#x000A; | commands                      | core     |            | [query=''][--index] [--query_fields=A,B,C] | List or search commands                                                     |&#x000A; | menu                          | core     |            | [output] [options={}] [&amp;block]             | Provide a menu to multi-select elements from a given array                  |&#x000A; | get                           | web_core |            | [url]                                      | Gets the body of a url                                                      |&#x000A; | install                       | web_core |            | [url][--force] [--name=NAME]               | Installs a library by url. Library should then be loaded with load_library. |&#x000A; | browser                       | web_core |            | [*urls]                                    | Opens urls in a browser                                                     |&#x000A; | irb_pop_workspace             | irb_core | popws      |                                            | Pops current workspace and changes to next workspace in context             |&#x000A; | irb_require                   | irb_core |            |                                            | Evals file like require line by line                                        |&#x000A; | public                        | irb_core |            |                                            | Works same as module#public                                                 |&#x000A; | private                       | irb_core |            |                                            | Works same as module#private                                                |&#x000A; | irb                           | irb_core |            |                                            | Starts a new workspace/subsession                                           |&#x000A; | irb_push_workspace            | irb_core | pushws     |                                            | Creates a workspace for given object and pushes it into the current context |&#x000A; | irb_load                      | irb_core |            |                                            | Evals file like load line by line                                           |&#x000A; | irb_change_workspace          | irb_core | cws        |                                            | Changes current workspace to given object                                   |&#x000A; | irb_source                    | irb_core | source     |                                            | Evals full path file line by line                                           |&#x000A; | irb_jobs                      | irb_core | jobs       |                                            | List workspaces/subsessions                                                 |&#x000A; | irb_fg                        | irb_core | fg         |                                            | Switch to a workspace/subsession                                            |&#x000A; | irb_help                      | irb_core | help       |                                            | Ri based help                                                               |&#x000A; | irb_kill                      | irb_core | kill       |                                            | Kills a given workspace/subsession                                          |&#x000A; | include                       | irb_core |            |                                            | Works same as module#include                                                |&#x000A; | irb_exit                      | irb_core | exit       |                                            | Kills the current workspace/subsession                                      |&#x000A; | irb_workspaces                | irb_core | workspaces |                                            | Array of workspaces for current context                                     |&#x000A; | irb_context                   | irb_core | conf       |                                            | Displays configuration for current workspace/subsession                     |&#x000A; | install_alias_method          | irb_core |            |                                            | Aliases given method, allows lazy loading of dependent file                 |&#x000A; | irb_current_working_workspace | irb_core | cwws       |                                            | Prints current workspace                                                    |&#x000A; +-------------------------------+----------+------------+--------------------------------------------+-----------------------------------------------------------------------------+&#x000A; 28 rows in set&#x000A;&#x000A; # Sweet! Now we have a list and description of commands that come with irb.</pre>
+            <h2>Creating Command Libraries</h2>
+            <p>
+            See <a href="../classes/Boson/FileLibrary.html">Boson::FileLibrary</a> or
+            <a
+            href="http://tagaholic.me/boson/doc/classes/Boson/FileLibrary.html">here</a>.
+            </p>
+            <h2>Todo</h2>
+            <ul>
+            <li>More docs
+            
+            </li>
+            <li>More tests
+            
+            </li>
+            <li>Making commands out of existing gems easier and more powerful
+            
+            </li>
+            <li>Better local repositories, perhaps a BosonFile
+            
+            </li>
+            <li>Consider managing extensions to core and standard libraries
+            
+            </li>
+            <li>Consider dropping alias gem dependency if not using its full potential
+            
+            </li>
+            </ul>
+            <h2>Motivation</h2>
+            <p>
+            My <a href="http://github.com/cldwalker/tag-tree">tagging obsession</a>
+            from the ruby console.
+            </p>
+            <h2>Acknowledgements</h2>
+            <p>
+            <a href="../classes/Boson.html">Boson</a> stands on the shoulders of these
+            people and their ideas:
+            </p>
+            <ul>
+            <li>Yehuda Katz and Daniel Berger for an awesome option parser (<a
+            href="../classes/Boson/OptionParser.html">Boson::OptionParser</a>)
+            
+            </li>
+            <li>Dave Thomas for scraping a method&#8217;s comments (<a
+            href="../classes/Boson/CommentInspector.html">Boson::CommentInspector</a>)
+            
+            </li>
+            <li>Mauricio Fernandez for scraping a method&#8217;s arguments (<a
+            href="../classes/Boson/ArgumentInspector.html">Boson::ArgumentInspector</a>)
+            
+            </li>
+            <li>Chris Wanstrath for inspiring Boson&#8217;s libraries with Rip&#8217;s
+            packages.
+            
+            </li>
+            </ul>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

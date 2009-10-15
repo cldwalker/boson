@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::ArgumentInspector [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson::ArgumentInspector
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/inspectors/argument_inspector_rb.html">lib/boson/inspectors/argument_inspector.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            Extracts arguments and their default values from methods either by by
+            scraping a method&#8217;s text or with method_added and brute force eval
+            (thanks to <a
+            href="http://eigenclass.org/hiki/method+arguments+via+introspection">eigenclass</a>).
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000040">scrape_with_eval</a></li>
+              <li><a href="#M000039">scrape_with_text</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MAX_ARGS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>10</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      Max number of arguments extracted per method with <a
+                      href="ArgumentInspector.html#M000040">scrape_with_eval</a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000040'>
+                <a name='M000040'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>scrape_with_eval</span>
+                  <span class='arguments'>(meth, klass, object)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Scrapes non-private methods for argument names and default values. Returns
+                  arguments as array of argument arrays with optional default value as a
+                  second element.
+                  </p>
+                  <h4>Examples:</h4>
+                  <pre>def meth1(arg1, arg2='val', options={}) -&gt; [['arg1'], ['arg2', 'val'], ['options', {}]]&#x000A;def meth2(*args) -&gt; [['*args']]</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000040-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000040-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/argument_inspector.rb, line 21</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape_with_eval</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">klass</span>, <span class="ruby-identifier">object</span>)&#x000A;    <span class="ruby-keyword kw">unless</span> <span class="ruby-node">%w[initialize]</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>)&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">object</span>; <span class="ruby-identifier">private_instance_methods</span>(<span class="ruby-keyword kw">true</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span> } <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>)&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-identifier">params</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">arity</span>, <span class="ruby-identifier">num_args</span> = <span class="ruby-identifier">trace_method_args</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">klass</span>, <span class="ruby-identifier">object</span>)&#x000A;    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">local_variables</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">params</span> <span class="ruby-comment cmt"># nothing new found</span>&#x000A;    <span class="ruby-identifier">format_arguments</span>(<span class="ruby-identifier">params</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">arity</span>, <span class="ruby-identifier">num_args</span>)&#x000A;    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span>&#x000A;      <span class="ruby-comment cmt"># puts &quot;#{klass}.#{meth}: #{$!.message}&quot;</span>&#x000A;    <span class="ruby-keyword kw">ensure</span>&#x000A;      <span class="ruby-identifier">set_trace_func</span>(<span class="ruby-keyword kw">nil</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000039'>
+                <a name='M000039'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>scrape_with_text</span>
+                  <span class='arguments'>(file_string, meth)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns same argument arrays as <a
+                  href="ArgumentInspector.html#M000040">scrape_with_eval</a> but argument
+                  defaults haven&#8217;t been evaluated.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000039-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000039-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/argument_inspector.rb, line 7</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape_with_text</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">meth</span>)&#x000A;    <span class="ruby-identifier">tabspace</span> = <span class="ruby-value str">&quot;[ \t]&quot;</span>&#x000A;    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">match</span> = <span class="ruby-node">/^#{tabspace}*def#{tabspace}+#{meth}\b#{tabspace}*($|\(?\s*([^\)]+)\s*\)?\s*$)/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">file_string</span>)&#x000A;      (<span class="ruby-identifier">match</span>.<span class="ruby-identifier">to_a</span>[<span class="ruby-value">2</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*,\s*/</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*=\s*/</span>)}&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

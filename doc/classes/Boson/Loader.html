@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::Loader [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson::Loader
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/loader_rb.html">lib/boson/loader.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            This module is mixed into <a href="Library.html">Library</a> to give it
+            load() and reload() functionality. When creating your own <a
+            href="Library.html">Library</a> subclass, you should override <a
+            href="Loader.html#M000016">load_source_and_set_module</a> and <a
+            href="Loader.html#M000019">reload_source_and_set_module</a> . You can
+            override other methods in this module as needed.
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000015">load</a></li>
+              <li><a href="#M000016">load_source_and_set_module</a></li>
+              <li><a href="#M000017">loaded_correctly?</a></li>
+              <li><a href="#M000018">reload</a></li>
+              <li><a href="#M000019">reload_source_and_set_module</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000015'>
+                <a name='M000015'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>load</span>
+                  <span class='arguments'>() {|if block_given?| ...}</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Loads a library and its dependencies and returns true if library loads
+                  correctly.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000015-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000015-source'><span class="ruby-comment cmt"># File lib/boson/loader.rb, line 10</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load</span>&#x000A;      <span class="ruby-ivar">@gems</span> <span class="ruby-operator">||=</span> []&#x000A;      <span class="ruby-identifier">load_source_and_set_module</span>&#x000A;      <span class="ruby-identifier">module_callbacks</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@module</span>&#x000A;      <span class="ruby-keyword kw">yield</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;      (<span class="ruby-ivar">@module</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@class_commands</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">detect_additions</span> { <span class="ruby-identifier">load_module_commands</span> } <span class="ruby-operator">:</span> <span class="ruby-ivar">@namespace</span> = <span class="ruby-keyword kw">nil</span>&#x000A;      <span class="ruby-ivar">@init_methods</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">namespace_object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">m</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">namespace_object</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">m</span>) } <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@init_methods</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@index</span>&#x000A;      <span class="ruby-identifier">set_library_commands</span>&#x000A;      <span class="ruby-identifier">loaded_correctly?</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-ivar">@loaded</span> = <span class="ruby-keyword kw">true</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000016'>
+                <a name='M000016'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>load_source_and_set_module</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Load the source and set instance variables necessary to make a library
+                  valid i.e. @module.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000016-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000016-source'><span class="ruby-comment cmt"># File lib/boson/loader.rb, line 22</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load_source_and_set_module</span>; <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000017'>
+                <a name='M000017'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>loaded_correctly?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Boolean which indicates if library loaded correctly.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000017-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000017-source'><span class="ruby-comment cmt"># File lib/boson/loader.rb, line 25</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">loaded_correctly?</span>&#x000A;      <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-ivar">@module</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000018'>
+                <a name='M000018'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>reload</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Reloads a library from its source and adds new commands.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000018-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000018-source'><span class="ruby-comment cmt"># File lib/boson/loader.rb, line 30</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reload</span>&#x000A;      <span class="ruby-identifier">original_commands</span> = <span class="ruby-ivar">@commands</span>&#x000A;      <span class="ruby-identifier">reload_source_and_set_module</span>&#x000A;      <span class="ruby-identifier">detect_additions</span> { <span class="ruby-identifier">load_module_commands</span> } <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@new_module</span>&#x000A;      <span class="ruby-ivar">@new_commands</span> = <span class="ruby-ivar">@commands</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">original_commands</span>&#x000A;      <span class="ruby-keyword kw">true</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000019'>
+                <a name='M000019'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>reload_source_and_set_module</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Same as <a href="Loader.html#M000016">load_source_and_set_module</a> except
+                  it reloads.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000019-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000019-source'><span class="ruby-comment cmt"># File lib/boson/loader.rb, line 39</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reload_source_and_set_module</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">LoaderError</span>, <span class="ruby-value str">&quot;Reload not implemented&quot;</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

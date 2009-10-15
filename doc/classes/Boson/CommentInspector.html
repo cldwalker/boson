@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::CommentInspector [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson::CommentInspector
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/inspectors/comment_inspector_rb.html">lib/boson/inspectors/comment_inspector.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            Scrapes comments right before a method for its attributes. Metadata
+            attributes are the same as <a
+            href="MethodInspector.html">MethodInspector</a> : desc, options,
+            render_options. Attributes must begin with &#8217;@&#8217; i.e.:
+            </p>
+            <pre># @desc Does foo&#x000A;# @options :verbose=&gt;true&#x000A;def foo(options={})</pre>
+            <p>
+            Some rules about comment attributes:
+            </p>
+            <ul>
+            <li>Attribute definitions can span multiple lines. When a new attribute starts
+            a line or the comments end then a definition ends.
+            
+            </li>
+            <li>If no @desc is found in the comment block, then the first comment line
+            directly above the method is assumed to be the value for @desc. This means
+            that no multi-line attribute definitions can occur without a description
+            since the last line is assumed to be a description.
+            
+            </li>
+            <li>options and render_options attributes can take any valid ruby since
+            they&#8217;re evaled in their module&#8217;s context.
+            
+            </li>
+            <li>desc attribute is not evaled and is simply text to be set as a string.
+            
+            </li>
+            </ul>
+            <p>
+            This module was inspired by <a
+            href="http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da">pragdave</a>.
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000038">scrape</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EVAL_ATTRIBUTES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:options, :render_options]</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000038'>
+                <a name='M000038'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>scrape</span>
+                  <span class='arguments'>(file_string, line, mod, attribute=nil)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Given a method&#8217;s file string, line number and defining module,
+                  returns a hash of attributes defined for that method.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000038-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000038-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/comment_inspector.rb, line 26</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">line</span>, <span class="ruby-identifier">mod</span>, <span class="ruby-identifier">attribute</span>=<span class="ruby-keyword kw">nil</span>)&#x000A;      <span class="ruby-identifier">hash</span> = <span class="ruby-identifier">scrape_file</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">line</span>) <span class="ruby-operator">||</span> {}&#x000A;      <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">select</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">attribute</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">attribute</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">k</span>) }.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-constant">EVAL_ATTRIBUTES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">eval_comment</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>), <span class="ruby-identifier">mod</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">attribute</span> <span class="ruby-value">? </span><span class="ruby-identifier">hash</span>[<span class="ruby-identifier">attribute</span>] <span class="ruby-operator">:</span> <span class="ruby-identifier">hash</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

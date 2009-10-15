@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::ConsoleRunner [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Boson::ConsoleRunner
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/runners/console_runner_rb.html">lib/boson/runners/console_runner.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong><a href="Runner.html">Boson::Runner</a></strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            <a href="Runner.html">Runner</a> used when starting irb. To use in irb,
+            drop this in your ~/.irbrc:
+            </p>
+            <pre>require 'boson'&#x000A;Boson.start</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000065">bin_start</a></li>
+              <li><a href="#M000064">start</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='public-class method' id='method-M000065'>
+                <a name='M000065'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>bin_start</span>
+                  <span class='arguments'>(repl, libraries)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Loads libraries and then starts irb (or the configured console) from the
+                  commandline.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000065-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000065-source'><span class="ruby-comment cmt"># File lib/boson/runners/console_runner.rb, line 23</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bin_start</span>(<span class="ruby-identifier">repl</span>, <span class="ruby-identifier">libraries</span>)&#x000A;        <span class="ruby-identifier">start</span> <span class="ruby-identifier">:no_defaults=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:libraries=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">libraries</span>&#x000A;        <span class="ruby-identifier">repl</span> = <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:console</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:console</span>]&#x000A;        <span class="ruby-identifier">repl</span> = <span class="ruby-constant">RUBY_PLATFORM</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/(:?mswin|mingw)/</span> <span class="ruby-operator">?</span> <span class="ruby-value str">'irb.bat'</span> <span class="ruby-operator">:</span> <span class="ruby-value str">'irb'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">repl</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;        <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">repl</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'/'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> (<span class="ruby-identifier">repl</span> = <span class="ruby-constant">Util</span>.<span class="ruby-identifier">which</span>(<span class="ruby-identifier">repl</span>))&#x000A;          <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;Console not found. Please specify full path in config[:console].&quot;</span>&#x000A;          <span class="ruby-keyword kw">return</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-constant">ARGV</span>.<span class="ruby-identifier">replace</span> [<span class="ruby-value str">'-f'</span>]&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">$0</span> = <span class="ruby-identifier">repl</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-class method' id='method-M000064'>
+                <a name='M000064'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>start</span>
+                  <span class='arguments'>(options={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Starts <a href="../Boson.html">Boson</a> by loading configured libraries.
+                  If no default libraries are specified in the config, it will load up all
+                  detected libraries.
+                  </p>
+                  <h4>Options</h4>
+                  <dl>
+                  <dt>:libraries</dt><dd>Array of libraries to load.
+                  
+                  </dd>
+                  <dt>:verbose</dt><dd>Boolean to be verbose about libraries loading. Default is true.
+                  
+                  </dd>
+                  <dt>:no_defaults</dt><dd>Boolean which turns off loading any default libraries. Default is false.
+                  
+                  </dd>
+                  <dt>:autoload_libraries</dt><dd>Boolean which makes any command execution easier. It redefines
+                  method_missing on Boson.main_object so that commands with unloaded
+                  libraries are automatically loaded. Default is false.
+                  
+                  </dd>
+                  </dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000064-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000064-source'><span class="ruby-comment cmt"># File lib/boson/runners/console_runner.rb, line 16</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-ivar">@options</span> = {<span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>}.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">options</span>&#x000A;        <span class="ruby-identifier">init</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@initialized</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span>(<span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:libraries</span>], <span class="ruby-identifier">load_options</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:libraries</span>]&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

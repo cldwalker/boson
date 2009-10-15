@@ -1,0 +1,339 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::OptionParser [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Boson::OptionParser
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/option_parser_rb.html">lib/boson/option_parser.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong>Object</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            This class provides option parsing for boolean, string, numeric and array
+            values given a simple hash of options. Setting option values should be
+            straightforward for *nix people. By option type:
+            </p>
+            <ul>
+            <li><b>:boolean</b>: These don&#8217;t have values i.e.
+            &#8217;&#8212;debug&#8217;. To toogle a boolean, prepend with &#8212;no-
+            i.e. &#8217;&#8212;no-debug&#8217;. Multiple booleans can be joined
+            together i.e. &#8217;-d -f -t&#8217; == &#8217;-dft&#8217;.
+            
+            </li>
+            <li><b>:string</b>: Separate name from value with space or &#8217;=&#8217; i.e.
+            &#8217;&#8212;color red&#8217; or &#8217;&#8212;color=red&#8217;.
+            
+            </li>
+            <li><b>:numeric</b>: Receives values as :string does or by appending number
+            right after name i.e. &#8217;-N3&#8217; == &#8217;-N=3&#8217;.
+            
+            </li>
+            <li><b>:array</b>: Receives values as :string does. Multiple values are split
+            by &#8217;,&#8217; i.e. &#8217;&#8212;fields 1,2,3&#8217; ->
+            [&#8216;1&#8217;,&#8217;2&#8217;,&#8217;3&#8217;]. The split character can
+            be configured as explained at <a
+            href="OptionParser.html#M000071">OptionParser.new</a> .
+            
+            </li>
+            </ul>
+            <p>
+            This is a modified version of Yehuda Katz&#8217;s Thor::Options class which
+            is a modified version of Daniel Berger&#8217;s Getopt::Long class (licensed
+            under Ruby&#8217;s license).
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000071">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000073">formatted_usage</a></li>
+              <li><a href="#M000070">non_opts</a></li>
+              <li><a href="#M000072">parse</a></li>
+              <li><a href="#M000075">print_usage_table</a></li>
+              <li><a href="#M000074">to_s</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='class-list'>
+              <h2>Classes and Modules</h2>
+              Class <a href="OptionParser/Error.html" class="link">Boson::OptionParser::Error</a><br />
+            </div>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NUMERIC</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/(\d*\.\d+|\d+)/</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>LONG_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/^(--\w+[-\w+]*)$/</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHORT_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/^(-[a-zA-Z])$/i</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EQ_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/^(--\w+[-\w+]*|-[a-zA-Z])=(.*)$/i</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHORT_SQ_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/^-([a-zA-Z]{2,})$/i</td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SHORT_NUM</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/^(-[a-zA-Z])#{NUMERIC}$/i</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>leading_non_opts</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>opt_aliases</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>trailing_non_opts</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='public-class method' id='method-M000071'>
+                <a name='M000071'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(opts)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Takes a hash of options. Each option, a key-value pair, must provide the
+                  option&#8217;s name and type. Names longer than one character are accessed
+                  with &#8217;&#8212;&#8217; while one character names are accessed with
+                  &#8217;-&#8217;. Names can be symbols, strings or even dasherized strings:
+                  </p>
+                  <pre>Boson::OptionParser.new :debug=&gt;:boolean, 'level'=&gt;:numeric,&#x000A;  '--fields'=&gt;:array</pre>
+                  <p>
+                  Options can have default values and implicit types simply by changing the
+                  option type for the default value:
+                  </p>
+                  <pre>Boson::OptionParser.new :debug=&gt;true, 'level'=&gt;3.1, :fields=&gt;%w{f1 f2}</pre>
+                  <p>
+                  By default every option name longer than one character is given an alias,
+                  the first character from its name. For example, the &#8212;fields option
+                  has -f as its alias. You can override the default alias by providing your
+                  own option aliases as an array in the option&#8217;s key.
+                  </p>
+                  <pre>Boson::OptionParser.new [:debug, :damnit, :D]=&gt;true</pre>
+                  <p>
+                  Note that aliases are accessed the same way as option names. For the above,
+                  &#8212;debug, &#8212;damnit and -D all refer to the same option.
+                  </p>
+                  <p>
+                  Options can have additional attributes by passing a hash to the option
+                  value instead of a type or default:
+                  </p>
+                  <pre>Boson::OptionParser.new :fields=&gt;{:type=&gt;:array, :values=&gt;%w{f1 f2 f3},&#x000A; :enum=&gt;false}</pre>
+                  <p>
+                  Here are the available option attributes:
+                  </p>
+                  <ul>
+                  <li><b>:type</b>: This or :default is required. Available types are :string,
+                  :boolean, :array, :numeric.
+                  
+                  </li>
+                  <li><b>:default</b>: This or :type is required. This is the default value an
+                  option has when not passed.
+                  
+                  </li>
+                  <li><b>:values</b>: An array of values an option can have. Available for :array
+                  and :string options. Values here can be aliased by typing a unique string
+                  it starts with. For example:
+                  
+                  <pre>For values foo, odd, optional: f refers to foo, o to odd and op to optional.</pre>
+                  </li>
+                  <li><b>:enum</b>: Boolean indicating if an option enforces values in :values.
+                  Default is true. Available for :array and :string options.
+                  
+                  </li>
+                  <li><b>:split</b>: Only for :array options. A string or regular expression on
+                  which an array value splits to produce an array of values. Default is
+                  &#8217;,&#8217;.
+                  
+                  </li>
+                  </ul>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000071-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000071-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 100</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-ivar">@defaults</span> = {}&#x000A;      <span class="ruby-ivar">@opt_aliases</span> = {}&#x000A;      <span class="ruby-ivar">@leading_non_opts</span>, <span class="ruby-ivar">@trailing_non_opts</span> = [], []&#x000A;&#x000A;      <span class="ruby-comment cmt"># build hash of dashed options to option types</span>&#x000A;      <span class="ruby-comment cmt"># type can be a hash of opt attributes, a default value or a type symbol</span>&#x000A;      <span class="ruby-ivar">@opt_types</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">inject</span>({}) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mem</span>, (<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>)<span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">aliases</span> = <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;        <span class="ruby-identifier">name</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>&#x000A;        <span class="ruby-comment cmt"># we need both nice and dasherized form of option name</span>&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'-'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;          <span class="ruby-identifier">nice_name</span> = <span class="ruby-identifier">undasherize</span> <span class="ruby-identifier">name</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">nice_name</span> = <span class="ruby-identifier">name</span>&#x000A;          <span class="ruby-identifier">name</span> = <span class="ruby-identifier">dasherize</span> <span class="ruby-identifier">name</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-comment cmt"># store for later</span>&#x000A;        <span class="ruby-ivar">@opt_aliases</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">aliases</span> <span class="ruby-operator">||</span> []&#x000A;&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;          <span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">||=</span> {}&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span>&#x000A;          <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>]&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>][<span class="ruby-identifier">:enum</span>] = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:values</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:enum</span>)&#x000A;          <span class="ruby-identifier">type</span> = <span class="ruby-identifier">determine_option_type</span>(<span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>]) <span class="ruby-operator">||</span> <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:type</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">:boolean</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-comment cmt"># set defaults</span>&#x000A;        <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">type</span>&#x000A;          <span class="ruby-keyword kw">when</span> <span class="ruby-constant">TrueClass</span>               <span class="ruby-keyword kw">then</span>  <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-keyword kw">true</span>&#x000A;          <span class="ruby-keyword kw">when</span> <span class="ruby-constant">FalseClass</span>              <span class="ruby-keyword kw">then</span>  <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-keyword kw">false</span>&#x000A;          <span class="ruby-keyword kw">when</span> <span class="ruby-constant">String</span>, <span class="ruby-constant">Numeric</span>, <span class="ruby-constant">Array</span>  <span class="ruby-keyword kw">then</span>  <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        &#x000A;        <span class="ruby-identifier">mem</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">determine_option_type</span>(<span class="ruby-identifier">type</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">type</span>&#x000A;        <span class="ruby-identifier">mem</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-comment cmt"># generate hash of dashed aliases to dashed options</span>&#x000A;      <span class="ruby-ivar">@opt_aliases</span> = <span class="ruby-ivar">@opt_aliases</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">inject</span>({}) {<span class="ruby-operator">|</span><span class="ruby-identifier">h</span>, (<span class="ruby-identifier">nice_name</span>, <span class="ruby-identifier">aliases</span>)<span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">name</span> = <span class="ruby-identifier">dasherize</span> <span class="ruby-identifier">nice_name</span>&#x000A;        <span class="ruby-comment cmt"># allow for aliases as symbols</span>&#x000A;        <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">map!</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'-'</span>) <span class="ruby-operator">!=</span> <span class="ruby-value">0</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">dasherize</span>(<span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">e</span> }&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">nice_name</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;          <span class="ruby-identifier">opt_alias</span> = <span class="ruby-identifier">nice_name</span>[<span class="ruby-value">0</span>,<span class="ruby-value">1</span>]&#x000A;          <span class="ruby-identifier">opt_alias</span> = <span class="ruby-identifier">h</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>) <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>.<span class="ruby-identifier">capitalize</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>&#x000A;          <span class="ruby-identifier">h</span>[<span class="ruby-identifier">opt_alias</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">opt_alias</span>)&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">e</span>] = <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">e</span>) }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">h</span>&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000073'>
+                <a name='M000073'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>formatted_usage</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  One-line option usage
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000073-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 198</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">formatted_usage</span>&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-value str">&quot;&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opt</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">type</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:boolean</span>&#x000A;          <span class="ruby-node">&quot;[#{opt}]&quot;</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:required</span>&#x000A;          <span class="ruby-identifier">opt</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;=&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opt</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/\-/</span>, <span class="ruby-value str">&quot;&quot;</span>).<span class="ruby-identifier">upcase</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">sample</span> = <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">opt</span>)]&#x000A;          <span class="ruby-identifier">sample</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">type</span>&#x000A;            <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:string</span>  <span class="ruby-keyword kw">then</span> <span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">opt</span>).<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp re">/\-/</span>, <span class="ruby-value str">&quot;_&quot;</span>).<span class="ruby-identifier">upcase</span>&#x000A;            <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:numeric</span> <span class="ruby-keyword kw">then</span> <span class="ruby-value str">&quot;N&quot;</span>&#x000A;            <span class="ruby-keyword kw">when</span> <span class="ruby-identifier">:array</span>   <span class="ruby-keyword kw">then</span> <span class="ruby-value str">&quot;A,B,C&quot;</span>&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;          <span class="ruby-value str">&quot;[&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">opt</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;=&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">sample</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;]&quot;</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot; &quot;</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000070'>
+                <a name='M000070'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>non_opts</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Array of arguments left after defined options have been parsed out by
+                  parse.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000070-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 54</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">non_opts</span>&#x000A;      <span class="ruby-identifier">leading_non_opts</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">trailing_non_opts</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000072'>
+                <a name='M000072'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>parse</span>
+                  <span class='arguments'>(args, flags={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Parses an array of arguments for defined options to return a hash. Once the
+                  parser recognizes a valid option, it continues to parse until an non option
+                  argument is detected. Flags that can be passed to the parser:
+                  </p>
+                  <ul>
+                  <li>:opts_before_args: When true options must come before arguments. Default is
+                  false.
+                  
+                  </li>
+                  <li>:delete_invalid_opts: When true deletes any invalid options left after
+                  parsing. Default is false.
+                  
+                  </li>
+                  </ul>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000072-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000072-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 160</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse</span>(<span class="ruby-identifier">args</span>, <span class="ruby-identifier">flags</span>={})&#x000A;      <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>&#x000A;      <span class="ruby-comment cmt"># start with defaults</span>&#x000A;      <span class="ruby-identifier">hash</span> = <span class="ruby-constant">IndifferentAccessHash</span>.<span class="ruby-identifier">new</span> <span class="ruby-ivar">@defaults</span>&#x000A;      &#x000A;      <span class="ruby-ivar">@leading_non_opts</span> = []&#x000A;      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">flags</span>[<span class="ruby-identifier">:opts_before_args</span>]&#x000A;        <span class="ruby-ivar">@leading_non_opts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">shift</span> <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">current_is_option?</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@args</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">current_is_option?</span>&#x000A;        <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">shift</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">SHORT_SQ_RE</span>&#x000A;          <span class="ruby-identifier">unshift</span> <span class="ruby-identifier">$1</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">''</span>).<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;-#{f}&quot;</span> }&#x000A;          <span class="ruby-keyword kw">next</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">EQ_RE</span>, <span class="ruby-constant">SHORT_NUM</span>&#x000A;          <span class="ruby-identifier">unshift</span> <span class="ruby-identifier">$2</span>&#x000A;          <span class="ruby-identifier">option</span> = <span class="ruby-identifier">$1</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">LONG_RE</span>, <span class="ruby-constant">SHORT_RE</span>&#x000A;          <span class="ruby-identifier">option</span> = <span class="ruby-identifier">$1</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        &#x000A;        <span class="ruby-identifier">dashed_option</span> = <span class="ruby-identifier">normalize_option</span>(<span class="ruby-identifier">option</span>)&#x000A;        <span class="ruby-ivar">@current_option</span> = <span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">dashed_option</span>)&#x000A;        <span class="ruby-identifier">type</span> = <span class="ruby-identifier">option_type</span>(<span class="ruby-identifier">dashed_option</span>)&#x000A;        <span class="ruby-identifier">validate_option_value</span>(<span class="ruby-identifier">type</span>)&#x000A;        <span class="ruby-identifier">value</span> = <span class="ruby-identifier">get_option_value</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">dashed_option</span>)&#x000A;        <span class="ruby-comment cmt"># set on different line since current_option may change</span>&#x000A;        <span class="ruby-identifier">hash</span>[<span class="ruby-ivar">@current_option</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-identifier">value</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-ivar">@trailing_non_opts</span> = <span class="ruby-ivar">@args</span>&#x000A;      <span class="ruby-identifier">check_required!</span> <span class="ruby-identifier">hash</span>&#x000A;      <span class="ruby-identifier">delete_invalid_opts</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">flags</span>[<span class="ruby-identifier">:delete_invalid_opts</span>]&#x000A;      <span class="ruby-identifier">hash</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000075'>
+                <a name='M000075'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>print_usage_table</span>
+                  <span class='arguments'>(render_options={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  More verbose option help in the form of a table.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000075-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000075-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 221</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">print_usage_table</span>(<span class="ruby-identifier">render_options</span>={})&#x000A;      <span class="ruby-identifier">aliases</span> = <span class="ruby-ivar">@opt_aliases</span>.<span class="ruby-identifier">invert</span>&#x000A;      <span class="ruby-identifier">additional</span> = [<span class="ruby-identifier">:desc</span>, <span class="ruby-identifier">:values</span>].<span class="ruby-identifier">select</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> (<span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">values</span>.<span class="ruby-identifier">any?</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">f</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">e</span>) } }&#x000A;      <span class="ruby-identifier">opts</span> = <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">inject</span>([]) {<span class="ruby-operator">|</span><span class="ruby-identifier">t</span>,<span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">h</span> = {<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">e</span>, <span class="ruby-identifier">:aliases=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">aliases</span>[<span class="ruby-identifier">e</span>], <span class="ruby-identifier">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">e</span>]}&#x000A;        <span class="ruby-identifier">additional</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">f</span>] = (<span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">e</span>)] <span class="ruby-operator">||</span> {})[<span class="ruby-identifier">f</span>]  }&#x000A;        <span class="ruby-identifier">t</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">h</span>&#x000A;      }&#x000A;      <span class="ruby-identifier">render_options</span> = {<span class="ruby-identifier">:headers=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">&quot;Option&quot;</span>, <span class="ruby-identifier">:aliases=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">&quot;Alias&quot;</span>, <span class="ruby-identifier">:desc=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'Description'</span>, <span class="ruby-identifier">:values=</span><span class="ruby-operator">&gt;</span><span class="ruby-value str">'Values'</span>},&#x000A;        <span class="ruby-identifier">:fields=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">:name</span>, <span class="ruby-identifier">:aliases</span>, <span class="ruby-identifier">:type</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">additional</span>, <span class="ruby-identifier">:description=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">:filters=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-identifier">:values=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">e</span> <span class="ruby-operator">||</span> []).<span class="ruby-identifier">join</span>(<span class="ruby-value str">','</span>)} }&#x000A;      }.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">render_options</span>)&#x000A;      <span class="ruby-constant">View</span>.<span class="ruby-identifier">render</span> <span class="ruby-identifier">opts</span>, <span class="ruby-identifier">render_options</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000074'>
+                <a name='M000074'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>to_s</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Alias for <a href="OptionParser.html#M000073">formatted_usage</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
