@@ -5,7 +5,7 @@ Works with Ruby 1.8.6 and 1.9.1.
 
 == Features
 * Commands are just methods extended for a given object, the default being the top level object, main.
-* Commands are accessible from the commandline (Boson::BinRunner) or irb (Boson::ReplRunner).
+* Commands are accessible from the commandline (Boson::BinRunner) or irb (Boson::ConsoleRunner).
 * Command libraries, which are just modules, are written in non-dsl ruby which allows for easy testing
   and use outside of boson (Boson::FileLibrary).
 * Comes with default commands to load, search, list and install commands and libraries (Boson::Commands::Core).
@@ -137,6 +137,7 @@ See Boson::FileLibrary or here[http://tagaholic.me/boson/doc/classes/Boson/FileL
 * Making commands out of existing gems easier and more powerful
 * Better local repositories, perhaps a BosonFile
 * Consider managing extensions to core and standard libraries
+* Consider dropping alias gem dependency if not using its full potential
 
 == Motivation
 My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby console.
