@@ -1,8 +1,9 @@
 == 0.1.0
 * First real release
 * Plenty of fixes to make it ruby 1.9 ready.
-* More documentation
+* Added more documentation
 * BinRunner tweaks and bug fixes
+* Other miscellaneous bug fixes
 
 == 0.0.1
 * An initial release for others to play with.

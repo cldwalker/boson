@@ -25,7 +25,7 @@ begin
     s.authors = ["Gabriel Horner"]
     s.has_rdoc = true
     s.rubyforge_project = 'tagaholic'
-    s.add_dependency 'hirb', '>= 0.2.6'
+    s.add_dependency 'hirb', '>= 0.2.7'
     s.add_dependency 'alias', '>= 0.2.1'
     s.extra_rdoc_files = ["README.rdoc", "LICENSE.txt"]
     s.files = FileList["Rakefile", "VERSION.yml", "README.rdoc", "LICENSE.txt", "{bin,lib,test}/**/*"]
