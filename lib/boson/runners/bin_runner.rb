@@ -36,17 +36,15 @@ module Boson
         init
 
         if @options[:help]
-          print_command_help
+          Boson.invoke(:usage, @command, :verbose=>@options[:verbose])
         elsif @options[:execute]
           Boson.main_object.instance_eval @options[:execute]
         else
           execute_command
         end
       rescue Exception
-        message = (@command && !Boson.can_invoke?(@command[/\w+/])) ?
+        print_error_message (@command && !Boson.can_invoke?(@command[/\w+/])) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
-        message += "\nActual error: #{$!}\n" + $!.backtrace.inspect if @options && @options[:verbose]
-        $stderr.puts message
       end
 
       # Loads the given command.
@@ -63,6 +61,11 @@ module Boson
       end
 
       #:stopdoc:
+      def print_error_message(message)
+        message += "\nActual error: #{$!}\n" + $!.backtrace.inspect if @options && @options[:verbose]
+        $stderr.puts message
+      end
+
       def load_command_by_index
         Index.update(:verbose=>@options[:verbose]) if !@options[:index] && Boson.can_invoke?(@command) && !@options[:help]
         if !Boson.can_invoke?(@command) && ((lib = Index.find_library(@command)) ||
@@ -80,12 +83,10 @@ module Boson
         dispatcher = subcommand ? Boson.invoke(command) : Boson.main_object
         render_output dispatcher.send(subcommand || command, *@args)
       rescue ArgumentError
-        puts "'#{@command}' was called incorrectly."
-        print_command_help
-      end
-
-      def print_command_help
-        Boson.invoke(:usage, @command, :verbose=>@options[:verbose])
+        # for the rare case it's raise outside of boson
+        raise unless $!.backtrace.first.include?('boson/')
+        print_error_message "'#{@command}' was called incorrectly."
+        Boson.invoke(:usage, @command)
       end
 
       def parse_args(args)
