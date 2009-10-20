@@ -23,7 +23,8 @@ module Boson
       :console=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
       :load=>{:type=>:array, :values=>all_libraries, :enum=>false, :desc=>"A comma delimited array of libraries to load"},
-      :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"}
+      :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"},
+      :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"}
     } #:nodoc:
 
     class <<self
@@ -34,6 +35,7 @@ module Boson
         return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
         return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
         init
+        View.toggle_pager if @options[:pager_toggle]
 
         if @options[:help]
           Boson.invoke(:usage, @command, :verbose=>@options[:verbose])

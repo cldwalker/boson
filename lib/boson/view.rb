@@ -9,6 +9,10 @@ module Boson
       @enabled = true
     end
 
+    def toggle_pager
+      Hirb::View.toggle_pager
+    end
+
     # Renders any object via Hirb. Options are passed directly to
     # {Hirb::Console.render_output}[http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011].
     def render(object, options={})

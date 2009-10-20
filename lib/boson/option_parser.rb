@@ -226,7 +226,7 @@ module Boson
         additional.each {|f| h[f] = (@option_attributes[undasherize(e)] || {})[f]  }
         t << h
       }
-      render_options = {:headers=>{:name=>"Option", :aliases=>"Alias", :desc=>'Description', :values=>'Values'},
+      render_options = {:headers=>{:name=>"Option", :aliases=>"Alias", :desc=>'Description', :values=>'Values', :type=>'Type'},
         :fields=>[:name, :aliases, :type] + additional, :description=>false, :filters=>{:values=>lambda {|e| (e || []).join(',')} }
       }.merge(render_options)
       View.render opts, render_options
