@@ -15,12 +15,10 @@ module Boson
         }.should =~ /included blah/
       end
 
-      test "calls methods in config init_methods" do
-        with_config(:libraries=>{"blah"=>{:init_methods=>['blah']}}) do
-          capture_stdout {
-            load :blah, :file_string=>"module Blah; def blah; puts 'yo'; end; end"
-          }.should == "yo\n"
-        end
+      test "calls after_included hook" do
+        capture_stdout {
+          load :blah, :file_string=>"module Blah; def self.after_included; puts 'yo'; end; end"
+        }.should == "yo\n"
       end
 
       test "prints error and returns false for existing library" do

@@ -13,7 +13,6 @@ module Boson
       module_callbacks if @module
       yield if block_given?
       (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = nil
-      @init_methods.each {|m| namespace_object.send(m) if namespace_object.respond_to?(m) } if @init_methods && !@index
       set_library_commands
       loaded_correctly? && (@loaded = true)
     end
@@ -75,6 +74,7 @@ module Boson
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
       @namespace ? Namespace.create(@namespace, self) : include_in_universe
+      @module.after_included if @module.respond_to?(:after_included) && !@index
     end
 
     def include_in_universe(lib_module=@module)
