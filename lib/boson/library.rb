@@ -60,7 +60,7 @@ module Boson
       set_command_aliases(repo.config[:command_aliases])
       @namespace = true if Boson.repo.config[:auto_namespace] && @namespace.nil? &&
         !Boson::Runner.default_libraries.include?(@module)
-      @namespace = clean_name if @namespace
+      @namespace = clean_name if @namespace && !@namespace.is_a?(String)
     end
 
     # A concise symbol version of a library type i.e. FileLibrary -> :file.
