@@ -33,7 +33,7 @@ module Boson
         begin
           sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?
             lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :
-            (object[0].send(sort).respond_to?(:<=>) ? lambda {|e| e.send(sort)} :
+            (object[0].send(sort).respond_to?(:<=>) ? lambda {|e| e.send(sort) || ''} :
             lambda {|e| e.send(sort).to_s })
           object = object.sort_by &sort_lambda
           object = object.reverse if options[:reverse_sort]
