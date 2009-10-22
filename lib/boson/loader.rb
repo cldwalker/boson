@@ -74,11 +74,11 @@ module Boson
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
       @namespace ? Namespace.create(@namespace, self) : include_in_universe
-      @module.after_included if @module.respond_to?(:after_included) && !@index
     end
 
     def include_in_universe(lib_module=@module)
       Boson::Universe.send :include, lib_module
+      @module.after_included if lib_module.respond_to?(:after_included) && !@index
       Boson::Universe.send :extend_object, Boson.main_object
     end
 
