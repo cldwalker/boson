@@ -64,6 +64,13 @@ module Boson
     main_object.send(*args, &block)
   end
 
+  # Invoke command string even with namespaces
+  def full_invoke(cmd, args) #:nodoc:
+    command, subcommand = cmd.include?('.') ? cmd.split('.', 2) : [cmd, nil]
+    dispatcher = subcommand ? Boson.invoke(command) : Boson.main_object
+    dispatcher.send(subcommand || command, *args)
+  end
+
   # Boolean indicating if the main object can invoke the given method/command.
   def can_invoke?(meth)
     Boson.main_object.respond_to? meth

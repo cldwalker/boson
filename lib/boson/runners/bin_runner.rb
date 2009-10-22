@@ -81,10 +81,8 @@ module Boson
       end
 
       def execute_command
-        command, subcommand = @command.include?('.') ? @command.split('.', 2) : [@command, nil]
-        dispatcher = subcommand ? Boson.invoke(command) : Boson.main_object
-        render_output dispatcher.send(subcommand || command, *@args)
-      rescue ArgumentError
+        render_output Boson.full_invoke(@command, @args)
+        rescue ArgumentError
         # for the rare case it's raise outside of boson
         raise unless $!.backtrace.first.include?('boson/')
         print_error_message "'#{@command}' was called incorrectly."
