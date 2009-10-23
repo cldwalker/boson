@@ -5,6 +5,26 @@ module Boson
   # This module is mixed into Library to give it load() and reload() functionality.
   # When creating your own Library subclass, you should override load_source_and_set_module and
   # reload_source_and_set_module . You can override other methods in this module as needed.
+  #
+  # === Module Callbacks
+  # For libraries that have a module i.e. FileLibrary and GemLibrary, the following class methods
+  # are invoked in the order below when loading a library:
+  #
+  # [:config] This method returns a library's hash of attributes as explained by Library.new. This is useful
+  #           for distributing libraries with a default configuration. The library attributes specified here
+  #           can be overridden by a user in their config file.
+  # [:append_features] In addition to its normal behavior, this method's return value determines if a
+  #                    library is loaded in the current environment. This is useful for libraries that you
+  #                    want loaded by default but not in some environments i.e. different ruby versions or
+  #                    in irb but not in script/console. Remember to use super when returning true.
+  # [:included] In addition to its normal behavior, this method should be used to require external libraries.
+  #             Although requiring dependencies could be done anywhere in a module, putting dependencies here
+  #             are encouraged. By not having dependencies hardcoded in a module, it's possible to analyze
+  #             and view a library's commands without having to install and load its dependencies.
+  #             If creating commands here, note that conflicts with existing commands won't be detected.
+  # [:after_included] This method is called after included() to initialize functionality. This is useful for
+  #                   libraries that are primarily executing ruby code i.e. defining ruby extensions or
+  #                   setting irb features. This method isn't called when indexing a library.
   module Loader
     # Loads a library and its dependencies and returns true if library loads correctly.
     def load
