@@ -58,7 +58,7 @@ module Boson
       @repo_dir = repo.dir
       @commands_hash = {}
       @commands = []
-      set_config (repo.config[:libraries][@name] || {}).merge(hash)
+      set_config (repo.config[:libraries][@name] || {}).merge(hash), true
       set_command_aliases(repo.config[:command_aliases])
       @namespace = true if Boson.repo.config[:auto_namespace] && @namespace.nil? &&
         !Boson::Runner.default_libraries.include?(@module)
@@ -86,7 +86,7 @@ module Boson
       name.to_s or raise ArgumentError, "New library missing required key :name"
     end
 
-    def set_config(config)
+    def set_config(config, force=false)
       if (commands = config.delete(:commands))
         if commands.is_a?(Array)
           @commands += commands
@@ -97,7 +97,7 @@ module Boson
         end
       end
       set_command_aliases config.delete(:command_aliases) if config[:command_aliases]
-      set_attributes config, true
+      set_attributes config, force
     end
 
     def set_command_aliases(command_aliases)

@@ -9,16 +9,23 @@ module Boson
 
     context "load" do
       before(:each) { reset }
-      test "calls included hook" do
+      test "calls included callback" do
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
         }.should =~ /included blah/
       end
 
-      test "calls after_included hook" do
+      test "calls after_included callback" do
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.after_included; puts 'yo'; end; end"
         }.should == "yo\n"
+      end
+
+      test "config callback overridden by user's config" do
+        with_config(:libraries=>{'blah'=>{:namespace=>false}}) do
+          load :blah, :file_string=>"module Blah; def self.config; {:namespace=>'bling'}; end; end"
+          library('blah').namespace.should == false
+        end
       end
 
       test "prints error and returns false for existing library" do
