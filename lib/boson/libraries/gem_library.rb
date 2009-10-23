@@ -1,6 +1,12 @@
 module Boson
   # This library loads a gem by the given name. Unlike FileLibrary or ModuleLibrary, this library
   # doesn't need a module to provide its functionality.
+  #
+  # Example:
+  #   >> load_library 'httparty', :class_commands=>{'put'=>'HTTParty.put',
+  #      'delete'=>'HTTParty.delete' }
+  #   => true
+  #   >> put 'http://someurl.com'
   class GemLibrary < Library
     #:stopdoc:
     def self.is_a_gem?(name)
