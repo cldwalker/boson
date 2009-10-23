@@ -69,7 +69,11 @@ module Boson
 
       test "failed subcommand prints error and not command not found" do
         BinRunner.expects(:execute_command).raises("bling")
-        capture_stderr { start("commands.blah") }.should =~ /Error: bling/
+        capture_stderr { start("commands.to_s") }.should =~ /Error: bling/
+      end
+
+      test "nonexistant subcommand prints command not found" do
+        capture_stderr { start("to_s.bling") }.should =~ /'to_s.bling' not found/
       end
 
       test "undiscovered command prints error" do
