@@ -12,7 +12,8 @@ module Boson
   #
   # [:config] This method returns a library's hash of attributes as explained by Library.new. This is useful
   #           for distributing libraries with a default configuration. The library attributes specified here
-  #           can be overridden by a user in their config file.
+  #           are overridden by ones a user has in their config file except for the :commands attribute, which
+  #           is recursively merged together.
   # [:append_features] In addition to its normal behavior, this method's return value determines if a
   #                    library is loaded in the current environment. This is useful for libraries that you
   #                    want loaded by default but not in some environments i.e. different ruby versions or

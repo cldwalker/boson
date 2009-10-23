@@ -29,7 +29,8 @@ module Boson
 
     # Creates a library object with a hash of attributes which must include a :name attribute.
     # Each hash pair maps directly to an instance variable and value. Defaults for attributes
-    # are read from config[:libraries][@library_name][@attribute].
+    # are read from config[:libraries][@library_name][@attribute]. When loading libraries, attributes
+    # can also be set via a library module's config() method (see Loader).
     #
     # Attributes that can be configured:
     # * *:dependencies*: An array of libraries that this library depends on. A library won't load
@@ -117,6 +118,10 @@ module Boson
 
     def command_objects(names)
       Boson.commands.select {|e| names.include?(e.name) && e.lib == self.name }
+    end
+
+    def command_object(name)
+      command_objects([name])[0]
     end
 
     def marshal_dump
