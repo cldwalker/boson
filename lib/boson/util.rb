@@ -108,5 +108,14 @@ module Boson
     def recursive_hash_merge(hash1, hash2)
       hash1.merge(hash2) {|k,o,n| (o.is_a?(Hash)) ? recursive_hash_merge(o,n) : n}
     end
+
+    # From Rubygems, determine a user's home.
+    def find_home
+      ['HOME', 'USERPROFILE'].each {|e| return ENV[e] if ENV[e] }
+      return "#{ENV['HOMEDRIVE']}#{ENV['HOMEPATH']}" if ENV['HOMEDRIVE'] && ENV['HOMEPATH']
+      File.expand_path("~")
+    rescue
+      File::ALT_SEPARATOR ? "C:/" : "/"
+    end
   end
 end
