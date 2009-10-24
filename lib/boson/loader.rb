@@ -116,7 +116,6 @@ module Boson
       @commands -= aliases
       @commands.delete(@namespace) if @namespace
       @commands += Boson.invoke(@namespace).boson_commands if @namespace && !@pre_defined_commands
-      @commands -= @except if @except
       @commands.uniq!
     end
     #:startdoc:

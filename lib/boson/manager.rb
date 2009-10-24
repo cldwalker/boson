@@ -129,10 +129,6 @@ module Boson
       end
 
       def create_commands(lib, commands=lib.commands)
-        if lib.except
-          commands -= lib.except
-          lib.except.each {|e| lib.namespace_object.instance_eval("class<<self;self;end").send :undef_method, e }
-        end
         before_create_commands(lib)
         commands.each {|e| Boson.commands << Command.create(e, lib)}
         create_command_aliases(lib, commands) if commands.size > 0 && !lib.no_alias_creation

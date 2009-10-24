@@ -5,7 +5,7 @@ module Boson
     context "after_load" do
       def load_library(hash)
         new_attributes = {:name=>hash.delete(:name), :commands=>[], :created_dependencies=>[], :loaded=>true}
-        [:module, :except, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
+        [:module, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
         Manager.expects(:load_once).returns(Library.new(new_attributes))
         Manager.load([hash[:name]])
       end
@@ -21,14 +21,6 @@ module Boson
         load_library :name=>'blah', :commands=>['frylock','meatwad']
         library_loaded? 'blah'
         command_exists?('frylock')
-        command_exists?('meatwad')
-      end
-
-      test "loads library with commands and except option" do
-        Boson.main_object.instance_eval("class<<self;self;end").expects(:undef_method).with('frylock')
-        load_library :name=>'blah', :commands=>['frylock','meatwad'], :except=>['frylock']
-        library_loaded? 'blah'
-        command_exists?('frylock', false)
         command_exists?('meatwad')
       end
 
