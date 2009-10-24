@@ -90,7 +90,7 @@ module Boson
     def create_module(base_module, name)
       desired_class = camelize(name)
       possible_suffixes = [''] + %w{1 2 3 4 5 6 7 8 9 10}
-      if (suffix = possible_suffixes.find {|e| base_module.const_defined?(desired_class+e)})
+      if (suffix = possible_suffixes.find {|e| !base_module.const_defined?(desired_class+e)})
         base_module.const_set(desired_class+suffix, Module.new)
       end
     end
