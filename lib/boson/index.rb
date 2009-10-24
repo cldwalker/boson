@@ -37,9 +37,10 @@ module Boson
     def read_and_transfer(ignored_libraries=[])
       read
       existing_libraries = (Boson.libraries.map {|e| e.name} + ignored_libraries).uniq
-      Boson.libraries += @libraries.select {|e| !existing_libraries.include?(e.name)}
-      existing_commands = Boson.commands.map {|e| e.name} #td: consider namespace
-      Boson.commands += @commands.select {|e| !existing_commands.include?(e.name) && !ignored_libraries.include?(e.lib)}
+      libraries_to_add = @libraries.select {|e| !existing_libraries.include?(e.name)}
+      Boson.libraries += libraries_to_add
+      # depends on saved commands being correctly associated with saved libraries
+      Boson.commands += libraries_to_add.map {|e| e.command_objects(e.commands, @commands) }.flatten
     end
 
     def exists?

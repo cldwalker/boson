@@ -9,7 +9,8 @@ module Boson
       before(:each) { reset_boson; Index.instance_eval "@libraries = @commands = nil" }
 
       def transfers(options={})
-        Index.instance_variable_set "@libraries", [Library.new(:name=>'blah'), Library.new(:name=>'bling')]
+        Index.instance_variable_set "@libraries", [Library.new(:name=>'blah', :commands=>['blurb']),
+          Library.new(:name=>'bling')]
         Index.instance_variable_set "@commands", [Command.new(:name=>'blurb', :lib=>'blah')]
         Index.read_and_transfer options[:ignored] || []
         Boson.libraries.map {|e| e.name}.should == options[:libraries]

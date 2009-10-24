@@ -132,8 +132,8 @@ module Boson
       hash.each {|k,v| instance_variable_set("@#{k}", v) if instance_variable_get("@#{k}").nil? || force }
     end
 
-    def command_objects(names)
-      Boson.commands.select {|e| names.include?(e.name) && e.lib == self.name }
+    def command_objects(names=self.commands, command_array=Boson.commands)
+      command_array.select {|e| names.include?(e.name) && e.lib == self.name }
     end
 
     def command_object(name)
