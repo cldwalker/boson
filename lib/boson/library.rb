@@ -33,27 +33,27 @@ module Boson
     # can also be set via a library module's config() method (see Loader).
     #
     # Attributes that can be configured:
-    # * *:dependencies*: An array of libraries that this library depends on. A library won't load
-    #   unless its dependencies are loaded first.
-    # * *:commands*: A hash or array of commands that belong to this library. A hash configures command attributes
-    #   for the given commands with command names pointing to their configs. See Command.new for a
-    #   command's configurable attributes. If an array, the commands are set for the given library,
-    #   overidding default command detection.
-    #     Example:
-    #       :commands=>{'commands'=>{:description=>'Lists commands', :alias=>'com'}}
-    # * *:class_commands*: A hash of commands to create. A hash key-pair can map command names to any string of ruby code
-    #   that ends with a method call. Or a key-pair can map a class to an array of its class methods to create commands
-    #   of the same name.
-    #     Example:
-    #       :class_commands=>{'spy'=>'Bond.spy', 'create'=>'Alias.manager.create',
-    #         'Boson::Util'=>['detect', 'any_const_get']}
-    # * *:force*: Boolean which forces a library to ignore when a library's methods are overriding existing ones.
-    #   Use with caution. Default is false.
-    # * *:object_methods*: Boolean which detects any Object/Kernel methods created when loading a library and automatically
-    #   adds them to a library's commands. Default is true.
-    # * *:namespace*: Boolean or string which namespaces a library. When true, the library is automatically namespaced
-    #   to the library's name. When a string, the library is namespaced to the string. Default is nil. To control the
-    #   namespacing of all libraries see Boson::Repo.config.
+    # [*:dependencies*] An array of libraries that this library depends on. A library won't load
+    #                   unless its dependencies are loaded first.
+    # [*:commands*] A hash or array of commands that belong to this library. A hash configures command attributes
+    #               for the given commands with command names pointing to their configs. See Command.new for a
+    #               command's configurable attributes. If an array, the commands are set for the given library,
+    #               overidding default command detection. Example:
+    #                :commands=>{'commands'=>{:description=>'Lists commands', :alias=>'com'}}
+    # [*:class_commands*] A hash of commands to create. A hash key-pair can map command names to any string of ruby code
+    #                     that ends with a method call. Or a key-pair can map a class to an array of its class methods
+    #                     to create commands of the same name. Example:
+    #                      :class_commands=>{'spy'=>'Bond.spy', 'create'=>'Alias.manager.create',
+    #                       'Boson::Util'=>['detect', 'any_const_get']}
+    # [*:force*] Boolean which forces a library to ignore when a library's methods are overriding existing ones.
+    #            Use with caution. Default is false.
+    # [*:object_methods*] Boolean which detects any Object/Kernel methods created when loading a library and automatically
+    #                     adds them to a library's commands. Default is true.
+    # [*:namespace*] Boolean or string which namespaces a library. When true, the library is automatically namespaced
+    #                to the library's name. When a string, the library is namespaced to the string. Default is nil.
+    #                To control the namespacing of all libraries see Boson::Repo.config.
+    # [*:no_alias_creation*] Boolean which doesn't create aliases for a library. Useful for libraries that configure command
+    #                        aliases outside of Boson's control. Default is false.
     def initialize(hash)
       @name = set_name hash.delete(:name)
       @loaded = false
