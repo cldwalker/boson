@@ -12,6 +12,7 @@ module Boson
       # ==== Examples:
       #   Manager.load 'my_commands'  -> Loads a FileLibrary object from ~/.boson/commands/my_commands.rb
       #   Manager.load 'method_lister' -> Loads a GemLibrary object which requires the method_lister gem
+      # Any options that aren't listed here are passed as library attributes to the libraries (see Library.new)
       # ==== Options:
       # [:verbose] Boolean to print each library's loaded status along with more verbose errors. Default is false.
       # [:index]   Boolean to load in index mode. Default is false.

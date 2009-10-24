@@ -35,8 +35,8 @@ module Boson
     #                    key of a library entry in :libraries.
     #                     Example:
     #                      :command_aliases=>{'libraries'=>'lib', 'commands'=>'com'}
-    # [:console_defaults] Array of libraries to load at start up when used in irb. Default is to load all library files and libraries defined
-    #             in the config.
+    # [:console_defaults] Array of libraries to load at start up when used in irb. Default is to load all library files and libraries
+    #                     defined in the config.
     # [:bin_defaults] Array of libraries to load at start up when used from the commandline. Default is no libraries.
     # [:add_load_path] Boolean specifying whether to add a load path pointing to the lib subdirectory/. This is useful in sharing
     #                  classes between libraries without resorting to packaging them as gems. Defaults to false if the lib
@@ -45,7 +45,8 @@ module Boson
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.
     # [:console] Console to load when using --console from commandline. Default is irb.
-    # [:auto_namespace] Boolean which automatically namespaces all user-defined libraries. Default is false.
+    # [:auto_namespace] Boolean which automatically namespaces all user-defined libraries. Be aware this can break libraries which
+    #                   depend on commands from other libraries. Default is false.
     def config(reload=false)
       if reload || @config.nil?
         default = {:libraries=>{}, :command_aliases=>{}, :console_defaults=>[]}

@@ -1,8 +1,22 @@
 module Boson
   # A library is a group of commands (Command objects) usually grouped together by a module.
   # Libraries are loaded from different sources depending on the library subclass. Default library
-  # subclasses are FileLibrary, GemLibrary, RequireLibrary and ModuleLibrary. See Loader for callbacks a
-  # library's module can have.
+  # subclasses are FileLibrary, GemLibrary, RequireLibrary and ModuleLibrary.
+  # See Loader for callbacks a library's module can have.
+  #
+  # == Configuration
+  # To configure a library, pass a hash of {library attributes}[link:classes/Boson/Library.html#M000077] under
+  # {the :libraries key}[link:classes/Boson/Repo.html#M000070] of a config file. When not using FileLibrary,
+  # you can give most commands the functionality FileLibrary naturally gives its commands by configuring
+  # the :commands key. Here's a config example of a GemLibrary that does that:
+  #   :libraries:
+  #     httparty:
+  #       :class_commands:
+  #         delete: HTTParty.delete
+  #       :commands:
+  #         delete:
+  #           :alias: d
+  #           :description: Http delete a given url
   #
   # === Creating Your Own Library
   # To create your own subclass you need to define what sources the subclass can handle with handles().
