@@ -166,6 +166,11 @@ module Boson
       end
 
       def create_class_aliases(mod, class_commands)
+        class_commands.each {|k,v|
+          if v.is_a?(Array)
+            class_commands.delete(k).each {|e| class_commands[e] = "#{k}.#{e}"}
+          end
+        }
         Alias.manager.create_aliases(:any_to_instance_method, mod.to_s=>class_commands.invert)
       end
 

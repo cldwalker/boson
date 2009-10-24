@@ -41,10 +41,12 @@ module Boson
     #   overidding default command detection.
     #     Example:
     #       :commands=>{'commands'=>{:description=>'Lists commands', :alias=>'com'}}
-    # * *:class_commands*: A hash of commands to create. Hash should map command names to any string of ruby code
-    #   that ends with a method call.
+    # * *:class_commands*: A hash of commands to create. A hash key-pair can map command names to any string of ruby code
+    #   that ends with a method call. Or a key-pair can map a class to an array of its class methods to create commands
+    #   of the same name.
     #     Example:
-    #       :class_commands=>{'spy'=>'Bond.spy', 'create'=>'Alias.manager.create'}
+    #       :class_commands=>{'spy'=>'Bond.spy', 'create'=>'Alias.manager.create',
+    #         'Boson::Util'=>['detect', 'any_const_get']}
     # * *:force*: Boolean which forces a library to ignore when a library's methods are overriding existing ones.
     #   Use with caution. Default is false.
     # * *:object_methods*: Boolean which detects any Object/Kernel methods created when loading a library and automatically
