@@ -89,7 +89,8 @@ module Boson
     # to create one with a number appended to the name.
     def create_module(base_module, name)
       desired_class = camelize(name)
-      if (suffix = ([""] + (1..10).to_a).find {|e| !base_module.const_defined?(desired_class+e)})
+      possible_suffixes = [''] + %w{1 2 3 4 5 6 7 8 9 10}
+      if (suffix = possible_suffixes.find {|e| base_module.const_defined?(desired_class+e)})
         base_module.const_set(desired_class+suffix, Module.new)
       end
     end
