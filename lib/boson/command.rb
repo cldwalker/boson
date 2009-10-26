@@ -80,7 +80,7 @@ module Boson
     # Usage string for command, created from options and args.
     def usage
       return '' if options.nil? && args.nil?
-      usage_args = args && @options ? args[0..-2] : args
+      usage_args = args && @options && !has_splat_args? ? args[0..-2] : args
       str = args ? usage_args.map {|e|
         (e.size < 2) ? "[#{e[0]}]" : "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
       }.join(' ') : '[*unknown]'
