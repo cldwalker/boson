@@ -70,12 +70,13 @@ module Boson
     end
 
     def load_module_commands
-        initialize_library_module
+      initialize_library_module
     rescue MethodConflictError=>e
       if Boson.repo.config[:error_method_conflicts] || @namespace
         raise MethodConflictError, e.message
       else
         @namespace = clean_name
+        @method_conflict = true
         $stderr.puts "#{e.message}. Attempting load into the namespace #{@namespace}..."
         initialize_library_module
       end
@@ -94,10 +95,10 @@ module Boson
       raise(LoaderError, "No module for library #{@name}") unless @module
       if (conflict = Util.top_level_class_conflict(Boson::Commands, @module.to_s))
         warn "Library module '#{@module}' may conflict with top level class/module '#{conflict}' references in"+
-          " your libraries. Either rename your module or prefix the top level class/module with '::'."
+          " your libraries. Rename your module to avoid this warning."
       end
 
-      Manager.create_class_aliases(@module, @class_commands) unless @class_commands.to_s.empty?
+      Manager.create_class_aliases(@module, @class_commands) unless @class_commands.to_s.empty? || @method_conflict
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
       @namespace ? Namespace.create(@namespace, self) : include_in_universe
