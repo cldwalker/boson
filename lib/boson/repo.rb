@@ -25,6 +25,7 @@ module Boson
 
     # A hash read from the YAML config file at config/boson.yml.
     # {See here}[http://github.com/cldwalker/irbfiles/blob/master/boson/config/boson.yml] for an example config file.
+    # Top level config keys, library attributes and config attributes need to be symbols.
     # ==== Valid config keys:
     # [:libraries] Hash of libraries mapping their name to attribute hashes. See Library.new for configurable attributes.
     #               Example:
