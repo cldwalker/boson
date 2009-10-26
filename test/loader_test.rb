@@ -40,6 +40,13 @@ module Boson
         end
       end
 
+      test "prints error if library module conflicts with top level constant/module" do
+        capture_stderr {
+          load :blah, :file_string=>"module Object; def self.blah; end; end"
+        }.should =~ /conflict.*'Object'/
+        library_loaded?('blah')
+      end
+
       test "prints error and returns false for existing library" do
         libs = create_library('blah', :loaded=>true)
         Manager.stubs(:loader_create).returns(libs[0])

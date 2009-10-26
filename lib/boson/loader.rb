@@ -92,6 +92,11 @@ module Boson
     def initialize_library_module
       @module = @module ? Util.constantize(@module) : Util.create_module(Boson::Commands, clean_name)
       raise(LoaderError, "No module for library #{@name}") unless @module
+      if (conflict = Util.top_level_class_conflict(Boson::Commands, @module.to_s))
+        warn "Library module '#{@module}' may conflict with top level class/module '#{conflict}' references in"+
+          " your libraries. Either rename your module or prefix the top level class/module with '::'."
+      end
+
       Manager.create_class_aliases(@module, @class_commands) unless @class_commands.to_s.empty?
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
