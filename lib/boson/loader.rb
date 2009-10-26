@@ -46,7 +46,8 @@ module Boson
       !!@module
     end
 
-    # Reloads a library from its source and adds new commands.
+    # Reloads a library from its source and adds new commands. Only implemented
+    # for FileLibrary for now.
     def reload
       original_commands = @commands
       reload_source_and_set_module

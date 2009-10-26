@@ -1,6 +1,8 @@
 module Boson
-  # This library takes a module as a library's name. Reload for this library
-  # subclass is disabled.
+  # This library takes a module or class as a library's name and loads its class methods
+  # as commands. If no commands are given it defaults to loading all of its class methods
+  # as commands. The only method callback (see Loader) this library calls on the
+  # original module/class is config().
   #
   # Example:
   #  >> load_library Math, :commands=>%w{sin cos tan}
@@ -25,7 +27,11 @@ module Boson
       super Util.underscore(underscore_lib)
     end
 
-    def reload; false; end
+    def initialize_library_module
+      @class_commands = {@module.to_s=>Array(@commands).empty? ? @module.methods(false) : @commands }
+      @module = nil
+      super
+    end
     #:startdoc:
   end
 end

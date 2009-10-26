@@ -1,5 +1,7 @@
 module Boson::Commands::WebCore #:nodoc:
-  def self.config
+  extend self
+
+  def config
     descriptions = {
       :install=>"Installs a library by url. Library should then be loaded with load_library.",
       :browser=>"Opens urls in a browser on a Mac", :get=>"Gets the body of a url", :post=>'Posts to url' }
