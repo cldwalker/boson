@@ -178,6 +178,10 @@ module Boson
           end
         }
         opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(RENDER_OPTIONS))
+        if opts[:fields][:default] && !opts[:fields].key?(:values)
+          opts[:fields][:values] = opts[:fields][:default]
+          opts[:fields][:enum] = false unless opts[:fields].key?(:enum)
+        end
         opts[:sort][:values] ||= opts[:fields][:values] if opts[:fields][:values]
         opts
       end
