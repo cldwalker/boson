@@ -66,7 +66,7 @@ module Boson
 
       #:stopdoc:
       def print_error_message(message)
-        message += "\nActual error: #{$!}\n" + $!.backtrace.inspect if @options && @options[:verbose]
+        message += "\nOriginal error: #{$!}\n" + $!.backtrace.map {|e| "  " + e }.join("\n") if @options && @options[:verbose]
         $stderr.puts message
       end
 

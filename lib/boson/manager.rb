@@ -63,8 +63,9 @@ module Boson
         print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}"
       rescue Exception=>e
         FileLibrary.reset_file_cache(library.to_s)
-        print_error_message "Unable to #{load_method} library #{library}. Reason: #{$!}" + "\n" +
-          e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
+        message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
+        message += "\n" + e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n") if @options[:verbose]
+        print_error_message message
       ensure
         Inspector.disable if Inspector.enabled
       end
