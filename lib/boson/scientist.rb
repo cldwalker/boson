@@ -186,7 +186,7 @@ module Boson
         if opts[:fields][:values]
           opts[:sort][:values] ||= opts[:fields][:values]
           opts[:query][:keys] ||= opts[:fields][:values]
-          # opts[:query_fields][:default] ||= opts[:fields][:values][0,1]
+          opts[:query][:default_keys] ||= "*"
         end
         opts
       end
