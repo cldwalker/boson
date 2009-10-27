@@ -340,7 +340,8 @@ module Boson
   context ":hash type" do
     before(:all) {
       create :a=>:hash, :b=>{:default=>{:a=>'b'}}, :c=>{:type=>:hash, :keys=>%w{one two three}},
-        :d=>{:type=>:hash, :split=>" "}, :e=>{:type=>:hash, :keys=>[:one, :two, :three]}
+        :e=>{:type=>:hash, :keys=>[:one, :two, :three], :default_keys=>:three},
+        :d=>{:type=>:hash, :split=>" "}
     }
 
     it "converts comma delimited pairs to hash" do
@@ -355,8 +356,20 @@ module Boson
       assert_error(OptionParser::Error, "no value.*'a'") { parse("-a") }
     end
 
+    it "raises error if invalid key-value pair given for unknown keys" do
+      assert_error(OptionParser::Error, "invalid.*pair.*'a'") { parse("-a", 'b') }
+    end
+
     it "auto aliases :keys attribute" do
       parse("-c","t:3,o:1")[:c].should == {'three'=>'3', 'one'=>'1'}
+    end
+
+    it "adds in explicit default keys with value only argument" do
+      parse('-e', 'whoop')[:e].should == {:three=>'whoop'}
+    end
+
+    it "adds in default keys from known :keys with value only argument" do
+      parse("-c","okay")[:c].should == {'one'=>'okay'}
     end
 
     it "auto aliases symbolic :keys" do

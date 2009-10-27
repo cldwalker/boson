@@ -106,7 +106,7 @@ module Boson
     #    Boson::OptionParser.new :fields=>{:type=>:array, :values=>%w{f1 f2 f3},
     #     :enum=>false}
     #
-    # Here are the available option attributes:
+    # Here are the available option attributes (some are specific to option types):
     #
     # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric, :hash.
     # [*:default*] This or :type is required. This is the default value an option has when not passed.
@@ -115,11 +115,13 @@ module Boson
     # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
     #             can be aliased by typing a unique string it starts with. For example, for values foo, odd, optional,
     #             f refers to foo, o to odd and op to optional.
-    # [*:keys*] An array of values a hash option's keys can have. Keys can be aliased just like :values.
-    # [*:enum*] Boolean indicating if an option enforces values in :values. Default is true. Available for
-    #           :array and :string options.
-    # [*:split*] Only for :array options. A string or regular expression on which an array value splits
+    # [*:enum*] Boolean indicating if an option enforces values in :values or :keys. Default is true. For
+    #           :array, :hash and :string options.
+    # [*:split*] For :array and :hash options. A string or regular expression on which an array value splits
     #            to produce an array of values. Default is ','.
+    # [*:keys*] :hash option only. An array of values a hash option's keys can have. Keys can be aliased just like :values.
+    # [:default_keys] :hash option only. Default keys to assume when only a value is given. Multiple keys can be joined
+    #                 by the :split character. Defaults to first key of :keys if :keys given.
     def initialize(opts)
       @defaults = {}
       @opt_aliases = {}
@@ -146,6 +148,7 @@ module Boson
           @defaults[nice_name] = type[:default] if type[:default]
           @option_attributes[nice_name][:enum] = true if (type.key?(:values) || type.key?(:keys)) &&
             !type.key?(:enum)
+          @option_attributes[nice_name][:default_keys] ||= type[:keys][0] if type.key?(:keys)
           type = determine_option_type(type[:default]) || type[:type] || :boolean
         end
 
@@ -297,7 +300,12 @@ module Boson
           splitter = current_option_attributes[:split] || ','
           (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
           # Creates array pairs, grouping array of keys with a value
-          aoa = Hash[*shift.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
+          value = shift
+          if !value.include?(':')
+            (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
+              raise(Error, "invalid key:value pair for option '#{@current_option}'")
+          end
+          aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
           aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
           hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
           keys ? hash.each {|k,v|
