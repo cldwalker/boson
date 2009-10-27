@@ -29,19 +29,35 @@ module Boson
 
     def render_object(object, options={}) #:nodoc:
       options[:class] ||= :auto_table
+      if options[:query_fields] && options[:query] && object.is_a?(Array)
+        object = search_object(object, options[:query], options[:query_fields])
+      end
       if object.is_a?(Array) && object.size > 0 && (sort = options.delete(:sort))
-        begin
-          sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?
-            lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :
-            (object[0].send(sort).respond_to?(:<=>) ? lambda {|e| e.send(sort) || ''} :
-            lambda {|e| e.send(sort).to_s })
-          object = object.sort_by &sort_lambda
-          object = object.reverse if options[:reverse_sort]
-        rescue NoMethodError, ArgumentError
-          $stderr.puts "Sort failed with nonexistant method '#{sort}'"
-        end
+        object = sort_object(object, sort, options[:reverse_sort])
       end
       Hirb::Console.render_output(object, options)
+    end
+
+    def search_object(object, query, query_fields)
+      if object[0].is_a?(Hash)
+        query_fields.map {|e| object.select {|f| f[e].to_s =~ /#{query}/i } }.flatten.uniq
+      else
+        query_fields.map {|e| object.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten.uniq
+      end
+    rescue NoMethodError
+      $stderr.puts "Query '#{query}' failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'"
+    end
+
+    def sort_object(object, sort, reverse_sort) #:nodoc:
+      sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?
+        lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :
+        (object[0].send(sort).respond_to?(:<=>) ? lambda {|e| e.send(sort) || ''} :
+        lambda {|e| e.send(sort).to_s })
+      object = object.sort_by &sort_lambda
+      object = object.reverse if reverse_sort
+      object
+    rescue NoMethodError, ArgumentError
+      $stderr.puts "Sort failed with nonexistant method '#{sort}'"
     end
   end
 end
