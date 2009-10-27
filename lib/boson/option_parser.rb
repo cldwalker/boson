@@ -257,7 +257,7 @@ module Boson
           shift
         when :string
           value = shift
-          if (values = @option_attributes[@current_option][:values].sort_by {|e| e.to_s} rescue nil)
+          if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
             (val = auto_alias_value(values, value)) && value = val
           end
           value
@@ -266,17 +266,17 @@ module Boson
         when :numeric
           peek.index('.') ? shift.to_f : shift.to_i
         when :array
-          splitter = (@option_attributes[@current_option][:split] rescue nil) || ','
+          splitter = current_option_attributes[:split] || ','
           array = shift.split(splitter)
-          if values = @option_attributes[@current_option][:values].sort_by {|e| e.to_s } rescue nil
+          if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
             array.each_with_index {|e,i|
               (value = auto_alias_value(values, e)) && array[i] = value
             }
           end
           array
         when :hash
-          splitter = (@option_attributes[@current_option][:split] rescue nil) || ','
-          keys = @option_attributes[@current_option][:keys].sort_by {|e| e.to_s } rescue nil
+          splitter = current_option_attributes[:split] || ','
+          (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
           # Creates array pairs, grouping array of keys with a value
           aoa = Hash[*shift.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
           aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
@@ -285,6 +285,10 @@ module Boson
                   (new_key = auto_alias_value(keys, k)) && hash[new_key] = hash.delete(k)
                  } : hash
       end
+    end
+
+    def current_option_attributes
+      @option_attributes && @option_attributes[@current_option] || {}
     end
 
     def auto_alias_value(values, possible_value)

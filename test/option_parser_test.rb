@@ -326,7 +326,7 @@ module Boson
   context ":hash type" do
     before(:all) {
       create :a=>:hash, :b=>{:default=>{:a=>'b'}}, :c=>{:type=>:hash, :keys=>%w{one two three}},
-        :d=>{:type=>:hash, :split=>" "}
+        :d=>{:type=>:hash, :split=>" "}, :e=>{:type=>:hash, :keys=>[:one, :two, :three]}
     }
 
     it "converts comma delimited pairs to hash" do
@@ -342,7 +342,11 @@ module Boson
     end
 
     it "auto aliases :keys attribute" do
-      parse("-c","t:2,o:1")[:c].should == {'three'=>'2', 'one'=>'1'}
+      parse("-c","t:3,o:1")[:c].should == {'three'=>'3', 'one'=>'1'}
+    end
+
+    it "auto aliases symbolic :keys" do
+      parse("-e","t:3,o:1")[:e].should == {:three=>'3', :one=>'1'}
     end
 
     it "supports a configurable splitter" do
