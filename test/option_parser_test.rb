@@ -226,7 +226,30 @@ module Boson
       parse("--foo", "yup", "--bar","ok:dude").should == {:foo=>'yup', :bar=>{'ok'=>'dude'}}
     end
   end
-  
+
+  context ":bool_default option attribute" do
+    before(:all) {
+      create :foo=>{:type=>:string, :bool_default=>'whoop'}, :bar=>{:type=>:array, :bool_default=>'1'},
+        :verbose=>:boolean
+    }
+
+    it "sets default boolean" do
+      parse('--foo', '--bar', '1')[:foo].should == 'whoop'
+    end
+
+    it "sets options normally" do
+      parse('--foo', 'boo', '--bar', 'har').should == {:foo=>'boo', :bar=>['har']}
+    end
+
+    it "sets non-string default boolean" do
+      parse("--bar", '--foo', '2')[:bar].should == ['1']
+    end
+
+    it "default booleans can be joined with boolean options" do
+      parse('-fbv').should == {:verbose=>true, :bar=>['1'], :foo=>'whoop'}
+    end
+  end
+
   context ":string type" do
     before :each do
       create "--foo" => :string, "--bar" => :string

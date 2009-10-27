@@ -27,10 +27,14 @@ module Boson
     #:startdoc:
   end
 
-  # This class provides option parsing for 5 different option types. Setting option values should follow
-  # conventions in *nix environments. When options are parsed by OptionParser.parse, an IndifferentAccessHash
-  # hash of options is returned. With the variety of option types, an option value can be any of the following
-  # Ruby objects: String, Integer, Float, Array, Hash, FalseClass, TrueClass.
+  # This class concisely defines commandline options that can be parsed produce a Hash. Additional points:
+  # * Setting option values should follow conventions in *nix environments.
+  # * Any option type can be passed as a boolean if it has a :bool_default attribute.
+  # * When options are parsed by OptionParser.parse, an IndifferentAccessHash hash is returned.
+  # * Each value in the returned options hash can be any of the following Ruby objects: String, Integer, Float,
+  #   Array, Hash, FalseClass, TrueClass.
+  # * Each option can have option attributes to enable more features (see OptionParser.new).
+  # * Options are also called switches, parameters, flags etc.
   #
   # Available option types:
   # [*:boolean*] This option has no passed value. To toogle a boolean, prepend with '--no-'.
@@ -110,6 +114,7 @@ module Boson
     #
     # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric, :hash.
     # [*:default*] This or :type is required. This is the default value an option has when not passed.
+    # [*:bool_default*] This is the default value an option has when passed as a boolean.
     # [*:required*] Boolean indicating if option is required. Option parses raises error if value not given.
     #               Default is false.
     # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
@@ -270,10 +275,16 @@ module Boson
       end
     end
 
+    def value_shift
+      return shift if !(bool_default = current_option_attributes[:bool_default])
+      return shift if peek && !valid?(peek)
+      bool_default
+    end
+
     def get_option_value(type, opt)
       case type
         when :string
-          value = shift
+          value = value_shift
           if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
             (val = auto_alias_value(values, value)) && value = val
           end
@@ -286,10 +297,10 @@ module Boson
             true
           end
         when :numeric
-          peek.index('.') ? shift.to_f : shift.to_i
+          peek.index('.') ? value_shift.to_f : value_shift.to_i
         when :array
           splitter = current_option_attributes[:split] || ','
-          array = shift.split(splitter)
+          array = value_shift.split(splitter)
           if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
             array.each_with_index {|e,i|
               (value = auto_alias_value(values, e)) && array[i] = value
@@ -300,7 +311,7 @@ module Boson
           splitter = current_option_attributes[:split] || ','
           (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
           # Creates array pairs, grouping array of keys with a value
-          value = shift
+          value = value_shift
           if !value.include?(':')
             (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
               raise(Error, "invalid key:value pair for option '#{@current_option}'")
@@ -324,6 +335,7 @@ module Boson
     end
 
     def validate_option_value(type)
+      return if current_option_attributes[:bool_default]
       if type != :boolean && peek.nil?
         raise Error, "no value provided for option '#{@current_option}'"
       end
