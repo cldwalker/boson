@@ -1,5 +1,10 @@
 module Boson
-  # Runs Boson from the commandline. Usage for the boson shell command looks like this:
+  # This class handles the boson executable (boson command execution from the commandline). Any changes
+  # to your commands are immediately available from the commandline except for changes to the main config file.
+  # For its changes to take effect you'll need to explicitly load the changed libraries with the global option --load.
+  # See Index to understand how Boson can immediately detect the latest commands.
+  #
+  # Usage for the boson shell command looks like this:
   #   boson [GLOBAL OPTIONS] [COMMAND] [ARGS] [COMMAND OPTIONS]
   #
   # The boson executable comes with these global options:

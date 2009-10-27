@@ -3,8 +3,8 @@ module Boson
   # Since there can be multiple repositories, a library's file is looked for in the order given by
   # Boson.repos.
   #
-  # To create this library, simply create a file with a module and some methods. Non-private methods
-  # are automatically loaded as a library's commands.
+  # To create this library, simply create a file with a module and some methods (See Library
+  # for naming a module). Non-private methods are automatically loaded as a library's commands.
   #
   # Take for example a library brain.rb:
   #   module Brain

@@ -1,9 +1,9 @@
 require 'digest/md5'
 module Boson
-  # This class saves all of Boson's commands and libraries to a Marshal-ed index at ~/.boson/config/index.marshal.
-  # When this index is updated, the default behavior is to only reindex libraries whose md5 hash have changed.
-  # Since the index is marshaled, putting lambdas/procs in it will break it. If your index gets corrupted, simply
-  # delete it and next time Boson needs it, the index will be recreated.
+  # This class is used by BinRunner to index/store all of Boson's commands and libraries. When this index updates,
+  # it detects library files whose md5 hash have changed and reindexes them. The index is stored with Marshal
+  # at ~/.boson/config/index.marshal. Since the index is marshaled, putting lambdas/procs in it will break it.
+  # If your index gets corrupted, simply delete it and next time Boson needs it, the index will be recreated.
   module Index
     extend self
     attr_reader :libraries, :commands

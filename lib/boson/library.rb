@@ -4,6 +4,16 @@ module Boson
   # subclasses are FileLibrary, GemLibrary, RequireLibrary and ModuleLibrary.
   # See Loader for callbacks a library's module can have.
   #
+  # == Naming a Library Module
+  # Although you can name a library module almost anything, here's the fine print:
+  # * A module can have any name if it's the only module in a library.
+  # * If there are multiple modules in a file library, the module's name must be a camelized version
+  #   of the file's basename i.e. ~/.boson/commands/ruby_core.rb -> RubyCore.
+  # * Although modules are evaluated under the Boson::Commands namespace, Boson will warn you about creating
+  #   modules whose name is the same as a top level class/module. The warning is to encourage users to stay
+  #   away from error-prone libraries. Once you introduce such a module, _all_ libraries assume the nested module
+  #   over the top level module and the top level module has to be prefixed with '::' _everywhere_.
+  #
   # == Configuration
   # To configure a library, pass a hash of {library attributes}[link:classes/Boson/Library.html#M000077] under
   # {the :libraries key}[link:classes/Boson/Repo.html#M000070] of a config file. When not using FileLibrary,

@@ -27,14 +27,15 @@ module Boson
   # This class provides option parsing for boolean, string, numeric and array
   # values given a simple hash of options. Setting option values should be straightforward for
   # *nix people. By option type:
-  # * *:boolean*: These don't have values i.e. '--debug'. To toogle a boolean, prepend with --no- i.e. '--no-debug'.
-  #   Multiple booleans can be joined together i.e. '-d -f -t' == '-dft'.
-  # * *:string*: Separate name from value with space or '=' i.e. '--color red' or '--color=red'.
-  # * *:numeric*: Receives values as :string does or by appending number right after name i.e.
-  #   '-N3' == '-N=3'. 
-  # * *:array*: Receives values as :string does. Multiple values are split by ',' i.e.
-  #   '--fields 1,2,3' -> ['1','2','3']. The split character can be configured as explained at
-  #   OptionParser.new .
+  # [*:boolean*] These don't have values i.e. '--debug'. To toogle a boolean, prepend with --no- i.e. '--no-debug'.
+  #              Multiple booleans can be joined together i.e. '-d -f -t' == '-dft'.
+  # [*:string*] Separate name from value with space or '=' i.e. '--color red' or '--color=red'.
+  # [*:numeric*] Receives values as :string does or by appending number right after name i.e.
+  #              '-N3' == '-N=3'.
+  # [*:array*] Receives values as :string does. Multiple values are split by ',' i.e.
+  #            '--fields 1,2,3' -> ['1','2','3']. The split character can be configured as explained at
+  #            OptionParser.new .
+  #
   # This is a modified version of Yehuda Katz's Thor::Options class which is a modified version
   # of Daniel Berger's Getopt::Long class (licensed under Ruby's license).
   class OptionParser
@@ -86,17 +87,15 @@ module Boson
     #
     # Here are the available option attributes:
     #
-    # * *:type*: This or :default is required. Available types are :string, :boolean, :array, :numeric.
-    # * *:default*: This or :type is required. This is the default value an option has when not passed.
-    # * *:values*: An array of values an option can have. Available for :array and :string options.  Values here
-    #   can be aliased by typing a unique string it starts with. For example:
-    #      
-    #     For values foo, odd, optional: f refers to foo, o to odd and op to optional.
-    #
-    # * *:enum*: Boolean indicating if an option enforces values in :values. Default is true. Available for
-    #   :array and :string options.
-    # * *:split*: Only for :array options. A string or regular expression on which an array value splits
-    #   to produce an array of values. Default is ','.
+    # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric.
+    # [*:default*] This or :type is required. This is the default value an option has when not passed.
+    # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
+    #             can be aliased by typing a unique string it starts with. For example, for values foo, odd, optional,
+    #             f refers to foo, o to odd and op to optional.
+    # [*:enum*] Boolean indicating if an option enforces values in :values. Default is true. Available for
+    #           :array and :string options.
+    # [*:split*] Only for :array options. A string or regular expression on which an array value splits
+    #            to produce an array of values. Default is ','.
     def initialize(opts)
       @defaults = {}
       @opt_aliases = {}

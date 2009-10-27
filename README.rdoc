@@ -132,15 +132,22 @@ Having done that, let's start up irb:
 See Boson::FileLibrary or here[http://tagaholic.me/boson/doc/classes/Boson/FileLibrary.html].
 
 == Todo
-* More docs
 * More tests
 * Making commands out of existing gems easier and more powerful
 * Better local repositories, perhaps a BosonFile
 * Consider managing extensions to core and standard libraries
 * Consider dropping alias gem dependency if not using its full potential
 
+== Bugs/Issues
+Please report them {on github}[http://github.com/cldwalker/boson/issues].
+
 == Motivation
 My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby console.
+
+== Links
+* http://tagaholic.me/2009/10/14/boson-command-your-ruby-universe.html
+* http://tagaholic.me/2009/10/15/boson-and-hirb-interactions.html
+* http://tagaholic.me/2009/10/19/how-boson-enhances-your-irb-experience.html
 
 == Acknowledgements
 Boson stands on the shoulders of these people and their ideas:

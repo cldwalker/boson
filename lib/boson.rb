@@ -7,6 +7,16 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 %w{namespace view command util commands option_parser index scientist}.each {|e| require "boson/#{e}" }
 
 # This module stores the libraries, commands, repos and main object used throughout Boson.
+#
+# Useful documentation links:
+# * Boson::BinRunner - Runs the boson executable
+# * Boson::ConsoleRunner - Runs Boson from the ruby console
+# * Boson::Repo.config - Explains main config file
+# * Boson::Library - All about libraries
+# * Boson::FileLibrary - Explains creating libraries as files
+# * Boson::Loader - Explains library module callbacks
+# * Boson::OptionParser - All about options
+# * Boson::Scientist - Explains how commands can be both shell-commands and normal ruby methods
 module Boson
   # Module which is extended by Boson.main_object to give it command functionality.
   module Universe; include Commands::Namespace; end
