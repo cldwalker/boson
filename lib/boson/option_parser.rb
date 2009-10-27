@@ -27,8 +27,10 @@ module Boson
   # This class provides option parsing for boolean, string, numeric and array
   # values given a simple hash of options. Setting option values should be straightforward for
   # *nix people. By option type:
-  # [*:boolean*] These don't have values i.e. '--debug'. To toogle a boolean, prepend with --no- i.e. '--no-debug'.
+  # [*:boolean*] These don't have values i.e. '--debug'. To toogle a boolean, prepend with '--no-'.
   #              Multiple booleans can be joined together i.e. '-d -f -t' == '-dft'.
+  #                --debug -> true
+  #                --no-debug -> false   # or --no-d
   # [*:string*] Separate name from value with space or '=' i.e. '--color red' or '--color=red'.
   # [*:numeric*] Receives values as :string does or by appending number right after name i.e.
   #              '-N3' == '-N=3'.
@@ -262,7 +264,12 @@ module Boson
           end
           value
         when :boolean
-          (!@opt_types.key?(opt) && @current_option =~ /^no-(\w+)$/) ? (@current_option.replace($1) && false) : true
+          if (!@opt_types.key?(opt) && @current_option =~ /^no-(\w+)$/)
+            opt = (opt = original_no_opt($1)) ? undasherize(opt) : $1
+            (@current_option.replace(opt) && false)
+          else
+            true
+          end
         when :numeric
           peek.index('.') ? shift.to_f : shift.to_i
         when :array
@@ -347,7 +354,8 @@ module Boson
     
     def valid?(arg)
       if arg.to_s =~ /^--no-(\w+)$/
-        @opt_types.key?(arg) or (@opt_types["--#{$1}"] == :boolean)
+        @opt_types.key?(arg) or (@opt_types["--#{$1}"] == :boolean) or
+          (@opt_types[original_no_opt($1)] == :boolean)
       else
         @opt_types.key?(arg) or @opt_aliases.key?(arg)
       end
@@ -368,12 +376,16 @@ module Boson
     
     def option_type(opt)
       if opt =~ /^--no-(\w+)$/
-        @opt_types[opt] || @opt_types["--#{$1}"]
+        @opt_types[opt] || @opt_types["--#{$1}"] || @opt_types[original_no_opt($1)]
       else
         @opt_types[opt]
       end
     end
-    
+
+    def original_no_opt(opt)
+      @opt_aliases[dasherize(opt)]
+    end
+
     def check_required!(hash)
       for name, type in @opt_types
         if type == :required and !hash[undasherize(name)]

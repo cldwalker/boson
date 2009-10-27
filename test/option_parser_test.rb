@@ -113,6 +113,7 @@ module Boson
     it "accepts --[no-]opt variant for booleans, setting false for value" do
       create "--foo" => :boolean
       parse("--no-foo")["foo"].should == false
+      parse("--no-f")["foo"].should == false
       parse("--foo")["foo"].should == true
     end
     
