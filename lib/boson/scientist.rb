@@ -84,8 +84,7 @@ module Boson
     RENDER_OPTIONS = {
       :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
       :sort=>{:type=>:string, :desc=>"Sort by given field"},
-      # :query_fields=>{:type=>:array},
-      # :query=>{:type=>:string},
+      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
       :class=>{:type=>:string, :desc=>"Hirb helper class which renders"},
       :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
       :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
@@ -186,7 +185,7 @@ module Boson
         end
         if opts[:fields][:values]
           opts[:sort][:values] ||= opts[:fields][:values]
-          # opts[:query_fields][:values] ||= opts[:fields][:values]
+          opts[:query][:keys] ||= opts[:fields][:values]
           # opts[:query_fields][:default] ||= opts[:fields][:values][0,1]
         end
         opts

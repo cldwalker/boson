@@ -29,8 +29,8 @@ module Boson
 
     def render_object(object, options={}) #:nodoc:
       options[:class] ||= :auto_table
-      if options[:query_fields] && options[:query] && object.is_a?(Array)
-        object = search_object(object, options[:query], options[:query_fields])
+      if options[:query] && object.is_a?(Array)
+        object = search_object(object, options[:query])
       end
       if object.is_a?(Array) && object.size > 0 && (sort = options.delete(:sort))
         object = sort_object(object, sort, options[:reverse_sort])
@@ -38,11 +38,11 @@ module Boson
       Hirb::Console.render_output(object, options)
     end
 
-    def search_object(object, query, query_fields)
+    def search_object(object, query_hash)
       if object[0].is_a?(Hash)
-        query_fields.map {|e| object.select {|f| f[e].to_s =~ /#{query}/i } }.flatten.uniq
+        query_hash.map {|field,query| object.select {|e| e[field].to_s =~ /#{query}/i } }.flatten.uniq
       else
-        query_fields.map {|e| object.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten.uniq
+        query_hash.map {|field,query| object.select {|e| e.send(field).to_s =~ /#{query}/i } }.flatten.uniq
       end
     rescue NoMethodError
       $stderr.puts "Query '#{query}' failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'"
