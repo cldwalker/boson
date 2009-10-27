@@ -90,7 +90,7 @@ module Boson
     end
     
     it "allows humanized opt name" do
-      create 'foo' => :string, :bar => :required
+      create 'foo' => :string, :bar => :string
       parse("-f", "1", "-b", "2").should == {:foo => "1", :bar => "2"}
     end
 
@@ -126,7 +126,7 @@ module Boson
 
   context "option values can be set with" do
     it "a opt=<value> assignment" do
-      create "--foo" => :required
+      create "--foo" => :string
       parse("--foo=12")["foo"].should == "12"
       parse("-f=12")["foo"].should == "12"
       parse("--foo=bar=baz")["foo"].should == "bar=baz"
@@ -134,8 +134,8 @@ module Boson
     end
   
     it "a -nXY assignment" do
-      create "--num" => :required
-      parse("-n12")["num"].should == "12"
+      create "--num" => :numeric
+      parse("-n12")["num"].should == 12
     end
   
     it "conjoined short options" do
@@ -147,17 +147,17 @@ module Boson
     end
   
     it "conjoined short options with argument" do
-      create "--foo" => true, "--bar" => true, "--app" => :required
+      create "--foo" => true, "--bar" => true, "--app" => :numeric
       opts = parse "-fba", "12"
       opts["foo"].should == true
       opts["bar"].should == true
-      opts["app"].should == "12"
+      opts["app"].should == 12
     end
   end
 
   context "parse" do
     it "extracts non-option arguments" do
-      create "--foo" => :required, "--bar" => true
+      create "--foo" => :string, "--bar" => true
       parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").should == {
         :foo => "12", :bar => true
       }
@@ -209,9 +209,22 @@ module Boson
     end
   end
 
-  it ":required type raises an error if it isn't given" do
-    create "--foo" => :required, "--bar" => :string
-    assert_error(OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str") }
+  context ":required option attribute" do
+    before(:all) {
+      create "--foo" => {:type=>:string, :required=>true}, :bar => {:type=>:hash, :required=>true}
+    }
+
+    it "raises an error if string option isn't given" do
+      assert_error(OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str:ok") }
+    end
+
+    it "raises an error if non-string option isn't given" do
+      assert_error(OptionParser::Error, 'no value.*required.*bar') { parse("--foo", "yup") }
+    end
+
+    it "raises no error when given arguments" do
+      parse("--foo", "yup", "--bar","ok:dude").should == {:foo=>'yup', :bar=>{'ok'=>'dude'}}
+    end
   end
   
   context ":string type" do

@@ -1,6 +1,8 @@
 module Boson
-  # Simple Hash with indifferent access. Used by OptionParser.
-  class IndifferentAccessHash < ::Hash #:nodoc:
+  # Simple Hash with indifferent access and retrieval of keys. Other actions such as merging should assume
+  # symbolic keys. Used by OptionParser.
+  class IndifferentAccessHash < ::Hash
+    #:stopdoc:
     def initialize(hash)
       super()
       hash.each {|k,v| self[k] = v }
@@ -19,29 +21,41 @@ module Boson
     end
 
     protected
-      def convert_key(key)
-        key.kind_of?(String) ? key.to_sym : key
-      end
+    def convert_key(key)
+      key.kind_of?(String) ? key.to_sym : key
+    end
+    #:startdoc:
   end
 
-  # This class provides option parsing for boolean, string, numeric and array
-  # values given a simple hash of options. Setting option values should be straightforward for
-  # *nix people. By option type:
-  # [*:boolean*] These don't have values i.e. '--debug'. To toogle a boolean, prepend with '--no-'.
-  #              Multiple booleans can be joined together i.e. '-d -f -t' == '-dft'.
-  #                --debug -> true
-  #                --no-debug -> false   # or --no-d
-  # [*:string*] Separate name from value with space or '=' i.e. '--color red' or '--color=red'.
-  # [*:numeric*] Receives values as :string does or by appending number right after name i.e.
-  #              '-N3' == '-N=3'.
-  # [*:array*] Receives values as :string does. Multiple values are split by a configurable character
+  # This class provides option parsing for 5 different option types. Setting option values should follow
+  # conventions in *nix environments. When options are parsed by OptionParser.parse, an IndifferentAccessHash
+  # hash of options is returned. With the variety of option types, an option value can be any of the following
+  # Ruby objects: String, Integer, Float, Array, Hash, FalseClass, TrueClass.
+  #
+  # Available option types:
+  # [*:boolean*] This option has no passed value. To toogle a boolean, prepend with '--no-'.
+  #              Multiple booleans can be joined together.
+  #                '--debug'    -> {:debug=>true}
+  #                '--no-debug' -> {:debug=>false}
+  #                '--no-d'     -> {:debug=>false}
+  #                '-d -f -t' same as '-dft'
+  # [*:string*] Sets values by separating name from value with space or '='.
+  #               '--color red' -> {:color=>'red'}
+  #               '--color=red' -> {:color=>'red'}
+  #               '--color "gotta love spaces"' -> {:color=>'gotta love spaces'}
+  # [*:numeric*] Sets values as :string does or by appending number right after aliased name. Shortened form
+  #              can be appended to joined booleans.
+  #                '-n3'  -> {:num=>3}
+  #                '-dn3' -> {:debug=>true, :num=>3}
+  # [*:array*] Sets values as :string does. Multiple values are split by a configurable character
   #            (default ','). See OptionParser.new for more.
-  #             '--fields 1,2,3' -> ['1','2','3']
-  # [*:hash*] Receives values as :string does. Key-value pairs are split by ':' and pairs are split by
+  #             '--fields 1,2,3' -> {:fields=>['1','2','3']}
+  # [*:hash*] Sets values as :string does. Key-value pairs are split by ':' and pairs are split by
   #           a configurable character (default ','). Multiple keys can be joined to one value. Passing '*'
   #           as a key refers to all known :keys.
-  #             '--fields a:b,c:d' -> {'a'=>'b', 'c'=>'d'}
-  #             '--fields a,b:d' -> {'a'=>'d','b'=>'d'}
+  #             '--fields a:b,c:d' -> {:fields=>{'a'=>'b', 'c'=>'d'} }
+  #             '--fields a,b:d'   -> {:fields=>{'a'=>'d', 'b'=>'d'} }
+  #             '--fields *:d'     -> {:fields=>{'a'=>'d', 'b'=>'d', 'c'=>'d'} }
   #
   # This is a modified version of Yehuda Katz's Thor::Options class which is a modified version
   # of Daniel Berger's Getopt::Long class (licensed under Ruby's license).
@@ -94,8 +108,10 @@ module Boson
     #
     # Here are the available option attributes:
     #
-    # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric.
+    # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric, :hash.
     # [*:default*] This or :type is required. This is the default value an option has when not passed.
+    # [*:required*] Boolean indicating if option is required. Option parses raises error if value not given.
+    #               Default is false.
     # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
     #             can be aliased by typing a unique string it starts with. For example, for values foo, odd, optional,
     #             f refers to foo, o to odd and op to optional.
@@ -160,7 +176,7 @@ module Boson
       }
     end
 
-    # Parses an array of arguments for defined options to return a hash. Once the parser
+    # Parses an array of arguments for defined options to return an IndifferentAccessHash. Once the parser
     # recognizes a valid option, it continues to parse until an non option argument is detected.
     # Flags that can be passed to the parser:
     # * :opts_before_args: When true options must come before arguments. Default is false.
@@ -209,8 +225,6 @@ module Boson
         case type
         when :boolean
           "[#{opt}]"
-        when :required
-          opt + "=" + opt.gsub(/\-/, "").upcase
         else
           sample = @defaults[undasherize(opt)]
           sample ||= case type
@@ -255,8 +269,6 @@ module Boson
 
     def get_option_value(type, opt)
       case type
-        when :required
-          shift
         when :string
           value = shift
           if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
@@ -309,7 +321,7 @@ module Boson
       end
 
       case type
-      when :required, :string
+      when :string
         raise Error, "cannot pass '#{peek}' as an argument to option '#{@current_option}'" if valid?(peek)
       when :numeric
         unless peek =~ NUMERIC and $& == peek
@@ -388,8 +400,9 @@ module Boson
 
     def check_required!(hash)
       for name, type in @opt_types
-        if type == :required and !hash[undasherize(name)]
-          raise Error, "no value provided for required option '#{undasherize(name)}'"
+        @current_option = undasherize(name)
+        if current_option_attributes[:required] && !hash.key?(@current_option.to_sym)
+          raise Error, "no value provided for required option '#{@current_option}'"
         end
       end
     end
