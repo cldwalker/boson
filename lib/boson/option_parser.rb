@@ -32,9 +32,13 @@ module Boson
   # [*:string*] Separate name from value with space or '=' i.e. '--color red' or '--color=red'.
   # [*:numeric*] Receives values as :string does or by appending number right after name i.e.
   #              '-N3' == '-N=3'.
-  # [*:array*] Receives values as :string does. Multiple values are split by ',' i.e.
-  #            '--fields 1,2,3' -> ['1','2','3']. The split character can be configured as explained at
-  #            OptionParser.new .
+  # [*:array*] Receives values as :string does. Multiple values are split by a configurable character
+  #            (default ','). See OptionParser.new for more.
+  #             '--fields 1,2,3' -> ['1','2','3']
+  # [*:hash*] Receives values as :string does. Key-value pairs are split by ':' and pairs are split by
+  #           a configurable character (default ','). Multiple keys can be joined to one value.
+  #             '--fields a:b,c:d' -> {'a'=>'b', 'c'=>'d'}
+  #             '--fields a,b:d' -> {'a'=>'d','b'=>'d'}
   #
   # This is a modified version of Yehuda Katz's Thor::Options class which is a modified version
   # of Daniel Berger's Getopt::Long class (licensed under Ruby's license).
@@ -92,6 +96,7 @@ module Boson
     # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
     #             can be aliased by typing a unique string it starts with. For example, for values foo, odd, optional,
     #             f refers to foo, o to odd and op to optional.
+    # [*:keys*] An array of values a hash option's keys can have. Keys can be aliased just like :values.
     # [*:enum*] Boolean indicating if an option enforces values in :values. Default is true. Available for
     #           :array and :string options.
     # [*:split*] Only for :array options. A string or regular expression on which an array value splits
@@ -120,15 +125,16 @@ module Boson
           @option_attributes ||= {}
           @option_attributes[nice_name] = type
           @defaults[nice_name] = type[:default] if type[:default]
-          @option_attributes[nice_name][:enum] = true if type.key?(:values) && !type.key?(:enum)
+          @option_attributes[nice_name][:enum] = true if (type.key?(:values) || type.key?(:keys)) &&
+            !type.key?(:enum)
           type = determine_option_type(type[:default]) || type[:type] || :boolean
         end
 
         # set defaults
         case type
-          when TrueClass               then  @defaults[nice_name] = true
-          when FalseClass              then  @defaults[nice_name] = false
-          when String, Numeric, Array  then  @defaults[nice_name] = type
+          when TrueClass                     then  @defaults[nice_name] = true
+          when FalseClass                    then  @defaults[nice_name] = false
+          when String, Numeric, Array, Hash  then  @defaults[nice_name] = type
         end
         
         mem[name] = determine_option_type(type) || type
@@ -208,6 +214,7 @@ module Boson
             when :string  then undasherize(opt).gsub(/\-/, "_").upcase
             when :numeric then "N"
             when :array   then "A,B,C"
+            when :hash    then "A:B,C:D"
             end
           "[" + opt + "=" + sample.to_s + "]"
         end
@@ -238,6 +245,7 @@ module Boson
         when String                then :string
         when Numeric               then :numeric
         when Array                 then :array
+        when Hash                  then :hash
         else nil
       end
     end
@@ -265,6 +273,19 @@ module Boson
             }
           end
           array
+        when :hash
+          splitter = (@option_attributes[@current_option][:split] rescue nil) || ','
+          # Creates array pairs, grouping array of keys with a value
+          aoa = Hash[*shift.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
+          hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
+          if keys = @option_attributes[@current_option][:keys].sort_by {|e| e.to_s } rescue nil
+            hash.each {|k,v|
+              if (new_key = auto_alias_value(keys, k))
+                hash[new_key] = hash.delete(k)
+              end
+            }
+          end
+          hash
       end
     end
 

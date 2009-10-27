@@ -318,8 +318,39 @@ module Boson
       parse("-c","f,b")[:c].should == %w{fa bar}
     end
 
-    it "allows a configurable splitter" do
+    it "supports a configurable splitter" do
       parse("-d", "yogi berra")[:d].should == %w{yogi berra}
+    end
+  end
+
+  context ":hash type" do
+    before(:all) {
+      create :a=>:hash, :b=>{:default=>{:a=>'b'}}, :c=>{:type=>:hash, :keys=>%w{one two three}},
+        :d=>{:type=>:hash, :split=>" "}
+    }
+
+    it "converts comma delimited pairs to hash" do
+      parse("-a", "f:3,g:4")[:a].should == {'f'=>'3', 'g'=>'4'}
+    end
+
+    it "supports hash defaults" do
+      parse[:b].should == {:a=>'b'}
+    end
+
+    it "raises error when option has no value" do
+      assert_error(OptionParser::Error, "no value.*'a'") { parse("-a") }
+    end
+
+    it "auto aliases :keys attribute" do
+      parse("-c","t:2,o:1")[:c].should == {'three'=>'2', 'one'=>'1'}
+    end
+
+    it "supports a configurable splitter" do
+      parse("-d","a:ab b:bc")[:d].should == {'a'=>'ab', 'b'=>'bc'}
+    end
+
+    it "supports grouping keys" do
+      parse("-c", "t,tw:foo,o:bar")[:c].should == {'three'=>'foo','two'=>'foo', 'one'=>'bar'}
     end
   end
 
@@ -359,6 +390,11 @@ module Boson
     it "outputs array args with sample value" do
       create "--libs" => :array
       usage.should == ["[--libs=A,B,C]"]
+    end
+
+    it "outputs hash args with sample value" do
+      create '--paths' => :hash
+      usage.should == ["[--paths=A:B,C:D]"]
     end
   end
 end
