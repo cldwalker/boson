@@ -352,6 +352,11 @@ module Boson
     it "supports grouping keys" do
       parse("-c", "t,tw:foo,o:bar")[:c].should == {'three'=>'foo','two'=>'foo', 'one'=>'bar'}
     end
+
+    it "aliases * to all keys" do
+      parse("-c", "*:foo")[:c].should == {'three'=>'foo', 'two'=>'foo', 'one'=>'foo'}
+      parse('-a', '*:foo')[:a].should == {'*'=>'foo'}
+    end
   end
 
   context "option with attributes" do

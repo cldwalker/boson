@@ -36,7 +36,8 @@ module Boson
   #            (default ','). See OptionParser.new for more.
   #             '--fields 1,2,3' -> ['1','2','3']
   # [*:hash*] Receives values as :string does. Key-value pairs are split by ':' and pairs are split by
-  #           a configurable character (default ','). Multiple keys can be joined to one value.
+  #           a configurable character (default ','). Multiple keys can be joined to one value. Passing '*'
+  #           as a key refers to all known :keys.
   #             '--fields a:b,c:d' -> {'a'=>'b', 'c'=>'d'}
   #             '--fields a,b:d' -> {'a'=>'d','b'=>'d'}
   #
@@ -275,17 +276,14 @@ module Boson
           array
         when :hash
           splitter = (@option_attributes[@current_option][:split] rescue nil) || ','
+          keys = @option_attributes[@current_option][:keys].sort_by {|e| e.to_s } rescue nil
           # Creates array pairs, grouping array of keys with a value
           aoa = Hash[*shift.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
+          aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
           hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
-          if keys = @option_attributes[@current_option][:keys].sort_by {|e| e.to_s } rescue nil
-            hash.each {|k,v|
-              if (new_key = auto_alias_value(keys, k))
-                hash[new_key] = hash.delete(k)
-              end
-            }
-          end
-          hash
+          keys ? hash.each {|k,v|
+                  (new_key = auto_alias_value(keys, k)) && hash[new_key] = hash.delete(k)
+                 } : hash
       end
     end
 
