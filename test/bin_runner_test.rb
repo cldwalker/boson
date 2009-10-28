@@ -114,23 +114,21 @@ module Boson
 
       test "with index option, no existing index and core command updates index and prints index message" do
         index :load=>Runner.all_libraries
-        Index.expects(:exists?).returns(false)
+        Index.stubs(:exists?).returns(false)
         capture_stdout { start("--index", "libraries") }.should =~ /Generating index/
       end
 
       test "with index option, existing index and core command updates incremental index" do
-        Index.expects(:changed_libraries).returns(['changed'])
         index :load=>['changed']
-        Index.expects(:exists?).returns(true)
-        capture_stdout { start("--index", "libraries")}.should =~ /Indexing.*changed/
+        Index.stubs(:exists?).returns(true)
+        capture_stdout { start("--index=changed", "libraries")}.should =~ /Indexing.*changed/
       end
 
       test "with index option, failed indexing prints error" do
-        Index.expects(:changed_libraries).returns(['changed'])
         index :load=>['changed'], :fails=>true
-        Index.expects(:exists?).returns(true)
+        Index.stubs(:exists?).returns(true)
         capture_stderr {
-          capture_stdout { start("--index", "libraries")}.should =~ /Indexing.*changed/
+          capture_stdout { start("--index=changed", "libraries")}.should =~ /Indexing.*changed/
         }.should =~ /Error:.*failed.*changed/
       end
 

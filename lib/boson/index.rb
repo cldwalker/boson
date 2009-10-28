@@ -10,11 +10,10 @@ module Boson
 
     # Updates the index.
     def update(options={})
-      options[:all] = true if !exists? && !options.key?(:all)
-      libraries_to_update = options[:all] ? Runner.all_libraries : changed_libraries
+      libraries_to_update = !exists? ? Runner.all_libraries : options[:libraries] || changed_libraries
       read_and_transfer(libraries_to_update)
       if options[:verbose]
-        puts options[:all] ? "Generating index for all #{libraries_to_update.size} libraries. Patience ... is a bitch" :
+        puts !exists? ? "Generating index for all #{libraries_to_update.size} libraries. Patience ... is a bitch" :
           (libraries_to_update.empty? ? "No libraries indexed" :
           "Indexing the following libraries: #{libraries_to_update.join(', ')}")
       end

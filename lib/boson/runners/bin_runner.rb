@@ -1,7 +1,7 @@
 module Boson
   # This class handles the boson executable (boson command execution from the commandline). Any changes
   # to your commands are immediately available from the commandline except for changes to the main config file.
-  # For its changes to take effect you'll need to explicitly load the changed libraries with the global option --load.
+  # For those changes to take effect you need to explicitly load and index the libraries with --index.
   # See Index to understand how Boson can immediately detect the latest commands.
   #
   # Usage for the boson shell command looks like this:
@@ -10,20 +10,23 @@ module Boson
   # The boson executable comes with these global options:
   # [:help]  Gives a basic help of global options. When a command is given the help shifts to a command's help.
   # [:verbose] Using this along with :help option shows more help. Also gives verbosity to other actions i.e. loading.
-  # [:index] Updates index. This should be called in the unusual case that Boson doesn't detect new commands
-  #          and libraries.
   # [:execute] Like ruby -e, this executes a string of ruby code. However, this has the advantage that all
   #            commands are available as normal methods, automatically loading as needed. This is a good
   #            way to call commands that take non-string arguments.
   # [:console] This drops Boson into irb after having loaded default commands and any explict libraries with
-  #                :load option. This is a good way to start irb with only certain libraries loaded.
+  #            :load option. This is a good way to start irb with only certain libraries loaded.
   # [:load] Explicitly loads a list of libraries separated by commas. Most useful when used with :console option.
   #         Can also be used to explicitly load libraries that aren't being detected automatically.
+  # [:index] Updates index for given libraries allowing you to use them. This is useful if Boson's autodetection of
+  #          changed libraries isn't picking up your changes. Since this option has a :bool_default attribute, arguments
+  #          passed to this option need to be passed with '=' i.e. '--index=my_lib'.
   # [:render] Pretty formats the results of commands without options. Handy for commands that return arrays.
+  # [:pager_toggle] Toggles Hirb's pager in case you'd like to pipe to another command.
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
-      :index=>{:type=>:boolean, :desc=>"Updates index for libraries and commands"},
+      :index=>{:type=>:array, :desc=>"Libraries to index. Libraries must be passed with '='.",
+        :bool_default=>':auto', :values=>all_libraries, :enum=>false},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
       :console=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
@@ -59,7 +62,9 @@ module Boson
       # Loads the given command.
       def init
         super
-        Index.update(:verbose=>true) if @options[:index]
+        if @options[:index]
+          Index.update({:verbose=>true}.merge!(@options[:index].include?(':auto') ? {} : {:libraries=>@options[:index]}))
+        end
         if @options[:load]
           Manager.load @options[:load], load_options
         elsif @options[:execute]
