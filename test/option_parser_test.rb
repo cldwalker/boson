@@ -126,7 +126,7 @@ module Boson
 
   context "option values can be set with" do
     it "a opt=<value> assignment" do
-      create "--foo" => :string
+      create :foo => :string
       parse("--foo=12")["foo"].should == "12"
       parse("-f=12")["foo"].should == "12"
       parse("--foo=bar=baz")["foo"].should == "bar=baz"
@@ -235,10 +235,11 @@ module Boson
 
     it "sets default boolean" do
       parse('--foo', '--bar', '1')[:foo].should == 'whoop'
+      parse('--foo', 'ok', 'dokay')[:foo].should == 'whoop'
     end
 
     it "sets options normally" do
-      parse('--foo', 'boo', '--bar', 'har').should == {:foo=>'boo', :bar=>['har']}
+      parse('--foo=boo', '--bar=har').should == {:foo=>'boo', :bar=>['har']}
     end
 
     it "sets non-string default boolean" do

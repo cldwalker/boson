@@ -29,7 +29,6 @@ module Boson
 
   # This class concisely defines commandline options that can be parsed produce a Hash. Additional points:
   # * Setting option values should follow conventions in *nix environments.
-  # * Any option type can be passed as a boolean if it has a :bool_default attribute.
   # * When options are parsed by OptionParser.parse, an IndifferentAccessHash hash is returned.
   # * Each value in the returned options hash can be any of the following Ruby objects: String, Integer, Float,
   #   Array, Hash, FalseClass, TrueClass.
@@ -114,7 +113,8 @@ module Boson
     #
     # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric, :hash.
     # [*:default*] This or :type is required. This is the default value an option has when not passed.
-    # [*:bool_default*] This is the default value an option has when passed as a boolean.
+    # [*:bool_default*] This is the value an option has when passed as a boolean. However, by enabling this
+    #                   an option can only have explicit values with '=' i.e. '--index=alias' and no '--index alias'.
     # [*:required*] Boolean indicating if option is required. Option parses raises error if value not given.
     #               Default is false.
     # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
@@ -200,7 +200,7 @@ module Boson
       end
 
       while current_is_option?
-        case shift
+        case @original_current_option = shift
         when SHORT_SQ_RE
           unshift $1.split('').map { |f| "-#{f}" }
           next
@@ -210,7 +210,7 @@ module Boson
         when LONG_RE, SHORT_RE
           option = $1
         end
-        
+
         dashed_option = normalize_option(option)
         @current_option = undasherize(dashed_option)
         type = option_type(dashed_option)
@@ -277,7 +277,7 @@ module Boson
 
     def value_shift
       return shift if !(bool_default = current_option_attributes[:bool_default])
-      return shift if peek && !valid?(peek)
+      return shift if @original_current_option =~ EQ_RE #peek && !valid?(peek)
       bool_default
     end
 
