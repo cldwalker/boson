@@ -15,7 +15,6 @@ module Boson
       # Any options that aren't listed here are passed as library attributes to the libraries (see Library.new)
       # ==== Options:
       # [:verbose] Boolean to print each library's loaded status along with more verbose errors. Default is false.
-      # [:index]   Boolean to load in index mode. Default is false.
       def load(libraries, options={})
         libraries = [libraries] unless libraries.is_a?(Array)
         libraries.map {|e|
@@ -60,18 +59,14 @@ module Boson
       rescue AppendFeaturesFalseError
       rescue LoaderError=>e
         FileLibrary.reset_file_cache(library.to_s)
-        print_error_message "Unable to #{load_method} library #{library}. Reason: #{e.message}"
+        $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
       rescue Exception=>e
         FileLibrary.reset_file_cache(library.to_s)
         message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
         message += "\n" + e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n") if @options[:verbose]
-        print_error_message message
+        $stderr.puts message
       ensure
         Inspector.disable if Inspector.enabled
-      end
-
-      def print_error_message(message)
-        $stderr.puts message if !@options[:index] || (@options[:index] && @options[:verbose])
       end
 
       def load_once(source, options={})

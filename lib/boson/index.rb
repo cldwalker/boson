@@ -18,7 +18,10 @@ module Boson
           (libraries_to_update.empty? ? "No libraries indexed" :
           "Indexing the following libraries: #{libraries_to_update.join(', ')}")
       end
-      Manager.load(libraries_to_update, options.merge(:index=>true)) unless libraries_to_update.empty?
+      unless libraries_to_update.empty?
+        Manager.load(libraries_to_update, options) || $stderr.puts("Error: One of these libraries failed" +
+          " to load while indexing: #{libraries_to_update.join(', ')}")
+      end
       write
     end
 
