@@ -152,7 +152,7 @@ module Boson
       @obj, @command, @args = obj, command, args
       # prepends default option
       if @command.default_option && @command.arg_size == 1 && !@command.has_splat_args? && @args[0].to_s[/./] != '-'
-        @args[0] = "--#{@command.default_option}=#{@args[0]}"
+        @args[0] = "--#{@command.default_option}=#{@args[0]}" unless @args.join.empty?
       end
       @command.options ||= {}
 

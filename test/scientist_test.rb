@@ -4,7 +4,7 @@ module Boson
   class ScientistTest < Test::Unit::TestCase
     before(:all) {
       unless ScientistTest.const_defined?(:Blah)
-        Boson.send :remove_const, :BinRunner
+        Boson.send :remove_const, :BinRunner if Boson.const_defined?(:BinRunner)
       eval <<-EOF
       module Blah
         def blah(arg1, options={})
@@ -256,8 +256,17 @@ module Boson
         command(@cmd_attributes, ['--force', '--level=3']).should == {:level=>3, :force=>true}
       end
 
-      test "prepends correctly" do
+      test "parses no arguments normally" do
+        command(@cmd_attributes, '').should == {:level=>2}
+      end
+
+      test "prepends correctly from irb" do
         command(@cmd_attributes, '3 -f').should == {:level=>3, :force=>true}
+      end
+
+      test "prepends correctly from cmdline" do
+        Boson.expects(:const_defined?).returns true
+        command(@cmd_attributes, ['3','-f']).should == {:level=>3, :force=>true}
       end
     end
 
