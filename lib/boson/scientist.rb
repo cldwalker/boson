@@ -1,9 +1,12 @@
 require 'shellwords'
 module Boson
-  # Scientist redefines the methods of commands that have options and/or take global options. This redefinition
-  # allows a command to receive its arguments normally or as a commandline app does. For a command's
-  # method to be redefined correctly, its last argument _must_ expect a hash.
+  # Scientist redefines _any_ object's methods to act like shell commands while still receiving ruby arguments normally.
+  # It also let's your method have an optional view generated from a method's return value.
+  # Boson::Scientist.create_option_command redefines an object's method with a Boson::Command while
+  # Boson::Scientist.commandify redefines with just a hash. For an object's method to be redefined correctly,
+  # its last argument _must_ expect a hash.
   #
+  # === Examples
   # Take for example this basic method/command with an options definition:
   #   options :level=>:numeric, :verbose=>:boolean
   #   def foo(arg='', options={})
@@ -91,13 +94,36 @@ module Boson
       :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"}
     } #:nodoc:
 
-    # Redefines a command's method for the given object.
+    # Redefines an object's method with a Command of the same name.
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
       @no_option_commands << command if command.options.nil?
       [command.name, command.alias].compact.each {|e|
         obj.instance_eval("class<<self;self;end").send(:define_method, e, cmd_block)
       }
+    end
+
+    # A wrapper around create_option_command that doesn't depend on a Command object. Rather you
+    # simply pass a hash of command attributes (see Command.new) or command methods and let OpenStruct mock a command.
+    # The only required attribute is :name, though to get any real use you should define :options and
+    # :arg_size (default is '*'). Example:
+    #   >> def checkit(*args); args; end
+    #   => nil
+    #   >> Boson::Scientist.commandify(self, :name=>'checkit', :options=>{:verbose=>:boolean, :num=>:numeric})
+    #   => ['checkit']
+    #   # regular ruby method
+    #   >> checkit 'one', 'two', :num=>13, :verbose=>true
+    #   => ["one", "two", {:num=>13, :verbose=>true}]
+    #   # commandline ruby method
+    #   >> checkit 'one two -v -n=13'
+    #   => ["one", "two", {:num=>13, :verbose=>true}]
+    def commandify(obj, hash)
+      raise ArgumentError, ":name required" unless hash[:name]
+      hash[:arg_size] ||= '*'
+      hash[:has_splat_args?] = true if hash[:arg_size] == '*'
+      fake_cmd = OpenStruct.new(hash)
+      fake_cmd.option_parser ||= OptionParser.new(fake_cmd.options || {})
+      create_option_command(obj, fake_cmd)
     end
 
     # The actual method which replaces a command's original method

@@ -9,10 +9,6 @@ module Boson
       @enabled = true
     end
 
-    def toggle_pager
-      Hirb::View.toggle_pager
-    end
-
     # Renders any object via Hirb. Options are passed directly to
     # {Hirb::Console.render_output}[http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011].
     def render(object, options={})
@@ -23,11 +19,16 @@ module Boson
       end
     end
 
+    #:stopdoc:
+    def toggle_pager
+      Hirb::View.toggle_pager
+    end
+
     def silent_object?(obj)
       [nil,false,true].include?(obj)
     end
 
-    def render_object(object, options={}) #:nodoc:
+    def render_object(object, options={})
       options[:class] ||= :auto_table
       if object.is_a?(Array)
         object = search_object(object, options.delete(:query)) if options[:query]
@@ -48,7 +49,7 @@ module Boson
       $stderr.puts "Query failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'"
     end
 
-    def sort_object(object, sort, reverse_sort=false) #:nodoc:
+    def sort_object(object, sort, reverse_sort=false)
       sort_lambda = object[0].is_a?(Hash) ? (object.all? {|e| e[sort].respond_to?(:<=>) } ?
         lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :
         (object.all? {|e| e.send(sort).respond_to?(:<=>) } ? lambda {|e| e.send(sort) || ''} :
@@ -59,5 +60,6 @@ module Boson
     rescue NoMethodError, ArgumentError
       $stderr.puts "Sort failed with nonexistant method '#{sort}'"
     end
+    #:startdoc:
   end
 end
