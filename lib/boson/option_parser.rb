@@ -51,8 +51,9 @@ module Boson
   #                '-n3'  -> {:num=>3}
   #                '-dn3' -> {:debug=>true, :num=>3}
   # [*:array*] Sets values as :string does. Multiple values are split by a configurable character
-  #            (default ','). See OptionParser.new for more.
+  #            Default is ',' (see OptionParser.new). Passing '*' refers to all known :values.
   #             '--fields 1,2,3' -> {:fields=>['1','2','3']}
+  #             '--fields *'     -> {:fields=>['1','2','3']}
   # [*:hash*] Sets values as :string does. Key-value pairs are split by ':' and pairs are split by
   #           a configurable character (default ','). Multiple keys can be joined to one value. Passing '*'
   #           as a key refers to all known :keys.
@@ -302,6 +303,7 @@ module Boson
           splitter = current_option_attributes[:split] || ','
           array = value_shift.split(splitter)
           if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
+            array.each {|e| array.delete(e) && array += values if e == '*'}
             array.each_with_index {|e,i|
               (value = auto_alias_value(values, e)) && array[i] = value
             }
@@ -310,12 +312,12 @@ module Boson
         when :hash
           splitter = current_option_attributes[:split] || ','
           (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
-          # Creates array pairs, grouping array of keys with a value
           value = value_shift
           if !value.include?(':')
             (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
               raise(Error, "invalid key:value pair for option '#{@current_option}'")
           end
+          # Creates array pairs, grouping array of keys with a value
           aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
           aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
           hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
