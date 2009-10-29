@@ -150,7 +150,12 @@ module Boson
 
     def translate_args(obj, command, args)
       @obj, @command, @args = obj, command, args
+      # prepends default option
+      if @command.default_option && @command.arg_size == 1 && !@command.has_splat_args? && @args[0].to_s[/./] != '-'
+        @args[0] = "--#{@command.default_option}=#{@args[0]}"
+      end
       @command.options ||= {}
+
       if parsed_options = command_options
         add_default_args(@args)
         return @args if @no_option_commands.include?(@command)
@@ -231,7 +236,7 @@ module Boson
         parsed_options, @args = parse_options Shellwords.shellwords(@args[0])
       # last string argument interpreted as args + options
       elsif @args.size > 1 && @args[-1].is_a?(String)
-        args = caller.grep(/bin_runner.rb:/).empty? ? Shellwords.shellwords(@args.pop) : @args
+        args = Boson.const_defined?(:BinRunner) ? @args : Shellwords.shellwords(@args.pop)
         parsed_options, new_args = parse_options args
         @args += new_args
       # add default options

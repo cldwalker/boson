@@ -3,6 +3,8 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class ScientistTest < Test::Unit::TestCase
     before(:all) {
+      unless ScientistTest.const_defined?(:Blah)
+        Boson.send :remove_const, :BinRunner
       eval <<-EOF
       module Blah
         def blah(arg1, options={})
@@ -15,8 +17,12 @@ module Boson
           [arg1, arg2, options]
         end
         def default; 'some default'; end
+        def default_option(options={})
+          options
+        end
       end
       EOF
+      end
       @opt_cmd = Object.new.extend Blah
     }
 
@@ -235,6 +241,23 @@ module Boson
         render_expected :fields=>['f1'], :foo=>true
         args = ["--foo --fields f1 ab"]
         basic_command({:render_options=>{:foo=>:boolean, :fields=>%w{f1 f2 f3}} }, args)
+      end
+    end
+
+    context "command with default option" do
+      before(:all) { @cmd_attributes = {:name=>'default_option', :default_option=>'level', :args=>1} }
+
+      test "parses normally from irb" do
+        command(@cmd_attributes, '-f --level=3').should == {:level=>3, :force=>true}
+      end
+
+      test "parses normally from cmdline" do
+        Boson.expects(:const_defined?).returns true
+        command(@cmd_attributes, ['--force', '--level=3']).should == {:level=>3, :force=>true}
+      end
+
+      test "prepends correctly" do
+        command(@cmd_attributes, '3 -f').should == {:level=>3, :force=>true}
       end
     end
 

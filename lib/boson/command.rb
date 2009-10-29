@@ -19,7 +19,7 @@ module Boson
     end
 
     ATTRIBUTES = [:name, :lib, :alias, :description, :options, :args]
-    attr_accessor *(ATTRIBUTES + [:render_options, :namespace])
+    attr_accessor *(ATTRIBUTES + [:render_options, :namespace, :default_option])
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
     #
@@ -32,6 +32,10 @@ module Boson
     #   important for commands that have options/render_options. Its value can be an array
     #   (as ArgumentInspector.scrape_with_eval produces), a number representing
     #   the number of arguments or '*' if the command has a variable number of arguments.
+    # * *:default_option* Only for an option command that has one argument. This sets a default
+    #   option to use when a command is detected to start with a non-option argument. Example:
+    #     # For a command with default option 'query'
+    #     'some -v'   -> '--query=some -v'
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
@@ -40,6 +44,7 @@ module Boson
       @render_options = hash[:render_options] if hash[:render_options]
       @options = hash[:options] if hash[:options]
       @namespace = hash[:namespace] if hash[:namespace]
+      @default_option = hash[:default_option] if hash[:default_option]
       if hash[:args]
         if hash[:args].is_a?(Array)
           @args = hash[:args]
