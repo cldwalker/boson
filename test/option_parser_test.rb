@@ -337,7 +337,7 @@ module Boson
   context ":array type" do
     before(:all) {
       create :a=>:array, :b=>[1,2,3], :c=>{:type=>:array, :values=>%w{foo fa bar zebra}, :enum=>false},
-        :d=>{:type=>:array, :split=>" "}
+        :d=>{:type=>:array, :split=>" ", :values=>[:ab, :bc, :cd], :enum=>false}
     }
 
     it "supports array defaults" do
@@ -354,6 +354,10 @@ module Boson
 
     it "auto aliases :values attribute" do
       parse("-c","f,b")[:c].should == %w{fa bar}
+    end
+
+    it "auto aliases symbolic :values" do
+      parse("-d","a c")[:d].should == [:ab,:cd]
     end
 
     it "supports a configurable splitter" do

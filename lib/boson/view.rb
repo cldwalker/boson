@@ -29,11 +29,11 @@ module Boson
 
     def render_object(object, options={}) #:nodoc:
       options[:class] ||= :auto_table
-      if options[:query] && object.is_a?(Array)
-        object = search_object(object, options[:query])
-      end
-      if object.is_a?(Array) && object.size > 0 && (sort = options.delete(:sort))
-        object = sort_object(object, sort, options[:reverse_sort])
+      if object.is_a?(Array)
+        object = search_object(object, options.delete(:query)) if options[:query]
+        if object.size > 0 && (sort = options.delete(:sort))
+          object = sort_object(object, sort, options.delete(:reverse_sort))
+        end
       end
       Hirb::Console.render_output(object, options)
     end
@@ -45,13 +45,13 @@ module Boson
         query_hash.map {|field,query| object.select {|e| e.send(field).to_s =~ /#{query}/i } }.flatten.uniq
       end
     rescue NoMethodError
-      $stderr.puts "Query '#{query}' failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'"
+      $stderr.puts "Query failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'"
     end
 
-    def sort_object(object, sort, reverse_sort) #:nodoc:
-      sort_lambda = object[0].is_a?(Hash) ? (object[0][sort].respond_to?(:<=>) ?
+    def sort_object(object, sort, reverse_sort=false) #:nodoc:
+      sort_lambda = object[0].is_a?(Hash) ? (object.all? {|e| e[sort].respond_to?(:<=>) } ?
         lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }) :
-        (object[0].send(sort).respond_to?(:<=>) ? lambda {|e| e.send(sort) || ''} :
+        (object.all? {|e| e.send(sort).respond_to?(:<=>) } ? lambda {|e| e.send(sort) || ''} :
         lambda {|e| e.send(sort).to_s })
       object = object.sort_by &sort_lambda
       object = object.reverse if reverse_sort
