@@ -9,17 +9,20 @@ module Boson::Commands::Core #:nodoc:
       'render'=>{:description=>"Render any object using Hirb"},
       'menu'=>{:description=>"Provide a menu to multi-select elements from a given array"},
       'usage'=>{:description=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
-      'commands'=>{ :description=>"List or search commands",
-        :options=>{:query_fields=>{:default=>['full_name'], :values=>command_attributes, :desc=>"Searchable fields"},
-          :index=>{:type=>:boolean, :desc=>"Searches index"}},
-        :render_options=>{:fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes} }
-      },
-      'libraries'=>{ :description=>"List or search libraries",
-        :options=>{:query_fields=>{:default=>['name'], :values=>library_attributes, :desc=>"Searchable fields"},
-          :index=>{:type=>:boolean, :desc=>"Searches index"} },
+      'commands'=>{
+        :description=>"List or search commands", :default_option=>'query',
+        :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"}},
         :render_options=>{
+          :query=>{:keys=>command_attributes, :default_keys=>'full_name'},
+          :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes} }
+      },
+      'libraries'=>{
+        :description=>"List or search libraries", :default_option=>'query',
+        :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"} },
+        :render_options=>{
+          :query=>{:keys=>library_attributes, :default_keys=>'name'},
           :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
-          :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}} }
+          :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}, :desc=>"Filters to apply to library fields" }}
       },
       'load_library'=>{:description=>"Load/reload a library", :options=>{:reload=>:boolean, [:verbose,:V]=>true}}
     }
@@ -27,17 +30,12 @@ module Boson::Commands::Core #:nodoc:
     {:library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
-  def commands(query='', options={})
-    query_fields = options[:query_fields] || ['full_name']
-    Boson::Index.read if options[:index]
-    commands = options[:index] ? Boson::Index.commands : Boson.commands
-    query_fields.map {|e| commands.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten.uniq
+  def commands(options={})
+    options[:index] ? (Boson::Index.read || true) && Boson::Index.commands : Boson.commands
   end
 
-  def libraries(query='', options={})
-    Boson::Index.read if options[:index]
-    libraries = options[:index] ? Boson::Index.libraries : Boson.libraries
-    options[:query_fields].map {|e| libraries.select {|f| f.send(e).to_s =~ /#{query}/i } }.flatten.uniq
+  def libraries(options={})
+    options[:index] ? (Boson::Index.read || true) && Boson::Index.libraries : Boson.libraries
   end
 
   def load_library(library, options={})
