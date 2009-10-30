@@ -74,11 +74,6 @@ module Boson
       all_modules
     end
 
-    # Returns array of _all_ common instance methods between two modules/classes.
-    def common_instance_methods(module1, module2)
-      (module1.instance_methods + module1.private_instance_methods) & (module2.instance_methods + module2.private_instance_methods)
-    end
-
     # Creates a module under a given base module and possible name. If the module already exists or conflicts
     # per top_level_class_conflict, it attempts to create one with a number appended to the name.
     def create_module(base_module, name)

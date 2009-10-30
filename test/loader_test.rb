@@ -110,6 +110,14 @@ module Boson
         end
       end
 
+      test "prints error for method conflicts with main_object method" do
+        with_config(:error_method_conflicts=>true) do
+          capture_stderr {
+            load('blah', :file_string=>"module Blah; def require; end; end")
+          }.should =~ /Unable to load library blah.*conflict.*require/
+        end
+      end
+
       test "prints error for method conflicts with config error_method_conflicts" do
         with_config(:error_method_conflicts=>true) do
           load('blah', :file_string=>"module Blah; def chwhat; end; end")
