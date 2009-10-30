@@ -49,20 +49,26 @@ module Boson
       (MethodInspector::METHODS + [:method_args]).each do |e|
         key = command_key(e)
         (@store[e] || []).each do |cmd, val|
-          if no_command_config_for(cmd, key)
-            (@commands_hash[cmd] ||= {})[key] = val
-          end
+          @commands_hash[cmd] ||= {}
+          add_scraped_data_to_config(key, val, cmd)
         end
+      end
+    end
+
+    def add_scraped_data_to_config(key, value, cmd)
+      if value.is_a?(Hash)
+        @commands_hash[cmd][key] = Util.recursive_hash_merge value, @commands_hash[cmd][key] || {}
+      else
+        @commands_hash[cmd][key] ||= value
       end
     end
 
     def add_comment_scraped_data
       (@store[:method_locations] || []).select {|k,(f,l)| f == @library_file }.each do |cmd, (file, lineno)|
         scraped = CommentInspector.scrape(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module)
+        @commands_hash[cmd] ||= {}
         MethodInspector::METHODS.each do |e|
-          if no_command_config_for(cmd, e)
-            (@commands_hash[cmd] ||= {})[command_key(e)] = scraped[e]
-          end
+          add_scraped_data_to_config(command_key(e), scraped[e], cmd)
         end
       end
     end
@@ -70,10 +76,6 @@ module Boson
     # translates from inspector attribute name to command attribute name
     def command_key(key)
       {:method_args=>:args, :desc=>:description}[key] || key
-    end
-
-    def no_command_config_for(cmd, attribute)
-      !@commands_hash[cmd] || (@commands_hash[cmd] && !@commands_hash[cmd].key?(attribute))
     end
     #:startdoc:
   end

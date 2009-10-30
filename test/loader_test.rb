@@ -7,6 +7,43 @@ module Boson
       Manager.load([Boson::Commands::Namespace])
     end
 
+    context "config" do
+      before(:each) { reset }
+      test "from callback overridden by user's config" do
+        with_config(:libraries=>{'blih'=>{:namespace=>false}}) do
+          load :blih, :file_string=>"module Blah; def self.config; {:namespace=>'bling'}; end; end"
+          library('blih').namespace.should == false
+        end
+      end
+
+      # if this test fails, other exists? using methods fail
+      test "from callback recursively merges with user's config" do
+        with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:description=>'bling', :options=>{:num=>3}}}}}) do
+          File.stubs(:exists?).returns(true)
+          load :blah, :file_string=> "module Blah; def self.config; {:commands=>{'blang'=>{:alias=>'ba'}, " +
+            "'bling'=>{:options=>{:verbose=>:boolean}}}}; end; end"
+          library('blah').command_object('bling').options.should == {:verbose=>:boolean, :num=>3}
+          library('blah').command_object('bling').description.should == 'bling'
+          library('blah').command_object('blang').alias.should == 'ba'
+        end
+      end
+
+      test "non-hash from inspector overridden by user's config" do
+        with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:description=>'already'}}}}) do
+          load :blah, :file_string=>"module Blah; #from file\ndef bling; end; end"
+          library('blah').command_object('bling').description.should == 'already'
+        end
+      end
+
+      test "hash from inspector recursively merged with user's config" do
+        with_config(:libraries=>{'blah'=>{:commands=>{'blung'=>{:args=>[], :render_options=>{:sort=>'this'}}}}}) do
+          CommentInspector.expects(:scrape).returns({:render_options=>{:fields=>['this']}})
+          load :blah, :file_string=>"module Blah; def blung; end; end"
+          library('blah').command_object('blung').render_options.should == {:fields=>["this"], :sort=>"this"}
+        end
+      end
+    end
+
     context "load" do
       before(:each) { reset }
       test "calls included callback" do
@@ -19,25 +56,6 @@ module Boson
         capture_stdout {
           load :blah, :file_string=>"module Blah; def self.after_included; puts 'yo'; end; end"
         }.should == "yo\n"
-      end
-
-      test "config callback overridden by user's config" do
-        with_config(:libraries=>{'blah'=>{:namespace=>false}}) do
-          load :blah, :file_string=>"module Blah; def self.config; {:namespace=>'bling'}; end; end"
-          library('blah').namespace.should == false
-        end
-      end
-
-      # if this test fails, other exists? using methods fail
-      test "config callback recursively merges with user's config" do
-        with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:description=>'bling', :options=>{:num=>3}}}}}) do
-          File.stubs(:exists?).returns(true)
-          load :blah, :file_string=> "module Blah; def self.config; {:commands=>{'blang'=>{:alias=>'ba'}, " +
-            "'bling'=>{:options=>{:verbose=>:boolean}}}}; end; end"
-          library('blah').command_object('bling').options.should == {:verbose=>:boolean, :num=>3}
-          library('blah').command_object('bling').description.should == 'bling'
-          library('blah').command_object('blang').alias.should == 'ba'
-        end
       end
 
       test "prints error if library module conflicts with top level constant/module" do
