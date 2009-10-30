@@ -43,7 +43,7 @@ module Boson
 
     METHODS.each do |e|
       define_method(e) do |mod, val|
-        store(mod)[e] ||= {}
+        (@mod_store[mod] ||= {})[e] ||= {}
         (store(mod)[:temp] ||= {})[e] = val
       end
     end

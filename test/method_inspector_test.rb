@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
-  class InspectorTest < Test::Unit::TestCase
+  class MethodInspectorTest < Test::Unit::TestCase
     test "non commands module can't set anything" do
       eval "module Blah; end"
       MethodInspector.current_module = Blah
@@ -21,7 +21,7 @@ module Boson
       end
 
       before(:all) { eval "module ::Boson::Commands::Zzz; end" }
-      before(:each) { MethodInspector.mod_store[::Boson::Commands::Zzz] = {} }
+      before(:each) { MethodInspector.mod_store.delete(::Boson::Commands::Zzz) }
 
       test "desc sets descriptions" do
         parsed = parse "desc 'test'; def m1; end; desc 'one'; desc 'more'; def m2; end"
