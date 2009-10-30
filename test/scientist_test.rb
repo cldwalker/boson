@@ -260,6 +260,10 @@ module Boson
         command(@cmd_attributes, '').should == {:level=>2}
       end
 
+      test "parses ruby arguments normally" do
+        command(@cmd_attributes, [{:force=>true, :level=>10}]).should == {:level=>10, :force=>true}
+      end
+
       test "prepends correctly from irb" do
         command(@cmd_attributes, '3 -f').should == {:level=>3, :force=>true}
       end

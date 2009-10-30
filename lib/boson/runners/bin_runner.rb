@@ -124,7 +124,7 @@ module Boson
         if @options[:verbose]
           Manager.load [Boson::Commands::Core]
           puts "\n\nDEFAULT COMMANDS"
-          Boson.invoke :commands, "", :fields=>["name", "usage", "description"], :description=>false
+          Boson.invoke :commands, :fields=>["name", "usage", "description"], :description=>false
         end
       end
       #:startdoc:
