@@ -32,10 +32,11 @@ module Boson
     #   important for commands that have options/render_options. Its value can be an array
     #   (as ArgumentInspector.scrape_with_eval produces), a number representing
     #   the number of arguments or '*' if the command has a variable number of arguments.
-    # * *:default_option* Only for an option command that has one argument. This sets a default
-    #   option to use when a command is detected to start with a non-option argument. Example:
-    #     # For a command with default option 'query'
+    # * *:default_option* Only for an option command that has one argument. This treats the given
+    #   option as an optional first argument. Example:
+    #     # For a command with default option 'query' and options --query and -v
     #     'some -v'   -> '--query=some -v'
+    #     '-v'        -> '-v'
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
@@ -85,7 +86,9 @@ module Boson
     # Usage string for command, created from options and args.
     def usage
       return '' if options.nil? && args.nil?
-      usage_args = args && @options && !has_splat_args? ? args[0..-2] : args
+      usage_args = args && @options && !has_splat_args? ?
+        (@default_option ? [[@default_option.to_s, @file_parsed_args ? ''.inspect : '']] + args[0..-2] :
+        args[0..-2]) : args
       str = args ? usage_args.map {|e|
         (e.size < 2) ? "[#{e[0]}]" : "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
       }.join(' ') : '[*unknown]'
@@ -121,11 +124,11 @@ module Boson
         @args.map! {|e| e.size == 2 ? [e[0], e[1].inspect] : e }
         @file_parsed_args = true
       end
-      [@name, @alias, @lib, @description, @options, @render_options, @args]
+      [@name, @alias, @lib, @description, @options, @render_options, @args, @default_option]
     end
 
     def marshal_load(ary)
-      @name, @alias, @lib, @description, @options, @render_options, @args = ary
+      @name, @alias, @lib, @description, @options, @render_options, @args, @default_option = ary
     end
     #:startdoc:
   end
