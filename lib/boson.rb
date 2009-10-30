@@ -83,7 +83,7 @@ module Boson
 
   # Boolean indicating if the main object can invoke the given method/command.
   def can_invoke?(meth)
-    Boson.main_object.respond_to? meth
+    Boson.main_object.respond_to? meth, true
   end
 end
 
