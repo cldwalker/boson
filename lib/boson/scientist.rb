@@ -212,26 +212,30 @@ module Boson
     end
 
     def default_option_parser
-      @default_option_parser ||= OptionParser.new RENDER_OPTIONS.merge(default_global_options)
+      @default_option_parser ||= OptionParser.new default_render_options.merge(default_global_options)
     end
 
     def default_global_options
       (Boson.repo.config[:global_options] || {}).merge GLOBAL_OPTIONS
     end
 
+    def default_render_options
+      @default_render_options ||= RENDER_OPTIONS.merge Boson.repo.config[:render_options] || {}
+    end
+
     # current render options
     def render_options
-      @command.render_options ? command_render_options : RENDER_OPTIONS
+      @command.render_options ? command_render_options : default_render_options
     end
 
     def command_render_options
       (@command_render_options ||= {})[@command] ||= begin
         @command.render_options.each {|k,v|
-          if !v.is_a?(Hash) && !v.is_a?(Symbol) && RENDER_OPTIONS.keys.include?(k)
+          if !v.is_a?(Hash) && !v.is_a?(Symbol) && default_render_options.keys.include?(k)
             @command.render_options[k] = {:default=>v}
           end
         }
-        opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(RENDER_OPTIONS))
+        opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(default_render_options))
         if opts[:fields][:default] && !opts[:fields].key?(:values)
           opts[:fields][:values] = opts[:fields][:default]
           opts[:fields][:enum] = false unless opts[:fields].key?(:enum)
