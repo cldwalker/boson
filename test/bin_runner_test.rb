@@ -55,7 +55,7 @@ module Boson
       end
 
       test "global option takes value with whitespace" do
-        View.expects(:render).with(anything, {:sort => :lib, :fields => [:name, :lib]})
+        View.expects(:render).with(anything, {:sort => :lib, :fields => [:name, :lib]}, anything)
         start('commands', '-g', 'f=name,lib s=lib')
       end
 

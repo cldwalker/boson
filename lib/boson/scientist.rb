@@ -175,29 +175,51 @@ module Boson
     end
 
     def render_or_raw(result)
-      (@rendered = render?) ? View.render(result, global_render_options) : result
+      return_obj = !(@global_options.keys & pipe_options.keys).empty?
+      result = View.render(result, global_render_options, return_obj) if (@rendered = render?)
+      return_obj ? pipe_command(result) : result
     rescue Exception
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
     end
 
+    def pipe_options
+      @pipe_options ||= Hash[*default_global_options.select {|k,v| v[:pipe] }.flatten]
+    end
+
+    def pipe_command(result)
+      (@global_options.keys & pipe_options.keys).each {|e|
+        command = pipe_options[e][:pipe] != true ? pipe_options[e][:pipe] : e
+        pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
+          Boson.invoke(e, result, @global_options[e])
+      }
+    end
+
+    # choose current parser
     def option_parser
       @command.render_options ? command_option_parser : default_option_parser
     end
 
+    # current command parser
     def command_option_parser
-      (@option_parsers ||= {})[@command] ||= OptionParser.new render_options.merge(GLOBAL_OPTIONS)
+      (@option_parsers ||= {})[@command] ||= OptionParser.new render_options.merge(default_global_options)
     end
 
+    # set cmd and use its parser
     def render_option_parser(cmd)
       @command = cmd
       option_parser
     end
 
     def default_option_parser
-      @default_option_parser ||= OptionParser.new RENDER_OPTIONS.merge(GLOBAL_OPTIONS)
+      @default_option_parser ||= OptionParser.new RENDER_OPTIONS.merge(default_global_options)
     end
 
+    def default_global_options
+      (Boson.repo.config[:global_options] || {}).merge GLOBAL_OPTIONS
+    end
+
+    # current render options
     def render_options
       @command.render_options ? command_render_options : RENDER_OPTIONS
     end

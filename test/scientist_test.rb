@@ -193,7 +193,7 @@ module Boson
     end
 
     def render_expected(options=nil)
-      View.expects(:render).with(anything, options || anything)
+      View.expects(:render).with(anything, options || anything, false)
     end
 
     context "render" do

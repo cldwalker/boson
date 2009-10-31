@@ -11,11 +11,11 @@ module Boson
 
     # Renders any object via Hirb. Options are passed directly to
     # {Hirb::Console.render_output}[http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011].
-    def render(object, options={})
+    def render(object, options={}, return_obj=false)
       if silent_object?(object)
         puts(object.inspect) unless options[:silence_booleans]
       else
-        render_object(object, options)
+        render_object(object, options, return_obj)
       end
     end
 
@@ -28,7 +28,7 @@ module Boson
       [nil,false,true].include?(obj)
     end
 
-    def render_object(object, options={})
+    def render_object(object, options={}, return_obj=false)
       options[:class] ||= :auto_table
       if object.is_a?(Array)
         object = search_object(object, options.delete(:query)) if options[:query]
@@ -36,7 +36,8 @@ module Boson
           object = sort_object(object, sort, options.delete(:reverse_sort))
         end
       end
-      Hirb::Console.render_output(object, options)
+      render_result = Hirb::Console.render_output(object, options)
+      return_obj ? object : render_result
     end
 
     def search_object(object, query_hash)
