@@ -155,7 +155,7 @@ module Boson
           @option_attributes[nice_name][:enum] = true if (type.key?(:values) || type.key?(:keys)) &&
             !type.key?(:enum)
           @option_attributes[nice_name][:default_keys] ||= type[:keys][0] if type.key?(:keys)
-          type = determine_option_type(type[:default]) || type[:type] || :boolean
+          type = !type[:default].nil? ? determine_option_type(type[:default]) : type[:type] || :boolean
         end
 
         # set defaults
@@ -164,8 +164,7 @@ module Boson
           when FalseClass                    then  @defaults[nice_name] = false
           when String, Numeric, Array, Hash  then  @defaults[nice_name] = type
         end
-        
-        mem[name] = determine_option_type(type) || type
+        mem[name] = !type.nil? ? determine_option_type(type) : type
         mem
       end
 
@@ -227,23 +226,37 @@ module Boson
       hash
     end
 
+    def usage_for_boolean(opt)
+      opt
+    end
+
+    def usage_with_default(opt, default)
+      default = @defaults[undasherize(opt)] || default
+      opt + "=" + default.to_s
+    end
+
+    def usage_for_string(opt)
+      usage_with_default(opt, undasherize(opt).upcase)
+    end
+
+    def usage_for_numeric(opt)
+      usage_with_default opt, "N"
+    end
+
+    def usage_for_array(opt)
+      usage_with_default opt, "A,B,C"
+    end
+
+    def usage_for_hash(opt)
+      usage_with_default opt, "A:B,C:D"
+    end
+
     # One-line option usage
     def formatted_usage
       return "" if @opt_types.empty?
       @opt_types.map do |opt, type|
-        case type
-        when :boolean
-          "[#{opt}]"
-        else
-          sample = @defaults[undasherize(opt)]
-          sample ||= case type
-            when :string  then undasherize(opt).gsub(/\-/, "_").upcase
-            when :numeric then "N"
-            when :array   then "A,B,C"
-            when :hash    then "A:B,C:D"
-            end
-          "[" + opt + "=" + sample.to_s + "]"
-        end
+        val = respond_to?("usage_for_#{type}", true) ? send("usage_for_#{type}", opt) : "#{opt}=:#{type}"
+        "[" + val + "]"
       end.join(" ")
     end
 
@@ -269,13 +282,12 @@ module Boson
 
     private
     def determine_option_type(value)
+      return value if value.is_a?(Symbol)
       case value
-        when TrueClass, FalseClass then :boolean
-        when String                then :string
-        when Numeric               then :numeric
-        when Array                 then :array
-        when Hash                  then :hash
-        else nil
+      when TrueClass, FalseClass   then :boolean
+      when Numeric                 then :numeric
+      else
+        value.class.to_s.downcase.to_sym
       end
     end
 
@@ -285,49 +297,59 @@ module Boson
       bool_default
     end
 
-    def get_option_value(type, opt)
-      case type
-        when :string
-          value = value_shift
-          if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
-            (val = auto_alias_value(values, value)) && value = val
-          end
-          value
-        when :boolean
-          if (!@opt_types.key?(opt) && @current_option =~ /^no-(\w+)$/)
-            opt = (opt = original_no_opt($1)) ? undasherize(opt) : $1
-            (@current_option.replace(opt) && false)
-          else
-            true
-          end
-        when :numeric
-          peek.index('.') ? value_shift.to_f : value_shift.to_i
-        when :array
-          splitter = current_option_attributes[:split] || ','
-          array = value_shift.split(splitter)
-          if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
-            array.each {|e| array.delete(e) && array += values if e == '*'}
-            array.each_with_index {|e,i|
-              (value = auto_alias_value(values, e)) && array[i] = value
-            }
-          end
-          array
-        when :hash
-          splitter = current_option_attributes[:split] || ','
-          (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
-          value = value_shift
-          if !value.include?(':')
-            (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
-              raise(Error, "invalid key:value pair for option '#{@current_option}'")
-          end
-          # Creates array pairs, grouping array of keys with a value
-          aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
-          aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
-          hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
-          keys ? hash.each {|k,v|
-                  (new_key = auto_alias_value(keys, k)) && hash[new_key] = hash.delete(k)
-                 } : hash
+    def create_string(opt)
+      value = value_shift
+      if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
+        (val = auto_alias_value(values, value)) && value = val
       end
+      value
+    end
+
+    def create_boolean(opt)
+      if (!@opt_types.key?(opt) && @current_option =~ /^no-(\w+)$/)
+        opt = (opt = original_no_opt($1)) ? undasherize(opt) : $1
+        (@current_option.replace(opt) && false)
+      else
+        true
+      end
+    end
+
+    def create_numeric(opt)
+      peek.index('.') ? value_shift.to_f : value_shift.to_i
+    end
+
+    def create_array(opt)
+      splitter = current_option_attributes[:split] || ','
+      array = value_shift.split(splitter)
+      if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
+        array.each {|e| array.delete(e) && array += values if e == '*'}
+        array.each_with_index {|e,i|
+          (value = auto_alias_value(values, e)) && array[i] = value
+        }
+      end
+      array
+    end
+
+    def create_hash(opt)
+      splitter = current_option_attributes[:split] || ','
+      (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
+      value = value_shift
+      if !value.include?(':')
+        (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
+          raise(Error, "invalid key:value pair for option '#{@current_option}'")
+      end
+      # Creates array pairs, grouping array of keys with a value
+      aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
+      aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
+      hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
+      keys ? hash.each {|k,v|
+              (new_key = auto_alias_value(keys, k)) && hash[new_key] = hash.delete(k)
+             } : hash
+    end
+
+    def get_option_value(type, opt)
+      respond_to?("create_#{type}", true) ? send("create_#{type}", opt) :
+        raise(Error, "Option '#{@current_option}' is invalid option type #{type.inspect}.")
     end
 
     def current_option_attributes
@@ -339,20 +361,22 @@ module Boson
         raise(Error, "invalid value '#{possible_value}' for option '#{@current_option}'") : possible_value)
     end
 
+    def validate_string
+      raise Error, "cannot pass '#{peek}' as an argument to option '#{@current_option}'" if valid?(peek)
+    end
+
+    def validate_numeric
+      unless peek =~ NUMERIC and $& == peek
+        raise Error, "expected numeric value for option '#{@current_option}'; got #{peek.inspect}"
+      end
+    end
+
     def validate_option_value(type)
       return if current_option_attributes[:bool_default]
       if type != :boolean && peek.nil?
         raise Error, "no value provided for option '#{@current_option}'"
       end
-
-      case type
-      when :string
-        raise Error, "cannot pass '#{peek}' as an argument to option '#{@current_option}'" if valid?(peek)
-      when :numeric
-        unless peek =~ NUMERIC and $& == peek
-          raise Error, "expected numeric value for option '#{@current_option}'; got #{peek.inspect}"
-        end
-      end
+      send("validate_#{type}") if respond_to?("validate_#{type}", true)
     end
 
     def delete_invalid_opts
