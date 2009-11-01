@@ -191,8 +191,9 @@ module Boson
     def run_pipe_commands(result)
       (global_options.keys & pipe_options.keys).each {|e|
         command = pipe_options[e][:pipe] != true ? pipe_options[e][:pipe] : e
-        pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
+        pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
           Boson.invoke(e, result, global_options[e])
+        result = pipe_result if pipe_options[e][:filter]
       }
       result
     end
@@ -218,7 +219,7 @@ module Boson
     end
 
     def default_global_options
-      @default_global_options ||= (Boson.repo.config[:global_options] || {}).merge GLOBAL_OPTIONS
+      @default_global_options ||= GLOBAL_OPTIONS.merge Boson.repo.config[:global_options] || {}
     end
 
     def default_render_options
