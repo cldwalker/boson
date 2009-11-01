@@ -82,14 +82,14 @@ module Boson
       :render=>{:type=>:boolean, :desc=>"Toggle a command's default rendering behavior"},
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
       :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes"},
-      :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"}
+      :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"},
+      :sort=>{:type=>:string, :desc=>"Sort by given field"},
+      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
+      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
     } #:nodoc:
     RENDER_OPTIONS = {
       :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
-      :sort=>{:type=>:string, :desc=>"Sort by given field"},
-      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
       :class=>{:type=>:string, :desc=>"Hirb helper class which renders"},
-      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
       :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
       :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"}
     } #:nodoc:
@@ -175,9 +175,10 @@ module Boson
     end
 
     def render_or_raw(result)
-      return_obj = !(@global_options.keys & pipe_options.keys).empty?
-      result = View.render(result, global_render_options, return_obj) if (@rendered = render?)
-      return_obj ? pipe_command(result) : result
+      result = View.search_and_sort(result, @global_options) if !(@global_options.keys & [:sort, :reverse_sort, :query]).empty?
+      result = run_pipe_commands(result)
+      render_global_opts = @global_options.dup.delete_if {|k,v| default_global_options.keys.include?(k) }
+      (@rendered = render?) ? View.render(result, render_global_opts, false) : result
     rescue Exception
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
@@ -187,12 +188,13 @@ module Boson
       @pipe_options ||= Hash[*default_global_options.select {|k,v| v[:pipe] }.flatten]
     end
 
-    def pipe_command(result)
-      (@global_options.keys & pipe_options.keys).each {|e|
+    def run_pipe_commands(result)
+      (global_options.keys & pipe_options.keys).each {|e|
         command = pipe_options[e][:pipe] != true ? pipe_options[e][:pipe] : e
         pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
-          Boson.invoke(e, result, @global_options[e])
+          Boson.invoke(e, result, global_options[e])
       }
+      result
     end
 
     # choose current parser
@@ -202,7 +204,7 @@ module Boson
 
     # current command parser
     def command_option_parser
-      (@option_parsers ||= {})[@command] ||= OptionParser.new render_options.merge(default_global_options)
+      (@option_parsers ||= {})[@command] ||= OptionParser.new current_command_options
     end
 
     # set cmd and use its parser
@@ -216,26 +218,22 @@ module Boson
     end
 
     def default_global_options
-      (Boson.repo.config[:global_options] || {}).merge GLOBAL_OPTIONS
+      @default_global_options ||= (Boson.repo.config[:global_options] || {}).merge GLOBAL_OPTIONS
     end
 
     def default_render_options
       @default_render_options ||= RENDER_OPTIONS.merge Boson.repo.config[:render_options] || {}
     end
 
-    # current render options
-    def render_options
-      @command.render_options ? command_render_options : default_render_options
-    end
-
-    def command_render_options
+    def current_command_options
       (@command_render_options ||= {})[@command] ||= begin
         @command.render_options.each {|k,v|
-          if !v.is_a?(Hash) && !v.is_a?(Symbol) && default_render_options.keys.include?(k)
+          if !v.is_a?(Hash) && !v.is_a?(Symbol)
             @command.render_options[k] = {:default=>v}
           end
         }
-        opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(default_render_options))
+        render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(default_render_options))
+        opts = Util.recursive_hash_merge render_opts, Util.deep_copy(default_global_options)
         if opts[:fields][:default] && !opts[:fields].key?(:values)
           opts[:fields][:values] = opts[:fields][:default]
           opts[:fields][:enum] = false unless opts[:fields].key?(:enum)
@@ -247,10 +245,6 @@ module Boson
         end
         opts
       end
-    end
-
-    def global_render_options
-      @global_options.dup.delete_if {|k,v| !render_options.keys.include?(k) }
     end
 
     def render?

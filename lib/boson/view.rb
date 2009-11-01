@@ -20,6 +20,17 @@ module Boson
     end
 
     #:stopdoc:
+    # Sorts and searches an array of objects or hashes using options :query, :sort and :reverse_sort.
+    def search_and_sort(object, options)
+      if object.is_a?(Array)
+        object = search_object(object, options.delete(:query)) if options[:query]
+        if object.size > 0 && (sort = options.delete(:sort))
+          object = sort_object(object, sort, options.delete(:reverse_sort))
+        end
+      end
+      object
+    end
+
     def toggle_pager
       Hirb::View.toggle_pager
     end
@@ -30,12 +41,6 @@ module Boson
 
     def render_object(object, options={}, return_obj=false)
       options[:class] ||= :auto_table
-      if object.is_a?(Array)
-        object = search_object(object, options.delete(:query)) if options[:query]
-        if object.size > 0 && (sort = options.delete(:sort))
-          object = sort_object(object, sort, options.delete(:reverse_sort))
-        end
-      end
       render_result = Hirb::Console.render_output(object, options)
       return_obj ? object : render_result
     end
