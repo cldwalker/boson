@@ -50,8 +50,15 @@ module Boson
     #                   depend on commands from other libraries. Default is false.
     def config(reload=false)
       if reload || @config.nil?
-        default = {:libraries=>{}, :command_aliases=>{}, :console_defaults=>[]}
-        @config = default.merge(YAML::load_file(config_dir + '/boson.yml')) rescue default
+        begin
+          @config = {:libraries=>{}, :command_aliases=>{}, :console_defaults=>[]}
+          config_file = config_dir + '/boson.yml'
+          @config.merge!(YAML::load_file(config_file)) if File.exists?(config_file)
+        rescue ArgumentError
+          message = $!.message !~ /syntax error on line (\d+)/ ? "Error"+$!.message :
+            "Error: Syntax error in line #{$1} of config file '#{config_file}'"
+          Kernel.abort message
+        end
       end
       @config
     end

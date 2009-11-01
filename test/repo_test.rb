@@ -11,6 +11,7 @@ class Boson::RepoTest < Test::Unit::TestCase
 
     test "reads existing config correctly" do
       expected_hash = {:commands=>{'c1'=>{}}, :libraries=>{}}
+      File.expects(:exists?).returns(true)
       YAML.expects(:load_file).returns(expected_hash)
       @repo.config[:commands]['c1'].should == {}
     end
