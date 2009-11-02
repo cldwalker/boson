@@ -11,7 +11,7 @@ module Boson
 
       # Libraries that come with Boson
       def default_libraries
-        [Boson::Commands::Core, Boson::Commands::WebCore]
+        [Boson::Commands::Core, Boson::Commands::WebCore] + (Boson.repo.config[:defaults] || [])
       end
 
       # Libraries detected in repositories
