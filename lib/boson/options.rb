@@ -1,16 +1,51 @@
 module Boson
+  # This module contains the methods used to define the default option types.
+  #
+  # === Creating Your Own Option Type
+  # Defining your own option type simply requires one method (create_@type) to parse the option value and create
+  # the desired object. To create an option type :date, you could create the following create_date method:
+  #   # Drop this in your ~/.irbrc after require 'boson'
+  #   module Boson::Options::Date
+  #     def create_date(value)
+  #       # value_shift should be mm/dd
+  #       Date.parse(value + "/#{Date.today.year}")
+  #     end
+  #   end
+  #   Boson::OptionParser.send :include, Boson::Options::Date
+  #
+  # In a FileLibrary, we could then use this new option:
+  #   module Calendar
+  #     #@options :day=>:date
+  #     def appointments(options={})
+  #       # ...
+  #     end
+  #   end
+  #   # >> appointments '-d 10/10'   -> {:day=>#<Date: 4910229/2,0,2299161> }
+  # As you can see, a date object is created from the :date option's value and passed into appointments().
+  #
+  # Some additional tips on the create_* method:
+  # * The argument passed to the method is the option value from the user.
+  # * To access the current option name use @current_option.
+  # * To access the hash of attributes the current option has use OptionParser.current_option_attributes. See
+  #   OptionParser.new for more about option attributes.
+  #
+  # There are two optional methods per option type: validate_@type and usage_for_@type i.e. validate_date and usage_for_date.
+  # Like create_@type, validate_@type takes the option's value. If the value validation fails, raise an
+  # OptionParser::Error with a proper message. All user-defined option types automatically validate for an option value's existence.
+  # The usage_for_* method takes an option's name (i.e. --day) and returns a usage string to be wrapped in '[ ]'. If no usage is defined
+  # the default would look like '[--day=:date]'. Consider using the OptionParser.default_usage helper method for your usage.
   module Options
+    #:stopdoc:
     # Parse/create methods
-    def create_string(opt)
-      value = value_shift
+    def create_string(value)
       if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
         (val = auto_alias_value(values, value)) && value = val
       end
       value
     end
 
-    def create_boolean(opt)
-      if (!@opt_types.key?(opt) && @current_option =~ /^no-(\w+)$/)
+    def create_boolean(value)
+      if (!@opt_types.key?(dasherize(@current_option)) && @current_option =~ /^no-(\w+)$/)
         opt = (opt = original_no_opt($1)) ? undasherize(opt) : $1
         (@current_option.replace(opt) && false)
       else
@@ -18,13 +53,13 @@ module Boson
       end
     end
 
-    def create_numeric(opt)
-      peek.index('.') ? value_shift.to_f : value_shift.to_i
+    def create_numeric(value)
+      value.index('.') ? value.to_f : value.to_i
     end
 
-    def create_array(opt)
+    def create_array(value)
       splitter = current_option_attributes[:split] || ','
-      array = value_shift.split(splitter)
+      array = value.split(splitter)
       if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
         array.each {|e| array.delete(e) && array += values if e == '*'}
         array.each_with_index {|e,i|
@@ -34,10 +69,9 @@ module Boson
       array
     end
 
-    def create_hash(opt)
+    def create_hash(value)
       splitter = current_option_attributes[:split] || ','
       (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
-      value = value_shift
       if !value.include?(':')
         (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
           raise(OptionParser::Error, "invalid key:value pair for option '#{@current_option}'")
@@ -52,13 +86,13 @@ module Boson
     end
 
     # Validation methods
-    def validate_string
-      raise OptionParser::Error, "cannot pass '#{peek}' as an argument to option '#{@current_option}'" if valid?(peek)
+    def validate_string(value)
+      raise OptionParser::Error, "cannot pass '#{value}' as an argument to option '#{@current_option}'" if valid?(value)
     end
 
-    def validate_numeric
-      unless peek =~ OptionParser::NUMERIC and $& == peek
-        raise OptionParser::Error, "expected numeric value for option '#{@current_option}'; got #{peek.inspect}"
+    def validate_numeric(value)
+      unless value =~ OptionParser::NUMERIC and $& == value
+        raise OptionParser::Error, "expected numeric value for option '#{@current_option}'; got #{value.inspect}"
       end
     end
 
@@ -81,7 +115,8 @@ module Boson
 
     def usage_for_hash(opt)
       default_usage opt, "A:B,C:D"
-    end    
+    end
+    #:startdoc:
   end
 end
 Boson::OptionParser.send :include, Boson::Options

@@ -1,6 +1,6 @@
 module Boson
-  # Simple Hash with indifferent access and retrieval of keys. Other actions such as merging should assume
-  # symbolic keys. Used by OptionParser.
+  # Simple Hash with indifferent fetching and storing using symbol or string keys. Other actions such as
+  # merging should assume symbolic keys. Used by OptionParser.
   class IndifferentAccessHash < ::Hash
     #:stopdoc:
     def initialize(hash)
@@ -27,11 +27,14 @@ module Boson
     #:startdoc:
   end
 
-  # This class concisely defines commandline options that when parsed produce a Hash. Additional points:
-  # * Setting option values should follow conventions in *nix environments.
-  # * Each value in the returned options hash can be any of the following Ruby objects: String, Integer, Float,
-  #   Array, Hash, FalseClass, TrueClass.
-  # * Each option can have option attributes to enable more features (see OptionParser.new).
+  # This class concisely defines commandline options that when parsed produce a Hash of option keys and values.
+  # Additional points:
+  # * Setting option values should follow conventions in *nix environments. See examples below.
+  # * By default, there are 5 option types, each which produce different objects for option values.
+  # * The default option types can produce objects for one or more of the following Ruby classes:
+  #   String, Integer, Float, Array, Hash, FalseClass, TrueClass.
+  # * Users can define their own option types which create objects for _any_ Ruby class. See Options.
+  # * Each option type can have attributes to enable more features (see OptionParser.new).
   # * When options are parsed by OptionParser.parse, an IndifferentAccessHash hash is returned.
   # * Options are also called switches, parameters, flags etc.
   #
@@ -110,7 +113,8 @@ module Boson
     #    Boson::OptionParser.new :fields=>{:type=>:array, :values=>%w{f1 f2 f3},
     #     :enum=>false}
     #
-    # Here are the available option attributes (some are specific to option types):
+    # These attributes are available when an option is parsed via current_option_attributes().
+    # Here are the available option attributes for the default option types:
     #
     # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric, :hash.
     # [*:default*] This or :type is required. This is the default value an option has when not passed.
@@ -216,7 +220,7 @@ module Boson
         @current_option = undasherize(dashed_option)
         type = option_type(dashed_option)
         validate_option_value(type)
-        value = get_option_value(type, dashed_option)
+        value = create_option_value(type)
         # set on different line since current_option may change
         hash[@current_option.to_sym] = value
       end
@@ -227,11 +231,13 @@ module Boson
       hash
     end
 
-    def default_usage(opt, default)
-      opt + "=" + (@defaults[undasherize(opt)] || default).to_s
+    # Helper method to generate usage. Takes a dashed option and a string value indicating
+    # an option value's format.
+    def default_usage(opt, val)
+      opt + "=" + (@defaults[undasherize(opt)] || val).to_s
     end
 
-    # One-line option usage
+    # Generates one-line usage of all options.
     def formatted_usage
       return "" if @opt_types.empty?
       @opt_types.map do |opt, type|
@@ -260,6 +266,23 @@ module Boson
       View.render opts, render_options
     end
 
+    # Hash of option attributes for the currently parsed option. _Any_ hash keys
+    # passed to an option are available here. This means that an option type can have any
+    # user-defined attributes available during option parsing and object creation.
+    def current_option_attributes
+      @option_attributes && @option_attributes[@current_option] || {}
+    end
+
+    # Removes dashes from a dashed option i.e. '--date' -> 'date' and '-d' -> 'd'.
+    def undasherize(str)
+      str.sub(/^-{1,2}/, '')
+    end
+
+    # Adds dashes to an option name i.e. 'date' -> '--date' and 'd' -> '-d'.
+    def dasherize(str)
+      (str.length > 1 ? "--" : "-") + str
+    end
+
     private
     def determine_option_type(value)
       return value if value.is_a?(Symbol)
@@ -277,13 +300,9 @@ module Boson
       bool_default
     end
 
-    def get_option_value(type, opt)
-      respond_to?("create_#{type}", true) ? send("create_#{type}", opt) :
+    def create_option_value(type)
+      respond_to?("create_#{type}", true) ? send("create_#{type}", type != :boolean ? value_shift : nil) :
         raise(Error, "Option '#{@current_option}' is invalid option type #{type.inspect}.")
-    end
-
-    def current_option_attributes
-      @option_attributes && @option_attributes[@current_option] || {}
     end
 
     def auto_alias_value(values, possible_value)
@@ -296,7 +315,7 @@ module Boson
       if type != :boolean && peek.nil?
         raise Error, "no value provided for option '#{@current_option}'"
       end
-      send("validate_#{type}") if respond_to?("validate_#{type}", true)
+      send("validate_#{type}", peek) if respond_to?("validate_#{type}", true)
     end
 
     def delete_invalid_opts
@@ -309,14 +328,6 @@ module Boson
       end
     end
 
-    def undasherize(str)
-      str.sub(/^-{1,2}/, '')
-    end
-    
-    def dasherize(str)
-      (str.length > 1 ? "--" : "-") + str
-    end
-    
     def peek
       @args.first
     end

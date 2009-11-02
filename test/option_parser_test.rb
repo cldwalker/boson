@@ -471,10 +471,10 @@ module Boson
     before(:all) {
       ::FooBoo = Struct.new(:name)
       module ::Boson::Options::FooBoo
-        def create_foo_boo(opt)
-          ::FooBoo.new(value_shift)
+        def create_foo_boo(value)
+          ::FooBoo.new(value)
         end
-        def validate_foo_boo; end
+        def validate_foo_boo(value); end
       end
       ::Boson::OptionParser.send :include, ::Boson::Options::FooBoo
       create :a=>:foo_boo, :b=>::FooBoo.new('blah'), :c=>:blah_blah,
