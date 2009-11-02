@@ -160,9 +160,10 @@ module Boson
 
         # set defaults
         case type
-          when TrueClass                     then  @defaults[nice_name] = true
-          when FalseClass                    then  @defaults[nice_name] = false
-          when String, Numeric, Array, Hash  then  @defaults[nice_name] = type
+        when TrueClass                     then  @defaults[nice_name] = true
+        when FalseClass                    then  @defaults[nice_name] = false
+        else
+          @defaults[nice_name] = type unless type.is_a?(Symbol)
         end
         mem[name] = !type.nil? ? determine_option_type(type) : type
         mem
@@ -226,29 +227,8 @@ module Boson
       hash
     end
 
-    def usage_for_boolean(opt)
-      opt
-    end
-
-    def usage_with_default(opt, default)
-      default = @defaults[undasherize(opt)] || default
-      opt + "=" + default.to_s
-    end
-
-    def usage_for_string(opt)
-      usage_with_default(opt, undasherize(opt).upcase)
-    end
-
-    def usage_for_numeric(opt)
-      usage_with_default opt, "N"
-    end
-
-    def usage_for_array(opt)
-      usage_with_default opt, "A,B,C"
-    end
-
-    def usage_for_hash(opt)
-      usage_with_default opt, "A:B,C:D"
+    def default_usage(opt, default)
+      opt + "=" + (@defaults[undasherize(opt)] || default).to_s
     end
 
     # One-line option usage
@@ -297,56 +277,6 @@ module Boson
       bool_default
     end
 
-    def create_string(opt)
-      value = value_shift
-      if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
-        (val = auto_alias_value(values, value)) && value = val
-      end
-      value
-    end
-
-    def create_boolean(opt)
-      if (!@opt_types.key?(opt) && @current_option =~ /^no-(\w+)$/)
-        opt = (opt = original_no_opt($1)) ? undasherize(opt) : $1
-        (@current_option.replace(opt) && false)
-      else
-        true
-      end
-    end
-
-    def create_numeric(opt)
-      peek.index('.') ? value_shift.to_f : value_shift.to_i
-    end
-
-    def create_array(opt)
-      splitter = current_option_attributes[:split] || ','
-      array = value_shift.split(splitter)
-      if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
-        array.each {|e| array.delete(e) && array += values if e == '*'}
-        array.each_with_index {|e,i|
-          (value = auto_alias_value(values, e)) && array[i] = value
-        }
-      end
-      array
-    end
-
-    def create_hash(opt)
-      splitter = current_option_attributes[:split] || ','
-      (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
-      value = value_shift
-      if !value.include?(':')
-        (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
-          raise(Error, "invalid key:value pair for option '#{@current_option}'")
-      end
-      # Creates array pairs, grouping array of keys with a value
-      aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
-      aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
-      hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
-      keys ? hash.each {|k,v|
-              (new_key = auto_alias_value(keys, k)) && hash[new_key] = hash.delete(k)
-             } : hash
-    end
-
     def get_option_value(type, opt)
       respond_to?("create_#{type}", true) ? send("create_#{type}", opt) :
         raise(Error, "Option '#{@current_option}' is invalid option type #{type.inspect}.")
@@ -359,16 +289,6 @@ module Boson
     def auto_alias_value(values, possible_value)
       values.find {|v| v.to_s =~ /^#{possible_value}/ } or (@option_attributes[@current_option][:enum] ?
         raise(Error, "invalid value '#{possible_value}' for option '#{@current_option}'") : possible_value)
-    end
-
-    def validate_string
-      raise Error, "cannot pass '#{peek}' as an argument to option '#{@current_option}'" if valid?(peek)
-    end
-
-    def validate_numeric
-      unless peek =~ NUMERIC and $& == peek
-        raise Error, "expected numeric value for option '#{@current_option}'; got #{peek.inspect}"
-      end
     end
 
     def validate_option_value(type)

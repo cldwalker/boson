@@ -4,7 +4,8 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
 %w{module file gem require}.each {|e| require "boson/libraries/#{e}_library" }
-%w{namespace view command util commands option_parser index scientist}.each {|e| require "boson/#{e}" }
+(%w{namespace view command util commands option_parser options} +
+  %w{index scientist}).each {|e| require "boson/#{e}" }
 
 # This module stores the libraries, commands, repos and main object used throughout Boson.
 #
