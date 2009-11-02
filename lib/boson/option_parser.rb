@@ -27,15 +27,15 @@ module Boson
     #:startdoc:
   end
 
-  # This class concisely defines commandline options that can be parsed produce a Hash. Additional points:
+  # This class concisely defines commandline options that when parsed produce a Hash. Additional points:
   # * Setting option values should follow conventions in *nix environments.
-  # * When options are parsed by OptionParser.parse, an IndifferentAccessHash hash is returned.
   # * Each value in the returned options hash can be any of the following Ruby objects: String, Integer, Float,
   #   Array, Hash, FalseClass, TrueClass.
   # * Each option can have option attributes to enable more features (see OptionParser.new).
+  # * When options are parsed by OptionParser.parse, an IndifferentAccessHash hash is returned.
   # * Options are also called switches, parameters, flags etc.
   #
-  # Available option types:
+  # Default option types:
   # [*:boolean*] This option has no passed value. To toogle a boolean, prepend with '--no-'.
   #              Multiple booleans can be joined together.
   #                '--debug'    -> {:debug=>true}
@@ -267,13 +267,13 @@ module Boson
       when TrueClass, FalseClass   then :boolean
       when Numeric                 then :numeric
       else
-        value.class.to_s.downcase.to_sym
+        Util.underscore(value.class.to_s).to_sym
       end
     end
 
     def value_shift
       return shift if !(bool_default = current_option_attributes[:bool_default])
-      return shift if @original_current_option =~ EQ_RE #peek && !valid?(peek)
+      return shift if @original_current_option =~ EQ_RE
       bool_default
     end
 

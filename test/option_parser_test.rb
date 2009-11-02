@@ -441,11 +441,11 @@ module Boson
     end
   end
   
+  def usage
+    @opt.formatted_usage.split(" ").sort
+  end
+
   context "#formatted_usage" do
-    def usage
-      @opt.formatted_usage.split(" ").sort
-    end
-    
     it "outputs string args with sample values" do
       create "--repo" => :string, "--branch" => "bugfix", "-n" => 6
       usage.should == %w([--branch=bugfix] [--repo=REPO] [-n=6])
@@ -464,6 +464,49 @@ module Boson
     it "outputs hash args with sample value" do
       create '--paths' => :hash
       usage.should == ["[--paths=A:B,C:D]"]
+    end
+  end
+
+  context "user defined option class" do
+    before(:all) {
+      ::FooBoo = Struct.new(:name)
+      module ::Boson::Options::FooBoo
+        def create_foo_boo(opt)
+          ::FooBoo.new(value_shift)
+        end
+        def validate_foo_boo; end
+      end
+      ::Boson::OptionParser.send :include, ::Boson::Options::FooBoo
+      create :a=>:foo_boo, :b=>::FooBoo.new('blah'), :c=>:blah_blah,
+        :d=>{:type=>:foo_boo, :type=>::FooBoo.new('bling')}
+    }
+
+    test "created from symbol" do
+      (obj = parse('-a', 'whoop')[:a]).class.should == ::FooBoo
+      obj.name.should == 'whoop'
+    end
+
+    test "created from default" do
+      (obj = parse[:b]).class.should == ::FooBoo
+      obj.name.should == 'blah'
+    end
+
+    test "created from type attribute" do
+      (obj = parse('-d', 'whoop')[:d]).class.should == ::FooBoo
+      obj.name.should == 'whoop'
+    end
+
+    test "has its validation called" do
+      @opt.expects(:validate_foo_boo)
+      parse("-a", 'blah')
+    end
+
+    test "has default usage" do
+      usage[0].should == "[-a=:foo_boo]"
+    end
+
+    test "when nonexistant raises error" do
+      assert_error(OptionParser::Error, "invalid.*:blah_blah") { parse("-c", 'ok') }
     end
   end
 end
