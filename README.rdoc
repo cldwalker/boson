@@ -3,6 +3,8 @@ A command/task framework similar to rake and thor that opens your ruby universe 
 and irb. For my libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
 Works with Ruby 1.8.6 and 1.9.1.
 
+Note: To read a linkable version of this README, {see here}[http://tagaholic.me/boson/doc/].
+
 == Features
 * Commands are just methods extended for a given object, the default being the top level object, main.
 * Commands are accessible from the commandline (Boson::BinRunner) or irb (Boson::ConsoleRunner).
@@ -11,7 +13,9 @@ Works with Ruby 1.8.6 and 1.9.1.
 * Comes with default commands to load, search, list and install commands and libraries (Boson::Commands::Core).
 * Commands can be full-blown commandline apps thanks to powerful options (Boson::OptionParser)
   and hirb's views.
-* Commands can have views toggled without adding view code to your original command (Boson::Scientist).
+* There are 5 default option types: boolean, array, string, hash and numeric. Custom option types
+  can be defined to map to any Ruby class with one method (Boson::Options).
+* Commands can have views toggled without adding view code to the original command (Boson::Scientist).
 * Command libraries are social as a user can install them from a url and then customize command
   names and options without changing the original library.
 * Namespaces are optional and when used are methods which allow for method_missing magic.
