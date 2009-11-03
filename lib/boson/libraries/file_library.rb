@@ -83,25 +83,32 @@ module Boson
     end
 
     handles {|source|
-      @repo = Boson.repos.find {|e|
-        File.exists? library_file(source.to_s, e.dir)
-      }
+      @repo = Boson.repos.find {|e| File.exists? library_file(source.to_s, e.dir) } ||
+       Boson.repos.find {|e|
+        Dir["#{e.commands_dir}/**/*.rb"].grep(/\/#{source}\.rb/).size == 1
+        }
       !!@repo
     }
 
-    def library_file
-      self.class.library_file(@name, @repo_dir)
+    def library_file(name=@name)
+      self.class.library_file(name, @repo_dir)
     end
 
     def set_repo
       self.class.matched_repo
     end
 
+    def set_name(name)
+      @lib_file = File.exists?(library_file(name.to_s)) ? library_file(name.to_s) :
+        Dir[self.class.matched_repo.commands_dir.to_s+'/**/*.rb'].find {|e| e =~ /\/#{name}\.rb$/}
+      super @lib_file.gsub(/^#{self.class.matched_repo.commands_dir}\/|\.rb$/, '')
+    end
+
     def load_source(reload=false)
-      library_string = self.class.read_library_file(library_file, reload)
+      library_string = self.class.read_library_file(@lib_file, reload)
       @base_module = @name.include?('/') ? create_module_from_path : Commands
       Inspector.enable
-      @base_module.module_eval(library_string, library_file)
+      @base_module.module_eval(library_string, @lib_file)
       Inspector.disable
     end
 

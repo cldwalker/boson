@@ -79,10 +79,10 @@ module Boson
     # [*:no_alias_creation*] Boolean which doesn't create aliases for a library. Useful for libraries that configure command
     #                        aliases outside of Boson's control. Default is false.
     def initialize(hash)
-      @name = set_name hash.delete(:name)
-      @loaded = false
       repo = set_repo
       @repo_dir = repo.dir
+      @name = set_name hash.delete(:name)
+      @loaded = false
       @commands_hash = {}
       @commands = []
       set_config (repo.config[:libraries][@name] || {}).merge(hash), true

@@ -23,6 +23,13 @@ module Boson
         command_exists?('blah')
       end
 
+      test "loads by basename" do
+        Dir.stubs(:[]).returns(['./test/commands/site/github.rb'])
+        load 'github', :file_string=>"module Github; def blah; end; end", :exists=>false
+        library_has_module('site/github', "Boson::Commands::Site::Github")
+        command_exists?('blah')
+      end
+
       test "prints error for file library with no module" do
         capture_stderr { load(:blah, :file_string=>"def blah; end") }.should =~ /Can't.*at least/
       end

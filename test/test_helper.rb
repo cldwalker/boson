@@ -21,6 +21,8 @@ require 'test_benchmark' if ENV['BENCHMARK']
 class Test::Unit::TestCase
   # make local so it doesn't pick up my real boson dir
   Boson.repo.dir = File.dirname(__FILE__)
+  # prevent extra File.exists? calls which interfere with stubs for it
+  Boson.repo.config = {:libraries=>{}, :command_aliases=>{}, :console_defaults=>[]}
   Boson.instance_variable_set "@repos", [Boson.repo]
 
   def assert_error(error, message=nil)
@@ -77,8 +79,9 @@ class Test::Unit::TestCase
 
   # mocks as a file library
   def mock_library(lib, options={})
-    options[:file_string] ||= ''
-    File.expects(:exists?).with(Boson::FileLibrary.library_file(lib.to_s, Boson.repo.dir)).returns(true)
+    options = {:file_string=>'', :exists=>true}.merge!(options)
+    File.expects(:exists?).with(Boson::FileLibrary.library_file(lib.to_s, Boson.repo.dir)).
+      at_least(1).returns(options.delete(:exists))
     File.expects(:read).returns(options.delete(:file_string))
   end
 
