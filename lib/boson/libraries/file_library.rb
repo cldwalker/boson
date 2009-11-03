@@ -99,14 +99,24 @@ module Boson
 
     def load_source(reload=false)
       library_string = self.class.read_library_file(library_file, reload)
+      @base_module = @name.include?('/') ? create_module_from_path : Commands
       Inspector.enable
-      Commands.module_eval(library_string, library_file)
+      @base_module.module_eval(library_string, library_file)
       Inspector.disable
+    end
+
+    def create_module_from_path
+      @name.split('/')[0..-2].inject(Boson::Commands) {|base, e|
+        base.const_defined?(sub_mod = Util.camelize(e)) ? base.const_get(sub_mod) :
+          Util.create_module(base, e)
+      }
     end
 
     def load_source_and_set_module
       detected = detect_additions(:modules=>true) { load_source }
       @module = determine_lib_module(detected[:modules]) unless @module
+      #without this, module's class methods weren't showing up
+      @module = Util.constantize(@module) if @base_module != Commands
     end
 
     def reload_source_and_set_module
@@ -123,7 +133,7 @@ module Boson
       when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
       else
         unless (lib_module = Util.constantize("boson/commands/#{@name}")) && lib_module.to_s[/^Boson::Commands/]
-          command_modules = detected_modules.map {|e| e.to_s}.grep(/^Boson::Commands/)
+          command_modules = detected_modules.map {|e| e.to_s}.grep(/^#{@base_module}::/)
           unless command_modules.size == 1 && (lib_module = command_modules[0])
             raise LoaderError, "Can't detect module. Specify a module in this library's config."
           end

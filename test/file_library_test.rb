@@ -13,7 +13,7 @@ module Boson
 
       test "in a subdirectory loads" do
         load 'site/delicious', :file_string=>"module Delicious; def blah; end; end"
-        library_has_module('site/delicious', "Boson::Commands::Delicious")
+        library_has_module('site/delicious', "Boson::Commands::Site::Delicious")
         command_exists?('blah')
       end
 
