@@ -122,9 +122,11 @@ module Boson
       when 1 then lib_module = detected_modules[0]
       when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
       else
-        command_modules = detected_modules.map {|e| e.to_s}.grep(/^Boson::Commands/)
-        unless command_modules.size == 1 && (lib_module = command_modules[0])
-          raise LoaderError, "Can't detect module. Specify a module in this library's config."
+        unless (lib_module = Util.constantize("boson/commands/#{@name}")) && lib_module.to_s[/^Boson::Commands/]
+          command_modules = detected_modules.map {|e| e.to_s}.grep(/^Boson::Commands/)
+          unless command_modules.size == 1 && (lib_module = command_modules[0])
+            raise LoaderError, "Can't detect module. Specify a module in this library's config."
+          end
         end
       end
       lib_module
