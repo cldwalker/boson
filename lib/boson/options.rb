@@ -72,9 +72,8 @@ module Boson
     def create_hash(value)
       splitter = current_option_attributes[:split] || ','
       (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
-      if !value.include?(':')
-        (defaults = current_option_attributes[:default_keys]) ? value = "#{defaults}:#{value}" :
-          raise(OptionParser::Error, "invalid key:value pair for option '#{@current_option}'")
+      if !value.include?(':') && current_option_attributes[:default_keys]
+        value = current_option_attributes[:default_keys].to_s + ":#{value}"
       end
       # Creates array pairs, grouping array of keys with a value
       aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
@@ -93,6 +92,12 @@ module Boson
     def validate_numeric(value)
       unless value =~ OptionParser::NUMERIC and $& == value
         raise OptionParser::Error, "expected numeric value for option '#{@current_option}'; got #{value.inspect}"
+      end
+    end
+
+    def validate_hash(value)
+      if !value.include?(':') && !current_option_attributes[:default_keys]
+        raise(OptionParser::Error, "invalid key:value pair for option '#{@current_option}'")
       end
     end
 
