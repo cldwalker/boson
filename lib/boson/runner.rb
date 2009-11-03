@@ -17,7 +17,7 @@ module Boson
       # Libraries detected in repositories
       def detected_libraries
         Boson.repos.map {|repo| Dir[File.join(repo.commands_dir, '**/*.rb')].
-          map {|e| e.gsub(/.*commands\//,'').gsub('.rb','') } }.flatten
+          map {|e| e.gsub(/^#{repo.commands_dir}\/|\.rb$/, '')} }.flatten
       end
 
       # Libraries specified in config files and detected_libraries
