@@ -230,7 +230,7 @@ module Boson
   context ":bool_default option attribute" do
     before(:all) {
       create :foo=>{:type=>:string, :bool_default=>'whoop'}, :bar=>{:type=>:array, :bool_default=>'1'},
-        :verbose=>:boolean
+        :verbose=>:boolean, :yep=>{:type=>:string, :bool_default=>true}
     }
 
     it "sets default boolean" do
@@ -242,8 +242,12 @@ module Boson
       parse('--foo=boo', '--bar=har').should == {:foo=>'boo', :bar=>['har']}
     end
 
-    it "sets non-string default boolean" do
+    it "sets default boolean for array" do
       parse("--bar", '--foo', '2')[:bar].should == ['1']
+    end
+
+    it "sets default boolean for non-string value" do
+      parse('--yep', '--foo=2')[:yep].should == true
     end
 
     it "default booleans can be joined with boolean options" do

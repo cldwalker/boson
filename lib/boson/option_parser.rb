@@ -120,6 +120,8 @@ module Boson
     # [*:default*] This or :type is required. This is the default value an option has when not passed.
     # [*:bool_default*] This is the value an option has when passed as a boolean. However, by enabling this
     #                   an option can only have explicit values with '=' i.e. '--index=alias' and no '--index alias'.
+    #                   If this value is a string, it is parsed as any option value would be. Otherwise, the value is
+    #                   passed directly without parsing.
     # [*:required*] Boolean indicating if option is required. Option parses raises error if value not given.
     #               Default is false.
     # [*:alias*] Alternative way to define option aliases with an option name or an array of them. Useful in yaml files.
@@ -297,14 +299,19 @@ module Boson
     end
 
     def value_shift
-      return shift if !(bool_default = current_option_attributes[:bool_default])
+      return shift if !current_option_attributes.key?(:bool_default)
       return shift if @original_current_option =~ EQ_RE
-      bool_default
+      current_option_attributes[:bool_default]
     end
 
     def create_option_value(type)
-      respond_to?("create_#{type}", true) ? send("create_#{type}", type != :boolean ? value_shift : nil) :
-        raise(Error, "Option '#{@current_option}' is invalid option type #{type.inspect}.")
+      if current_option_attributes.key?(:bool_default) && (@original_current_option !~ EQ_RE) &&
+        !(bool_default = current_option_attributes[:bool_default]).is_a?(String)
+          bool_default
+      else
+        respond_to?("create_#{type}", true) ? send("create_#{type}", type != :boolean ? value_shift : nil) :
+          raise(Error, "Option '#{@current_option}' is invalid option type #{type.inspect}.")
+      end
     end
 
     def auto_alias_value(values, possible_value)
@@ -313,7 +320,7 @@ module Boson
     end
 
     def validate_option_value(type)
-      return if current_option_attributes[:bool_default]
+      return if current_option_attributes.key?(:bool_default)
       if type != :boolean && peek.nil?
         raise Error, "no value provided for option '#{@current_option}'"
       end
