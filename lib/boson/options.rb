@@ -26,7 +26,7 @@ module Boson
   # Some additional tips on the create_* method:
   # * The argument passed to the method is the option value from the user.
   # * To access the current option name use @current_option.
-  # * To access the hash of attributes the current option has use OptionParser.current_option_attributes. See
+  # * To access the hash of attributes the current option has use OptionParser.current_attributes. See
   #   OptionParser.new for more about option attributes.
   #
   # There are two optional methods per option type: validate_@type and usage_for_@type i.e. validate_date and usage_for_date.
@@ -38,7 +38,7 @@ module Boson
     #:stopdoc:
     # Parse/create methods
     def create_string(value)
-      if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
+      if (values = current_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
         (val = auto_alias_value(values, value)) && value = val
       end
       value
@@ -58,9 +58,9 @@ module Boson
     end
 
     def create_array(value)
-      splitter = current_option_attributes[:split] || ','
+      splitter = current_attributes[:split] || ','
       array = value.split(splitter)
-      if (values = current_option_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
+      if (values = current_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
         array.each {|e| array.delete(e) && array += values if e == '*'}
         array.each_with_index {|e,i|
           (value = auto_alias_value(values, e)) && array[i] = value
@@ -70,10 +70,10 @@ module Boson
     end
 
     def create_hash(value)
-      splitter = current_option_attributes[:split] || ','
-      (keys = current_option_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
-      if !value.include?(':') && current_option_attributes[:default_keys]
-        value = current_option_attributes[:default_keys].to_s + ":#{value}"
+      splitter = current_attributes[:split] || ','
+      (keys = current_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
+      if !value.include?(':') && current_attributes[:default_keys]
+        value = current_attributes[:default_keys].to_s + ":#{value}"
       end
       # Creates array pairs, grouping array of keys with a value
       aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
@@ -96,7 +96,7 @@ module Boson
     end
 
     def validate_hash(value)
-      if !value.include?(':') && !current_option_attributes[:default_keys]
+      if !value.include?(':') && !current_attributes[:default_keys]
         raise(OptionParser::Error, "invalid key:value pair for option '#{@current_option}'")
       end
     end

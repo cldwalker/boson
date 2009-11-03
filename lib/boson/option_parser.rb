@@ -113,7 +113,7 @@ module Boson
     #    Boson::OptionParser.new :fields=>{:type=>:array, :values=>%w{f1 f2 f3},
     #     :enum=>false}
     #
-    # These attributes are available when an option is parsed via current_option_attributes().
+    # These attributes are available when an option is parsed via current_attributes().
     # Here are the available option attributes for the default option types:
     #
     # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric, :hash.
@@ -273,7 +273,7 @@ module Boson
     # Hash of option attributes for the currently parsed option. _Any_ hash keys
     # passed to an option are available here. This means that an option type can have any
     # user-defined attributes available during option parsing and object creation.
-    def current_option_attributes
+    def current_attributes
       @option_attributes && @option_attributes[@current_option] || {}
     end
 
@@ -299,14 +299,14 @@ module Boson
     end
 
     def value_shift
-      return shift if !current_option_attributes.key?(:bool_default)
+      return shift if !current_attributes.key?(:bool_default)
       return shift if @original_current_option =~ EQ_RE
-      current_option_attributes[:bool_default]
+      current_attributes[:bool_default]
     end
 
     def create_option_value(type)
-      if current_option_attributes.key?(:bool_default) && (@original_current_option !~ EQ_RE) &&
-        !(bool_default = current_option_attributes[:bool_default]).is_a?(String)
+      if current_attributes.key?(:bool_default) && (@original_current_option !~ EQ_RE) &&
+        !(bool_default = current_attributes[:bool_default]).is_a?(String)
           bool_default
       else
         respond_to?("create_#{type}", true) ? send("create_#{type}", type != :boolean ? value_shift : nil) :
@@ -320,7 +320,7 @@ module Boson
     end
 
     def validate_option_value(type)
-      return if current_option_attributes.key?(:bool_default)
+      return if current_attributes.key?(:bool_default)
       if type != :boolean && peek.nil?
         raise Error, "no value provided for option '#{@current_option}'"
       end
@@ -390,7 +390,7 @@ module Boson
     def check_required!(hash)
       for name, type in @opt_types
         @current_option = undasherize(name)
-        if current_option_attributes[:required] && !hash.key?(@current_option.to_sym)
+        if current_attributes[:required] && !hash.key?(@current_option.to_sym)
           raise Error, "no value provided for required option '#{@current_option}'"
         end
       end
