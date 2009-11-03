@@ -122,6 +122,7 @@ module Boson
     #                   an option can only have explicit values with '=' i.e. '--index=alias' and no '--index alias'.
     # [*:required*] Boolean indicating if option is required. Option parses raises error if value not given.
     #               Default is false.
+    # [*:alias*] Alternative way to define option aliases with an option name or an array of them. Useful in yaml files.
     # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
     #             can be aliased by typing a unique string it starts with. For example, for values foo, odd, optional,
     #             f refers to foo, o to odd and op to optional.
@@ -155,6 +156,7 @@ module Boson
         if type.is_a?(Hash)
           @option_attributes ||= {}
           @option_attributes[nice_name] = type
+          @opt_aliases[nice_name] = Array(type[:alias]) if type[:alias]
           @defaults[nice_name] = type[:default] if type[:default]
           @option_attributes[nice_name][:enum] = true if (type.key?(:values) || type.key?(:keys)) &&
             !type.key?(:enum)
