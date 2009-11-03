@@ -17,6 +17,12 @@ module Boson
         command_exists?('blah')
       end
 
+      test "in a sub subdirectory loads" do
+        load 'web/site/delicious', :file_string=>"module Delicious; def blah; end; end"
+        library_has_module('web/site/delicious', "Boson::Commands::Web::Site::Delicious")
+        command_exists?('blah')
+      end
+
       test "prints error for file library with no module" do
         capture_stderr { load(:blah, :file_string=>"def blah; end") }.should =~ /Can't.*at least/
       end
