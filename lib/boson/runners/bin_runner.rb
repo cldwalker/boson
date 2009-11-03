@@ -26,7 +26,7 @@ module Boson
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
       :index=>{:type=>:array, :desc=>"Libraries to index. Libraries must be passed with '='.",
-        :bool_default=>':auto', :values=>all_libraries, :enum=>false},
+        :bool_default=>nil, :values=>all_libraries, :enum=>false},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
       :console=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
@@ -62,9 +62,7 @@ module Boson
       # Loads the given command.
       def init
         super
-        if @options[:index]
-          Index.update({:verbose=>true}.merge!(@options[:index].include?(':auto') ? {} : {:libraries=>@options[:index]}))
-        end
+        Index.update(:verbose=>true, :libraries=>@options[:index]) if @options.key?(:index)
         if @options[:load]
           Manager.load @options[:load], load_options
         elsif @options[:execute]
@@ -81,7 +79,7 @@ module Boson
       end
 
       def load_command_by_index
-        Index.update(:verbose=>@options[:verbose]) if !@options[:index] && Boson.can_invoke?(@command) && !@options[:help]
+        Index.update(:verbose=>@options[:verbose]) if !@options.key?(:index) && Boson.can_invoke?(@command) && !@options[:help]
         if !Boson.can_invoke?(@command) && ((lib = Index.find_library(@command)) ||
           (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
           Manager.load lib, load_options
