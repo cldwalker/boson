@@ -192,7 +192,7 @@ module Boson
       (global_options.keys & pipe_options.keys).each {|e|
         command = pipe_options[e][:pipe] != true ? pipe_options[e][:pipe] : e
         pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
-          Boson.invoke(e, result, global_options[e])
+          Boson.invoke(command, result, global_options[e])
         result = pipe_result if pipe_options[e][:filter]
       }
       result
