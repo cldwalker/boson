@@ -112,7 +112,7 @@ module Boson
     # Returns name of top level class that conflicts if it exists. For example, for base module Boson::Commands,
     # Boson::Commands::Alias conflicts with Alias if Alias exists.
     def top_level_class_conflict(base_module, conflicting_module)
-      (conflicting_module =~ /^#{base_module}::([^:]+)/) && Object.const_defined?($1) && $1
+      (conflicting_module =~ /^#{base_module}.*::([^:]+)/) && Object.const_defined?($1) && $1
     end
   end
 end

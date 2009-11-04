@@ -89,7 +89,7 @@ Having done that, let's start up irb:
     2 rows in set
 
     # Let's install another library
-    bash> boson install http://github.com/cldwalker/irbfiles/raw/master/boson/commands/irb_core.rb
+    bash> boson install http://github.com/cldwalker/irbfiles/raw/master/boson/commands/public/irb_core.rb
     Saved to /Users/bozo/.boson/commands/irb_core.rb
 
     # Let's start irb ...
