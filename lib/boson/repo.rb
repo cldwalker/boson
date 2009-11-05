@@ -15,7 +15,16 @@ module Boson
 
     # Points to the config/ subdirectory and is automatically created when called. Used for config files.
     def config_dir
-      @config_dir ||= FileUtils.mkdir_p("#{dir}/config") && "#{dir}/config"
+      @config_dir ||= FileUtils.mkdir_p(config_dir_path) && config_dir_path
+    end
+
+    def config_dir_path
+      "#{dir}/config"
+    end
+
+    # Path name of main config file. If passed true, parent directory of file is created.
+    def config_file(create_dir=false)
+      File.join((create_dir ? config_dir : config_dir_path), 'boson.yml')
     end
 
     # Points to the commands/ subdirectory and is automatically created when called. Used for command libraries.
@@ -54,8 +63,7 @@ module Boson
       if reload || @config.nil?
         begin
           @config = {:libraries=>{}, :command_aliases=>{}, :console_defaults=>[]}
-          config_file = config_dir + '/boson.yml'
-          @config.merge!(YAML::load_file(config_file)) if File.exists?(config_file)
+          @config.merge!(YAML::load_file(config_file(true))) if File.exists?(config_file)
         rescue ArgumentError
           message = $!.message !~ /syntax error on line (\d+)/ ? "Error"+$!.message :
             "Error: Syntax error in line #{$1} of config file '#{config_file}'"
