@@ -7,6 +7,8 @@ module Boson
   # Handles loading and reloading of libraries and commands.
   class Manager
     class <<self
+      attr_accessor :failed_libraries
+
       # Loads a library or an array of libraries with options. Manager loads the first library subclass
       # to meet a library subclass' criteria in this order: ModuleLibrary, FileLibrary, GemLibrary, RequireLibrary.
       # ==== Examples:
@@ -16,8 +18,7 @@ module Boson
       # ==== Options:
       # [:verbose] Boolean to print each library's loaded status along with more verbose errors. Default is false.
       def load(libraries, options={})
-        libraries = [libraries] unless libraries.is_a?(Array)
-        libraries.map {|e|
+        Array(libraries).map {|e|
           (@library = load_once(e, options)) ? after_load : false
         }.all?
       end
@@ -45,6 +46,10 @@ module Boson
       end
 
       #:stopdoc:
+      def failed_libraries
+        @failed_libraries ||= []
+      end
+
       def add_library(lib)
         Boson.libraries.delete(Boson.library(lib.name))
         Boson.libraries << lib
@@ -59,9 +64,11 @@ module Boson
       rescue AppendFeaturesFalseError
       rescue LoaderError=>e
         FileLibrary.reset_file_cache(library.to_s)
+        failed_libraries << library
         $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
       rescue Exception=>e
         FileLibrary.reset_file_cache(library.to_s)
+        failed_libraries << library
         message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
         message += "\n" + e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n") if @options[:verbose]
         $stderr.puts message

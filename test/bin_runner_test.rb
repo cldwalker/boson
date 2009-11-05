@@ -127,6 +127,7 @@ module Boson
       test "with index option, failed indexing prints error" do
         index :load=>['changed'], :fails=>true
         Index.stubs(:exists?).returns(true)
+        Manager.stubs(:failed_libraries).returns(['changed'])
         capture_stderr {
           capture_stdout { start("--index=changed", "libraries")}.should =~ /Indexing.*changed/
         }.should =~ /Error:.*failed.*changed/

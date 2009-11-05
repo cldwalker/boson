@@ -17,11 +17,14 @@ module Boson
           (libraries_to_update.empty? ? "No libraries indexed" :
           "Indexing the following libraries: #{libraries_to_update.join(', ')}")
       end
+      Manager.failed_libraries = []
       unless libraries_to_update.empty?
-        Manager.load(libraries_to_update, options) || $stderr.puts("Error: One of these libraries failed" +
-          " to load while indexing: #{libraries_to_update.join(', ')}")
+        Manager.load(libraries_to_update, options)
+        unless Manager.failed_libraries.empty?
+          $stderr.puts("Error: These libraries failed to load while indexing: #{Manager.failed_libraries.join(', ')}")
+        end
       end
-      write
+      write(Manager.failed_libraries)
     end
 
     # Reads and initializes index.
@@ -34,8 +37,10 @@ module Boson
     end
 
     # Writes/saves current index to config/index.marshal.
-    def write
-      save_marshal_index Marshal.dump([Boson.libraries, Boson.commands, latest_hashes])
+    def write(failed_libraries=[])
+      latest = latest_hashes
+      failed_libraries.each {|e| latest.delete(e) }
+      save_marshal_index Marshal.dump([Boson.libraries, Boson.commands, latest])
     end
 
     #:stopdoc:
