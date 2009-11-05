@@ -80,7 +80,7 @@ module Boson
 
       def load_command_by_index
         Index.update(:verbose=>@options[:verbose]) if !@options.key?(:index) && Boson.can_invoke?(@command) && !@options[:help]
-        if !Boson.can_invoke?(@command) && ((lib = Index.find_library(@command)) ||
+        if !Boson.can_invoke?(@command, false) && ((lib = Index.find_library(@command)) ||
           (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
           Manager.load lib, load_options
         end
