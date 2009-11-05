@@ -96,8 +96,8 @@ module Boson
     end
 
     def namespace(orig=@namespace)
-      @namespace = !orig.nil? ? orig : begin
-        if (@namespace == true || Boson.repo.config[:auto_namespace])
+      @namespace = [String,FalseClass].include?(orig.class) ? orig : begin
+        if (@namespace == true || (Boson.repo.config[:auto_namespace] && !@index))
           @namespace = clean_name
         else
           @namespace = false
