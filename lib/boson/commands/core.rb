@@ -27,7 +27,7 @@ module Boson::Commands::Core #:nodoc:
       'load_library'=>{:description=>"Load/reload a library", :options=>{:reload=>:boolean, [:verbose,:V]=>true}}
     }
 
-    {:library_file=>File.expand_path(__FILE__), :commands=>commands}
+    {:namespace=>false, :library_file=>File.expand_path(__FILE__), :commands=>commands}
   end
 
   def commands(options={})

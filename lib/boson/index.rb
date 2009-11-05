@@ -19,7 +19,7 @@ module Boson
       end
       Manager.failed_libraries = []
       unless libraries_to_update.empty?
-        Manager.load(libraries_to_update, options)
+        Manager.load(libraries_to_update, options.merge(:index=>true))
         unless Manager.failed_libraries.empty?
           $stderr.puts("Error: These libraries failed to load while indexing: #{Manager.failed_libraries.join(', ')}")
         end
@@ -69,16 +69,12 @@ module Boson
       @commands.delete_if {|e| names_to_delete.include? e.lib }
     end
 
-    # get latest namespaces from config files
+    # set namespaces for commands
     def set_latest_namespaces
-      namespace_libs = Boson.repo.config[:auto_namespace] ? @libraries.map {|e| [e.name, {:namespace=>true}]} :
-        Boson.repo.config[:libraries].select {|k,v| v && v[:namespace] }
       lib_commands = @commands.inject({}) {|t,e| (t[e.lib] ||= []) << e; t }
-      namespace_libs.each {|name, hash|
-        if (lib = @libraries.find {|l| l.name == name})
-          lib.namespace = (hash[:namespace] == true) ? lib.clean_name : hash[:namespace]
-          (lib_commands[lib.name] || []).each {|e| e.namespace = lib.namespace }
-        end
+      namespace_libs = @libraries.select {|e| e.namespace(e.original_namespace) }
+      namespace_libs.each {|lib|
+        (lib_commands[lib.name] || []).each {|e| e.namespace = lib.namespace }
       }
     end
 

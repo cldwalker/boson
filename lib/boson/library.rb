@@ -44,7 +44,7 @@ module Boson
     end
 
     # Public attributes for use outside of Boson.
-    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace]
+    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :original_namespace]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
     # Private attribute for use within Boson.
     attr_reader :no_alias_creation, :new_module, :new_commands
@@ -87,9 +87,6 @@ module Boson
       @commands = []
       set_config (repo.config[:libraries][@name] || {}).merge(hash), true
       set_command_aliases(repo.config[:command_aliases])
-      @namespace = true if Boson.repo.config[:auto_namespace] && @namespace.nil? &&
-        !Boson::Runner.default_libraries.include?(@module)
-      @namespace = clean_name if @namespace && !@namespace.is_a?(String)
     end
 
     # A concise symbol version of a library type i.e. FileLibrary -> :file.
@@ -98,9 +95,19 @@ module Boson
       str.downcase.to_sym
     end
 
+    def namespace(orig=@namespace)
+      @namespace = !orig.nil? ? orig : begin
+        if (@namespace == true || Boson.repo.config[:auto_namespace])
+          @namespace = clean_name
+        else
+          @namespace = false
+        end
+      end
+    end
+
     # The object a library uses for executing its commands.
     def namespace_object
-      @namespace_object ||= @namespace ? Boson.invoke(@namespace) : Boson.main_object
+      @namespace_object ||= namespace ? Boson.invoke(namespace) : Boson.main_object
     end
 
     #:stopdoc:
@@ -151,11 +158,11 @@ module Boson
     end
 
     def marshal_dump
-      [@name, @commands, @gems, @module.to_s, @repo_dir]
+      [@name, @commands, @gems, @module.to_s, @repo_dir, @original_namespace]
     end
 
     def marshal_load(ary)
-      @name, @commands, @gems, @module, @repo_dir = ary
+      @name, @commands, @gems, @module, @repo_dir, @original_namespace = ary
     end
     #:startdoc:
   end

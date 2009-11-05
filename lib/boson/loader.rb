@@ -33,8 +33,9 @@ module Boson
       load_source_and_set_module
       module_callbacks if @module
       yield if block_given?
-      (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = nil
+      (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = false
       set_library_commands
+      @original_namespace = (@namespace == false) ? nil : @namespace if @index
       loaded_correctly? && (@loaded = true)
     end
 
@@ -72,7 +73,7 @@ module Boson
     def load_module_commands
       initialize_library_module
     rescue MethodConflictError=>e
-      if Boson.repo.config[:error_method_conflicts] || @namespace
+      if Boson.repo.config[:error_method_conflicts] || namespace
         raise MethodConflictError, e.message
       else
         @namespace = clean_name
@@ -101,7 +102,7 @@ module Boson
       Manager.create_class_aliases(@module, @class_commands) unless @class_commands.to_s.empty? || @method_conflict
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
-      @namespace ? Namespace.create(@namespace, self) : include_in_universe
+      namespace ? Namespace.create(namespace, self) : include_in_universe
     end
 
     def include_in_universe(lib_module=@module)
@@ -111,7 +112,7 @@ module Boson
     end
 
     def check_for_method_conflicts
-      conflicts = @namespace ? (Boson.can_invoke?(@namespace) ? [@namespace] : []) :
+      conflicts = namespace ? (Boson.can_invoke?(namespace) ? [namespace] : []) :
         (@module.instance_methods + @module.private_instance_methods) & (Boson.main_object.methods +
           Boson.main_object.private_methods)
       unless conflicts.empty?
@@ -122,8 +123,8 @@ module Boson
     def set_library_commands
       aliases = @commands_hash.select {|k,v| @commands.include?(k) }.map {|k,v| v[:alias]}.compact
       @commands -= aliases
-      @commands.delete(@namespace) if @namespace
-      @commands += Boson.invoke(@namespace).boson_commands if @namespace && !@pre_defined_commands
+      @commands.delete(namespace) if namespace
+      @commands += Boson.invoke(namespace).boson_commands if namespace && !@pre_defined_commands
       @commands.uniq!
     end
     #:startdoc:
