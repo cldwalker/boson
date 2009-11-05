@@ -83,15 +83,15 @@ module Boson
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
       :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"},
-      :sort=>{:type=>:string, :desc=>"Sort by given field"},
-      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
-      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
     } #:nodoc:
     RENDER_OPTIONS = {
       :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
       :class=>{:type=>:string, :desc=>"Hirb helper class which renders"},
       :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
-      :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"}
+      :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"},
+      :sort=>{:type=>:string, :desc=>"Sort by given field"},
+      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
+      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
     } #:nodoc:
 
     # Redefines an object's method with a Command of the same name.
@@ -175,10 +175,14 @@ module Boson
     end
 
     def render_or_raw(result)
-      result = View.search_and_sort(result, @global_options) if !(@global_options.keys & [:sort, :reverse_sort, :query]).empty?
-      result = run_pipe_commands(result)
-      render_global_opts = @global_options.dup.delete_if {|k,v| default_global_options.keys.include?(k) }
-      (@rendered = render?) ? View.render(result, render_global_opts, false) : result
+      if (@rendered = render?)
+        result = run_pipe_commands(result)
+        render_global_opts = @global_options.dup.delete_if {|k,v| default_global_options.keys.include?(k) }
+        View.render(result, render_global_opts, false)
+      else
+        result = View.search_and_sort(result, @global_options) if !(@global_options.keys & [:sort, :reverse_sort, :query]).empty?
+        run_pipe_commands(result)
+      end
     rescue Exception
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
