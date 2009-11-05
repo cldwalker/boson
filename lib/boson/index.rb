@@ -32,7 +32,7 @@ module Boson
       return if @read
       @libraries, @commands, @lib_hashes = exists? ? Marshal.load(File.read(marshal_file)) : [[], [], {}]
       delete_stale_libraries_and_commands
-      set_latest_namespaces
+      set_command_namespaces
       @read = true
     end
 
@@ -70,7 +70,7 @@ module Boson
     end
 
     # set namespaces for commands
-    def set_latest_namespaces
+    def set_command_namespaces
       lib_commands = @commands.inject({}) {|t,e| (t[e.lib] ||= []) << e; t }
       namespace_libs = @libraries.select {|e| e.namespace(e.original_namespace) }
       namespace_libs.each {|lib|
@@ -79,7 +79,9 @@ module Boson
     end
 
     def namespaces
-      @libraries.map {|e| e.namespace }.compact
+      nsps = @libraries.map {|e| e.namespace }.compact
+      nsps.delete(false)
+      nsps
     end
 
     def all_main_methods
