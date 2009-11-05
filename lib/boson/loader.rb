@@ -35,7 +35,7 @@ module Boson
       yield if block_given?
       (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = false
       set_library_commands
-      @original_namespace = (@namespace == false) ? nil : @namespace if @index
+      @indexed_namespace = (@namespace == false) ? nil : @namespace if @index
       loaded_correctly? && (@loaded = true)
     end
 

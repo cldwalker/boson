@@ -72,7 +72,7 @@ module Boson
     # set namespaces for commands
     def set_command_namespaces
       lib_commands = @commands.inject({}) {|t,e| (t[e.lib] ||= []) << e; t }
-      namespace_libs = @libraries.select {|e| e.namespace(e.original_namespace) }
+      namespace_libs = @libraries.select {|e| e.namespace(e.indexed_namespace) }
       namespace_libs.each {|lib|
         (lib_commands[lib.name] || []).each {|e| e.namespace = lib.namespace }
       }

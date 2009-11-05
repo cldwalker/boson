@@ -44,7 +44,7 @@ module Boson
     end
 
     # Public attributes for use outside of Boson.
-    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :original_namespace]
+    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :indexed_namespace]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
     # Private attribute for use within Boson.
     attr_reader :no_alias_creation, :new_module, :new_commands
@@ -158,11 +158,11 @@ module Boson
     end
 
     def marshal_dump
-      [@name, @commands, @gems, @module.to_s, @repo_dir, @original_namespace]
+      [@name, @commands, @gems, @module.to_s, @repo_dir, @indexed_namespace]
     end
 
     def marshal_load(ary)
-      @name, @commands, @gems, @module, @repo_dir, @original_namespace = ary
+      @name, @commands, @gems, @module, @repo_dir, @indexed_namespace = ary
     end
     #:startdoc:
   end
