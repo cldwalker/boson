@@ -257,7 +257,7 @@ module Boson
 
   context ":string type" do
     before :each do
-      create "--foo" => :string, "--bar" => :string
+      create "--foo" => :string, "--bar" => :string, :blah=>{:type=>:string, :default=>:huh}
     end
 
     it "doesn't set nonexistant options" do
@@ -279,6 +279,10 @@ module Boson
 
     it "overwrites earlier values with later values" do
       parse("--foo", "12", "--foo", "13")[:foo].should == "13"
+    end
+
+    it "can have symbolic default value" do
+      parse('--blah','ok')[:blah].should == 'ok'
     end
   end
   

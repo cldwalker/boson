@@ -132,7 +132,7 @@ module Boson
         end
 
         test "with unexpected error in translation" do
-          Scientist.expects(:command_options).raises("unexpected")
+          Scientist.expects(:parse_command_options).raises("unexpected")
           capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
         end
 

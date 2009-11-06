@@ -163,7 +163,7 @@ module Boson
           @option_attributes[nice_name][:enum] = true if (type.key?(:values) || type.key?(:keys)) &&
             !type.key?(:enum)
           @option_attributes[nice_name][:default_keys] ||= type[:keys][0] if type.key?(:keys)
-          type = !type[:default].nil? ? determine_option_type(type[:default]) : type[:type] || :boolean
+          type = type[:type] || (!type[:default].nil? ? determine_option_type(type[:default]) : :boolean)
         end
 
         # set defaults

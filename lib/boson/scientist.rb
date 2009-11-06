@@ -75,7 +75,7 @@ module Boson
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
 
-    attr_reader :global_options, :rendered
+    attr_reader :global_options, :rendered, :option_parsers, :command_options
     @no_option_commands ||= []
     GLOBAL_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
@@ -156,7 +156,7 @@ module Boson
       end
       @command.options ||= {}
 
-      if parsed_options = command_options
+      if parsed_options = parse_command_options
         add_default_args(@args)
         return @args if @no_option_commands.include?(@command)
         @args << parsed_options
@@ -231,7 +231,7 @@ module Boson
     end
 
     def current_command_options
-      (@command_render_options ||= {})[@command] ||= begin
+      (@command_options ||= {})[@command] ||= begin
         @command.render_options.each {|k,v|
           if !v.is_a?(Hash) && !v.is_a?(Symbol)
             @command.render_options[k] = {:default=>v}
@@ -256,7 +256,7 @@ module Boson
       (@command.render_options && !@global_options[:render]) || (!@command.render_options && @global_options[:render])
     end
 
-    def command_options
+    def parse_command_options
       if @args.size == 1 && @args[0].is_a?(String)
         parsed_options, @args = parse_options Shellwords.shellwords(@args[0])
       # last string argument interpreted as args + options
