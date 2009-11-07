@@ -155,6 +155,7 @@ My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby conso
 
 == Acknowledgements
 Boson stands on the shoulders of these people and their ideas:
+* Yehuda Katz for inspiring me with Thor's power and elegant design
 * Yehuda Katz and Daniel Berger for an awesome option parser (Boson::OptionParser)
 * Dave Thomas for scraping a method's comments (Boson::CommentInspector)
 * Mauricio Fernandez for scraping a method's arguments (Boson::ArgumentInspector)

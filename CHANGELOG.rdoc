@@ -1,3 +1,23 @@
+== 0.2.0
+* Command options
+** Added custom global and render options for commands.
+** Added pipe and filter option commands.
+** Add global query option.
+* Options
+** Users can define custom option types.
+** Added hash option type.
+** Any option can be a boolean with :bool_default attribute.
+** Adding * aliasing to relevant options.
+* Made Boson::Scientist.commandify for use outside Boson.
+* Any command can have a default option.
+* Directories are namespaced automatically.
+* Solidified library module callback methods.
+* Added support for Windows home.
+* Improved ModuleLibrary to handle class or module class methods.
+* Better search and sort integration with Hirb.
+* Better docs.
+* Fixed number of bugs.
+
 == 0.1.0
 * First real release
 * Plenty of fixes to make it ruby 1.9 ready.
