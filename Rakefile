@@ -21,11 +21,11 @@ begin
     s.description = "A command/task framework similar to rake and thor that opens your ruby universe to the commandline and irb."
     s.summary =  "Boson provides users with the power to turn any ruby method into a full-fledged commandline tool. Boson achieves this with powerful options (borrowed from thor) and views (thanks to hirb). Some other unique features that differentiate it from rake and thor include being accessible from irb and the commandline, being able to write boson commands in non-dsl ruby and toggling a pretty view of a command's output without additional view code."
     s.email = "gabriel.horner@gmail.com"
-    s.homepage = "http://github.com/cldwalker/boson"
+    s.homepage = "http://tagaholic.me/boson/"
     s.authors = ["Gabriel Horner"]
     s.has_rdoc = true
     s.rubyforge_project = 'tagaholic'
-    s.add_dependency 'hirb', '>= 0.2.7'
+    s.add_dependency 'hirb', '>= 0.2.8'
     s.add_dependency 'alias', '>= 0.2.1'
     s.extra_rdoc_files = ["README.rdoc", "LICENSE.txt"]
     s.files = FileList["Rakefile", "VERSION.yml", "README.rdoc", "LICENSE.txt", "{bin,lib,test}/**/*"]
