@@ -239,9 +239,14 @@ module Boson
         }
         render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(default_render_options))
         opts = Util.recursive_hash_merge render_opts, Util.deep_copy(default_global_options)
-        if opts[:fields][:default] && !opts[:fields].key?(:values)
-          opts[:fields][:values] = opts[:fields][:default]
-          opts[:fields][:enum] = false unless opts[:fields].key?(:enum)
+        if !opts[:fields].key?(:values)
+          if opts[:fields][:default]
+            opts[:fields][:values] = opts[:fields][:default]
+          else
+            opts[:fields][:values] = opts[:change_fields][:default].values if opts[:change_fields] && opts[:change_fields][:default]
+            opts[:fields][:values] ||= opts[:headers][:default].keys if opts[:headers] && opts[:headers][:default]
+          end
+          opts[:fields][:enum] = false if opts[:fields][:values] && !opts[:fields].key?(:enum)
         end
         if opts[:fields][:values]
           opts[:sort][:values] ||= opts[:fields][:values]
