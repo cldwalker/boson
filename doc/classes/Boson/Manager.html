@@ -50,15 +50,27 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000062">load</a></li>
-              <li><a href="#M000063">reload</a></li>
+              <li><a href="#M000065">load</a></li>
+              <li><a href="#M000066">reload</a></li>
             </ol>
           </div>
           <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>failed_libraries</td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000062'>
-                <a name='M000062'>      </a>
+              <div class='public-class method' id='method-M000065'>
+                <a name='M000065'>      </a>
                 <div class='synopsis'>
                   <span class='name'>load</span>
                   <span class='arguments'>(libraries, options={})</span>
@@ -75,26 +87,27 @@
                   </p>
                   <h4>Examples:</h4>
                   <pre>Manager.load 'my_commands'  -&gt; Loads a FileLibrary object from ~/.boson/commands/my_commands.rb&#x000A;Manager.load 'method_lister' -&gt; Loads a GemLibrary object which requires the method_lister gem</pre>
+                  <p>
+                  Any options that aren&#8217;t listed here are passed as library attributes
+                  to the libraries (see <a href="Library.html#M000085">Library.new</a>)
+                  </p>
                   <h4>Options:</h4>
                   <dl>
                   <dt>:verbose</dt><dd>Boolean to print each library&#8217;s loaded status along with more verbose
                   errors. Default is false.
                   
                   </dd>
-                  <dt>:index</dt><dd>Boolean to load in index mode. Default is false.
-                  
-                  </dd>
                   </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000062-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000065-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000062-source'><span class="ruby-comment cmt"># File lib/boson/manager.rb, line 18</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load</span>(<span class="ruby-identifier">libraries</span>, <span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-identifier">libraries</span> = [<span class="ruby-identifier">libraries</span>] <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">libraries</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;        <span class="ruby-identifier">libraries</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;          (<span class="ruby-ivar">@library</span> = <span class="ruby-identifier">load_once</span>(<span class="ruby-identifier">e</span>, <span class="ruby-identifier">options</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">after_load</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>&#x000A;        }.<span class="ruby-identifier">all?</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000065-source'><span class="ruby-comment cmt"># File lib/boson/manager.rb, line 20</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load</span>(<span class="ruby-identifier">libraries</span>, <span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-constant">Array</span>(<span class="ruby-identifier">libraries</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;          (<span class="ruby-ivar">@library</span> = <span class="ruby-identifier">load_once</span>(<span class="ruby-identifier">e</span>, <span class="ruby-identifier">options</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">after_load</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>&#x000A;        }.<span class="ruby-identifier">all?</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000063'>
-                <a name='M000063'>      </a>
+              <div class='public-class method' id='method-M000066'>
+                <a name='M000066'>      </a>
                 <div class='synopsis'>
                   <span class='name'>reload</span>
                   <span class='arguments'>(source, options={})</span>
@@ -110,10 +123,10 @@
                   </ul>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000063-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000066-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000063-source'><span class="ruby-comment cmt"># File lib/boson/manager.rb, line 27</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reload</span>(<span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">lib</span> = <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">library</span>(<span class="ruby-identifier">source</span>))&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">lib</span>.<span class="ruby-identifier">loaded</span>&#x000A;            <span class="ruby-identifier">command_size</span> = <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">commands</span>.<span class="ruby-identifier">size</span>&#x000A;            <span class="ruby-ivar">@options</span> = <span class="ruby-identifier">options</span>&#x000A;            <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">result</span> = <span class="ruby-identifier">rescue_load_action</span>(<span class="ruby-identifier">lib</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">:reload</span>) { <span class="ruby-identifier">lib</span>.<span class="ruby-identifier">reload</span> })&#x000A;              <span class="ruby-identifier">after_reload</span>(<span class="ruby-identifier">lib</span>)&#x000A;              <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Reloaded library #{source}: Added #{Boson.commands.size - command_size} commands&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-identifier">result</span>&#x000A;          <span class="ruby-keyword kw">else</span>&#x000A;            <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Library hasn't been loaded yet. Loading library #{source}...&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;            <span class="ruby-identifier">load</span>(<span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>)&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Library #{source} doesn't exist.&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;          <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000066-source'><span class="ruby-comment cmt"># File lib/boson/manager.rb, line 28</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">reload</span>(<span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">lib</span> = <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">library</span>(<span class="ruby-identifier">source</span>))&#x000A;          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">lib</span>.<span class="ruby-identifier">loaded</span>&#x000A;            <span class="ruby-identifier">command_size</span> = <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">commands</span>.<span class="ruby-identifier">size</span>&#x000A;            <span class="ruby-ivar">@options</span> = <span class="ruby-identifier">options</span>&#x000A;            <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">result</span> = <span class="ruby-identifier">rescue_load_action</span>(<span class="ruby-identifier">lib</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">:reload</span>) { <span class="ruby-identifier">lib</span>.<span class="ruby-identifier">reload</span> })&#x000A;              <span class="ruby-identifier">after_reload</span>(<span class="ruby-identifier">lib</span>)&#x000A;              <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Reloaded library #{source}: Added #{Boson.commands.size - command_size} commands&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;            <span class="ruby-keyword kw">end</span>&#x000A;            <span class="ruby-identifier">result</span>&#x000A;          <span class="ruby-keyword kw">else</span>&#x000A;            <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Library hasn't been loaded yet. Loading library #{source}...&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;            <span class="ruby-identifier">load</span>(<span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>)&#x000A;          <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Library #{source} doesn't exist.&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;          <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

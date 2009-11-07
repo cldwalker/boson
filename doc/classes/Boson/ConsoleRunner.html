@@ -52,15 +52,15 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000065">bin_start</a></li>
-              <li><a href="#M000064">start</a></li>
+              <li><a href="#M000068">bin_start</a></li>
+              <li><a href="#M000067">start</a></li>
             </ol>
           </div>
           <div id='section'>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000065'>
-                <a name='M000065'>      </a>
+              <div class='public-class method' id='method-M000068'>
+                <a name='M000068'>      </a>
                 <div class='synopsis'>
                   <span class='name'>bin_start</span>
                   <span class='arguments'>(repl, libraries)</span>
@@ -72,14 +72,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000065-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000068-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000065-source'><span class="ruby-comment cmt"># File lib/boson/runners/console_runner.rb, line 23</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bin_start</span>(<span class="ruby-identifier">repl</span>, <span class="ruby-identifier">libraries</span>)&#x000A;        <span class="ruby-identifier">start</span> <span class="ruby-identifier">:no_defaults=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:libraries=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">libraries</span>&#x000A;        <span class="ruby-identifier">repl</span> = <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:console</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:console</span>]&#x000A;        <span class="ruby-identifier">repl</span> = <span class="ruby-constant">RUBY_PLATFORM</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/(:?mswin|mingw)/</span> <span class="ruby-operator">?</span> <span class="ruby-value str">'irb.bat'</span> <span class="ruby-operator">:</span> <span class="ruby-value str">'irb'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">repl</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;        <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">repl</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'/'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> (<span class="ruby-identifier">repl</span> = <span class="ruby-constant">Util</span>.<span class="ruby-identifier">which</span>(<span class="ruby-identifier">repl</span>))&#x000A;          <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;Console not found. Please specify full path in config[:console].&quot;</span>&#x000A;          <span class="ruby-keyword kw">return</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-constant">ARGV</span>.<span class="ruby-identifier">replace</span> [<span class="ruby-value str">'-f'</span>]&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">$0</span> = <span class="ruby-identifier">repl</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000068-source'><span class="ruby-comment cmt"># File lib/boson/runners/console_runner.rb, line 23</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">bin_start</span>(<span class="ruby-identifier">repl</span>, <span class="ruby-identifier">libraries</span>)&#x000A;        <span class="ruby-identifier">start</span> <span class="ruby-identifier">:no_defaults=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:libraries=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">libraries</span>&#x000A;        <span class="ruby-identifier">repl</span> = <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:console</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:console</span>]&#x000A;        <span class="ruby-identifier">repl</span> = <span class="ruby-constant">RUBY_PLATFORM</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/(:?mswin|mingw)/</span> <span class="ruby-operator">?</span> <span class="ruby-value str">'irb.bat'</span> <span class="ruby-operator">:</span> <span class="ruby-value str">'irb'</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">repl</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;        <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">repl</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'/'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> (<span class="ruby-identifier">repl</span> = <span class="ruby-constant">Util</span>.<span class="ruby-identifier">which</span>(<span class="ruby-identifier">repl</span>))&#x000A;          <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span> <span class="ruby-value str">&quot;Console not found. Please specify full path in config[:console].&quot;</span>&#x000A;          <span class="ruby-keyword kw">return</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-constant">ARGV</span>.<span class="ruby-identifier">replace</span> [<span class="ruby-value str">'-f'</span>]&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">$0</span> = <span class="ruby-identifier">repl</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000064'>
-                <a name='M000064'>      </a>
+              <div class='public-class method' id='method-M000067'>
+                <a name='M000067'>      </a>
                 <div class='synopsis'>
                   <span class='name'>start</span>
                   <span class='arguments'>(options={})</span>
@@ -90,7 +90,7 @@
                   If no default libraries are specified in the config, it will load up all
                   detected libraries.
                   </p>
-                  <h4>Options</h4>
+                  <h4><a href="Options.html">Options</a></h4>
                   <dl>
                   <dt>:libraries</dt><dd>Array of libraries to load.
                   
@@ -109,10 +109,10 @@
                   </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000064-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000067-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000064-source'><span class="ruby-comment cmt"># File lib/boson/runners/console_runner.rb, line 16</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-ivar">@options</span> = {<span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>}.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">options</span>&#x000A;        <span class="ruby-identifier">init</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@initialized</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span>(<span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:libraries</span>], <span class="ruby-identifier">load_options</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:libraries</span>]&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000067-source'><span class="ruby-comment cmt"># File lib/boson/runners/console_runner.rb, line 16</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-ivar">@options</span> = {<span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>}.<span class="ruby-identifier">merge</span> <span class="ruby-identifier">options</span>&#x000A;        <span class="ruby-identifier">init</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@initialized</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span>(<span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:libraries</span>], <span class="ruby-identifier">load_options</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:libraries</span>]&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

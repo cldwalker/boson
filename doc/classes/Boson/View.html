@@ -46,16 +46,20 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000041">enable</a></li>
-              <li><a href="#M000042">render</a></li>
-              <li><a href="#M000043">silent_object?</a></li>
+              <li><a href="#M000042">enable</a></li>
+              <li><a href="#M000043">render</a></li>
+              <li><a href="#M000044">search_and_sort</a></li>
             </ol>
           </div>
           <div id='section'>
+            <div id='class-list'>
+              <h2>Classes and Modules</h2>
+              Module <a href="View/TableCallbacks.html" class="link">Boson::View::TableCallbacks</a><br />
+            </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000041'>
-                <a name='M000041'>      </a>
+              <div class='public-instance method' id='method-M000042'>
+                <a name='M000042'>      </a>
                 <div class='synopsis'>
                   <span class='name'>enable</span>
                   <span class='arguments'>()</span>
@@ -67,42 +71,50 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000041-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000041-source'><span class="ruby-comment cmt"># File lib/boson/view.rb, line 7</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">enable</span>&#x000A;      <span class="ruby-constant">Hirb</span><span class="ruby-operator">::</span><span class="ruby-constant">View</span>.<span class="ruby-identifier">enable</span>(<span class="ruby-identifier">:config_file=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config_dir</span>, <span class="ruby-value str">'hirb.yml'</span>)) <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@enabled</span>&#x000A;      <span class="ruby-ivar">@enabled</span> = <span class="ruby-keyword kw">true</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000042'>
-                <a name='M000042'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>render</span>
-                  <span class='arguments'>(object, options={})</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Renders any object via Hirb. Options are passed directly to <a
-                  href="http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011">Hirb::Console.render_output</a>.
-                  </p>
-                </div>
-                <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000042-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000042-source'><span class="ruby-comment cmt"># File lib/boson/view.rb, line 14</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">render</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">silent_object?</span>(<span class="ruby-identifier">object</span>)&#x000A;        <span class="ruby-identifier">puts</span>(<span class="ruby-identifier">object</span>.<span class="ruby-identifier">inspect</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:silence_booleans</span>]&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-identifier">render_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000042-source'><span class="ruby-comment cmt"># File lib/boson/view.rb, line 7</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">enable</span>&#x000A;      <span class="ruby-constant">Hirb</span><span class="ruby-operator">::</span><span class="ruby-constant">View</span>.<span class="ruby-identifier">enable</span>(<span class="ruby-identifier">:config_file=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config_dir</span>, <span class="ruby-value str">'hirb.yml'</span>)) <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@enabled</span>&#x000A;      <span class="ruby-ivar">@enabled</span> = <span class="ruby-keyword kw">true</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='public-instance method' id='method-M000043'>
                 <a name='M000043'>      </a>
                 <div class='synopsis'>
-                  <span class='name'>silent_object?</span>
-                  <span class='arguments'>(obj)</span>
+                  <span class='name'>render</span>
+                  <span class='arguments'>(object, options={}, return_obj=false)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Renders any object via Hirb. <a href="Options.html">Options</a> are passed
+                  directly to <a
+                  href="http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011">Hirb::Console.render_output</a>.
+                  </p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000043-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000043-source'><span class="ruby-comment cmt"># File lib/boson/view.rb, line 22</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">silent_object?</span>(<span class="ruby-identifier">obj</span>)&#x000A;      [<span class="ruby-keyword kw">nil</span>,<span class="ruby-keyword kw">false</span>,<span class="ruby-keyword kw">true</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">obj</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000043-source'><span class="ruby-comment cmt"># File lib/boson/view.rb, line 14</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">render</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span>={}, <span class="ruby-identifier">return_obj</span>=<span class="ruby-keyword kw">false</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">silent_object?</span>(<span class="ruby-identifier">object</span>)&#x000A;        <span class="ruby-identifier">puts</span>(<span class="ruby-identifier">object</span>.<span class="ruby-identifier">inspect</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:silence_booleans</span>]&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-identifier">render_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span>, <span class="ruby-identifier">return_obj</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000044'>
+                <a name='M000044'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>search_and_sort</span>
+                  <span class='arguments'>(object, options)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Searches and sorts an array of objects or hashes using options :query,
+                  :sort and :reverse_sort. The :query option is a hash of fields mapped to
+                  their search terms. Searches are OR-ed.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000044-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000044-source'><span class="ruby-comment cmt"># File lib/boson/view.rb, line 24</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">search_and_sort</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;        <span class="ruby-identifier">object</span> = <span class="ruby-identifier">search_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:query</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:query</span>]&#x000A;        <span class="ruby-identifier">object</span> = <span class="ruby-identifier">sort_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:sort</span>], <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:reverse_sort</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:sort</span>]&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">object</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

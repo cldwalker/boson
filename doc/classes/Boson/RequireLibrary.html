@@ -47,6 +47,10 @@
             libraries, non-gem libraries (i.e. rip packages) and anything else in
             $LOAD_PATH.
             </p>
+            <p>
+            Example:
+            </p>
+            <pre>&gt;&gt; load_library 'fileutils', :class_commands=&gt;{'cd'=&gt;'FileUtils.cd', 'cp'=&gt;'FileUtils.cp'}&#x000A;=&gt; true&#x000A;&gt;&gt; cd '/home'&#x000A;=&gt; 0&#x000A;&gt;&gt; Dir.pwd&#x000A;&gt;&gt; '/home'</pre>
           </div>
           <div id='section'>
           </div>

@@ -39,12 +39,18 @@
         <div id='text'>
           <div id='description'>
             <p>
-            <a href="Scientist.html">Scientist</a> redefines the methods of commands
-            that have options and/or take global options. This redefinition allows a
-            command to receive its arguments normally or as a commandline app does. For
-            a command&#8217;s method to be redefined correctly, its last argument
-            <em>must</em> expect a hash.
+            <a href="Scientist.html">Scientist</a> redefines <em>any</em>
+            object&#8217;s methods to act like shell commands while still receiving
+            ruby arguments normally. It also let&#8217;s your method have an optional
+            view generated from a method&#8217;s return value. <a
+            href="Scientist.html#M000023">Boson::Scientist.create_option_command</a>
+            redefines an object&#8217;s method with a <a
+            href="Command.html">Boson::Command</a> while <a
+            href="Scientist.html#M000024">Boson::Scientist.commandify</a> redefines
+            with just a hash. For an object&#8217;s method to be redefined correctly,
+            its last argument <em>must</em> expect a hash.
             </p>
+            <h3>Examples</h3>
             <p>
             Take for example this basic method/command with an options definition:
             </p>
@@ -58,7 +64,7 @@
             Non-string arguments can be passed in:
             </p>
             <pre>foo Object, :level=&gt;1&#x000A;foo Object, 'l1'&#x000A;&#x000A;Both calls return: [Object, {:level=&gt;1}]</pre>
-            <h3>Global Options</h3>
+            <h3>Global <a href="Options.html">Options</a></h3>
             <p>
             Any command with options comes with default global options. For example
             &#8217;-hv&#8217; on such a command prints a help summarizing a
@@ -75,7 +81,7 @@
             dashes. For example:
             </p>
             <pre>foo '-p --fields=f1,f2 -l=1'&#x000A;# is the same as&#x000A;foo ' -g &quot;p fields=f1,f2&quot; -l=1 '</pre>
-            <h3>Rendering Views With Global Options</h3>
+            <h3>Rendering Views With Global <a href="Options.html">Options</a></h3>
             <p>
             Perhaps the most important global option is &#8212;render. This option
             toggles the rendering of your command&#8217;s output with <a
@@ -99,8 +105,9 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
+              <li><a href="#M000024">commandify</a></li>
               <li><a href="#M000023">create_option_command</a></li>
-              <li><a href="#M000024">create_option_command_block</a></li>
+              <li><a href="#M000025">create_option_command_block</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -114,7 +121,17 @@
               <div class='name-list'>
                 <table>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>command_options</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>global_options</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>option_parsers</td>
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -128,6 +145,31 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000024'>
+                <a name='M000024'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>commandify</span>
+                  <span class='arguments'>(obj, hash)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  A wrapper around <a href="Scientist.html#M000023">create_option_command</a>
+                  that doesn&#8217;t depend on a <a href="Command.html">Command</a> object.
+                  Rather you simply pass a hash of command attributes (see <a
+                  href="Command.html#M000049">Command.new</a>) or command methods and let
+                  OpenStruct mock a command. The only required attribute is :name, though to
+                  get any real use you should define :options and :arg_size (default is
+                  &#8217;*&#8217;). Example:
+                  </p>
+                  <pre>&gt;&gt; def checkit(*args); args; end&#x000A;=&gt; nil&#x000A;&gt;&gt; Boson::Scientist.commandify(self, :name=&gt;'checkit', :options=&gt;{:verbose=&gt;:boolean, :num=&gt;:numeric})&#x000A;=&gt; ['checkit']&#x000A;# regular ruby method&#x000A;&gt;&gt; checkit 'one', 'two', :num=&gt;13, :verbose=&gt;true&#x000A;=&gt; [&quot;one&quot;, &quot;two&quot;, {:num=&gt;13, :verbose=&gt;true}]&#x000A;# commandline ruby method&#x000A;&gt;&gt; checkit 'one two -v -n=13'&#x000A;=&gt; [&quot;one&quot;, &quot;two&quot;, {:num=&gt;13, :verbose=&gt;true}]</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000024-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000024-source'><span class="ruby-comment cmt"># File lib/boson/scientist.rb, line 120</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commandify</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;:name required&quot;</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:name</span>]&#x000A;      <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:arg_size</span>] <span class="ruby-operator">||=</span> <span class="ruby-value str">'*'</span>&#x000A;      <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:has_splat_args?</span>] = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:arg_size</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">'*'</span>&#x000A;      <span class="ruby-identifier">fake_cmd</span> = <span class="ruby-constant">OpenStruct</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">fake_cmd</span>.<span class="ruby-identifier">option_parser</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">OptionParser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">fake_cmd</span>.<span class="ruby-identifier">options</span> <span class="ruby-operator">||</span> {})&#x000A;      <span class="ruby-identifier">create_option_command</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">fake_cmd</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
               <div class='public-instance method' id='method-M000023'>
                 <a name='M000023'>      </a>
                 <div class='synopsis'>
@@ -136,18 +178,19 @@
                 </div>
                 <div class='description'>
                   <p>
-                  Redefines a command&#8217;s method for the given object.
+                  Redefines an object&#8217;s method with a <a
+                  href="Command.html">Command</a> of the same name.
                   </p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000023-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000023-source'><span class="ruby-comment cmt"># File lib/boson/scientist.rb, line 94</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_option_command</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-identifier">cmd_block</span> = <span class="ruby-identifier">create_option_command_block</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-ivar">@no_option_commands</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">command</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">command</span>.<span class="ruby-identifier">options</span>.<span class="ruby-identifier">nil?</span>&#x000A;      [<span class="ruby-identifier">command</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">command</span>.<span class="ruby-identifier">alias</span>].<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-value str">&quot;class&lt;&lt;self;self;end&quot;</span>).<span class="ruby-identifier">send</span>(<span class="ruby-identifier">:define_method</span>, <span class="ruby-identifier">e</span>, <span class="ruby-identifier">cmd_block</span>)&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000023-source'><span class="ruby-comment cmt"># File lib/boson/scientist.rb, line 98</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_option_command</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-identifier">cmd_block</span> = <span class="ruby-identifier">create_option_command_block</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-ivar">@no_option_commands</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">command</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">command</span>.<span class="ruby-identifier">options</span>.<span class="ruby-identifier">nil?</span>&#x000A;      [<span class="ruby-identifier">command</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">command</span>.<span class="ruby-identifier">alias</span>].<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">instance_eval</span>(<span class="ruby-value str">&quot;class&lt;&lt;self;self;end&quot;</span>).<span class="ruby-identifier">send</span>(<span class="ruby-identifier">:define_method</span>, <span class="ruby-identifier">e</span>, <span class="ruby-identifier">cmd_block</span>)&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000024'>
-                <a name='M000024'>      </a>
+              <div class='public-instance method' id='method-M000025'>
+                <a name='M000025'>      </a>
                 <div class='synopsis'>
                   <span class='name'>create_option_command_block</span>
                   <span class='arguments'>(obj, command)</span>
@@ -158,10 +201,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000024-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000025-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000024-source'><span class="ruby-comment cmt"># File lib/boson/scientist.rb, line 103</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_option_command_block</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Scientist</span>.<span class="ruby-identifier">translate_and_render</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>, <span class="ruby-identifier">args</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>) }&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000025-source'><span class="ruby-comment cmt"># File lib/boson/scientist.rb, line 130</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_option_command_block</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>)&#x000A;      <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Scientist</span>.<span class="ruby-identifier">translate_and_render</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">command</span>, <span class="ruby-identifier">args</span>) {<span class="ruby-operator">|</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span> <span class="ruby-keyword kw">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>) }&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

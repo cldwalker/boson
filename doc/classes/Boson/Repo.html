@@ -52,13 +52,15 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000066">new</a></li>
+              <li><a href="#M000069">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000068">commands_dir</a></li>
-              <li><a href="#M000069">config</a></li>
-              <li><a href="#M000067">config_dir</a></li>
+              <li><a href="#M000073">commands_dir</a></li>
+              <li><a href="#M000074">config</a></li>
+              <li><a href="#M000070">config_dir</a></li>
+              <li><a href="#M000071">config_dir_path</a></li>
+              <li><a href="#M000072">config_file</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -81,8 +83,8 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000066'>
-                <a name='M000066'>      </a>
+              <div class='public-class method' id='method-M000069'>
+                <a name='M000069'>      </a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(dir)</span>
@@ -93,15 +95,15 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000066-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000066-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 12</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">dir</span>)&#x000A;      <span class="ruby-ivar">@dir</span> = <span class="ruby-identifier">dir</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000069-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 12</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">dir</span>)&#x000A;      <span class="ruby-ivar">@dir</span> = <span class="ruby-identifier">dir</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000068'>
-                <a name='M000068'>      </a>
+              <div class='public-instance method' id='method-M000073'>
+                <a name='M000073'>      </a>
                 <div class='synopsis'>
                   <span class='name'>commands_dir</span>
                   <span class='arguments'>()</span>
@@ -113,14 +115,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000068-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000068-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 22</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commands_dir</span>&#x000A;      <span class="ruby-ivar">@commands_dir</span> <span class="ruby-operator">||=</span> (<span class="ruby-identifier">cdir</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">commands_dir</span>(<span class="ruby-ivar">@dir</span>)) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span>(<span class="ruby-identifier">cdir</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cdir</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000073-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 31</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commands_dir</span>&#x000A;      <span class="ruby-ivar">@commands_dir</span> <span class="ruby-operator">||=</span> (<span class="ruby-identifier">cdir</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">commands_dir</span>(<span class="ruby-ivar">@dir</span>)) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span>(<span class="ruby-identifier">cdir</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cdir</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000069'>
-                <a name='M000069'>      </a>
+              <div class='public-instance method' id='method-M000074'>
+                <a name='M000074'>      </a>
                 <div class='synopsis'>
                   <span class='name'>config</span>
                   <span class='arguments'>(reload=false)</span>
@@ -129,12 +131,13 @@
                   <p>
                   A hash read from the YAML config file at config/boson.yml. <a
                   href="http://github.com/cldwalker/irbfiles/blob/master/boson/config/boson.yml">See
-                  here</a> for an example config file.
+                  here</a> for an example config file. Top level config keys, library
+                  attributes and config attributes need to be symbols.
                   </p>
                   <h4>Valid config keys:</h4>
                   <dl>
                   <dt>:libraries</dt><dd>Hash of libraries mapping their name to attribute hashes. See <a
-                  href="Library.html#M000076">Library.new</a> for configurable attributes.
+                  href="Library.html#M000085">Library.new</a> for configurable attributes.
                   
                   <pre>Example:&#x000A;:libraries=&gt;{'completion'=&gt;{:namespace=&gt;true}}</pre>
                   </dd>
@@ -146,13 +149,15 @@
                   
                   <pre>Example:&#x000A; :command_aliases=&gt;{'libraries'=&gt;'lib', 'commands'=&gt;'com'}</pre>
                   </dd>
-                  <dt>:console_defaults</dt><dd>Array of libraries to load at start up when used in irb. Default is to load
-                  all library files and libraries defined
+                  <dt>:defaults</dt><dd>Array of libraries to load at start up for commandline and irb. This is
+                  useful for extending boson i.e. adding your own option types. Default is no
+                  libraries.
                   
                   </dd>
-                  </dl>
-                  <pre>in the config.</pre>
-                  <dl>
+                  <dt>:console_defaults</dt><dd>Array of libraries to load at start up when used in irb. Default is to load
+                  all library files and libraries defined in the config.
+                  
+                  </dd>
                   <dt>:bin_defaults</dt><dd>Array of libraries to load at start up when used from the commandline.
                   Default is no libraries.
                   
@@ -173,21 +178,22 @@
                   <dt>:console</dt><dd>Console to load when using &#8212;console from commandline. Default is irb.
                   
                   </dd>
-                  <dt>:auto_namespace</dt><dd>Boolean which automatically namespaces all user-defined libraries. Default
-                  is false.
+                  <dt>:auto_namespace</dt><dd>Boolean which automatically namespaces all user-defined libraries. Be aware
+                  this can break libraries which depend on commands from other libraries.
+                  Default is false.
                   
                   </dd>
                   </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000074-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000069-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 49</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">config</span>(<span class="ruby-identifier">reload</span>=<span class="ruby-keyword kw">false</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">reload</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">nil?</span>&#x000A;        <span class="ruby-identifier">default</span> = {<span class="ruby-identifier">:libraries=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-identifier">:command_aliases=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-identifier">:console_defaults=</span><span class="ruby-operator">&gt;</span>[]}&#x000A;        <span class="ruby-ivar">@config</span> = <span class="ruby-identifier">default</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-constant">YAML</span><span class="ruby-operator">::</span><span class="ruby-identifier">load_file</span>(<span class="ruby-identifier">config_dir</span> <span class="ruby-operator">+</span> <span class="ruby-value str">'/boson.yml'</span>)) <span class="ruby-keyword kw">rescue</span> <span class="ruby-identifier">default</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-ivar">@config</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000074-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 62</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">config</span>(<span class="ruby-identifier">reload</span>=<span class="ruby-keyword kw">false</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">reload</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">nil?</span>&#x000A;        <span class="ruby-keyword kw">begin</span>&#x000A;          <span class="ruby-ivar">@config</span> = {<span class="ruby-identifier">:libraries=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-identifier">:command_aliases=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-identifier">:console_defaults=</span><span class="ruby-operator">&gt;</span>[]}&#x000A;          <span class="ruby-ivar">@config</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-constant">YAML</span><span class="ruby-operator">::</span><span class="ruby-identifier">load_file</span>(<span class="ruby-identifier">config_file</span>(<span class="ruby-keyword kw">true</span>))) <span class="ruby-keyword kw">if</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">config_file</span>)&#x000A;        <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">ArgumentError</span>&#x000A;          <span class="ruby-identifier">message</span> = <span class="ruby-identifier">$!</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">!~</span> <span class="ruby-regexp re">/syntax error on line (\d+)/</span> <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;Error&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">$!</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">:</span>&#x000A;            <span class="ruby-node">&quot;Error: Syntax error in line #{$1} of config file '#{config_file}'&quot;</span>&#x000A;          <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">abort</span> <span class="ruby-identifier">message</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-ivar">@config</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000067'>
-                <a name='M000067'>      </a>
+              <div class='public-instance method' id='method-M000070'>
+                <a name='M000070'>      </a>
                 <div class='synopsis'>
                   <span class='name'>config_dir</span>
                   <span class='arguments'>()</span>
@@ -199,10 +205,42 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000067-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000067-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 17</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">config_dir</span>&#x000A;      <span class="ruby-ivar">@config_dir</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span>(<span class="ruby-node">&quot;#{dir}/config&quot;</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-node">&quot;#{dir}/config&quot;</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000070-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 17</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">config_dir</span>&#x000A;      <span class="ruby-ivar">@config_dir</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">FileUtils</span>.<span class="ruby-identifier">mkdir_p</span>(<span class="ruby-identifier">config_dir_path</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">config_dir_path</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000071'>
+                <a name='M000071'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>config_dir_path</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000071-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000071-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 21</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">config_dir_path</span>&#x000A;      <span class="ruby-node">&quot;#{dir}/config&quot;</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000072'>
+                <a name='M000072'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>config_file</span>
+                  <span class='arguments'>(create_dir=false)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Path name of main config file. If passed true, parent directory of file is
+                  created.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000072-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000072-source'><span class="ruby-comment cmt"># File lib/boson/repo.rb, line 26</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">config_file</span>(<span class="ruby-identifier">create_dir</span>=<span class="ruby-keyword kw">false</span>)&#x000A;      <span class="ruby-constant">File</span>.<span class="ruby-identifier">join</span>((<span class="ruby-identifier">create_dir</span> <span class="ruby-value">? </span><span class="ruby-identifier">config_dir</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">config_dir_path</span>), <span class="ruby-value str">'boson.yml'</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

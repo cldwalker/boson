@@ -49,8 +49,48 @@
             subclasses are <a href="FileLibrary.html">FileLibrary</a>, <a
             href="GemLibrary.html">GemLibrary</a>, <a
             href="RequireLibrary.html">RequireLibrary</a> and <a
-            href="ModuleLibrary.html">ModuleLibrary</a>.
+            href="ModuleLibrary.html">ModuleLibrary</a>. See <a
+            href="Loader.html">Loader</a> for callbacks a library&#8217;s module can
+            have.
             </p>
+            <h2>Naming a <a href="Library.html">Library</a> Module</h2>
+            <p>
+            Although you can name a library module almost anything, here&#8217;s the
+            fine print:
+            </p>
+            <ul>
+            <li>A module can have any name if it&#8217;s the only module in a library.
+            
+            </li>
+            <li>If there are multiple modules in a file library, the module&#8217;s name
+            must be a camelized version of the file&#8217;s basename i.e.
+            ~/.boson/commands/ruby_core.rb -> RubyCore.
+            
+            </li>
+            <li>Although modules are evaluated under the <a
+            href="Commands.html">Boson::Commands</a> namespace, <a
+            href="../Boson.html">Boson</a> will warn you about creating modules whose
+            name is the same as a top level class/module. The warning is to encourage
+            users to stay away from error-prone libraries. Once you introduce such a
+            module, <em>all</em> libraries assume the nested module over the top level
+            module and the top level module has to be prefixed with &#8217;::&#8217;
+            <em>everywhere</em>.
+            
+            </li>
+            </ul>
+            <h2>Configuration</h2>
+            <p>
+            To configure a library, pass a hash of <a
+            href="Library.html#M000077">library attributes</a> under <a
+            href="Repo.html#M000070">the :libraries key</a> of a config file. When not
+            using <a href="FileLibrary.html">FileLibrary</a>, you can give most
+            commands the functionality <a href="FileLibrary.html">FileLibrary</a>
+            naturally gives its commands by configuring the :commands key. Here&#8217;s
+            a config example of a <a href="GemLibrary.html">GemLibrary</a> that does
+            that:
+            </p>
+            <pre>:libraries:&#x000A;  httparty:&#x000A;    :class_commands:&#x000A;      delete: HTTParty.delete&#x000A;    :commands:&#x000A;      delete:&#x000A;        :alias: d&#x000A;        :description: Http delete a given url</pre>
+            <h3>Creating Your Own <a href="Library.html">Library</a></h3>
             <p>
             To create your own subclass you need to define what sources the subclass
             can handle with handles(). If handles() returns true then the subclass is
@@ -62,12 +102,13 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000076">new</a></li>
+              <li><a href="#M000085">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000077">library_type</a></li>
-              <li><a href="#M000078">namespace_object</a></li>
+              <li><a href="#M000086">library_type</a></li>
+              <li><a href="#M000087">namespace</a></li>
+              <li><a href="#M000088">namespace_object</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -86,7 +127,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ATTRIBUTES</td>
                     <td>=</td>
-                    <td class='context-item-value'>[:gems, :dependencies, :commands, :loaded, :module, :name, :namespace]</td>
+                    <td class='context-item-value'>[:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :indexed_namespace]</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -100,14 +141,6 @@
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
                 <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>except</td>
-                    <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'>
-                      
-                      Private attribute for use within <a href="../Boson.html">Boson</a>.
-                    </td>
-                  </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>namespace</td>
                     <td class='context-item-value'>[W]</td>
@@ -146,8 +179,8 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000076'>
-                <a name='M000076'>      </a>
+              <div class='public-class method' id='method-M000085'>
+                <a name='M000085'>      </a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(hash)</span>
@@ -157,59 +190,66 @@
                   Creates a library object with a hash of attributes which must include a
                   :name attribute. Each hash pair maps directly to an instance variable and
                   value. Defaults for attributes are read from
-                  config[:libraries][@library_name][@attribute].
+                  config[:libraries][@library_name][@attribute]. When loading libraries,
+                  attributes can also be set via a library module&#8217;s config() method
+                  (see <a href="Loader.html">Loader</a>).
                   </p>
                   <p>
                   Attributes that can be configured:
                   </p>
-                  <ul>
-                  <li><b>:dependencies</b>: An array of libraries that this library depends on. A
-                  library won&#8217;t load unless its dependencies are loaded first.
+                  <dl>
+                  <dt><b>:dependencies</b></dt><dd>An array of libraries that this library depends on. A library won&#8217;t
+                  load unless its dependencies are loaded first.
                   
-                  </li>
-                  <li><b>:commands</b>: A hash or array of commands that belong to this library.
-                  A hash configures command attributes for the given commands with command
-                  names pointing to their configs. See <a
-                  href="Command.html#M000046">Command.new</a> for a command&#8217;s
-                  configurable attributes. If an array, the commands are set for the given
-                  library, overidding default command detection.
+                  </dd>
+                  <dt><b>:commands</b></dt><dd>A hash or array of commands that belong to this library. A hash configures
+                  command attributes for the given commands with command names pointing to
+                  their configs. See <a href="Command.html#M000049">Command.new</a> for a
+                  command&#8217;s configurable attributes. If an array, the commands are set
+                  for the given library, overidding default command detection. Example:
                   
-                  <pre>Example:&#x000A;  :commands=&gt;{'commands'=&gt;{:description=&gt;'Lists commands', :alias=&gt;'com'}}</pre>
-                  </li>
-                  <li><b>:class_commands</b>: A hash of commands to create. Hash should map
-                  command names to any string of ruby code that ends with a method call.
+                  <pre>:commands=&gt;{'commands'=&gt;{:description=&gt;'Lists commands', :alias=&gt;'com'}}</pre>
+                  </dd>
+                  <dt><b>:class_commands</b></dt><dd>A hash of commands to create. A hash key-pair can map command names to any
+                  string of ruby code that ends with a method call. Or a key-pair can map a
+                  class to an array of its class methods to create commands of the same name.
+                  Example:
                   
-                  <pre>Example:&#x000A;  :class_commands=&gt;{'spy'=&gt;'Bond.spy', 'create'=&gt;'Alias.manager.create'}</pre>
-                  </li>
-                  <li><b>:force</b>: Boolean which forces a library to ignore when a
-                  library&#8217;s methods are overriding existing ones. Use with caution.
+                  <pre>:class_commands=&gt;{'spy'=&gt;'Bond.spy', 'create'=&gt;'Alias.manager.create',&#x000A; 'Boson::Util'=&gt;['detect', 'any_const_get']}</pre>
+                  </dd>
+                  <dt><b>:force</b></dt><dd>Boolean which forces a library to ignore when a library&#8217;s methods are
+                  overriding existing ones. Use with caution. Default is false.
+                  
+                  </dd>
+                  <dt><b>:object_methods</b></dt><dd>Boolean which detects any Object/Kernel methods created when loading a
+                  library and automatically adds them to a library&#8217;s commands. Default
+                  is true.
+                  
+                  </dd>
+                  <dt><b>:namespace</b></dt><dd>Boolean or string which namespaces a library. When true, the library is
+                  automatically namespaced to the library&#8217;s name. When a string, the
+                  library is namespaced to the string. Default is nil. To control the
+                  namespacing of all libraries see <a
+                  href="Repo.html#M000074">Boson::Repo.config</a>.
+                  
+                  </dd>
+                  <dt><b>:no_alias_creation</b></dt><dd>Boolean which doesn&#8217;t create aliases for a library. Useful for
+                  libraries that configure command aliases outside of Boson&#8217;s control.
                   Default is false.
                   
-                  </li>
-                  <li><b>:object_methods</b>: Boolean which detects any Object/Kernel methods
-                  created when loading a library and automatically adds them to a
-                  library&#8217;s commands. Default is true.
-                  
-                  </li>
-                  <li><b>:namespace</b>: Boolean or string which namespaces a library. When true,
-                  the library is automatically namespaced to the library&#8217;s name. When a
-                  string, the library is namespaced to the string. Default is nil. To control
-                  the namespacing of all libraries see <a
-                  href="Repo.html#M000069">Boson::Repo.config</a>.
-                  
-                  </li>
-                  </ul>
+                  </dd>
+                  </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000076-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000085-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000076-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 52</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">set_name</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:name</span>)&#x000A;      <span class="ruby-ivar">@loaded</span> = <span class="ruby-keyword kw">false</span>&#x000A;      <span class="ruby-identifier">repo</span> = <span class="ruby-identifier">set_repo</span>&#x000A;      <span class="ruby-ivar">@repo_dir</span> = <span class="ruby-identifier">repo</span>.<span class="ruby-identifier">dir</span>&#x000A;      <span class="ruby-ivar">@commands_hash</span> = {}&#x000A;      <span class="ruby-ivar">@commands</span> = []&#x000A;      <span class="ruby-identifier">set_config</span> (<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:libraries</span>][<span class="ruby-ivar">@name</span>] <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">set_command_aliases</span>(<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:command_aliases</span>])&#x000A;      <span class="ruby-ivar">@namespace</span> = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:auto_namespace</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@namespace</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span>&#x000A;        <span class="ruby-operator">!</span><span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Runner</span>.<span class="ruby-identifier">default_libraries</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-ivar">@module</span>)&#x000A;      <span class="ruby-ivar">@namespace</span> = <span class="ruby-identifier">clean_name</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@namespace</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000085-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 81</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">repo</span> = <span class="ruby-identifier">set_repo</span>&#x000A;      <span class="ruby-ivar">@repo_dir</span> = <span class="ruby-identifier">repo</span>.<span class="ruby-identifier">dir</span>&#x000A;      <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">set_name</span> <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:name</span>)&#x000A;      <span class="ruby-ivar">@loaded</span> = <span class="ruby-keyword kw">false</span>&#x000A;      <span class="ruby-ivar">@commands_hash</span> = {}&#x000A;      <span class="ruby-ivar">@commands</span> = []&#x000A;      <span class="ruby-identifier">set_config</span> (<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:libraries</span>][<span class="ruby-ivar">@name</span>] <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>), <span class="ruby-keyword kw">true</span>&#x000A;      <span class="ruby-identifier">set_command_aliases</span>(<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:command_aliases</span>])&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000077'>
-                <a name='M000077'>      </a>
+              <div class='public-instance method' id='method-M000086'>
+                <a name='M000086'>      </a>
                 <div class='synopsis'>
                   <span class='name'>library_type</span>
                   <span class='arguments'>()</span>
@@ -221,14 +261,27 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000077-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000086-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000077-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 67</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">library_type</span>&#x000A;      <span class="ruby-identifier">str</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/::(\w+)Library$/</span>, <span class="ruby-value">1</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">'library'</span>&#x000A;      <span class="ruby-identifier">str</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000086-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 93</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">library_type</span>&#x000A;      <span class="ruby-identifier">str</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/::(\w+)Library$/</span>, <span class="ruby-value">1</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">'library'</span>&#x000A;      <span class="ruby-identifier">str</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000078'>
-                <a name='M000078'>      </a>
+              <div class='public-instance method' id='method-M000087'>
+                <a name='M000087'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>namespace</span>
+                  <span class='arguments'>(orig=@namespace)</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000087-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000087-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 98</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">namespace</span>(<span class="ruby-identifier">orig</span>=<span class="ruby-ivar">@namespace</span>)&#x000A;      <span class="ruby-ivar">@namespace</span> = [<span class="ruby-constant">String</span>,<span class="ruby-constant">FalseClass</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">orig</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">orig</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">begin</span>&#x000A;        <span class="ruby-keyword kw">if</span> (<span class="ruby-ivar">@namespace</span> <span class="ruby-operator">==</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">||</span> (<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:auto_namespace</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@index</span>))&#x000A;          <span class="ruby-ivar">@namespace</span> = <span class="ruby-identifier">clean_name</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-ivar">@namespace</span> = <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000088'>
+                <a name='M000088'>      </a>
                 <div class='synopsis'>
                   <span class='name'>namespace_object</span>
                   <span class='arguments'>()</span>
@@ -239,10 +292,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000078-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000088-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000078-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 73</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">namespace_object</span>&#x000A;      <span class="ruby-ivar">@namespace_object</span> <span class="ruby-operator">||=</span> <span class="ruby-ivar">@namespace</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-ivar">@namespace</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000088-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 109</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">namespace_object</span>&#x000A;      <span class="ruby-ivar">@namespace_object</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">namespace</span> <span class="ruby-value">? </span><span class="ruby-constant">Boson</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-identifier">namespace</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

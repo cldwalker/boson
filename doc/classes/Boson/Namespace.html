@@ -50,19 +50,19 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000060">create</a></li>
-              <li><a href="#M000059">namespaces</a></li>
+              <li><a href="#M000063">create</a></li>
+              <li><a href="#M000062">namespaces</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000061">boson_commands</a></li>
+              <li><a href="#M000064">boson_commands</a></li>
             </ol>
           </div>
           <div id='section'>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000060'>
-                <a name='M000060'>      </a>
+              <div class='public-class method' id='method-M000063'>
+                <a name='M000063'>      </a>
                 <div class='synopsis'>
                   <span class='name'>create</span>
                   <span class='arguments'>(name, library)</span>
@@ -73,14 +73,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000060-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000063-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000060-source'><span class="ruby-comment cmt"># File lib/boson/namespace.rb, line 10</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">library</span>.<span class="ruby-identifier">object_namespace</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">library</span>.<span class="ruby-identifier">module</span>.<span class="ruby-identifier">instance_methods</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>}.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">name</span>)&#x000A;        <span class="ruby-identifier">library</span>.<span class="ruby-identifier">include_in_universe</span>&#x000A;        <span class="ruby-identifier">create_object_namespace</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-identifier">create_basic_namespace</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000063-source'><span class="ruby-comment cmt"># File lib/boson/namespace.rb, line 10</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">library</span>.<span class="ruby-identifier">object_namespace</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">library</span>.<span class="ruby-identifier">module</span>.<span class="ruby-identifier">instance_methods</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>}.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">name</span>)&#x000A;        <span class="ruby-identifier">library</span>.<span class="ruby-identifier">include_in_universe</span>&#x000A;        <span class="ruby-identifier">create_object_namespace</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-identifier">create_basic_namespace</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000059'>
-                <a name='M000059'>      </a>
+              <div class='public-class method' id='method-M000062'>
+                <a name='M000062'>      </a>
                 <div class='synopsis'>
                   <span class='name'>namespaces</span>
                   <span class='arguments'>()</span>
@@ -91,15 +91,15 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000059-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000062-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000059-source'><span class="ruby-comment cmt"># File lib/boson/namespace.rb, line 5</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">namespaces</span>&#x000A;      <span class="ruby-ivar">@namespaces</span> <span class="ruby-operator">||=</span> {}&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000062-source'><span class="ruby-comment cmt"># File lib/boson/namespace.rb, line 5</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">namespaces</span>&#x000A;      <span class="ruby-ivar">@namespaces</span> <span class="ruby-operator">||=</span> {}&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000061'>
-                <a name='M000061'>      </a>
+              <div class='public-instance method' id='method-M000064'>
+                <a name='M000064'>      </a>
                 <div class='synopsis'>
                   <span class='name'>boson_commands</span>
                   <span class='arguments'>()</span>
@@ -110,10 +110,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000061-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000064-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000061-source'><span class="ruby-comment cmt"># File lib/boson/namespace.rb, line 46</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">boson_commands</span>&#x000A;      <span class="ruby-ivar">@library</span>.<span class="ruby-identifier">module</span>.<span class="ruby-identifier">instance_methods</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span> }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000064-source'><span class="ruby-comment cmt"># File lib/boson/namespace.rb, line 46</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">boson_commands</span>&#x000A;      <span class="ruby-ivar">@library</span>.<span class="ruby-identifier">module</span>.<span class="ruby-identifier">instance_methods</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span> }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

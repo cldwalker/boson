@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::Options [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson::Options
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../files/lib/boson/options_rb.html">lib/boson/options.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            This module contains the methods used to define the default option types.
+            </p>
+            <h3>Creating Your Own Option Type</h3>
+            <p>
+            Defining your own option type simply requires one method (create_@type) to
+            parse the option value and create the desired object. To create an option
+            type :date, you could create the following create_date method:
+            </p>
+            <pre># Drop this in your ~/.irbrc after require 'boson'&#x000A;module Boson::Options::Date&#x000A;  def create_date(value)&#x000A;    # value_shift should be mm/dd&#x000A;    Date.parse(value + &quot;/#{Date.today.year}&quot;)&#x000A;  end&#x000A;end&#x000A;Boson::OptionParser.send :include, Boson::Options::Date</pre>
+            <p>
+            In a <a href="FileLibrary.html">FileLibrary</a>, we could then use this new
+            option:
+            </p>
+            <pre>module Calendar&#x000A;  #@options :day=&gt;:date&#x000A;  def appointments(options={})&#x000A;    # ...&#x000A;  end&#x000A;end&#x000A;# &gt;&gt; appointments '-d 10/10'   -&gt; {:day=&gt;#&lt;Date: 4910229/2,0,2299161&gt; }</pre>
+            <p>
+            As you can see, a date object is created from the :date option&#8217;s
+            value and passed into appointments().
+            </p>
+            <p>
+            Some additional tips on the create_* method:
+            </p>
+            <ul>
+            <li>The argument passed to the method is the option value from the user.
+            
+            </li>
+            <li>To access the current option name use @current_option.
+            
+            </li>
+            <li>To access the hash of attributes the current option has use <a
+            href="OptionParser.html#M000082">OptionParser.current_attributes</a>. See
+            <a href="OptionParser.html#M000076">OptionParser.new</a> for more about
+            option attributes.
+            
+            </li>
+            </ul>
+            <p>
+            There are two optional methods per option type: validate_@type and
+            usage_for_@type i.e. validate_date and usage_for_date. Like create_@type,
+            validate_@type takes the option&#8217;s value. If the value validation
+            fails, raise an <a href="OptionParser/Error.html">OptionParser::Error</a>
+            with a proper message. All user-defined option types automatically validate
+            for an option value&#8217;s existence. The usage_for_* method takes an
+            option&#8217;s name (i.e. &#8212;day) and returns a usage string to be
+            wrapped in &#8217;[ ]&#8217;. If no usage is defined the default would look
+            like &#8217;[&#8212;day=:date]&#8217;. Consider using the <a
+            href="OptionParser.html#M000078">OptionParser.default_usage</a> helper
+            method for your usage.
+            </p>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

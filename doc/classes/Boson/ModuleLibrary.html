@@ -43,9 +43,16 @@
         <div id='text'>
           <div id='description'>
             <p>
-            This library takes a module as a library&#8217;s name. Reload for this
-            library subclass is disabled.
+            This library takes a module or class as a library&#8217;s name and loads
+            its class methods as commands. If no commands are given it defaults to
+            loading all of its class methods as commands. The only method callback (see
+            <a href="Loader.html">Loader</a>) this library calls on the original
+            module/class is config().
             </p>
+            <p>
+            Example:
+            </p>
+            <pre>&gt;&gt; load_library Math, :commands=&gt;%w{sin cos tan}&#x000A;=&gt; true&#x000A;&#x000A;# Let's brush up on ol trig&#x000A;&gt;&gt; sin (Math::PI/2)&#x000A;=&gt; 1.0&#x000A;&gt;&gt; tan (Math::PI/4)&#x000A;=&gt; 1.0&#x000A;# Close enough :)&#x000A;&gt;&gt; cos (Math::PI/2)&#x000A;=&gt; 6.12323399573677e-17</pre>
           </div>
           <div id='section'>
           </div>

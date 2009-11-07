@@ -48,6 +48,10 @@
             href="ModuleLibrary.html">ModuleLibrary</a>, this library doesn&#8217;t
             need a module to provide its functionality.
             </p>
+            <p>
+            Example:
+            </p>
+            <pre>&gt;&gt; load_library 'httparty', :class_commands=&gt;{'put'=&gt;'HTTParty.put',&#x000A;   'delete'=&gt;'HTTParty.delete' }&#x000A;=&gt; true&#x000A;&gt;&gt; put 'http://someurl.com'</pre>
           </div>
           <div id='section'>
           </div>
