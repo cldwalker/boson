@@ -17,6 +17,11 @@
 * Better search and sort integration with Hirb.
 * Better docs.
 * Fixed number of bugs.
+* query_fields option for searching libraries and commands is deprecated. Specifying query
+  fields is now done by prefixing a query with ':'. For example:
+  bash> boson commands library_type:gem
+  # instead of
+  bash> boson commands gem --query_fields=library_type
 
 == 0.1.0
 * First real release
