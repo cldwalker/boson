@@ -75,8 +75,7 @@ module Boson
 
     def self.reset_file_cache(name=nil)
       if name && @file_cache
-        #td: tia other repos
-        @file_cache.delete(library_file(name, Boson.repo.dir))
+        @file_cache.delete(library_file(name, (matched_repo || Boson.repo).dir))
       else
         @file_cache = nil
       end

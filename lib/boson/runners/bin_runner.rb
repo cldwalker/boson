@@ -87,7 +87,7 @@ module Boson
       end
 
       def default_libraries
-        super + (Boson.repo.config[:bin_defaults] || [])
+        super + Boson.repos.map {|e| e.config[:bin_defaults] || [] }.flatten
       end
 
       def execute_command

@@ -51,7 +51,7 @@ module Boson
     end
   end
 
-  # The array of loaded repositories
+  # The array of loaded repositories containing the main repo and a possible local repo
   def repos
     @repos ||= [repo, local_repo].compact
   end
