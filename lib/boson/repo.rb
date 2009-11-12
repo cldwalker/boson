@@ -72,5 +72,13 @@ module Boson
       end
       @config
     end
+
+    def detected_libraries #:nodoc:
+      Dir[File.join(commands_dir, '**/*.rb')].map {|e| e.gsub(/^#{commands_dir}\/|\.rb$/, '') }
+    end
+
+    def all_libraries #:nodoc:
+      (detected_libraries + config[:libraries].keys).uniq
+    end
   end
 end

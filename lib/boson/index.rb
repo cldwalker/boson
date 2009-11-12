@@ -10,7 +10,7 @@ module Boson
 
     # Updates the index.
     def update(options={})
-      libraries_to_update = !exists? ? Runner.all_libraries : options[:libraries] || changed_libraries
+      libraries_to_update = !exists? ? repo.all_libraries : options[:libraries] || changed_libraries
       read_and_transfer(libraries_to_update)
       if options[:verbose]
         puts !exists? ? "Generating index for all #{libraries_to_update.size} libraries. Patience ... is a bitch" :
@@ -89,7 +89,7 @@ module Boson
     end
 
     def marshal_file
-      File.join(Boson.repo.config_dir, 'index.marshal')
+      File.join(repo.config_dir, 'index.marshal')
     end
 
     def find_library(command)
@@ -102,14 +102,18 @@ module Boson
       end
     end
 
+    def repo
+      Boson.repo
+    end
+
     def changed_libraries
       read
       latest_hashes.select {|lib, hash| @lib_hashes[lib] != hash}.map {|e| e[0]}
     end
 
     def latest_hashes
-      Runner.all_libraries.inject({}) {|h, e|
-        lib_file = FileLibrary.library_file(e, Boson.repo.dir)
+      repo.all_libraries.inject({}) {|h, e|
+        lib_file = FileLibrary.library_file(e, repo.dir)
         h[e] = Digest::MD5.hexdigest(File.read(lib_file)) if File.exists?(lib_file)
         h
       }

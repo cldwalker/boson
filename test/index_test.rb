@@ -74,7 +74,7 @@ module Boson
       before(:all) { Index.instance_eval "@lib_hashes = nil" }
 
       def changed(string, all_libs=['file1'])
-        Runner.expects(:all_libraries).returns(all_libs)
+        Index.repo.expects(:all_libraries).returns(all_libs)
         Index.instance_variable_set "@lib_hashes", {"file1"=>Digest::MD5.hexdigest("state1")}
         File.stubs(:exists?).returns(true)
         File.expects(:read).returns(string)

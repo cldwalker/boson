@@ -16,13 +16,12 @@ module Boson
 
       # Libraries detected in repositories
       def detected_libraries
-        Boson.repos.map {|repo| Dir[File.join(repo.commands_dir, '**/*.rb')].
-          map {|e| e.gsub(/^#{repo.commands_dir}\/|\.rb$/, '')} }.flatten
+        Boson.repos.map {|e| e.detected_libraries }.flatten.uniq
       end
 
       # Libraries specified in config files and detected_libraries
       def all_libraries
-        (detected_libraries + Boson.repos.map {|e| e.config[:libraries].keys}.flatten).uniq
+        Boson.repos.map {|e| e.all_libraries }.flatten.uniq
       end
 
       #:stopdoc:
