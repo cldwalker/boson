@@ -7,7 +7,7 @@ module Boson
   #   # Drop this in your ~/.irbrc after require 'boson'
   #   module Boson::Options::Date
   #     def create_date(value)
-  #       # value_shift should be mm/dd
+  #       # value should be mm/dd
   #       Date.parse(value + "/#{Date.today.year}")
   #     end
   #   end
