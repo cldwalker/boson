@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
-  class IndexTest < Test::Unit::TestCase
+  class RepoIndexTest < Test::Unit::TestCase
     # since we're defining our own @commands, @libraries, @lib_hashes
     before(:all) { @index = RepoIndex.new(Boson.repo); @index.instance_variable_set "@read", true }
 
