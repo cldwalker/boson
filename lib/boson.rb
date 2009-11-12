@@ -45,8 +45,9 @@ module Boson
   # An optional local repository which defaults to ./lib/boson or ./.boson.
   def local_repo
     @local_repo ||= begin
+      ignored_dirs = (repo.config[:ignore_directories] || []).map {|e| File.expand_path(e) }
       dir = ["lib/boson", ".boson"].find {|e| File.directory?(e) &&
-         File.expand_path(e) != repo.dir }
+          File.expand_path(e) != repo.dir && !ignored_dirs.include?(File.expand_path('.')) }
       Repo.new(dir) if dir
     end
   end

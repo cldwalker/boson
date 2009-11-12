@@ -55,14 +55,17 @@ module Boson
     #                  subdirectory doesn't exist in the boson directory.
     #
     # ==== Config keys specific only for the main repo config ~/.boson/config/boson.yml
-    # [:global_options] Custom global options available to all option commands. These are merged with Boson::Scientist::GLOBAL_OPTIONS.
-    # [:render_options] Custom render options available to all option commands. These are merged with Boson::Scientist::RENDER_OPTIONS.
+    # [:global_options] Hash of global options which are merged with Boson::Scientist::GLOBAL_OPTIONS to be made available
+    #                   to all option commands.
+    # [:render_options] Hash of render options which are merged with Boson::Scientist::RENDER_OPTIONS to be made available to all
+    #                   option commands.
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.
     # [:console] Console to load when using --console from commandline. Default is irb.
     # [:auto_namespace] Boolean which automatically namespaces all user-defined libraries. Be aware this can break libraries which
     #                   depend on commands from other libraries. Default is false.
+    # [:ignore_directories] Array of directories to ignore when detecting local repositories for Boson.local_repo.
     def config(reload=false)
       if reload || @config.nil?
         begin
