@@ -34,9 +34,8 @@ module Boson
 
     # A hash read from the YAML config file at config/boson.yml.
     # {See here}[http://github.com/cldwalker/irbfiles/blob/master/boson/config/boson.yml] for an example config file.
-    # Top level config keys, library attributes and config attributes need to be symbols. Any keys that have a single value
-    # i.e. :console and :auto_namespace should only be used in the main repo (Boson.repo).
-    # ==== Valid config keys:
+    # Top level config keys, library attributes and config attributes need to be symbols.
+    # ==== Config keys for all repositories:
     # [:libraries] Hash of libraries mapping their name to attribute hashes. See Library.new for configurable attributes.
     #               Example:
     #               :libraries=>{'completion'=>{:namespace=>true}}
@@ -54,6 +53,10 @@ module Boson
     # [:add_load_path] Boolean specifying whether to add a load path pointing to the lib subdirectory/. This is useful in sharing
     #                  classes between libraries without resorting to packaging them as gems. Defaults to false if the lib
     #                  subdirectory doesn't exist in the boson directory.
+    #
+    # ==== Config keys specific only for the main repo config ~/.boson/config/boson.yml
+    # [:global_options] Custom global options available to all option commands. These are merged with Boson::Scientist::GLOBAL_OPTIONS.
+    # [:render_options] Custom render options available to all option commands. These are merged with Boson::Scientist::RENDER_OPTIONS.
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.
