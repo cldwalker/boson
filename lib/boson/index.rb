@@ -6,7 +6,44 @@ module Boson
   # If your index gets corrupted, simply delete it and next time Boson needs it, the index will be recreated.
   module Index
     extend self
-    attr_reader :libraries, :commands
+    def indexes
+      @indexes ||= Boson.repos.map {|e| RepoIndex.new(e) }
+    end
+
+    def update(options={})
+      indexes.each {|e| e.update(options) }
+    end
+
+    def read
+      indexes.each {|e| e.read }
+    end
+
+    def find_library(command)
+      indexes.each {|e|
+        lib = e.find_library(command)
+        return lib if lib
+      }
+      nil
+    end
+
+    def commands
+      indexes.map {|e| e.commands}.flatten
+    end
+
+    def libraries
+      indexes.map {|e| e.libraries}.flatten
+    end
+
+    def all_main_methods
+      indexes.map {|e| e.all_main_methods}.flatten
+    end
+  end
+
+  class RepoIndex
+    attr_reader :libraries, :commands, :repo
+    def initialize(repo)
+      @repo = repo
+    end
 
     # Updates the index.
     def update(options={})
@@ -100,10 +137,6 @@ module Boson
       elsif (cmd = Command.find(command, @commands))
         cmd.lib
       end
-    end
-
-    def repo
-      Boson.repo
     end
 
     def changed_libraries

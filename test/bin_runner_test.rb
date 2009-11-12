@@ -109,24 +109,24 @@ module Boson
       def index(options={})
         Manager.expects(:load).with {|*args| args[0][0].is_a?(Module) ? true : args[0] == options[:load]
           }.at_least(1).returns(!options[:fails])
-          Index.expects(:write)
+        Index.indexes[0].expects(:write)
       end
 
       test "with index option, no existing index and core command updates index and prints index message" do
         index :load=>Runner.all_libraries
-        Index.stubs(:exists?).returns(false)
+        Index.indexes[0].stubs(:exists?).returns(false)
         capture_stdout { start("--index", "libraries") }.should =~ /Generating index/
       end
 
       test "with index option, existing index and core command updates incremental index" do
         index :load=>['changed']
-        Index.stubs(:exists?).returns(true)
+        Index.indexes[0].stubs(:exists?).returns(true)
         capture_stdout { start("--index=changed", "libraries")}.should =~ /Indexing.*changed/
       end
 
       test "with index option, failed indexing prints error" do
         index :load=>['changed'], :fails=>true
-        Index.stubs(:exists?).returns(true)
+        Index.indexes[0].stubs(:exists?).returns(true)
         Manager.stubs(:failed_libraries).returns(['changed'])
         capture_stderr {
           capture_stdout { start("--index=changed", "libraries")}.should =~ /Indexing.*changed/
@@ -134,7 +134,7 @@ module Boson
       end
 
       test "with core command updates index and doesn't print index message" do
-        Index.expects(:write)
+        Index.indexes[0].expects(:write)
         Boson.main_object.expects(:send).with('libraries')
         capture_stdout { start 'libraries'}.should_not =~ /index/i
       end
@@ -142,14 +142,14 @@ module Boson
       test "with non-core command finding library doesn't update index" do
         Index.expects(:find_library).returns('sweet_lib')
         Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
-        Index.expects(:update).never
+        Index.indexes[0].expects(:update).never
         capture_stderr { start("sweet") }.should =~ /sweet/
       end
 
       test "with non-core command not finding library, does update index" do
         Index.expects(:find_library).returns(nil, 'sweet_lib').times(2)
         Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
-        Index.expects(:update).returns(true)
+        Index.indexes[0].expects(:update).returns(true)
         capture_stderr { start("sweet") }.should =~ /sweet/
       end
     end

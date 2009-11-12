@@ -3,16 +3,16 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 module Boson
   class IndexTest < Test::Unit::TestCase
     # since we're defining our own @commands, @libraries, @lib_hashes
-    before(:all) { Index.instance_variable_set "@read", true }
+    before(:all) { @index = RepoIndex.new(Boson.repo); @index.instance_variable_set "@read", true }
 
     context "read_and_transfer" do
-      before(:each) { reset_boson; Index.instance_eval "@libraries = @commands = nil" }
+      before(:each) { reset_boson; @index.instance_eval "@libraries = @commands = nil" }
 
       def transfers(options={})
-        Index.instance_variable_set "@libraries", [Library.new(:name=>'blah', :commands=>['blurb']),
+        @index.instance_variable_set "@libraries", [Library.new(:name=>'blah', :commands=>['blurb']),
           Library.new(:name=>'bling')]
-        Index.instance_variable_set "@commands", [Command.new(:name=>'blurb', :lib=>'blah')]
-        Index.read_and_transfer options[:ignored] || []
+        @index.instance_variable_set "@commands", [Command.new(:name=>'blurb', :lib=>'blah')]
+        @index.read_and_transfer options[:ignored] || []
         Boson.libraries.map {|e| e.name}.should == options[:libraries]
         Boson.commands.map {|e| e.name}.should == options[:commands]
       end
@@ -42,43 +42,43 @@ module Boson
         commands = [Command.new(:name=>'blurb', :lib=>'blah', :alias=>'bb'), 
           Command.new(:name=>'sub', :lib=>'bling', :alias=>'s')
         ]
-        Index.instance_variable_set "@commands", commands
-        Index.instance_variable_set "@libraries", [Library.new(:name=>'blah'), Library.new(:name=>'bling', :namespace=>'bling')]
+        @index.instance_variable_set "@commands", commands
+        @index.instance_variable_set "@libraries", [Library.new(:name=>'blah'), Library.new(:name=>'bling', :namespace=>'bling')]
       }
 
       test "finds command aliased or not" do
-        Index.find_library('blurb').should == 'blah'
-        Index.find_library('bb').should == 'blah'
+        @index.find_library('blurb').should == 'blah'
+        @index.find_library('bb').should == 'blah'
       end
 
       test "doesn't find command" do
-        Index.find_library('blah').should == nil
+        @index.find_library('blah').should == nil
       end
 
       test "finds a subcommand aliased or not" do
-        Index.find_library('bling.sub').should == 'bling'
-        # Index.find_library('bl.s').should == 'bling'
+        @index.find_library('bling.sub').should == 'bling'
+        # @index.find_library('bl.s').should == 'bling'
       end
 
       test "finds namespace command aliased or not without a subcommand" do
-        Index.find_library('bling').should == 'bling'
-        # Index.find_library('bl').should == 'bling'
+        @index.find_library('bling').should == 'bling'
+        # @index.find_library('bl').should == 'bling'
       end
 
       test "doesn't find a subcommand" do
-        Index.find_library('d.d').should == nil
+        @index.find_library('d.d').should == nil
       end
     end
 
     context "changed_libraries" do
-      before(:all) { Index.instance_eval "@lib_hashes = nil" }
+      before(:all) { @index.instance_eval "@lib_hashes = nil" }
 
       def changed(string, all_libs=['file1'])
-        Index.repo.expects(:all_libraries).returns(all_libs)
-        Index.instance_variable_set "@lib_hashes", {"file1"=>Digest::MD5.hexdigest("state1")}
+        @index.repo.expects(:all_libraries).returns(all_libs)
+        @index.instance_variable_set "@lib_hashes", {"file1"=>Digest::MD5.hexdigest("state1")}
         File.stubs(:exists?).returns(true)
         File.expects(:read).returns(string)
-        Index.changed_libraries
+        @index.changed_libraries
       end
 
       test "detects changed libraries" do
@@ -99,19 +99,19 @@ module Boson
         reset_boson
         Boson.commands << Command.new(:name=>'blah', :lib=>'blah', :args=>[['arg1', {}], ['arg2', self.class]])
         Boson.libraries << Library.new(:name=>'blah', :module=>self.class)
-        Index.expects(:latest_hashes)
+        @index.expects(:latest_hashes)
         libraries = commands = []
-        Index.expects(:save_marshal_index).with {|str| libraries, commands, hashes = Marshal.load(str) ; true}
-        Index.write
-        @index = {:libraries=>libraries, :commands=>commands}
+        @index.expects(:save_marshal_index).with {|str| libraries, commands, hashes = Marshal.load(str) ; true}
+        @index.write
+        @index_hash = {:libraries=>libraries, :commands=>commands}
       }
 
       test "saves library module constants as strings" do
-        @index[:libraries][0].module.class.should == String
+        @index_hash[:libraries][0].module.class.should == String
       end
 
       test "save commands with arg values as strings" do
-        @index[:commands][0].args.each {|e| e[1].class.should == String}
+        @index_hash[:commands][0].args.each {|e| e[1].class.should == String}
       end
     end
   end
