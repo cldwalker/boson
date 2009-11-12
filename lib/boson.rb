@@ -3,7 +3,7 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 %w{runner runners/console_runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
-%w{module file gem require}.each {|e| require "boson/libraries/#{e}_library" }
+%w{module file gem require local_file}.each {|e| require "boson/libraries/#{e}_library" }
 (%w{namespace view command util commands option_parser options} +
   %w{index repo_index scientist}).each {|e| require "boson/#{e}" }
 

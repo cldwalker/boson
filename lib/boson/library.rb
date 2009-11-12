@@ -81,7 +81,7 @@ module Boson
     def initialize(hash)
       repo = set_repo
       @repo_dir = repo.dir
-      @name = set_name hash.delete(:name)
+      @name = set_name(hash.delete(:name)) or raise ArgumentError, "Library missing required key :name"
       @loaded = false
       @commands_hash = {}
       @commands = []
@@ -117,7 +117,7 @@ module Boson
     end
 
     def set_name(name)
-      name.to_s or raise ArgumentError, "New library missing required key :name"
+      name.to_s
     end
 
     def set_config(config, force=false)

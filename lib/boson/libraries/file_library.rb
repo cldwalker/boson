@@ -100,14 +100,17 @@ module Boson
     def set_name(name)
       @lib_file = File.exists?(library_file(name.to_s)) ? library_file(name.to_s) :
         Dir[self.class.matched_repo.commands_dir.to_s+'/**/*.rb'].find {|e| e =~ /\/#{name}\.rb$/}
-      super @lib_file.gsub(/^#{self.class.matched_repo.commands_dir}\/|\.rb$/, '')
+      @lib_file.gsub(/^#{self.class.matched_repo.commands_dir}\/|\.rb$/, '')
+    end
+
+    def base_module
+      @base_module ||= @name.include?('/') ? create_module_from_path : Commands
     end
 
     def load_source(reload=false)
       library_string = self.class.read_library_file(@lib_file, reload)
-      @base_module = @name.include?('/') ? create_module_from_path : Commands
       Inspector.enable
-      @base_module.module_eval(library_string, @lib_file)
+      base_module.module_eval(library_string, @lib_file)
       Inspector.disable
     end
 
@@ -122,7 +125,7 @@ module Boson
       detected = detect_additions(:modules=>true) { load_source }
       @module = determine_lib_module(detected[:modules]) unless @module
       #without this, module's class methods weren't showing up
-      @module = Util.constantize(@module) if @base_module != Commands
+      @module = Util.constantize(@module) if base_module != Commands
     end
 
     def reload_source_and_set_module
@@ -139,7 +142,7 @@ module Boson
       when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
       else
         unless (lib_module = Util.constantize("boson/commands/#{@name}")) && lib_module.to_s[/^Boson::Commands/]
-          command_modules = detected_modules.map {|e| e.to_s}.grep(/^#{@base_module}::/)
+          command_modules = detected_modules.map {|e| e.to_s}.grep(/^#{base_module}::/)
           unless command_modules.size == 1 && (lib_module = command_modules[0])
             raise LoaderError, "Can't detect module. Specify a module in this library's config."
           end
