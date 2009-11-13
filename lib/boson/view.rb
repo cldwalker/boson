@@ -12,8 +12,8 @@ module Boson
     # Renders any object via Hirb. Options are passed directly to
     # {Hirb::Console.render_output}[http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011].
     def render(object, options={}, return_obj=false)
-      if silent_object?(object)
-        puts(object.inspect) unless options[:silence_booleans]
+      if options[:inspect] || inspected_object?(object)
+        puts(object.inspect)
       else
         render_object(object, options, return_obj)
       end
@@ -34,7 +34,7 @@ module Boson
       Hirb::View.toggle_pager
     end
 
-    def silent_object?(obj)
+    def inspected_object?(obj)
       [nil,false,true].include?(obj)
     end
 

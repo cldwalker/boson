@@ -75,7 +75,8 @@ module Boson
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
 
-    attr_reader :global_options, :rendered, :option_parsers, :command_options
+    attr_reader :option_parsers, :command_options
+    attr_accessor :global_options, :rendered
     @no_option_commands ||= []
     GLOBAL_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},

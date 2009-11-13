@@ -20,8 +20,16 @@ module Boson
   # [:index] Updates index for given libraries allowing you to use them. This is useful if Boson's autodetection of
   #          changed libraries isn't picking up your changes. Since this option has a :bool_default attribute, arguments
   #          passed to this option need to be passed with '=' i.e. '--index=my_lib'.
-  # [:render] Pretty formats the results of commands without options. Handy for commands that return arrays.
+  # [:render] Toggles the auto-rendering done for commands that don't have views. Doesn't affect commands that already have views.
+  #           Default is false. Also see Auto Rendering section below.
   # [:pager_toggle] Toggles Hirb's pager in case you'd like to pipe to another command.
+  #
+  # ==== Auto Rendering
+  # Commands that don't have views (defined via render_options) have their return value auto-rendered as a view as follows:
+  # * nil,false and true aren't rendered
+  # * arrays are rendered with Hirb's tables
+  # * non-arrays are printed with inspect()
+  # * Any of these cases can be toggled to render/not render with the global option :render
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
@@ -107,10 +115,8 @@ module Boson
       end
 
       def render_output(output)
-        if Scientist.global_options && !Scientist.rendered && !View.silent_object?(output)
-          puts output.inspect
-        elsif !Scientist.global_options && @options[:render]
-          View.render(output, :silence_booleans=>true)
+        if (!Scientist.rendered && !View.inspected_object?(output)) ^ @options[:render]
+          View.render(output, :inspect=>!output.is_a?(Array) || (Scientist.global_options || {})[:render])
         end
       end
 

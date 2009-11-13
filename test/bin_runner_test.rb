@@ -154,6 +154,42 @@ module Boson
       end
     end
 
+    context "render_output" do
+      before(:each) { Scientist.rendered = false; BinRunner.instance_eval "@options = {}" }
+
+      test "doesn't render when nil, false or true" do
+        View.expects(:render).never
+        [nil, false, true].each do |e|
+          BinRunner.render_output e
+        end
+      end
+
+      test "doesn't render when rendered with Scientist" do
+        Scientist.rendered = true
+        View.expects(:render).never
+        BinRunner.render_output 'blah'
+      end
+
+      test "renders with inspect when non-array" do
+        ['man', {:a=>true}, :ok].each do |e|
+          View.expects(:puts).with(e.inspect)
+          BinRunner.render_output e
+        end
+      end
+
+      test "renders with inspect when Scientist rendering toggled off with :render" do
+        Scientist.global_options = {:render=>true}
+        View.expects(:puts).with([1,2].inspect)
+        BinRunner.render_output [1,2]
+        Scientist.global_options = nil
+      end
+
+      test "renders with hirb when array" do
+        View.expects(:render_object)
+        BinRunner.render_output [1,2,3]
+      end
+    end
+
     test "parse_args only translates options before command" do
       BinRunner.parse_args(['-v', 'com', '-v']).should == ["com", {:verbose=>true}, ['-v']]
       BinRunner.parse_args(['com', '-v']).should == ["com", {}, ['-v']]
