@@ -6,18 +6,26 @@ Works with Ruby 1.8.6 and 1.9.1.
 Note: To read a linkable version of this README, {see here}[http://tagaholic.me/boson/doc/].
 
 == Features
-* Commands are just methods extended for a given object, the default being the top level object, main.
+* Simple organization: Commands are just methods on an object (default is main) and command libraries are just modules.
 * Commands are accessible from the commandline (Boson::BinRunner) or irb (Boson::ConsoleRunner).
-* Command libraries, which are just modules, are written in non-dsl ruby which allows for easy testing
-  and use outside of boson (Boson::FileLibrary).
+* Libraries
+  * can be written in non-dsl ruby which allows for easy testing and use independent of boson (Boson::FileLibrary).
+  * can exist locally as a Bosonfile (Boson::LocalFileLibrary) and under lib/boson/commands or .boson/commands.
+  * can be made from gems (Boson::GemLibrary) or any require-able file (Boson::RequireLibrary).
+  * are social as a user can install them from a url and then customize command names, aliases and options without touching
+    the original library.
+* Commands
+  * have several layers of options (Boson::OptionParser): global options, rendering options and local options
+    specific to the command (Boson::Scientist).
+  * can have any view associated to it (via Hirb) without adding view code to the command's method.
+    These views can be toggled on and manipulated via global options (Boson::Scientist).
+  * can have post-command commands accessible as options which change the returned value. Default post-command commands include
+    commands to search and sort an array of any objects (Boson::Scientist).
+* Option parser (Boson::OptionParser)
+  * provides option types that map to objects i.e. :array type creates Array objects.
+  * come with 5 default option types: boolean, array, string, hash and numeric.
+  * can have have custom option types defined by users (Boson::Options).
 * Comes with default commands to load, search, list and install commands and libraries (Boson::Commands::Core).
-* Commands can be full-blown commandline apps thanks to powerful options (Boson::OptionParser)
-  and hirb's views.
-* There are 5 default option types: boolean, array, string, hash and numeric. Custom option types
-  can be defined to map to any Ruby class with one method (Boson::Options).
-* Commands can have views toggled without adding view code to the original command (Boson::Scientist).
-* Command libraries are social as a user can install them from a url and then customize command
-  names and options without changing the original library.
 * Namespaces are optional and when used are methods which allow for method_missing magic.
 
 == Irb Example
