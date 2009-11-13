@@ -57,7 +57,11 @@ module Boson
 
     def add_scraped_data_to_config(key, value, cmd)
       if value.is_a?(Hash)
-        @commands_hash[cmd][key] = Util.recursive_hash_merge value, @commands_hash[cmd][key] || {}
+        if key == :config
+          @commands_hash[cmd] = Util.recursive_hash_merge value, @commands_hash[cmd]
+        else
+          @commands_hash[cmd][key] = Util.recursive_hash_merge value, @commands_hash[cmd][key] || {}
+        end
       else
         @commands_hash[cmd][key] ||= value
       end

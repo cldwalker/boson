@@ -19,7 +19,7 @@ module Boson
   # {pragdave}[http://github.com/pragdavespc/rake/commit/45231ac094854da9f4f2ac93465ed9b9ca67b2da].
   module CommentInspector
     extend self
-    EVAL_ATTRIBUTES = [:options, :render_options]
+    EVAL_ATTRIBUTES = [:options, :render_options, :config]
 
     # Given a method's file string, line number and defining module, returns a hash
     # of attributes defined for that method.

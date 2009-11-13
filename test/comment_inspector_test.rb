@@ -84,16 +84,17 @@ module Boson
     end
 
     test "scrape all comment types with implicit desc" do
-      @lines = ["module Foo", '# @render_options :b=>1', '  # @options {:a=>true}', '#blah', "  def foo", "  end", "end"]
-      expected = {:desc=>"blah", :options=>{:a=>true}, :render_options=>{:b=>1}}
-      CommentInspector.scrape(@lines.join("\n"), 5, Optional).should == expected
+      @lines = ["module Foo", '# @config :a=>true', '# @render_options :b=>1', '  # @options {:a=>true}',
+        '#blah', "  def foo", "  end", "end"]
+      expected = {:desc=>"blah", :options=>{:a=>true}, :render_options=>{:b=>1}, :config=>{:a=>true}}
+      CommentInspector.scrape(@lines.join("\n"), 6, Optional).should == expected
     end
 
     test "scrape all comment types with explicit desc" do
       @lines = ["module Foo",  '#@desc blah', '# @render_options :b=>1,', '# :c=>2',
-        '  # @options {:a=>true}', "  def foo", "  end", "end"]
-      expected = {:desc=>"blah", :options=>{:a=>true}, :render_options=>{:b=>1, :c=>2}}
-      CommentInspector.scrape(@lines.join("\n"), 6, Optional).should == expected
+        '  # @options {:a=>true}', '  # @config :a=>true', "  def foo", "  end", "end"]
+      expected = {:desc=>"blah", :options=>{:a=>true}, :render_options=>{:b=>1, :c=>2}, :config=>{:a=>true}}
+      CommentInspector.scrape(@lines.join("\n"), 7, Optional).should == expected
     end
   end
 end

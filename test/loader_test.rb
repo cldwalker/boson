@@ -35,6 +35,11 @@ module Boson
         end
       end
 
+      test "from inspector attribute config sets command's config" do
+        load :blah, :file_string=>"module Blah; config :alias=>'ok'\n; def bling; end; end"
+        library('blah').command_object('bling').alias.should == 'ok'
+      end
+
       test "hash from inspector recursively merged with user's config" do
         with_config(:libraries=>{'blah'=>{:commands=>{'blung'=>{:args=>[], :render_options=>{:sort=>'this'}}}}}) do
           CommentInspector.expects(:scrape).returns({:render_options=>{:fields=>['this']}})

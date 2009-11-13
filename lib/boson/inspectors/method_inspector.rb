@@ -20,7 +20,7 @@ module Boson
     attr_accessor :current_module
     attr_reader :mod_store
     @mod_store ||= {}
-    METHODS = [:desc, :options, :render_options]
+    METHODS = [:config, :desc, :options, :render_options]
 
     # The method_added used while scraping method attributes.
     def new_method_added(mod, meth)
