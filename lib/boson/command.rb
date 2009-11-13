@@ -28,11 +28,12 @@ module Boson
     # * *:alias*: Alternative name for command
     # * *:options*: Hash of options passed to OptionParser
     # * *:render_options*: Hash of rendering options passed to OptionParser
+    # * *:global_options*: Boolean to enable using global options when a command has no render_options or options.
     # * *:args*: Should only be set if not automatically set. This attribute is only
     #   important for commands that have options/render_options. Its value can be an array
     #   (as ArgumentInspector.scrape_with_eval produces), a number representing
     #   the number of arguments or '*' if the command has a variable number of arguments.
-    # * *:default_option* Only for an option command that has one argument. This treats the given
+    # * *:default_option* Only for an option command that has one or zero arguments. This treats the given
     #   option as an optional first argument. Example:
     #     # For a command with default option 'query' and options --query and -v
     #     'some -v'   -> '--query=some -v'
@@ -40,12 +41,10 @@ module Boson
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
-      @alias = hash[:alias] if hash[:alias]
-      @description = hash[:description] if hash[:description]
-      @render_options = hash[:render_options] if hash[:render_options]
-      @options = hash[:options] if hash[:options]
-      @namespace = hash[:namespace] if hash[:namespace]
-      @default_option = hash[:default_option] if hash[:default_option]
+      [:alias, :description, :render_options, :options, :namespace, :default_option,
+        :global_options].each do |e|
+          instance_variable_set("@#{e}", hash[e]) if hash[e]
+      end
       if hash[:args]
         if hash[:args].is_a?(Array)
           @args = hash[:args]
@@ -107,7 +106,7 @@ module Boson
     end
 
     def option_command?
-      options || render_options
+      options || render_options || @global_options
     end
 
     def arg_size
