@@ -155,7 +155,6 @@ module Boson
       if @command.default_option && @command.arg_size <= 1 && !@command.has_splat_args? && @args[0].to_s[/./] != '-'
         @args[0] = "--#{@command.default_option}=#{@args[0]}" unless @args.join.empty? || @args[0].is_a?(Hash)
       end
-      @command.options ||= {}
 
       if parsed_options = parse_command_options
         add_default_args(@args)
@@ -271,7 +270,7 @@ module Boson
         parsed_options, new_args = parse_options args
         @args += new_args
       # add default options
-      elsif @command.options.empty? || (!@command.has_splat_args? &&
+      elsif @command.options.to_s.empty? || (!@command.has_splat_args? &&
         @args.size <= (@command.arg_size - 1).abs) || (@command.has_splat_args? && !@args[-1].is_a?(Hash))
           parsed_options = parse_options([])[0]
       # merge default options with given hash of options

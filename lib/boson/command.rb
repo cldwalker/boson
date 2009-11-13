@@ -74,7 +74,7 @@ module Boson
 
     # Option parser for command as defined by @options.
     def option_parser
-      @option_parser ||= (@options ? OptionParser.new(@options) : nil)
+      @option_parser ||= OptionParser.new(@options || {})
     end
 
     # Help string for options if a command has it.
