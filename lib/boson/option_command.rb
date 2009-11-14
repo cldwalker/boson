@@ -1,3 +1,4 @@
+require 'shellwords'
 module Boson
   class OptionCommand
     GLOBAL_OPTIONS = {
@@ -36,7 +37,38 @@ module Boson
       @command = cmd
     end
 
-    # choose current parser
+    def parse(args)
+      if args.size == 1 && args[0].is_a?(String)
+        global_opt, parsed_options, args = parse_options Shellwords.shellwords(args[0])
+      # last string argument interpreted as args + options
+      elsif args.size > 1 && args[-1].is_a?(String)
+        temp_args = Boson.const_defined?(:BinRunner) ? args : Shellwords.shellwords(args.pop)
+        global_opt, parsed_options, new_args = parse_options temp_args
+        args += new_args
+      # add default options
+      elsif @command.options.to_s.empty? || (!@command.has_splat_args? &&
+        args.size <= (@command.arg_size - 1).abs) || (@command.has_splat_args? && !args[-1].is_a?(Hash))
+          global_opt, parsed_options = parse_options([])[0,2]
+      # merge default options with given hash of options
+      elsif (@command.has_splat_args? || (args.size == @command.arg_size)) && args[-1].is_a?(Hash)
+        global_opt, parsed_options = parse_options([])[0,2]
+        parsed_options.merge!(args.pop)
+      end
+      [global_opt || {}, parsed_options, args]
+    end
+
+    def parse_options(args)
+      parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
+      global_options = option_parser.parse @command.option_parser.leading_non_opts
+      new_args = option_parser.non_opts.dup + @command.option_parser.trailing_non_opts
+      if global_options[:global]
+        global_opts = Shellwords.shellwords(global_options[:global]).map {|str|
+          ((str[/^(.*?)=/,1] || str).length > 1 ? "--" : "-") + str }
+        global_options.merge! option_parser.parse(global_opts)
+      end
+      [global_options, parsed_options, new_args]
+    end
+
     def option_parser
       @option_parser ||= @command.render_options ? OptionParser.new(all_global_options) :
         self.class.default_option_parser
