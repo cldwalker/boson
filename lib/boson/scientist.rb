@@ -2,7 +2,7 @@ require 'shellwords'
 module Boson
   # Scientist redefines _any_ object's methods to act like shell commands while still receiving ruby arguments normally.
   # It also let's your method have an optional view generated from a method's return value.
-  # Boson::Scientist.create_option_command redefines an object's method with a Boson::Command while
+  # Boson::Scientist.redefine_command redefines an object's method with a Boson::Command while
   # Boson::Scientist.commandify redefines with just a hash. For an object's method to be redefined correctly,
   # its last argument _must_ expect a hash.
   #
@@ -79,16 +79,17 @@ module Boson
     attr_accessor :global_options, :rendered
     @no_option_commands ||= []
     @option_commands ||= {}
+
     # Redefines an object's method with a Command of the same name.
-    def create_option_command(obj, command)
-      cmd_block = create_option_command_block(obj, command)
+    def redefine_command(obj, command)
+      cmd_block = redefine_command_block(obj, command)
       @no_option_commands << command if command.options.nil?
       [command.name, command.alias].compact.each {|e|
         obj.instance_eval("class<<self;self;end").send(:define_method, e, cmd_block)
       }
     end
 
-    # A wrapper around create_option_command that doesn't depend on a Command object. Rather you
+    # A wrapper around redefine_command that doesn't depend on a Command object. Rather you
     # simply pass a hash of command attributes (see Command.new) or command methods and let OpenStruct mock a command.
     # The only required attribute is :name, though to get any real use you should define :options and
     # :arg_size (default is '*'). Example:
@@ -108,11 +109,11 @@ module Boson
       hash[:has_splat_args?] = true if hash[:arg_size] == '*'
       fake_cmd = OpenStruct.new(hash)
       fake_cmd.option_parser ||= OptionParser.new(fake_cmd.options || {})
-      create_option_command(obj, fake_cmd)
+      redefine_command(obj, fake_cmd)
     end
 
     # The actual method which replaces a command's original method
-    def create_option_command_block(obj, command)
+    def redefine_command_block(obj, command)
       lambda {|*args|
         Boson::Scientist.translate_and_render(obj, command, args) {|args| super(*args) }
       }
@@ -141,7 +142,7 @@ module Boson
       end
 
       if parsed_options = parse_command_options
-        add_default_args(@args)
+        option_command.add_default_args(@args, @obj)
         return @args if @no_option_commands.include?(@command)
         @args << parsed_options
         if @args.size != command.arg_size && !command.has_splat_args?
@@ -225,21 +226,6 @@ module Boson
       end
       raise EscapeGlobalOption if @global_options[:help]
       [parsed_options, new_args]
-    end
-
-    def add_default_args(args)
-      if @command.args && args.size < @command.args.size - 1
-        # leave off last arg since its an option
-        @command.args.slice(0..-2).each_with_index {|arr,i|
-          next if args.size >= i + 1 # only fill in once args run out
-          break if arr.size != 2 # a default arg value must exist
-          begin
-            args[i] = @command.file_parsed_args? ? @obj.instance_eval(arr[1]) : arr[1]
-          rescue Exception
-            raise Error, "Unable to set default argument at position #{i+1}.\nReason: #{$!.message}"
-          end
-        }
-      end
     end
     #:startdoc:
   end

@@ -30,7 +30,7 @@ module Boson
       hash = {:name=>'blah', :lib=>'bling', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
       @cmd = Command.new hash
       @cmd.instance_variable_set("@file_parsed_args", true) if hash[:file_parsed_args]
-      Scientist.create_option_command(@opt_cmd, @cmd)
+      Scientist.redefine_command(@opt_cmd, @cmd)
       @opt_cmd.send(hash[:name], *args)
     end
 

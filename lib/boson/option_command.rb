@@ -50,6 +50,10 @@ module Boson
       }
       render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(self.class.default_render_options))
       opts = Util.recursive_hash_merge render_opts, Util.deep_copy(self.class.default_global_options)
+      set_global_option_defaults opts
+    end
+
+    def set_global_option_defaults(opts)
       if !opts[:fields].key?(:values)
         if opts[:fields][:default]
           opts[:fields][:values] = opts[:fields][:default]
@@ -67,6 +71,21 @@ module Boson
         opts[:query][:default_keys] ||= "*"
       end
       opts
+    end
+
+    def add_default_args(args, obj)
+      if @command.args && args.size < @command.args.size - 1
+        # leave off last arg since its an option
+        @command.args.slice(0..-2).each_with_index {|arr,i|
+          next if args.size >= i + 1 # only fill in once args run out
+          break if arr.size != 2 # a default arg value must exist
+          begin
+            args[i] = @command.file_parsed_args? ? obj.instance_eval(arr[1]) : arr[1]
+          rescue Exception
+            raise Scientist::Error, "Unable to set default argument at position #{i+1}.\nReason: #{$!.message}"
+          end
+        }
+      end
     end
   end
 end
