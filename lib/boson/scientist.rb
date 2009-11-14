@@ -243,7 +243,9 @@ module Boson
           if opts[:fields][:default]
             opts[:fields][:values] = opts[:fields][:default]
           else
-            opts[:fields][:values] = opts[:change_fields][:default].values if opts[:change_fields] && opts[:change_fields][:default]
+            if opts[:change_fields] && (changed = opts[:change_fields][:default])
+              opts[:fields][:values] = changed.is_a?(Array) ? changed : changed.values
+            end
             opts[:fields][:values] ||= opts[:headers][:default].keys if opts[:headers] && opts[:headers][:default]
           end
           opts[:fields][:enum] = false if opts[:fields][:values] && !opts[:fields].key?(:enum)
