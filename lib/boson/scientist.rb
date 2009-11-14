@@ -78,23 +78,7 @@ module Boson
     attr_reader :option_parsers, :command_options
     attr_accessor :global_options, :rendered
     @no_option_commands ||= []
-    GLOBAL_OPTIONS = {
-      :help=>{:type=>:boolean, :desc=>"Display a command's help"},
-      :render=>{:type=>:boolean, :desc=>"Toggle a command's default rendering behavior"},
-      :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
-      :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes"},
-      :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"},
-    } #:nodoc:
-    RENDER_OPTIONS = {
-      :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
-      :class=>{:type=>:string, :desc=>"Hirb helper class which renders"},
-      :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
-      :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"},
-      :sort=>{:type=>:string, :desc=>"Sort by given field"},
-      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
-      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
-    } #:nodoc:
-
+    @option_commands ||= {}
     # Redefines an object's method with a Command of the same name.
     def create_option_command(obj, command)
       cmd_block = create_option_command_block(obj, command)
@@ -177,7 +161,7 @@ module Boson
     def render_or_raw(result)
       if (@rendered = render?)
         result = run_pipe_commands(result)
-        render_global_opts = @global_options.dup.delete_if {|k,v| default_global_options.keys.include?(k) }
+        render_global_opts = @global_options.dup.delete_if {|k,v| OptionCommand.default_global_options.keys.include?(k) }
         View.render(result, render_global_opts, false)
       else
         result = View.search_and_sort(result, @global_options) if !(@global_options.keys & [:sort, :reverse_sort, :query]).empty?
@@ -189,7 +173,7 @@ module Boson
     end
 
     def pipe_options
-      @pipe_options ||= Hash[*default_global_options.select {|k,v| v[:pipe] }.flatten]
+      @pipe_options ||= Hash[*OptionCommand.default_global_options.select {|k,v| v[:pipe] }.flatten]
     end
 
     def run_pipe_commands(result)
@@ -202,61 +186,8 @@ module Boson
       result
     end
 
-    # choose current parser
-    def option_parser
-      @command.render_options ? command_option_parser : default_option_parser
-    end
-
-    # current command parser
-    def command_option_parser
-      (@option_parsers ||= {})[@command] ||= OptionParser.new current_command_options
-    end
-
-    # set cmd and use its parser
-    def render_option_parser(cmd)
-      @command = cmd
-      option_parser
-    end
-
-    def default_option_parser
-      @default_option_parser ||= OptionParser.new default_render_options.merge(default_global_options)
-    end
-
-    def default_global_options
-      @default_global_options ||= GLOBAL_OPTIONS.merge Boson.repo.config[:global_options] || {}
-    end
-
-    def default_render_options
-      @default_render_options ||= RENDER_OPTIONS.merge Boson.repo.config[:render_options] || {}
-    end
-
-    def current_command_options
-      (@command_options ||= {})[@command] ||= begin
-        @command.render_options.each {|k,v|
-          if !v.is_a?(Hash) && !v.is_a?(Symbol)
-            @command.render_options[k] = {:default=>v}
-          end
-        }
-        render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(default_render_options))
-        opts = Util.recursive_hash_merge render_opts, Util.deep_copy(default_global_options)
-        if !opts[:fields].key?(:values)
-          if opts[:fields][:default]
-            opts[:fields][:values] = opts[:fields][:default]
-          else
-            if opts[:change_fields] && (changed = opts[:change_fields][:default])
-              opts[:fields][:values] = changed.is_a?(Array) ? changed : changed.values
-            end
-            opts[:fields][:values] ||= opts[:headers][:default].keys if opts[:headers] && opts[:headers][:default]
-          end
-          opts[:fields][:enum] = false if opts[:fields][:values] && !opts[:fields].key?(:enum)
-        end
-        if opts[:fields][:values]
-          opts[:sort][:values] ||= opts[:fields][:values]
-          opts[:query][:keys] ||= opts[:fields][:values]
-          opts[:query][:default_keys] ||= "*"
-        end
-        opts
-      end
+    def option_command(cmd=@command)
+      @option_commands[cmd] ||= OptionCommand.new(cmd)
     end
 
     def render?
@@ -285,12 +216,12 @@ module Boson
 
     def parse_options(args)
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
-      @global_options = option_parser.parse @command.option_parser.leading_non_opts
-      new_args = option_parser.non_opts.dup + @command.option_parser.trailing_non_opts
+      @global_options = option_command.option_parser.parse @command.option_parser.leading_non_opts
+      new_args = option_command.option_parser.non_opts.dup + @command.option_parser.trailing_non_opts
       if @global_options[:global]
         global_opts = Shellwords.shellwords(@global_options[:global]).map {|str|
           ((str[/^(.*?)=/,1] || str).length > 1 ? "--" : "-") + str }
-        @global_options.merge! option_parser.parse(global_opts)
+        @global_options.merge! option_command.option_parser.parse(global_opts)
       end
       raise EscapeGlobalOption if @global_options[:help]
       [parsed_options, new_args]

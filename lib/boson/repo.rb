@@ -55,9 +55,9 @@ module Boson
     #                  subdirectory doesn't exist in the boson directory.
     #
     # ==== Config keys specific only for the main repo config ~/.boson/config/boson.yml
-    # [:global_options] Hash of global options which are merged with Boson::Scientist::GLOBAL_OPTIONS to be made available
+    # [:global_options] Hash of global options which are merged with Boson::OptionCommand::GLOBAL_OPTIONS to be made available
     #                   to all option commands.
-    # [:render_options] Hash of render options which are merged with Boson::Scientist::RENDER_OPTIONS to be made available to all
+    # [:render_options] Hash of render options which are merged with Boson::OptionCommand::RENDER_OPTIONS to be made available to all
     #                   option commands.
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.

@@ -60,7 +60,7 @@ module Boson::Commands::Core #:nodoc:
         command.option_parser.print_usage_table
       end
       puts "\nGLOBAL/RENDER OPTIONS"
-      Boson::Scientist.render_option_parser(command).print_usage_table
+      Boson::Scientist.option_command(command).print_usage_table
     end
   end
 end

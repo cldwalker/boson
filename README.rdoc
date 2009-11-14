@@ -16,7 +16,7 @@ Note: To read a linkable version of this README, {see here}[http://tagaholic.me/
     the original library.
 * Commands
   * have several layers of options (Boson::OptionParser): global options, rendering options and local options
-    specific to the command (Boson::Scientist).
+    specific to the command (Boson::OptionCommand).
   * can have any view associated to it (via Hirb) without adding view code to the command's method.
     These views can be toggled on and manipulated via global options (Boson::Scientist).
   * can have post-command commands accessible as options which change the returned value. Default post-command commands include
