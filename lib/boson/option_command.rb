@@ -30,6 +30,10 @@ module Boson
       def default_render_options
         @default_render_options ||= RENDER_OPTIONS.merge Boson.repo.config[:render_options] || {}
       end
+
+      def delete_non_render_options(opt)
+        opt.delete_if {|k,v| default_global_options.keys.include?(k) }
+      end
     end
 
     attr_accessor :command
@@ -103,6 +107,20 @@ module Boson
         opts[:query][:default_keys] ||= "*"
       end
       opts
+    end
+
+    def prepend_default_option(args)
+      if @command.default_option && @command.arg_size <= 1 && !@command.has_splat_args? && args[0].to_s[/./] != '-'
+        args[0] = "--#{@command.default_option}=#{args[0]}" unless args.join.empty? || args[0].is_a?(Hash)
+      end
+    end
+
+    def check_argument_size(args)
+      if args.size != @command.arg_size && !@command.has_splat_args?
+        command_size, args_size = args.size > @command.arg_size ? [@command.arg_size, args.size] :
+          [@command.arg_size - 1, args.size - 1]
+        raise ArgumentError, "wrong number of arguments (#{args_size} for #{command_size})"
+      end
     end
 
     def add_default_args(args, obj)

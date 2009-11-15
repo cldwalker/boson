@@ -111,7 +111,7 @@ module Boson
       redefine_command(obj, fake_cmd)
     end
 
-    # The actual method which replaces a command's original method
+    # The actual method which redefines a command's original method
     def redefine_command_block(obj, command)
       lambda {|*args|
         Boson::Scientist.translate_and_render(obj, command, args) {|args| super(*args) }
@@ -139,11 +139,7 @@ module Boson
 
     def translate_args(obj, command, args)
       @obj, @command, @args = obj, command, args
-      # prepends default option
-      if @command.default_option && @command.arg_size <= 1 && !@command.has_splat_args? && @args[0].to_s[/./] != '-'
-        @args[0] = "--#{@command.default_option}=#{@args[0]}" unless @args.join.empty? || @args[0].is_a?(Hash)
-      end
-
+      option_command.prepend_default_option(@args)
       @global_options, parsed_options, @args = option_command.parse(@args)
       raise EscapeGlobalOption if @global_options[:help]
       add_parsed_options(parsed_options) if parsed_options
@@ -159,18 +155,13 @@ module Boson
       option_command.add_default_args(@args, @obj)
       return @args if @no_option_commands.include?(@command)
       @args << parsed_options
-      if @args.size != @command.arg_size && !@command.has_splat_args?
-        command_size, args_size = @args.size > @command.arg_size ? [@command.arg_size, @args.size] :
-          [@command.arg_size - 1, @args.size - 1]
-        raise ArgumentError, "wrong number of arguments (#{args_size} for #{command_size})"
-      end
+      option_command.check_argument_size(@args)
     end
 
     def render_or_raw(result)
       if (@rendered = render?)
         result = run_pipe_commands(result)
-        render_global_opts = @global_options.dup.delete_if {|k,v| OptionCommand.default_global_options.keys.include?(k) }
-        View.render(result, render_global_opts, false)
+        View.render(result, OptionCommand.delete_non_render_options(@global_options.dup), false)
       else
         result = View.search_and_sort(result, @global_options) if !(@global_options.keys & [:sort, :reverse_sort, :query]).empty?
         run_pipe_commands(result)
@@ -195,7 +186,7 @@ module Boson
     end
 
     def render?
-      (@command.render_options && !@global_options[:render]) || (!@command.render_options && @global_options[:render])
+      !!@command.render_options ^ @global_options[:render]
     end
     #:startdoc:
   end
