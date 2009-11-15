@@ -24,7 +24,7 @@ module Boson::Commands::Core #:nodoc:
           :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
           :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}, :desc=>"Filters to apply to library fields" }}
       },
-      'load_library'=>{:description=>"Load/reload a library", :options=>{:reload=>:boolean, [:verbose,:V]=>true}}
+      'load_library'=>{:description=>"Load a library", :options=>{[:verbose,:V]=>true}}
     }
 
     {:namespace=>false, :library_file=>File.expand_path(__FILE__), :commands=>commands}
@@ -39,8 +39,7 @@ module Boson::Commands::Core #:nodoc:
   end
 
   def load_library(library, options={})
-    options[:reload] ? Boson::Manager.reload(library, options) :
-      Boson::Manager.load(library, options)
+    Boson::Manager.load(library, options)
   end
 
   def render(object, options={})

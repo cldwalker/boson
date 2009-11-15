@@ -4,7 +4,7 @@ module Boson
   # Raised when a library's append_features returns false.
   class AppendFeaturesFalseError < StandardError; end
 
-  # Handles loading and reloading of libraries and commands.
+  # Handles loading of libraries and commands.
   class Manager
     class <<self
       attr_accessor :failed_libraries
@@ -21,28 +21,6 @@ module Boson
         Array(libraries).map {|e|
           (@library = load_once(e, options)) ? after_load : false
         }.all?
-      end
-
-      # Reloads a library or an array of libraries with the following options:
-      # * :verbose: Boolean to print reload status. Default is false.
-      def reload(source, options={})
-        if (lib = Boson.library(source))
-          if lib.loaded
-            command_size = Boson.commands.size
-            @options = options
-            if (result = rescue_load_action(lib.name, :reload) { lib.reload })
-              after_reload(lib)
-              puts "Reloaded library #{source}: Added #{Boson.commands.size - command_size} commands" if options[:verbose]
-            end
-            result
-          else
-            puts "Library hasn't been loaded yet. Loading library #{source}..." if options[:verbose]
-            load(source, options)
-          end
-        else
-          puts "Library #{source} doesn't exist." if options[:verbose]
-          false
-        end
       end
 
       #:stopdoc:
@@ -121,11 +99,6 @@ module Boson
           puts "Loaded library dependency #{e.name}" if @options[:verbose]
         end
         true
-      end
-
-      def after_reload(lib)
-        Boson.commands.delete_if {|e| e.lib == lib.name } if lib.new_module
-        create_commands(lib, lib.new_commands)
       end
 
       def before_create_commands(lib)

@@ -37,27 +37,6 @@ module Boson
       test "prints error for file library with multiple modules" do
         capture_stderr { load(:blah, :file_string=>"module Doo; end; module Daa; end") }.should =~ /Can't.*config/
       end
-
-      test "with same module reloads" do
-        load(:blah, :file_string=>"module Blah; def blah; end; end")
-        File.stubs(:exists?).returns(true)
-        File.stubs(:read).returns("module Blah; def bling; end; end")
-        Manager.reload('blah').should == true
-        command_exists?('bling')
-        library('blah').commands.size.should == 2
-      end
-
-      test "with different module reloads" do
-        load(:blah, :file_string=>"module Blah; def blah; end; end")
-        File.stubs(:exists?).returns(true)
-        File.stubs(:read).returns("module Bling; def bling; end; end")
-        Manager.reload('blah').should == true
-        library_has_module('blah', "Boson::Commands::Bling")
-        command_exists?('bling')
-        command_exists?('blah', false)
-        library('blah').commands.size.should == 1
-      end
-      
     end
   end
 end

@@ -128,14 +128,6 @@ module Boson
       @module = Util.constantize(@module) if base_module != Commands
     end
 
-    def reload_source_and_set_module
-      detected = detect_additions(:modules=>true) { load_source(true) }
-      if (@new_module = !detected[:modules].empty?)
-        @commands = []
-        @module = determine_lib_module(detected[:modules])
-      end
-    end
-
     def determine_lib_module(detected_modules)
       case detected_modules.size
       when 1 then lib_module = detected_modules[0]
