@@ -124,7 +124,7 @@ module Boson
     end
 
     def translate_and_render(obj, command, args)
-      @global_options = {}
+      @global_options, @command = {}, command
       args = translate_args(obj, command, args)
       if @global_options[:verbose] || @global_options[:pretend]
         puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
@@ -138,24 +138,21 @@ module Boson
     end
 
     def translate_args(obj, command, args)
-      @obj, @command, @args = obj, command, args
-      option_command.prepend_default_option(@args)
-      @global_options, parsed_options, @args = option_command.parse(@args)
+      option_command.prepend_default_option(args)
+      @global_options, parsed_options, args = option_command.parse(args)
       raise EscapeGlobalOption if @global_options[:help]
-      add_parsed_options(parsed_options) if parsed_options
-      @args
+      if parsed_options
+        option_command.add_default_args(args, obj)
+        return args if @no_option_commands.include?(command)
+        args << parsed_options
+        option_command.check_argument_size(args)
+      end
+      args
     rescue Error, ArgumentError, EscapeGlobalOption
       raise
     rescue Exception
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
-    end
-
-    def add_parsed_options(parsed_options)
-      option_command.add_default_args(@args, @obj)
-      return @args if @no_option_commands.include?(@command)
-      @args << parsed_options
-      option_command.check_argument_size(@args)
     end
 
     def render_or_raw(result)
