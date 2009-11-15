@@ -1,11 +1,18 @@
 module Boson
-  # Scientist redefines _any_ object's methods to act like shell commands while still receiving ruby arguments normally.
-  # It also let's your method have an optional view generated from a method's return value.
-  # Boson::Scientist.redefine_command redefines an object's method with a Boson::Command while
-  # Boson::Scientist.commandify redefines with just a hash. For an object's method to be redefined correctly,
+  # Scientist wraps around and redefines an object's method to give it the following features:
+  # * Methods can act like shell commands while still receiving ruby arguments normally. See the Commandification
+  #   section.
+  # * Methods can be commandified because they can have options. All methods have global options and can have render options
+  #   or local options depending on what method attributes it has. See OptionCommand.
+  # * Methods can have filter methods run on its return value before being returned TODO.
+  # * Methods can have any number of optional views associated with them via render options (see View). Views can be toggled
+  #   on/off with the global option --render (see OptionCommand).
+  #
+  # The main methods this module provides are redefine_command() for redefining an object's method with a Command object
+  # and commandify() for redefining with a hash of method attributes. Note that for an object's method to be redefined correctly,
   # its last argument _must_ expect a hash.
   #
-  # === Examples
+  # === Commandification
   # Take for example this basic method/command with an options definition:
   #   options :level=>:numeric, :verbose=>:boolean
   #   def foo(arg='', options={})
@@ -23,58 +30,12 @@ module Boson
   #    foo Object, 'l1'
   #
   #    Both calls return: [Object, {:level=>1}]
-  #
-  # === Global Options
-  # Any command with options comes with default global options. For example '-hv' on such a command
-  # prints a help summarizing a command's options as well as the global options.
-  # When using global options along with command options, global options _must_ precede command options.
-  # Take for example using the global --pretend option with the method above:
-  #   irb>> foo '-p -l=1'
-  #   Arguments: ["", {:level=>1}]
-  #   Global options: {:pretend=>true}
-  #
-  # If a global option conflicts with a command's option, the command's option takes precedence. You can get around
-  # this by passing a --global option which takes a string of options without their dashes. For example:
-  #   foo '-p --fields=f1,f2 -l=1'
-  #   # is the same as
-  #   foo ' -g "p fields=f1,f2" -l=1 '
-  #
-  # === Rendering Views With Global Options
-  # Perhaps the most important global option is --render. This option toggles the rendering of your command's output
-  # with Hirb[http://github.com/cldwalker/hirb]. Since Hirb can be customized to generate any view, this option allows
-  # you toggle a predefined view for a command without embedding view code in your command!
-  #
-  # Here's a simple example, toggling Hirb's table view:
-  #   # Defined in a library file:
-  #   #@options {}
-  #   def list(options={})
-  #     [1,2,3]
-  #   end
-  #
-  #   Using it in irb:
-  #   >> list
-  #   => [1,2,3]
-  #   >> list '-r'
-  #   +-------+
-  #   | value |
-  #   +-------+
-  #   | 1     |
-  #   | 2     |
-  #   | 3     |
-  #   +-------+
-  #   3 rows in set
-  #   => true
-  #
-  # To default to rendering a view for a command, add a render_options {method attribute}[link:classes/Boson/MethodInspector.html]
-  # above list() along with any options you want to pass to your Hirb helper class. In this case, using '-r' gives you the
-  # command's returned object instead of a formatted view!
   module Scientist
     extend self
     # Handles all Scientist errors.
     class Error < StandardError; end
     class EscapeGlobalOption < StandardError; end
 
-    attr_reader :option_parsers, :command_options
     attr_accessor :global_options, :rendered
     @no_option_commands ||= []
     @option_commands ||= {}

@@ -1,5 +1,9 @@
 module Boson
-  # Handles {Hirb}[http://tagaholic.me/hirb/]-based views.
+  # Handles {Hirb}[http://tagaholic.me/hirb/]-based views, mostly for commands. Since Hirb can be customized
+  # to generate any view, commands can have any views associated with them!
+  #
+  # === Views with Render Options
+  #  TODO
   module View
     extend self
 

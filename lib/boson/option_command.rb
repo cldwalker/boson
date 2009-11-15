@@ -1,5 +1,53 @@
 require 'shellwords'
 module Boson
+  # A class used by Scientist to wrap around Command objects. It's main purpose is to parse
+  # options that a command can have: global options, render options and local options.
+  # When passing options to these commands, global and render options _must_ be passed first then
+  # local options.
+  #
+  # === Global Options
+  # Any command with options comes with default global options. For example '-hv' on such a command
+  # prints a help summarizing all of a command's options.
+  # When using global options along with command options, global options _must_ precede command options.
+  # Take for example using the global --pretend option with the method above:
+  #   irb>> foo '-p -l=1'
+  #   Arguments: ["", {:level=>1}]
+  #   Global options: {:pretend=>true}
+  #
+  # If a global option conflicts with a command's option, the command's option takes precedence. You can get around
+  # this by passing a --global option which takes a string of options without their dashes. For example:
+  #   foo '-p --fields=f1,f2 -l=1'
+  #   # is the same as
+  #   foo ' -g "p fields=f1,f2" -l=1 '
+  #
+  # === Toggling Views With the Global Option --render
+  # Perhaps the most important global option is --render. This option toggles the rendering of a command's output done with
+  # with View and Hirb[http://github.com/cldwalker/hirb].
+  #
+  # Here's a simple example of toggling Hirb's table view:
+  #   # Defined in a library file:
+  #   #@options {}
+  #   def list(options={})
+  #     [1,2,3]
+  #   end
+  #
+  #   Using it in irb:
+  #   >> list
+  #   => [1,2,3]
+  #   >> list '-r'
+  #   +-------+
+  #   | value |
+  #   +-------+
+  #   | 1     |
+  #   | 2     |
+  #   | 3     |
+  #   +-------+
+  #   3 rows in set
+  #   => true
+  #
+  # To default to rendering a view for a command, add a render_options {method attribute}[link:classes/Boson/MethodInspector.html]
+  # above list() along with any options you want to pass to your Hirb helper class. In this case, using '-r' gives you the
+  # command's returned object instead of a formatted view! For more see View.
   class OptionCommand
     GLOBAL_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
@@ -19,6 +67,7 @@ module Boson
     } #:nodoc:
 
     class <<self
+      #:stopdoc:
       def default_option_parser
         @default_option_parser ||= OptionParser.new default_render_options.merge(default_global_options)
       end
@@ -34,6 +83,7 @@ module Boson
       def delete_non_render_options(opt)
         opt.delete_if {|k,v| default_global_options.keys.include?(k) }
       end
+      #:startdoc:
     end
 
     attr_accessor :command
@@ -41,6 +91,7 @@ module Boson
       @command = cmd
     end
 
+    # Parses arguments and returns global/render options, local options and leftover arguments.
     def parse(args)
       if args.size == 1 && args[0].is_a?(String)
         global_opt, parsed_options, args = parse_options Shellwords.shellwords(args[0])
@@ -61,6 +112,7 @@ module Boson
       [global_opt || {}, parsed_options, args]
     end
 
+    #:stopdoc:
     def parse_options(args)
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
       global_options = option_parser.parse @command.option_parser.leading_non_opts
@@ -137,5 +189,6 @@ module Boson
         }
       end
     end
+    #:startdoc:
   end
 end
