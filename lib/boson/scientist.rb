@@ -118,29 +118,14 @@ module Boson
 
     def render_or_raw(result)
       if (@rendered = render?)
-        result = run_pipe_commands(result)
         View.render(result, OptionCommand.delete_non_render_options(@global_options.dup), false)
+        # View.render(result, @global_options.dup, false)
       else
-        result = View.search_and_sort(result, @global_options) if !(@global_options.keys & [:sort, :reverse_sort, :query]).empty?
-        run_pipe_commands(result)
+        Pipe.process(result, @global_options)
       end
     rescue Exception
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
-    end
-
-    def pipe_options
-      @pipe_options ||= Hash[*OptionCommand.default_global_options.select {|k,v| v[:pipe] }.flatten]
-    end
-
-    def run_pipe_commands(result)
-      (global_options.keys & pipe_options.keys).each {|e|
-        command = pipe_options[e][:pipe] != true ? pipe_options[e][:pipe] : e
-        pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
-          Boson.invoke(command, result, global_options[e])
-        result = pipe_result if pipe_options[e][:filter]
-      }
-      result
     end
 
     def render?
