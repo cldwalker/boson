@@ -1,9 +1,44 @@
 module Boson
-  # Handles {Hirb}[http://tagaholic.me/hirb/]-based views, mostly for commands. Since Hirb can be customized
+  # This module generates views for a command by handing it to {Hirb}[http://tagaholic.me/hirb/]. Since Hirb can be customized
   # to generate any view, commands can have any views associated with them!
   #
   # === Views with Render Options
-  #  TODO
+  # To pass rendering options to a Hirb helper as command options, a command has to define the options with
+  # the render_options method attribute:
+  #
+  #   # @render_options :fields=>[:a,:b]
+  #   def list(options={})
+  #     [{:a=>1, :b=>2}, {:a=>10,:b=>11}]
+  #   end
+  #
+  #   # To see that the render_options method attribute actually passes the :fields option by default:
+  #   >> list '-p'   # or list '--pretend'
+  #   Arguments: []
+  #   Global options: {:pretend=>true, :fields=>[:a, :b]}
+  #
+  #   >> list
+  #   +----+----+
+  #   | a  | b  |
+  #   +----+----+
+  #   | 1  | 2  |
+  #   | 10 | 11 |
+  #   +----+----+
+  #   2 rows in set
+  #
+  #   # To create a vertical table, we can pass --vertical, one of the default global render options.
+  #   >> list '-V'   # or list '--vertical'
+  #   *** 1. row ***
+  #   a: 1
+  #   b: 2
+  #   ...
+  #
+  #   # To get the original return value don't forget --render
+  #   >> list '-r'  # or list '--render'
+  #   => [{:a=>1, :b=>2}, {:a=>10,:b=>11}]
+  #
+  # Since Boson, uses {Hirb's auto table helper}[http://tagaholic.me/hirb/doc/classes/Hirb/Helpers/AutoTable.html]
+  # by default, you should read up on it if you want to use and define (Repo.config) the many options that are available
+  # for this default helper. What if you want to use your own helper class? No problem. Simply pass it with the global :class option.
   module View
     extend self
 

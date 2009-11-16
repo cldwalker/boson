@@ -52,10 +52,6 @@ module Boson
   #   +-------+
   #   3 rows in set
   #   => true
-  #
-  # To default to rendering a view for a command, add a render_options {method attribute}[link:classes/Boson/MethodInspector.html]
-  # above list() along with any options you want to pass to your Hirb helper class. In this case, using '-r' gives you the
-  # command's returned object instead of a formatted view! For more see View.
   class OptionCommand
     BASIC_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
