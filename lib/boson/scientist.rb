@@ -117,7 +117,8 @@ module Boson
 
     def render_or_raw(result)
       if (@rendered = render?)
-        result = Pipe.process(result, @global_options) if @global_options.key?(:class)
+        result = Pipe.process(result, @global_options) if @global_options.key?(:class) ||
+          @global_options.key?(:method)
         View.render(result, OptionCommand.delete_non_render_options(@global_options.dup), false)
       else
         Pipe.process(result, @global_options)
