@@ -55,10 +55,10 @@ module Boson::Commands::Core #:nodoc:
     puts msg
     if command && options[:verbose]
       if command.options && !command.options.empty?
-        puts "\nCOMMAND OPTIONS"
+        puts "\nLOCAL OPTIONS"
         command.option_parser.print_usage_table
       end
-      puts "\nGLOBAL/RENDER OPTIONS"
+      puts "\nGLOBAL OPTIONS"
       Boson::Scientist.option_command(command).option_parser.print_usage_table
     end
   end

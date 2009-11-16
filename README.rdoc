@@ -15,10 +15,9 @@ Note: To read a linkable version of this README, {see here}[http://tagaholic.me/
   * are social as a user can install them from a url and then customize command names, aliases and options without touching
     the original library.
 * Commands
-  * have powerful options (Boson::OptionParser): global options, rendering options and local options
-    specific to the command (Boson::OptionCommand).
+  * can have any number of local and global options (Boson::OptionCommand). Options are defined with Boson::OptionParser.
   * can have any view associated to it (via Hirb) without adding view code to the command's method.
-    These views can be toggled on and manipulated via global options (Boson::View and Boson::OptionCommand).
+    These views can be toggled on and manipulated via global render options (Boson::View and Boson::OptionCommand).
   * can pipe their return value into multiple commands with pipe options. Default pipe options give the ability
     to search and sort an array of any objects (Boson::Pipe).
 * Option parser (Boson::OptionParser)

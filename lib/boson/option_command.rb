@@ -1,28 +1,36 @@
 require 'shellwords'
 module Boson
   # A class used by Scientist to wrap around Command objects. It's main purpose is to parse
-  # all the options that a command can have: global options, render options, pipe options and local options.
-  # When passing options to these commands, global, pipe and render options _must_ be passed first, then
-  # local options.
+  # a command's global options (basic options, render options, pipe options) and local options.
+  # As the names imply, global options are available to all commands while local options are specific to a command.
+  # When passing options to commands, global ones _must_ be passed first, then local ones.
+  # For more about pipe and render options see Pipe and View respectively.
   #
-  # === Global Options
-  # Any command with options comes with default global options. For example '-hv' on such a command
-  # prints a help summarizing all these options.
-  # When using global options along with command options, global options _must_ precede command options.
-  # Take for example using the global --pretend option with the method above:
-  #   irb>> foo '-p -l=1'
-  #   Arguments: ["", {:level=>1}]
+  # === Basic Global Options
+  # Any command with options comes with basic global options. For example '-hv' on an option command
+  # prints a help summarizing global and local options. Another basic global option is --pretend. This
+  # option displays what global options have been parsed and the actual arguments to be passed to a
+  # command if executed. For example:
+  #
+  #   # Define this command in a library
+  #   options :level=>:numeric, :verbose=>:boolean
+  #   def foo(*args)
+  #     args
+  #   end
+  #
+  #   irb>> foo 'testin -p -l=1'
+  #   Arguments: ["testin", {:level=>1}]
   #   Global options: {:pretend=>true}
   #
-  # If a global option conflicts with a command's option, the command's option takes precedence. You can get around
+  # If a global option conflicts with a local option, the local option takes precedence. You can get around
   # this by passing a --global option which takes a string of options without their dashes. For example:
   #   foo '-p --fields=f1,f2 -l=1'
   #   # is the same as
   #   foo ' -g "p fields=f1,f2" -l=1 '
   #
-  # === Toggling Views With the Global Option --render
-  # Perhaps the most important global option is --render. This option toggles the rendering of a command's output done with
-  # with View and Hirb[http://github.com/cldwalker/hirb].
+  # === Toggling Views With the Basic Global Option --render
+  # One of the more important global options is --render. This option toggles the rendering of a command's
+  # output done with View and Hirb[http://github.com/cldwalker/hirb].
   #
   # Here's a simple example of toggling Hirb's table view:
   #   # Defined in a library file:
@@ -34,7 +42,7 @@ module Boson
   #   Using it in irb:
   #   >> list
   #   => [1,2,3]
-  #   >> list '-r'
+  #   >> list '-r'  # or list --render
   #   +-------+
   #   | value |
   #   +-------+
@@ -49,7 +57,7 @@ module Boson
   # above list() along with any options you want to pass to your Hirb helper class. In this case, using '-r' gives you the
   # command's returned object instead of a formatted view! For more see View.
   class OptionCommand
-    GLOBAL_OPTIONS = {
+    BASIC_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
       :render=>{:type=>:boolean, :desc=>"Toggle a command's default rendering behavior"},
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
@@ -74,7 +82,7 @@ module Boson
       #:stopdoc:
       def default_option_parser
         @default_option_parser ||= OptionParser.new default_pipe_options.
-          merge(default_render_options.merge(GLOBAL_OPTIONS))
+          merge(default_render_options.merge(BASIC_OPTIONS))
       end
 
       def default_pipe_options
@@ -86,7 +94,7 @@ module Boson
       end
 
       def delete_non_render_options(opt)
-        opt.delete_if {|k,v| GLOBAL_OPTIONS.keys.include?(k) }
+        opt.delete_if {|k,v| BASIC_OPTIONS.keys.include?(k) }
       end
       #:startdoc:
     end
@@ -96,7 +104,7 @@ module Boson
       @command = cmd
     end
 
-    # Parses arguments and returns global/render options, local options and leftover arguments.
+    # Parses arguments and returns global options, local options and leftover arguments.
     def parse(args)
       if args.size == 1 && args[0].is_a?(String)
         global_opt, parsed_options, args = parse_options Shellwords.shellwords(args[0])
@@ -143,7 +151,7 @@ module Boson
       }
       render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(self.class.default_render_options))
       merged_opts = Util.recursive_hash_merge Util.deep_copy(self.class.default_pipe_options), render_opts
-      opts = Util.recursive_hash_merge merged_opts, Util.deep_copy(GLOBAL_OPTIONS)
+      opts = Util.recursive_hash_merge merged_opts, Util.deep_copy(BASIC_OPTIONS)
       set_global_option_defaults opts
     end
 

@@ -52,11 +52,11 @@ module Boson
       @pipe_options ||= Boson.repo.config[:pipe_options] || {}
     end
 
-    def process_user_pipes(result, global_options)
-      (global_options.keys & pipe_options.keys).each {|e|
+    def process_user_pipes(result, options)
+      (options.keys & pipe_options.keys).each {|e|
         command = pipe_options[e][:pipe] ||= e
         pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
-          Boson.invoke(command, result, global_options[e])
+          Boson.invoke(command, result, options[e])
         result = pipe_result if pipe_options[e][:filter]
       }
       result

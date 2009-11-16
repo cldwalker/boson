@@ -28,7 +28,7 @@ module Boson
     # * *:alias*: Alternative name for command
     # * *:options*: Hash of options passed to OptionParser
     # * *:render_options*: Hash of rendering options passed to OptionParser
-    # * *:global_options*: Boolean to enable using global options when a command has no render_options or options.
+    # * *:global_options*: Boolean to enable using global options without having to define render_options or options.
     # * *:args*: Should only be set if not automatically set. This attribute is only
     #   important for commands that have options/render_options. Its value can be an array
     #   (as ArgumentInspector.scrape_with_eval produces), a number representing

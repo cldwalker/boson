@@ -2,9 +2,9 @@ module Boson
   # Scientist wraps around and redefines an object's method to give it the following features:
   # * Methods can take shell command input with options or receive its normal arguments. See the Commandification
   #   section.
-  # * Methods have default global options such as --help. See OptionCommand.
+  # * Methods have a slew of global options available. See OptionCommand for an explanation of basic global options.
   # * Before a method returns its value, it pipes its return value through pipe commands if pipe options are specified. See Pipe.
-  # * Methods can have any number of optional views associated with them via render options (see View). Views can be toggled
+  # * Methods can have any number of optional views associated with them via global render options (see View). Views can be toggled
   #   on/off with the global option --render (see OptionCommand).
   #
   # The main methods Scientist provides are redefine_command() for redefining an object's method with a Command object

@@ -58,7 +58,7 @@ module Boson
   #   # prints much more verbose help
   #   irb>> take_over '-hv'
   #
-  # For more about these global options see Scientist.
+  # For more about these global options see OptionCommand.
   class FileLibrary < Library
     #:stopdoc:
     def self.library_file(library, dir)
