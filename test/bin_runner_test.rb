@@ -170,8 +170,13 @@ module Boson
         BinRunner.render_output 'blah'
       end
 
-      test "renders with inspect when non-array" do
-        ['man', {:a=>true}, :ok].each do |e|
+      test "render with puts when non-string" do
+        View.expects(:render).with('dude', {:method => 'puts'})
+        BinRunner.render_output 'dude'
+      end
+
+      test "renders with inspect when non-array and non-string" do
+        [{:a=>true}, :ok].each do |e|
           View.expects(:puts).with(e.inspect)
           BinRunner.render_output e
         end
