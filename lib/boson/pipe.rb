@@ -2,14 +2,23 @@ module Boson
   module Pipe
     extend self
 
-    def process(result, global_options)
-      result = search_and_sort(result, global_options) if !(global_options.keys & [:sort, :reverse_sort, :query]).empty?
-      run_pipe_commands(result, global_options)
+    PIPE_OPTIONS = {
+      :sort=>{:type=>:string, :desc=>"Sort by given field"},
+      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
+      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
+    } #:nodoc:
+
+    def default_pipe_options
+      @default_pipe_options ||= PIPE_OPTIONS.merge pipe_options
     end
 
-    # Pipe options from OptionCommand's global options
     def pipe_options
-      @pipe_options ||= Hash[*OptionCommand.default_global_options.select {|k,v| v[:pipe] }.flatten]
+      @pipe_options ||= Boson.repo.config[:pipe_options] || {}
+    end
+
+    def process(result, global_options)
+      result = search_and_sort(result, global_options) if !(global_options.keys & PIPE_OPTIONS.keys).empty?
+      process_user_pipes(result, global_options)
     end
 
     # Searches and sorts an array of objects or hashes using options :query, :sort and :reverse_sort.
@@ -23,9 +32,9 @@ module Boson
     end
 
     #:stopdoc:
-    def run_pipe_commands(result, global_options)
+    def process_user_pipes(result, global_options)
       (global_options.keys & pipe_options.keys).each {|e|
-        command = pipe_options[e][:pipe] != true ? pipe_options[e][:pipe] : e
+        command = pipe_options[e][:pipe] ||= e
         pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
           Boson.invoke(command, result, global_options[e])
         result = pipe_result if pipe_options[e][:filter]
@@ -83,7 +92,7 @@ module Boson
       end
 
       def z_pipe_options_callback(obj, options)
-        Pipe.run_pipe_commands(obj, options)
+        Pipe.process_user_pipes(obj, options)
       end
     end
   end

@@ -56,24 +56,20 @@ module Boson
       :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"},
     } #:nodoc:
+
     RENDER_OPTIONS = {
       :fields=>{:type=>:array, :desc=>"Displays fields in the order given"},
       :class=>{:type=>:string, :desc=>"Hirb helper class which renders"},
       :max_width=>{:type=>:numeric, :desc=>"Max width of a table"},
       :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"},
-      :sort=>{:type=>:string, :desc=>"Sort by given field"},
-      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
-      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
     } #:nodoc:
+
 
     class <<self
       #:stopdoc:
       def default_option_parser
-        @default_option_parser ||= OptionParser.new default_render_options.merge(default_global_options)
-      end
-
-      def default_global_options
-        @default_global_options ||= GLOBAL_OPTIONS.merge Boson.repo.config[:global_options] || {}
+        @default_option_parser ||= OptionParser.new Pipe.default_pipe_options.
+          merge(default_render_options.merge(GLOBAL_OPTIONS))
       end
 
       def default_render_options
@@ -81,7 +77,7 @@ module Boson
       end
 
       def delete_non_render_options(opt)
-        opt.delete_if {|k,v| default_global_options.keys.include?(k) }
+        opt.delete_if {|k,v| GLOBAL_OPTIONS.keys.include?(k) }
       end
       #:startdoc:
     end
@@ -137,7 +133,8 @@ module Boson
         end
       }
       render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(self.class.default_render_options))
-      opts = Util.recursive_hash_merge render_opts, Util.deep_copy(self.class.default_global_options)
+      merged_opts = Util.recursive_hash_merge Util.deep_copy(Pipe.default_pipe_options), render_opts
+      opts = Util.recursive_hash_merge merged_opts, Util.deep_copy(GLOBAL_OPTIONS)
       set_global_option_defaults opts
     end
 
