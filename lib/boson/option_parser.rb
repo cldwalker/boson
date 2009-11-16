@@ -70,6 +70,12 @@ module Boson
     # Raised for all OptionParser errors
     class Error < StandardError; end
 
+    # Given options to pass to OptionParser.new, this method parses ARGV and returns a hash of
+    # parsed options. This is useful for scripts outside of Boson.
+    def self.parse(options, args=ARGV)
+      new(options).parse(args)
+    end
+
     NUMERIC     = /(\d*\.\d+|\d+)/
     LONG_RE     = /^(--\w+[-\w+]*)$/
     SHORT_RE    = /^(-[a-zA-Z])$/i
