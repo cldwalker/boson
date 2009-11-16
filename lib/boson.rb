@@ -17,7 +17,6 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 # * Boson::FileLibrary - Explains creating libraries as files
 # * Boson::Loader - Explains library module callbacks
 # * Boson::OptionParser - All about options
-# * Boson::Scientist - Explains how commands can be both shell-commands and normal ruby methods
 module Boson
   # Module which is extended by Boson.main_object to give it command functionality.
   module Universe; include Commands::Namespace; end

@@ -3,11 +3,70 @@ module Boson
   # are processed in this order:
   # * A :query option searches an array of objects or hashes using Pipe.search_object.
   # * A :sort option sorts an array of objects or hashes using Pipe.sort_object.
-  # * All user-defined pipe options (:pipe_options key in Repo.config) are processed in any order.
+  # * All user-defined pipe options (:pipe_options key in Repo.config) are processed in random order.
   #
-  # Note that if a command is rendering with the default Hirb view, piping actually occurs after Hirb
-  # has converted the return value into an array of hashes. If using your own custom Hirb view, piping occurs
-  # before rendering.
+  # Some points:
+  # * User-defined pipes call a command (the option's name by default). It's the user's responsibility to have this
+  #   command loaded when used. The easiest way to do this is by adding the pipe command's library to :defaults in main config.
+  # * By default, pipe commands do not modify the value their given. This means you can activate multiple pipes using
+  #   a method's original return value.
+  # * If you want a pipe command to modify the value its given, set its pipe option's :filter attribute to true.
+  # * A pipe command expects a command's return value as its first argument. If the pipe option takes an argument, it's passed
+  #   on as a second argument.
+  # * When piping occurs in relation to rendering depends on the Hirb view. With the default Hirb view, piping occurs
+  #   occurs in the middle of the rendering, after Hirb has converted the return value into an array of hashes.
+  #   If using a custom Hirb view, piping occurs before rendering.
+  #
+  # === Default Pipes: Search and Sort
+  # The default pipe options, :query, :sort and :reverse_sort, are quite useful for searching and sorting arrays:
+  # Some examples using default commands:
+  #   # Searches commands in the full_name field for 'lib' and sorts results by that field.
+  #   bash> boson commands -q=f:lib -s=f    # or commands --query=full_name:lib --sort=full_name
+  #
+  #   # Multiple fields can be searched if separated by a ','. This searches the full_name and description fields.
+  #   bash> boson commands -q=f,d:web   # or commands --query=full_name,description:web
+  #
+  #   # All fields can be queried using a '*'.
+  #   # Searches all library fields and then reverse sorts on name field
+  #   bash> boson libraries -q=*:core -s=n -R  # or libraries --query=*:core --sort=name --reverse_sort
+  #
+  #   # Multiple searches can be joined together by ','
+  #   # Searches for libraries that have the name matching core or a library_type matching gem
+  #   bash> boson libraries -q=n:core,l:gem   # or libraries --query=name:core,library_type:gem
+  #
+  # In these examples, we queried commands and examples with an explicit --query. However, -q or --query isn't necessary
+  # for these commands because they already default to it when not present. This behavior comes from the default_option
+  # attribute a command can have.
+  #
+  # === User-defined Pipes
+  # Let's say you want to have two commands, browser and copy, you want to make available as pipe options:
+  #    # Opens url in browser. This command already ships with Boson.
+  #    def browser(url)
+  #      system('open', url)
+  #    end
+  #
+  #    # Copy to clipboard
+  #    def copy(str)
+  #      IO.popen('pbcopy', 'w+') {|clipboard| clipboard.write(str)}
+  #    end
+  #
+  # To configure them, drop the following config in ~/.boson/config/boson.yml:
+  #   :pipe_options:
+  #     :browser:
+  #       :type: :boolean
+  #       :desc: Open in browser
+  #     :copy:
+  #       :type: :boolean
+  #       :desc: Copy to clipboard
+  #
+  # Now for any command that returns a url string, these pipe options can be turned on to execute the url.
+  #
+  # Some examples of these options using commands from {my libraries}[http://github.com/cldwalker/irbfiles]:
+  #    # Creates a gist and then opens url in browser and copies it.
+  #    bash> cat some_file | boson gist -bC        # or cat some_file | boson gist --browser --copy
+  #
+  #    # Generates rdoc in current directory and then opens it in browser
+  #    irb>> rdoc '-b'    # or rdoc '--browser'
   module Pipe
     extend self
 
@@ -87,7 +146,7 @@ module Boson
         obj
       end
 
-      # Processes user-defined pipes in any order.
+      # Processes user-defined pipes in random order.
       def z_user_pipes_callback(obj, options)
         Pipe.process_user_pipes(obj, options)
       end
