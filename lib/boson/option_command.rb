@@ -1,13 +1,13 @@
 require 'shellwords'
 module Boson
   # A class used by Scientist to wrap around Command objects. It's main purpose is to parse
-  # options that a command can have: global options, render options and local options.
-  # When passing options to these commands, global and render options _must_ be passed first then
+  # all the options that a command can have: global options, render options, pipe options and local options.
+  # When passing options to these commands, global, pipe and render options _must_ be passed first, then
   # local options.
   #
   # === Global Options
   # Any command with options comes with default global options. For example '-hv' on such a command
-  # prints a help summarizing all of a command's options.
+  # prints a help summarizing all these options.
   # When using global options along with command options, global options _must_ precede command options.
   # Take for example using the global --pretend option with the method above:
   #   irb>> foo '-p -l=1'
@@ -64,12 +64,21 @@ module Boson
       :vertical=>{:type=>:boolean, :desc=>"Display a vertical table"},
     } #:nodoc:
 
+    PIPE_OPTIONS = {
+      :sort=>{:type=>:string, :desc=>"Sort by given field"},
+      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
+      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
+    } #:nodoc:
 
     class <<self
       #:stopdoc:
       def default_option_parser
-        @default_option_parser ||= OptionParser.new Pipe.default_pipe_options.
+        @default_option_parser ||= OptionParser.new default_pipe_options.
           merge(default_render_options.merge(GLOBAL_OPTIONS))
+      end
+
+      def default_pipe_options
+        @default_pipe_options ||= PIPE_OPTIONS.merge Pipe.pipe_options
       end
 
       def default_render_options
@@ -133,7 +142,7 @@ module Boson
         end
       }
       render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(self.class.default_render_options))
-      merged_opts = Util.recursive_hash_merge Util.deep_copy(Pipe.default_pipe_options), render_opts
+      merged_opts = Util.recursive_hash_merge Util.deep_copy(self.class.default_pipe_options), render_opts
       opts = Util.recursive_hash_merge merged_opts, Util.deep_copy(GLOBAL_OPTIONS)
       set_global_option_defaults opts
     end

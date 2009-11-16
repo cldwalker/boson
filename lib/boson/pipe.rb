@@ -1,47 +1,27 @@
 module Boson
+  # This module passes a command's return value through methods/commands specified as pipe options. Pipe options
+  # are processed in this order:
+  # * A :query option searches an array of objects or hashes using Pipe.search_object.
+  # * A :sort option sorts an array of objects or hashes using Pipe.sort_object.
+  # * All user-defined pipe options (:pipe_options key in Repo.config) are processed in any order.
+  #
+  # Note that if a command is rendering with the default Hirb view, piping actually occurs after Hirb
+  # has converted the return value into an array of hashes. If using your own custom Hirb view, piping occurs
+  # before rendering.
   module Pipe
     extend self
 
-    PIPE_OPTIONS = {
-      :sort=>{:type=>:string, :desc=>"Sort by given field"},
-      :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
-      :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
-    } #:nodoc:
-
-    def default_pipe_options
-      @default_pipe_options ||= PIPE_OPTIONS.merge pipe_options
-    end
-
-    def pipe_options
-      @pipe_options ||= Boson.repo.config[:pipe_options] || {}
-    end
-
-    def process(result, global_options)
-      result = search_and_sort(result, global_options) if !(global_options.keys & PIPE_OPTIONS.keys).empty?
-      process_user_pipes(result, global_options)
-    end
-
-    # Searches and sorts an array of objects or hashes using options :query, :sort and :reverse_sort.
-    # The :query option is a hash of fields mapped to their search terms. Searches are OR-ed.
-    def search_and_sort(object, options)
+    # Main method which processes all pipe commands, both default and user-defined ones.
+    def process(object, options)
       if object.is_a?(Array)
         object = search_object(object, options[:query]) if options[:query]
-        object = sort_object(object, options[:sort], options[:reverse_sort]) if object.size > 0 && options[:sort]
+        object = sort_object(object, options[:sort], options[:reverse_sort]) if options[:sort]
       end
-      object
+      process_user_pipes(object, options)
     end
 
-    #:stopdoc:
-    def process_user_pipes(result, global_options)
-      (global_options.keys & pipe_options.keys).each {|e|
-        command = pipe_options[e][:pipe] ||= e
-        pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
-          Boson.invoke(command, result, global_options[e])
-        result = pipe_result if pipe_options[e][:filter]
-      }
-      result
-    end
-
+    # Searches an array of objects or hashes using the :query option.
+    # This option is a hash of fields mapped to their search terms. Searches are OR-ed.
     def search_object(object, query_hash)
       if object[0].is_a?(Hash)
         TableCallbacks.search_callback(object, :query=>query_hash)
@@ -52,6 +32,7 @@ module Boson
       $stderr.puts "Query failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'"
     end
 
+    # Sorts an array of objects or hashes using a sort field. Sort is reversed with reverse_sort set to true.
     def sort_object(object, sort, reverse_sort=false)
       if object[0].is_a?(Hash)
         TableCallbacks.sort_callback(object, :sort=>sort, :reverse_sort=>reverse_sort)
@@ -65,13 +46,28 @@ module Boson
     rescue NoMethodError, ArgumentError
       $stderr.puts "Sort failed with nonexistant method '#{sort}'"
     end
+
+    #:stopdoc:
+    def pipe_options
+      @pipe_options ||= Boson.repo.config[:pipe_options] || {}
+    end
+
+    def process_user_pipes(result, global_options)
+      (global_options.keys & pipe_options.keys).each {|e|
+        command = pipe_options[e][:pipe] ||= e
+        pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
+          Boson.invoke(command, result, global_options[e])
+        result = pipe_result if pipe_options[e][:filter]
+      }
+      result
+    end
     #:startdoc:
 
-    # Callbacks used by Hirb::Helpers::Table to search and sort arrays of hashes.
+    # Callbacks used by Hirb::Helpers::Table to search,sort and run custom pipe commands on arrays of hashes.
     module TableCallbacks
       extend self
       # Case-insensitive searches an array of hashes using the option :query. Numerical string keys
-      # in :query are converted to actual numbers to interface with Hirb. See Pipe.search_and_sort for more
+      # in :query are converted to actual numbers to interface with Hirb. See Pipe.search_object for more
       # about :query.
       def search_callback(obj, options)
         !options[:query] ? obj : begin
@@ -91,7 +87,8 @@ module Boson
         obj
       end
 
-      def z_pipe_options_callback(obj, options)
+      # Processes user-defined pipes in any order.
+      def z_user_pipes_callback(obj, options)
         Pipe.process_user_pipes(obj, options)
       end
     end

@@ -1,35 +1,34 @@
 module Boson
   # Scientist wraps around and redefines an object's method to give it the following features:
-  # * Methods can act like shell commands while still receiving ruby arguments normally. See the Commandification
+  # * Methods can take shell command input with options or receive its normal arguments. See the Commandification
   #   section.
-  # * Methods can be commandified because they can have options. All methods have global options and can have render options
-  #   or local options depending on what method attributes it has. See OptionCommand.
-  # * Methods can have filter methods run on its return value before being returned TODO.
+  # * Methods have default global options such as --help. See OptionCommand.
+  # * Before a method returns its value, it pipes its return value through pipe commands if pipe options are specified. See Pipe.
   # * Methods can have any number of optional views associated with them via render options (see View). Views can be toggled
   #   on/off with the global option --render (see OptionCommand).
   #
-  # The main methods this module provides are redefine_command() for redefining an object's method with a Command object
+  # The main methods Scientist provides are redefine_command() for redefining an object's method with a Command object
   # and commandify() for redefining with a hash of method attributes. Note that for an object's method to be redefined correctly,
   # its last argument _must_ expect a hash.
   #
   # === Commandification
   # Take for example this basic method/command with an options definition:
   #   options :level=>:numeric, :verbose=>:boolean
-  #   def foo(arg='', options={})
-  #     [arg, options]
+  #   def foo(*args)
+  #     args
   #   end
   #
-  # When Scientist wraps around foo(), argument defaults are respected:
-  #    foo '', :verbose=>true   # normal call
-  #    foo '-v'                 # commandline call
+  # When Scientist wraps around foo(), it can take arguments normally or as a shell command:
+  #    foo 'one', 'two', :verbose=>true   # normal call
+  #    foo 'one two -v'                 # commandline call
   #
-  #    Both calls return: ['', {:verbose=>true}]
+  #    Both calls return: ['one', 'two', {:verbose=>true}]
   #
-  # Non-string arguments can be passed in:
-  #    foo Object, :level=>1
-  #    foo Object, 'l1'
+  # Non-string arguments can be passed as well:
+  #    foo Object, 'two', :level=>1
+  #    foo Object, 'two -l1'
   #
-  #    Both calls return: [Object, {:level=>1}]
+  #    Both calls return: [Object, 'two', {:level=>1}]
   module Scientist
     extend self
     # Handles all Scientist errors.
@@ -118,6 +117,7 @@ module Boson
 
     def render_or_raw(result)
       if (@rendered = render?)
+        result = Pipe.process(result, @global_options) if @global_options.key?(:class)
         View.render(result, OptionCommand.delete_non_render_options(@global_options.dup), false)
       else
         Pipe.process(result, @global_options)

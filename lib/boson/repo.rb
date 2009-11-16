@@ -54,10 +54,13 @@ module Boson
     #                  classes between libraries without resorting to packaging them as gems. Defaults to false if the lib
     #                  subdirectory doesn't exist in the boson directory.
     #
-    # ==== Config keys specific only for the main repo config ~/.boson/config/boson.yml
-    # [:pipe_options] Hash of options which activate piping commands(see Pipe).
-    # [:render_options] Hash of render options which are merged with Boson::OptionCommand::RENDER_OPTIONS to be made available to all
-    #                   option commands.
+    # ==== Config keys specific to the main repo config ~/.boson/config/boson.yml
+    # [:pipe_options] Hash of options available to all option commands for piping (see Pipe). A pipe option has the
+    #                 {normal option attributes}[link:classes/Boson/OptionParser.html#M000081] and these:
+    #                 * :pipe: Specifies the command to call when piping. Defaults to the pipe's option name.
+    #                 * :filter: Boolean which indicates that the pipe command will modify its input with what it returns.
+    #                   Default is false.
+    # [:render_options] Hash of render options available to all option commands to be passed to a Hirb view (see View).
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.
