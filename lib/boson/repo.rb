@@ -68,6 +68,7 @@ module Boson
     # [:auto_namespace] Boolean which automatically namespaces all user-defined libraries. Be aware this can break libraries which
     #                   depend on commands from other libraries. Default is false.
     # [:ignore_directories] Array of directories to ignore when detecting local repositories for Boson.local_repo.
+    # [:no_auto_render] When set, turns off commandline auto-rendering of a command's output. Default is false.
     def config(reload=false)
       if reload || @config.nil?
         begin

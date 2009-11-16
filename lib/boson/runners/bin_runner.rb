@@ -30,6 +30,7 @@ module Boson
   # * arrays are rendered with Hirb's tables
   # * non-arrays are printed with inspect()
   # * Any of these cases can be toggled to render/not render with the global option :render
+  # To turn off auto-rendering by default, add a :no_auto_render: true entry to the main config.
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
@@ -115,8 +116,9 @@ module Boson
       end
 
       def render_output(output)
-        if (!Scientist.rendered && !View.inspected_object?(output)) ^ @options[:render]
-          View.render(output, :inspect=>!output.is_a?(Array) || (Scientist.global_options || {})[:render])
+        if (!Scientist.rendered && !View.inspected_object?(output)) ^ @options[:render] ^
+          Boson.repo.config[:no_auto_render]
+            View.render(output, :inspect=>!output.is_a?(Array) || (Scientist.global_options || {})[:render])
         end
       end
 
