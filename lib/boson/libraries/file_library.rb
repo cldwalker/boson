@@ -1,12 +1,16 @@
 module Boson
-  # This library is based on a file of the same name under the commands directory of a repository.
-  # Since there can be multiple repositories, a library's file is looked for in the order given by
+  # This class loads a file by its path relative to the commands directory of a repository.
+  # For example the library 'public/misc' could refer to the file '~/.boson/commands/public/misc.rb'.
+  # If a file's basename is unique in its repository, then it can be loaded with its basename i.e. 'misc'
+  # for the previous example. When loading a library, this class searches repositories in the order given by
   # Boson.repos.
   #
-  # To create this library, simply create a file with a module and some methods (See Library
-  # for naming a module). Non-private methods are automatically loaded as a library's commands.
+  # === Creating a FileLibrary
+  # Start by creating a file with a module and some methods (See Library for naming a module).
+  # Non-private methods are automatically loaded as a library's commands.
   #
   # Take for example a library brain.rb:
+  #   # Drop this in ~/.boson/commands/brain.rb
   #   module Brain
   #     def take_over(destination)
   #       puts "Pinky, it's time to take over the #{destination}!"
@@ -32,10 +36,8 @@ module Boson
   #   bash> boson take_over world -e initiate_brainiac
   #   irb>> take_over 'world -e initiate_brainiac'
   #
-  # To learn more about the depth of option types available to a command, see OptionParser.
-  #
-  # Since boson aims to make your libraries just standard ruby, we can achieve the above
-  # by placing options in comments above a method:
+  # Since Boson aims to make your libraries just standard ruby, we can achieve the above
+  # by making options a commented method attribute:
   #   module Brain
   #     # @options :execute=>:string
   #     # Help Brain live the dream
@@ -46,10 +48,9 @@ module Boson
   #   end
   #
   # Some points about the above:
-  # * A '@' must prefix options and other method calls that become comments.
+  # * A '@' must prefix options and other method attributes that become comments.
   # * Note the comment above the method. One-line comments right before a method set a command's description.
-  # * See MethodInspector for other command attributes, like options, that can be placed above a method.
-  # * See CommentInspector for the rules about commenting command attributes.
+  # * See Inspector for other method attributes, like config and render_options, that can be placed above a method.
   #
   # Once a command has a defined option, a command can also recognize a slew of global options:
   #   irb>> take_over '-h'
@@ -58,7 +59,7 @@ module Boson
   #   # prints much more verbose help
   #   irb>> take_over '-hv'
   #
-  # For more about these global options see OptionCommand.
+  # For more about these global options see OptionCommand and View.
   class FileLibrary < Library
     #:stopdoc:
     def self.library_file(library, dir)

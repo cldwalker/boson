@@ -1,18 +1,16 @@
 module Boson
-  # Scrapes comments right before a method for its attributes. Metadata attributes are the
-  # same as MethodInspector : desc, options, render_options. Attributes must begin with '@' i.e.:
-  #
+  # Scrapes comments right before a method for its attributes. Method attributes must begin with '@' i.e.:
   #    # @desc Does foo
   #    # @options :verbose=>true
   #    def foo(options={})
   #
-  # Some rules about comment attributes:
-  # * Attribute definitions can span multiple lines. When a new attribute starts a line or the comments end
+  # Some rules about these attributes:
+  # * Attribute definitions can span multiple lines. When a new attribute starts a line or the comments end,
   #   then a definition ends.
   # * If no @desc is found in the comment block, then the first comment line directly above the method
   #   is assumed to be the value for @desc. This means that no multi-line attribute definitions can occur
   #   without a description since the last line is assumed to be a description.
-  # * options and render_options attributes can take any valid ruby since they're evaled in their module's context.
+  # * options, config and render_options attributes can take any valid ruby since they're evaled in their module's context.
   # * desc attribute is not evaled and is simply text to be set as a string.
   #
   # This module was inspired by

@@ -1,6 +1,28 @@
 module Boson
   # Scrapes and processes method attributes with the inspectors (MethodInspector, CommentInspector
-  # and ArgumentInspector) and hands off the usable data to FileLibrary objects.
+  # and ArgumentInspector) and hands off the data to FileLibrary objects.
+  #
+  # === Method Attributes
+  # Method attributes refer to (commented) Module methods placed before a command's method
+  # in a FileLibrary module:
+  #   module SomeMod
+  #      # @render_options :fields=>%w{one two}
+  #      # @config :alias=>'so'
+  #      options :verbose=>:boolean
+  #      # Something descriptive perhaps
+  #      def some_method(opts)
+  #        # ...
+  #      end
+  #   end
+  #
+  # Method attributes serve as configuration for a method's command. Available method attributes:
+  # * config: Hash to define any command attributes (see Command.new).
+  # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
+  # * options: Hash to define an OptionParser object for a command's options.
+  # * render_options: Hash to define an OptionParser object for a command's local/global render options (see View).
+  #
+  # When deciding whether to use commented or normal Module methods, remember that commented Module methods allow
+  # independence from Boson (useful for testing). See CommentInspector for more about commented method attributes.
   module Inspector
     extend self
     attr_reader :enabled

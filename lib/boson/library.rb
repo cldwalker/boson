@@ -1,7 +1,7 @@
 module Boson
   # A library is a group of commands (Command objects) usually grouped together by a module.
   # Libraries are loaded from different sources depending on the library subclass. Default library
-  # subclasses are FileLibrary, GemLibrary, RequireLibrary and ModuleLibrary.
+  # subclasses are FileLibrary, GemLibrary, RequireLibrary, ModuleLibrary and LocalFileLibrary.
   # See Loader for callbacks a library's module can have.
   #
   # == Naming a Library Module

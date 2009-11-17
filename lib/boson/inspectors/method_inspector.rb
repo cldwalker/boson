@@ -1,20 +1,7 @@
 module Boson
-  # Gathers method attributes with new_method_added and the
-  # following Module methods:
-  # * desc: Defines a description for a method/command.
-  # * options: Defines an OptionParser object for a method's options.
-  # * render_options: Defines an OptionParser object for a method's rendering options. These options
-  #   are passed to View.render when rendering a command.
-  #
-  # These method calls must come immediately before a method i.e.:
-  #
-  #     desc "Does foo"
-  #     options :verbose=>:boolean
-  #     def foo(options={})
-  #
-  # This module also allows for defining method attributes as comments. Although the actual
-  # scraping of comments is handled by CommentInspector, MethodInspector gather's the method
-  # location it needs with with find_method_locations().
+  # Gathers method attributes by redefining method_added and capturing method
+  # calls before a method. This module also saves method locations so CommentInspector
+  # can scrape their commented method attributes.
   module MethodInspector
     extend self
     attr_accessor :current_module

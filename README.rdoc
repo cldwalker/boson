@@ -9,11 +9,11 @@ Note: To read a linkable version of this README, {see here}[http://tagaholic.me/
 * Simple organization: Commands are just methods on an object (default is main) and command libraries are just modules.
 * Commands are accessible from the commandline (Boson::BinRunner) or irb (Boson::ConsoleRunner).
 * Libraries
-  * can be written in non-dsl ruby which allows for easy testing and use independent of boson (Boson::FileLibrary).
+  * can be written in plain ruby which allows for easy testing and use independent of boson (Boson::FileLibrary).
   * can exist locally as a Bosonfile (Boson::LocalFileLibrary) and under lib/boson/commands or .boson/commands.
   * can be made from gems (Boson::GemLibrary) or any require-able file (Boson::RequireLibrary).
-  * are social as a user can install them from a url and then customize command names, aliases and options without touching
-    the original library.
+  * are encouraged to be shared. Libraries can be installed with a given url. Users can customize any aspect of a third-party
+    library without modifying it.
 * Commands
   * can have any number of local and global options (Boson::OptionCommand). Options are defined with Boson::OptionParser.
   * can have any view associated to it (via Hirb) without adding view code to the command's method.
@@ -26,6 +26,9 @@ Note: To read a linkable version of this README, {see here}[http://tagaholic.me/
   * can have have custom option types defined by users (Boson::Options).
 * Comes with default commands to load, search, list and install commands and libraries (Boson::Commands::Core).
 * Namespaces are optional and when used are methods which allow for method_missing magic.
+
+== Creating Command Libraries
+See Boson::FileLibrary or here[http://tagaholic.me/boson/doc/classes/Boson/FileLibrary.html].
 
 == Irb Example
 
@@ -139,14 +142,11 @@ Having done that, let's start up irb:
 
     # Sweet! Now we have a list and description of commands that come with irb.
 
-== Creating Command Libraries
-See Boson::FileLibrary or here[http://tagaholic.me/boson/doc/classes/Boson/FileLibrary.html].
-
 == Todo
 * More tests
 * Making commands out of existing gems easier and more powerful
-* Better local repositories, perhaps a BosonFile
 * Consider managing extensions to core and standard libraries
+* Features based on commands and their argument types i.e. aliasing, completion, piping
 * Consider dropping alias gem dependency if not using its full potential
 
 == Bugs/Issues
