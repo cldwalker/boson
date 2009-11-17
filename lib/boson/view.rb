@@ -36,10 +36,16 @@ module Boson
   #   >> list '-r'  # or list '--render'
   #   => [{:a=>1, :b=>2}, {:a=>10,:b=>11}]
   #
+  # === Boson and Hirb
   # Since Boson uses {Hirb's auto table helper}[http://tagaholic.me/hirb/doc/classes/Hirb/Helpers/AutoTable.html]
   # by default, you may want to read up on its many options. To use any of them in commands, define them locally
   # with render_options or globally by adding them under the :render_options key of the main config.
   # What if you want to use your own helper class? No problem. Simply pass it with the global :class option.
+  #
+  # When using the default helper, one of the most important options to define is :fields. Aside from controlling what fields
+  # are displayed, it's used to set :values option attributes for related options i.e. :sort and :query. This provides handy option
+  # value aliasing via OptionParser. If you don't set :fields, Boson will try to set its :values with field-related options i.e.
+  # :change_fields, :filters and :headers.
   module View
     extend self
 

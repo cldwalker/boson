@@ -15,18 +15,24 @@ module Boson
   #   over the top level module and the top level module has to be prefixed with '::' _everywhere_.
   #
   # == Configuration
-  # To configure a library, pass a hash of {library attributes}[link:classes/Boson/Library.html#M000077] under
-  # {the :libraries key}[link:classes/Boson/Repo.html#M000070] of a config file. When not using FileLibrary,
-  # you can give most commands the functionality FileLibrary naturally gives its commands by configuring
-  # the :commands key. Here's a config example of a GemLibrary that does that:
-  #   :libraries:
-  #     httparty:
+  # Libraries and their commands can be configured in different ways in this order:
+  # * If library is a FileLibrary, commands be configured with a config method attribute (see Inspector).
+  # * If a library has a module, you can set library + command attributes via the config() callback (see Loader).
+  # * All libraries can be configured by passing a hash of {library attributes}[link:classes/Boson/Library.html#M000077] under
+  #   {the :libraries key}[link:classes/Boson/Repo.html#M000070] to the main config file ~/.boson/config/boson.yml.
+  #   For most libraries this may be the only way to configure a library's commands.
+  #   An example of a GemLibrary config:
+  #    :libraries:
+  #      httparty:
   #       :class_commands:
   #         delete: HTTParty.delete
   #       :commands:
   #         delete:
   #           :alias: d
   #           :description: Http delete a given url
+  #
+  # When installing a third-party library, use the config file as a way to override default library and command attributes
+  # without modifying the library.
   #
   # === Creating Your Own Library
   # To create your own subclass you need to define what sources the subclass can handle with handles().

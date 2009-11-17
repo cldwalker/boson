@@ -2,7 +2,7 @@ module Boson
   # This class handles the boson executable (boson command execution from the commandline). Any changes
   # to your commands are immediately available from the commandline except for changes to the main config file.
   # For those changes to take effect you need to explicitly load and index the libraries with --index.
-  # See Index to understand how Boson can immediately detect the latest commands.
+  # See RepoIndex to understand how Boson can immediately detect the latest commands.
   #
   # Usage for the boson shell command looks like this:
   #   boson [GLOBAL OPTIONS] [COMMAND] [ARGS] [COMMAND OPTIONS]

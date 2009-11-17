@@ -13,7 +13,7 @@ Note: To read a linkable version of this README, {see here}[http://tagaholic.me/
   * can exist locally as a Bosonfile (Boson::LocalFileLibrary) and under lib/boson/commands or .boson/commands.
   * can be made from gems (Boson::GemLibrary) or any require-able file (Boson::RequireLibrary).
   * are encouraged to be shared. Libraries can be installed with a given url. Users can customize any aspect of a third-party
-    library without modifying it.
+    library without modifying it (Boson::Library).
 * Commands
   * can have any number of local and global options (Boson::OptionCommand). Options are defined with Boson::OptionParser.
   * can have any view associated to it (via Hirb) without adding view code to the command's method.

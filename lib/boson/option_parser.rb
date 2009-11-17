@@ -35,7 +35,7 @@ module Boson
   #   String, Integer, Float, Array, Hash, FalseClass, TrueClass.
   # * Users can define their own option types which create objects for _any_ Ruby class. See Options.
   # * Each option type can have attributes to enable more features (see OptionParser.new).
-  # * When options are parsed by OptionParser.parse, an IndifferentAccessHash hash is returned.
+  # * When options are parsed by parse(), an IndifferentAccessHash hash is returned.
   # * Options are also called switches, parameters, flags etc.
   #
   # Default option types:
@@ -145,7 +145,7 @@ module Boson
     # [*:split*] For :array and :hash options. A string or regular expression on which an array value splits
     #            to produce an array of values. Default is ','.
     # [*:keys*] :hash option only. An array of values a hash option's keys can have. Keys can be aliased just like :values.
-    # [:default_keys] :hash option only. Default keys to assume when only a value is given. Multiple keys can be joined
+    # [*:default_keys*] :hash option only. Default keys to assume when only a value is given. Multiple keys can be joined
     #                 by the :split character. Defaults to first key of :keys if :keys given.
     def initialize(opts)
       @defaults = {}

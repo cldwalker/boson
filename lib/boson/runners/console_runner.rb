@@ -5,8 +5,7 @@ module Boson
   class ConsoleRunner < Runner
     class <<self
       # Starts Boson by loading configured libraries. If no default libraries are specified in the config,
-      # it will load up all detected libraries.
-      # ==== Options
+      # it will load up all detected libraries. Options:
       # [:libraries] Array of libraries to load.
       # [:verbose] Boolean to be verbose about libraries loading. Default is true.
       # [:no_defaults] Boolean which turns off loading any default libraries. Default is false.

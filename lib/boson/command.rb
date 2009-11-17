@@ -24,20 +24,20 @@ module Boson
     # and :lib are required keys.
     #
     # Attributes that can be configured:
-    # * *:description*: Description that shows up in command listings
-    # * *:alias*: Alternative name for command
-    # * *:options*: Hash of options passed to OptionParser
-    # * *:render_options*: Hash of rendering options passed to OptionParser
-    # * *:global_options*: Boolean to enable using global options without having to define render_options or options.
-    # * *:args*: Should only be set if not automatically set. This attribute is only
-    #   important for commands that have options/render_options. Its value can be an array
-    #   (as ArgumentInspector.scrape_with_eval produces), a number representing
-    #   the number of arguments or '*' if the command has a variable number of arguments.
-    # * *:default_option* Only for an option command that has one or zero arguments. This treats the given
-    #   option as an optional first argument. Example:
-    #     # For a command with default option 'query' and options --query and -v
-    #     'some -v'   -> '--query=some -v'
-    #     '-v'        -> '-v'
+    # [*:description*] Description that shows up in command listings
+    # [*:alias*] Alternative name for command
+    # [*:options*] Hash of options passed to OptionParser
+    # [*:render_options*] Hash of rendering options passed to OptionParser
+    # [*:global_options*] Boolean to enable using global options without having to define render_options or options.
+    # [*:args*] Should only be set if not automatically set. This attribute is only
+    #           important for commands that have options/render_options. Its value can be an array
+    #           (as ArgumentInspector.scrape_with_eval produces), a number representing
+    #           the number of arguments or '*' if the command has a variable number of arguments.
+    # [*:default_option*] Only for an option command that has one or zero arguments. This treats the given
+    #                     option as an optional first argument. Example:
+    #                       # For a command with default option 'query' and options --query and -v
+    #                       'some -v'   -> '--query=some -v'
+    #                       '-v'        -> '-v'
     def initialize(hash)
       @name = hash[:name] or raise ArgumentError
       @lib = hash[:lib] or raise ArgumentError
