@@ -60,7 +60,8 @@ module Boson
     #                 * :pipe: Specifies the command to call when piping. Defaults to the pipe's option name.
     #                 * :filter: Boolean which indicates that the pipe command will modify its input with what it returns.
     #                   Default is false.
-    # [:render_options] Hash of render options available to all option commands to be passed to a Hirb view (see View).
+    # [:render_options] Hash of render options available to all option commands to be passed to a Hirb view (see View). Since
+    #                   this merges with default render options, it's possible to override default render options.
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.

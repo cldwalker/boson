@@ -32,13 +32,14 @@ module Boson
   #   b: 2
   #   ...
   #
-  #   # To get the original return value don't forget --render
+  #   # To get the original return value use the global option --render
   #   >> list '-r'  # or list '--render'
   #   => [{:a=>1, :b=>2}, {:a=>10,:b=>11}]
   #
-  # Since Boson, uses {Hirb's auto table helper}[http://tagaholic.me/hirb/doc/classes/Hirb/Helpers/AutoTable.html]
-  # by default, you should read up on it if you want to use and define (Repo.config) the many options that are available
-  # for this default helper. What if you want to use your own helper class? No problem. Simply pass it with the global :class option.
+  # Since Boson uses {Hirb's auto table helper}[http://tagaholic.me/hirb/doc/classes/Hirb/Helpers/AutoTable.html]
+  # by default, you may want to read up on its many options. To use any of them in commands, define them locally
+  # with render_options or globally by adding them under the :render_options key of the main config.
+  # What if you want to use your own helper class? No problem. Simply pass it with the global :class option.
   module View
     extend self
 
@@ -51,10 +52,10 @@ module Boson
     # Renders any object via Hirb. Options are passed directly to
     # {Hirb::Console.render_output}[http://tagaholic.me/hirb/doc/classes/Hirb/Console.html#M000011].
     def render(object, options={}, return_obj=false)
-      if options[:inspect] || inspected_object?(object)
+      if options[:inspect]
         puts(object.inspect)
       else
-        render_object(object, options, return_obj)
+        render_object(object, options, return_obj) unless silent_object?(object)
       end
     end
 
@@ -63,7 +64,7 @@ module Boson
       Hirb::View.toggle_pager
     end
 
-    def inspected_object?(obj)
+    def silent_object?(obj)
       [nil,false,true].include?(obj)
     end
 

@@ -116,7 +116,7 @@ module Boson
       end
 
       def render_output(output)
-        if (!Scientist.rendered && !View.inspected_object?(output)) ^ @options[:render] ^
+        if (!Scientist.rendered && !View.silent_object?(output)) ^ @options[:render] ^
           Boson.repo.config[:no_auto_render]
             opts = output.is_a?(String) ? {:method=>'puts'} :
               {:inspect=>!output.is_a?(Array) || (Scientist.global_options || {})[:render] }
