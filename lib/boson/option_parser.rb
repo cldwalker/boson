@@ -70,12 +70,6 @@ module Boson
     # Raised for all OptionParser errors
     class Error < StandardError; end
 
-    # Given options to pass to OptionParser.new, this method parses ARGV and returns a hash of
-    # parsed options. This is useful for scripts outside of Boson.
-    def self.parse(options, args=ARGV)
-      new(options).parse(args)
-    end
-
     NUMERIC     = /(\d*\.\d+|\d+)/
     LONG_RE     = /^(--\w+[-\w+]*)$/
     SHORT_RE    = /^(-[a-zA-Z])$/i
@@ -84,6 +78,17 @@ module Boson
     SHORT_NUM   = /^(-[a-zA-Z])#{NUMERIC}$/i
     
     attr_reader :leading_non_opts, :trailing_non_opts, :opt_aliases
+
+    # Given options to pass to OptionParser.new, this method parses ARGV and returns a hash of
+    # parsed options. This is useful for scripts outside of Boson.
+    def self.parse(options, args=ARGV)
+      (@opt_parser ||= new(options)).parse(args)
+    end
+
+    # Usage string summarizing options defined in parse
+    def self.usage
+      @opt_parser.to_s
+    end
 
     # Array of arguments left after defined options have been parsed out by parse.
     def non_opts
