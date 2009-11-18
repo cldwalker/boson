@@ -139,6 +139,7 @@ module Boson
 
       # Sorts an array of hashes using :sort option and reverses the sort with :reverse_sort option.
       def sort_callback(obj, options)
+        return obj unless options[:sort]
         sort =  options[:sort].to_s[/^\d+$/] ? options[:sort].to_i : options[:sort]
         sort_lambda = (obj.all? {|e| e[sort].respond_to?(:<=>) } ? lambda {|e| e[sort] } : lambda {|e| e[sort].to_s })
         obj = obj.sort_by &sort_lambda
