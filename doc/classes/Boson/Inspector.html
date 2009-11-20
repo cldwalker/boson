@@ -42,17 +42,54 @@
             Scrapes and processes method attributes with the inspectors (<a
             href="MethodInspector.html">MethodInspector</a>, <a
             href="CommentInspector.html">CommentInspector</a> and <a
-            href="ArgumentInspector.html">ArgumentInspector</a>) and hands off the
-            usable data to <a href="FileLibrary.html">FileLibrary</a> objects.
+            href="ArgumentInspector.html">ArgumentInspector</a>) and hands off the data
+            to <a href="FileLibrary.html">FileLibrary</a> objects.
+            </p>
+            <h3>Method Attributes</h3>
+            <p>
+            Method attributes refer to (commented) Module methods placed before a
+            command&#8217;s method in a <a href="FileLibrary.html">FileLibrary</a>
+            module:
+            </p>
+            <pre>module SomeMod&#x000A;   # @render_options :fields=&gt;%w{one two}&#x000A;   # @config :alias=&gt;'so'&#x000A;   options :verbose=&gt;:boolean&#x000A;   # Something descriptive perhaps&#x000A;   def some_method(opts)&#x000A;     # ...&#x000A;   end&#x000A;end</pre>
+            <p>
+            Method attributes serve as configuration for a method&#8217;s command.
+            Available method attributes:
+            </p>
+            <ul>
+            <li>config: Hash to define any command attributes (see <a
+            href="Command.html#M000055">Command.new</a>).
+            
+            </li>
+            <li>desc: String to define a command&#8217;s description for a command.
+            Defaults to first commented line above a method.
+            
+            </li>
+            <li>options: Hash to define an <a href="OptionParser.html">OptionParser</a>
+            object for a command&#8217;s options.
+            
+            </li>
+            <li>render_options: Hash to define an <a
+            href="OptionParser.html">OptionParser</a> object for a command&#8217;s
+            local/global render options (see <a href="View.html">View</a>).
+            
+            </li>
+            </ul>
+            <p>
+            When deciding whether to use commented or normal Module methods, remember
+            that commented Module methods allow independence from <a
+            href="../Boson.html">Boson</a> (useful for testing). See <a
+            href="CommentInspector.html">CommentInspector</a> for more about commented
+            method attributes.
             </p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000022">add_method_data_to_library</a></li>
-              <li><a href="#M000021">disable</a></li>
-              <li><a href="#M000020">enable</a></li>
+              <li><a href="#M000019">add_method_data_to_library</a></li>
+              <li><a href="#M000018">disable</a></li>
+              <li><a href="#M000017">enable</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -70,8 +107,8 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000022'>
-                <a name='M000022'>      </a>
+              <div class='public-instance method' id='method-M000019'>
+                <a name='M000019'>      </a>
                 <div class='synopsis'>
                   <span class='name'>add_method_data_to_library</span>
                   <span class='arguments'>(library)</span>
@@ -83,14 +120,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000022-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000019-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000022-source'><span class="ruby-comment cmt"># File lib/boson/inspector.rb, line 38</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_method_data_to_library</span>(<span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-ivar">@commands_hash</span> = <span class="ruby-identifier">library</span>.<span class="ruby-identifier">commands_hash</span>&#x000A;      <span class="ruby-ivar">@library_file</span> = <span class="ruby-identifier">library</span>.<span class="ruby-identifier">library_file</span>&#x000A;      <span class="ruby-constant">MethodInspector</span>.<span class="ruby-identifier">current_module</span> = <span class="ruby-identifier">library</span>.<span class="ruby-identifier">module</span>&#x000A;      <span class="ruby-ivar">@store</span> = <span class="ruby-constant">MethodInspector</span>.<span class="ruby-identifier">store</span>&#x000A;      <span class="ruby-identifier">add_method_scraped_data</span>&#x000A;      <span class="ruby-identifier">add_comment_scraped_data</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000019-source'><span class="ruby-comment cmt"># File lib/boson/inspector.rb, line 60</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_method_data_to_library</span>(<span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-ivar">@commands_hash</span> = <span class="ruby-identifier">library</span>.<span class="ruby-identifier">commands_hash</span>&#x000A;      <span class="ruby-ivar">@library_file</span> = <span class="ruby-identifier">library</span>.<span class="ruby-identifier">library_file</span>&#x000A;      <span class="ruby-constant">MethodInspector</span>.<span class="ruby-identifier">current_module</span> = <span class="ruby-identifier">library</span>.<span class="ruby-identifier">module</span>&#x000A;      <span class="ruby-ivar">@store</span> = <span class="ruby-constant">MethodInspector</span>.<span class="ruby-identifier">store</span>&#x000A;      <span class="ruby-identifier">add_method_scraped_data</span>&#x000A;      <span class="ruby-identifier">add_comment_scraped_data</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000021'>
-                <a name='M000021'>      </a>
+              <div class='public-instance method' id='method-M000018'>
+                <a name='M000018'>      </a>
                 <div class='synopsis'>
                   <span class='name'>disable</span>
                   <span class='arguments'>()</span>
@@ -101,14 +138,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000021-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000018-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000021-source'><span class="ruby-comment cmt"># File lib/boson/inspector.rb, line 29</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">disable</span>&#x000A;      <span class="ruby-operator">::</span><span class="ruby-constant">Module</span>.<span class="ruby-identifier">module_eval</span> <span class="ruby-value str">%[&#x000A;        Boson::MethodInspector::METHODS.each {|e| remove_method e }&#x000A;        alias_method :method_added, :_old_method_added&#x000A;      ]</span>&#x000A;      <span class="ruby-ivar">@enabled</span> = <span class="ruby-keyword kw">false</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000018-source'><span class="ruby-comment cmt"># File lib/boson/inspector.rb, line 51</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">disable</span>&#x000A;      <span class="ruby-operator">::</span><span class="ruby-constant">Module</span>.<span class="ruby-identifier">module_eval</span> <span class="ruby-value str">%[&#x000A;        Boson::MethodInspector::METHODS.each {|e| remove_method e }&#x000A;        alias_method :method_added, :_old_method_added&#x000A;      ]</span>&#x000A;      <span class="ruby-ivar">@enabled</span> = <span class="ruby-keyword kw">false</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000020'>
-                <a name='M000020'>      </a>
+              <div class='public-instance method' id='method-M000017'>
+                <a name='M000017'>      </a>
                 <div class='synopsis'>
                   <span class='name'>enable</span>
                   <span class='arguments'>()</span>
@@ -120,10 +157,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000020-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000017-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000020-source'><span class="ruby-comment cmt"># File lib/boson/inspector.rb, line 10</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">enable</span>&#x000A;      <span class="ruby-ivar">@enabled</span> = <span class="ruby-keyword kw">true</span>&#x000A;      <span class="ruby-identifier">body</span> = <span class="ruby-constant">MethodInspector</span><span class="ruby-operator">::</span><span class="ruby-constant">METHODS</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-node">%[def #{e}(val)&#x000A;            Boson::MethodInspector.#{e}(self, val)&#x000A;          end]</span>&#x000A;      }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>) <span class="ruby-operator">+</span>&#x000A;      <span class="ruby-value str">%[&#x000A;        def new_method_added(method)&#x000A;          Boson::MethodInspector.new_method_added(self, method)&#x000A;        end&#x000A;&#x000A;        alias_method :_old_method_added, :method_added&#x000A;        alias_method :method_added, :new_method_added&#x000A;      ]</span>&#x000A;    <span class="ruby-operator">::</span><span class="ruby-constant">Module</span>.<span class="ruby-identifier">module_eval</span> <span class="ruby-identifier">body</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000017-source'><span class="ruby-comment cmt"># File lib/boson/inspector.rb, line 32</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">enable</span>&#x000A;      <span class="ruby-ivar">@enabled</span> = <span class="ruby-keyword kw">true</span>&#x000A;      <span class="ruby-identifier">body</span> = <span class="ruby-constant">MethodInspector</span><span class="ruby-operator">::</span><span class="ruby-constant">METHODS</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-node">%[def #{e}(val)&#x000A;            Boson::MethodInspector.#{e}(self, val)&#x000A;          end]</span>&#x000A;      }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;\n&quot;</span>) <span class="ruby-operator">+</span>&#x000A;      <span class="ruby-value str">%[&#x000A;        def new_method_added(method)&#x000A;          Boson::MethodInspector.new_method_added(self, method)&#x000A;        end&#x000A;&#x000A;        alias_method :_old_method_added, :method_added&#x000A;        alias_method :method_added, :new_method_added&#x000A;      ]</span>&#x000A;    <span class="ruby-operator">::</span><span class="ruby-constant">Module</span>.<span class="ruby-identifier">module_eval</span> <span class="ruby-identifier">body</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

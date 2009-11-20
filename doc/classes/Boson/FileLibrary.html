@@ -43,20 +43,24 @@
         <div id='text'>
           <div id='description'>
             <p>
-            This library is based on a file of the same name under the commands
-            directory of a repository. Since there can be multiple repositories, a
-            library&#8217;s file is looked for in the order given by <a
-            href="../Boson.html#M000005">Boson.repos</a>.
+            This class loads a file by its path relative to the commands directory of a
+            repository. For example the library &#8216;public/misc&#8217; could refer
+            to the file &#8217;~/.boson/commands/public/misc.rb&#8217;. If a
+            file&#8217;s basename is unique in its repository, then it can be loaded
+            with its basename i.e. &#8216;misc&#8217; for the previous example. When
+            loading a library, this class searches repositories in the order given by
+            <a href="../Boson.html#M000005">Boson.repos</a>.
             </p>
+            <h3>Creating a <a href="FileLibrary.html">FileLibrary</a></h3>
             <p>
-            To create this library, simply create a file with a module and some methods
-            (See <a href="Library.html">Library</a> for naming a module). Non-private
-            methods are automatically loaded as a library&#8217;s commands.
+            Start by creating a file with a module and some methods (See <a
+            href="Library.html">Library</a> for naming a module). Non-private methods
+            are automatically loaded as a library&#8217;s commands.
             </p>
             <p>
             Take for example a library brain.rb:
             </p>
-            <pre>module Brain&#x000A;  def take_over(destination)&#x000A;    puts &quot;Pinky, it's time to take over the #{destination}!&quot;&#x000A;  end&#x000A;end</pre>
+            <pre># Drop this in ~/.boson/commands/brain.rb&#x000A;module Brain&#x000A;  def take_over(destination)&#x000A;    puts &quot;Pinky, it's time to take over the #{destination}!&quot;&#x000A;  end&#x000A;end</pre>
             <p>
             Once loaded, this library can be run from the commandline or irb:
             </p>
@@ -73,32 +77,25 @@
             </p>
             <pre>bash&gt; boson take_over world -e initiate_brainiac&#x000A;irb&gt;&gt; take_over 'world -e initiate_brainiac'</pre>
             <p>
-            To learn more about the depth of option types available to a command, see
-            <a href="OptionParser.html">OptionParser</a>.
-            </p>
-            <p>
-            Since boson aims to make your libraries just standard ruby, we can achieve
-            the above by placing options in comments above a method:
+            Since <a href="../Boson.html">Boson</a> aims to make your libraries just
+            standard ruby, we can achieve the above by making options a commented
+            method attribute:
             </p>
             <pre>module Brain&#x000A;  # @options :execute=&gt;:string&#x000A;  # Help Brain live the dream&#x000A;  def take_over(destination, options={})&#x000A;    puts &quot;Pinky, it's time to take over the #{destination}!&quot;&#x000A;    system(options[:execute]) if options[:execute]&#x000A;  end&#x000A;end</pre>
             <p>
             Some points about the above:
             </p>
             <ul>
-            <li>A &#8217;@&#8217; must prefix options and other method calls that become
-            comments.
+            <li>A &#8217;@&#8217; must prefix options and other method attributes that
+            become comments.
             
             </li>
             <li>Note the comment above the method. One-line comments right before a method
             set a command&#8217;s description.
             
             </li>
-            <li>See <a href="MethodInspector.html">MethodInspector</a> for other command
-            attributes, like options, that can be placed above a method.
-            
-            </li>
-            <li>See <a href="CommentInspector.html">CommentInspector</a> for the rules
-            about commenting command attributes.
+            <li>See <a href="Inspector.html">Inspector</a> for other method attributes,
+            like config and render_options, that can be placed above a method.
             
             </li>
             </ul>
@@ -109,7 +106,8 @@
             <pre>irb&gt;&gt; take_over '-h'&#x000A;take_over [destination] [--execute=STRING]&#x000A;&#x000A;# prints much more verbose help&#x000A;irb&gt;&gt; take_over '-hv'</pre>
             <p>
             For more about these global options see <a
-            href="Scientist.html">Scientist</a>.
+            href="OptionCommand.html">OptionCommand</a> and <a
+            href="View.html">View</a>.
             </p>
           </div>
           <div id='section'>

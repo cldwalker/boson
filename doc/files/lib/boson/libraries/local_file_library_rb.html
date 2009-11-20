@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>File: scientist.rb [RDoc Documentation]</title>
+    <title>File: local_file_library.rb [RDoc Documentation]</title>
     <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
-    <link href='../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='../../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
         function popupCode(url) {
@@ -25,17 +25,33 @@
   <body class='page'>
     <div class='file' id='wrapper'>
       <div class='header'>
-        <h1 class='name'>scientist.rb</h1>
+        <h1 class='name'>local_file_library.rb</h1>
         <div class='paths'>
-          lib/boson/scientist.rb
+          lib/boson/libraries/local_file_library.rb
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>Mon Nov 16 12:22:35 -0500 2009</span>
+          <span class='datetime'>Thu Nov 12 19:13:20 -0500 2009</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
+          <div id='description'>
+            <p>
+            This class loads any local file and is most commonly used to load a local
+            Bosonfile. Since this file doesn&#8217;t exist inside a normal Repo, it is
+            not indexed with any repo. Since file-based libraries need to be associated
+            with a repository, <a href="../../../../classes/Boson.html">Boson</a>
+            associates it with a local repository if it exists or defaults to <a
+            href="../../../../classes/Boson.html#M000003">Boson.repo</a>. See <a
+            href="../../../../classes/Boson/FileLibrary.html">Boson::FileLibrary</a>
+            for more info about this library.
+            </p>
+            <p>
+            Example:
+            </p>
+            <pre>&gt;&gt; load_library 'Bosonfile'&#x000A;=&gt; true</pre>
+          </div>
           <div id='section'>
           </div>
         </div>

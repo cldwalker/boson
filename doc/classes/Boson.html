@@ -67,13 +67,22 @@
             <a href="../files/lib/boson/namespace_rb.html">lib/boson/namespace.rb</a>
           </li>
           <li class='other'>
+            <a href="../files/lib/boson/option_command_rb.html">lib/boson/option_command.rb</a>
+          </li>
+          <li class='other'>
             <a href="../files/lib/boson/option_parser_rb.html">lib/boson/option_parser.rb</a>
           </li>
           <li class='other'>
             <a href="../files/lib/boson/options_rb.html">lib/boson/options.rb</a>
           </li>
           <li class='other'>
+            <a href="../files/lib/boson/pipe_rb.html">lib/boson/pipe.rb</a>
+          </li>
+          <li class='other'>
             <a href="../files/lib/boson/repo_rb.html">lib/boson/repo.rb</a>
+          </li>
+          <li class='other'>
+            <a href="../files/lib/boson/repo_index_rb.html">lib/boson/repo_index.rb</a>
           </li>
           <li class='other'>
             <a href="../files/lib/boson/runner_rb.html">lib/boson/runner.rb</a>
@@ -120,7 +129,7 @@
             href="Boson.html">Boson</a> from the ruby console
             
             </li>
-            <li><a href="Boson/Repo.html#M000074">Boson::Repo.config</a> - Explains main
+            <li><a href="Boson/Repo.html#M000079">Boson::Repo.config</a> - Explains main
             config file
             
             </li>
@@ -137,10 +146,6 @@
             </li>
             <li><a href="Boson/OptionParser.html">Boson::OptionParser</a> - All about
             options
-            
-            </li>
-            <li><a href="Boson/Scientist.html">Boson::Scientist</a> - Explains how commands
-            can be both shell-commands and normal ruby methods
             
             </li>
             </ul>
@@ -170,6 +175,7 @@
               Module <a href="Boson/Loader.html" class="link">Boson::Loader</a><br />
               Module <a href="Boson/MethodInspector.html" class="link">Boson::MethodInspector</a><br />
               Module <a href="Boson/Options.html" class="link">Boson::Options</a><br />
+              Module <a href="Boson/Pipe.html" class="link">Boson::Pipe</a><br />
               Module <a href="Boson/Scientist.html" class="link">Boson::Scientist</a><br />
               Module <a href="Boson/Universe.html" class="link">Boson::Universe</a><br />
               Module <a href="Boson/Util.html" class="link">Boson::Util</a><br />
@@ -183,12 +189,15 @@
               Class <a href="Boson/IndifferentAccessHash.html" class="link">Boson::IndifferentAccessHash</a><br />
               Class <a href="Boson/Library.html" class="link">Boson::Library</a><br />
               Class <a href="Boson/LoaderError.html" class="link">Boson::LoaderError</a><br />
+              Class <a href="Boson/LocalFileLibrary.html" class="link">Boson::LocalFileLibrary</a><br />
               Class <a href="Boson/Manager.html" class="link">Boson::Manager</a><br />
               Class <a href="Boson/MethodConflictError.html" class="link">Boson::MethodConflictError</a><br />
               Class <a href="Boson/ModuleLibrary.html" class="link">Boson::ModuleLibrary</a><br />
               Class <a href="Boson/Namespace.html" class="link">Boson::Namespace</a><br />
+              Class <a href="Boson/OptionCommand.html" class="link">Boson::OptionCommand</a><br />
               Class <a href="Boson/OptionParser.html" class="link">Boson::OptionParser</a><br />
               Class <a href="Boson/Repo.html" class="link">Boson::Repo</a><br />
+              Class <a href="Boson/RepoIndex.html" class="link">Boson::RepoIndex</a><br />
               Class <a href="Boson/RequireLibrary.html" class="link">Boson::RequireLibrary</a><br />
               Class <a href="Boson/Runner.html" class="link">Boson::Runner</a><br />
             </div>
@@ -264,7 +273,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000002-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000002-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 36</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commands</span>&#x000A;    <span class="ruby-ivar">@commands</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000002-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 35</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commands</span>&#x000A;    <span class="ruby-ivar">@commands</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='public-instance method' id='method-M000007'>
@@ -300,7 +309,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000001-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000001-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 31</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">libraries</span>&#x000A;    <span class="ruby-ivar">@libraries</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000001-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 30</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">libraries</span>&#x000A;    <span class="ruby-ivar">@libraries</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='public-instance method' id='method-M000004'>
@@ -318,7 +327,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000004-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000004-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 46</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">local_repo</span>&#x000A;    <span class="ruby-ivar">@local_repo</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">begin</span>&#x000A;      <span class="ruby-identifier">dir</span> = [<span class="ruby-value str">&quot;lib/boson&quot;</span>, <span class="ruby-value str">&quot;.boson&quot;</span>].<span class="ruby-identifier">find</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">&amp;&amp;</span>&#x000A;         <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">repo</span>.<span class="ruby-identifier">dir</span> }&#x000A;      <span class="ruby-constant">Repo</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">dir</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">dir</span>&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000004-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 45</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">local_repo</span>&#x000A;    <span class="ruby-ivar">@local_repo</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">begin</span>&#x000A;      <span class="ruby-identifier">ignored_dirs</span> = (<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:ignore_directories</span>] <span class="ruby-operator">||</span> []).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">e</span>) }&#x000A;      <span class="ruby-identifier">dir</span> = [<span class="ruby-value str">&quot;lib/boson&quot;</span>, <span class="ruby-value str">&quot;.boson&quot;</span>].<span class="ruby-identifier">find</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">&amp;&amp;</span>&#x000A;          <span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">repo</span>.<span class="ruby-identifier">dir</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">ignored_dirs</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">expand_path</span>(<span class="ruby-value str">'.'</span>)) }&#x000A;      <span class="ruby-constant">Repo</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">dir</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">dir</span>&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='public-instance method' id='method-M000003'>
@@ -336,7 +345,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000003-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000003-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 41</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">repo</span>&#x000A;    <span class="ruby-ivar">@repo</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Repo</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{Util.find_home}/.boson&quot;</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000003-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 40</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">repo</span>&#x000A;    <span class="ruby-ivar">@repo</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Repo</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;#{Util.find_home}/.boson&quot;</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='public-instance method' id='method-M000005'>
@@ -347,7 +356,8 @@
                 </div>
                 <div class='description'>
                   <p>
-                  The array of loaded repositories
+                  The array of loaded repositories containing the main repo and a possible
+                  local repo
                   </p>
                 </div>
                 <div class='source'>
@@ -367,7 +377,7 @@
                   <p>
                   Start <a href="Boson.html">Boson</a> by loading repositories and their
                   configured libraries. See <a
-                  href="Boson/ConsoleRunner.html#M000067">ConsoleRunner.start</a> for its
+                  href="Boson/ConsoleRunner.html#M000072">ConsoleRunner.start</a> for its
                   options.
                   </p>
                 </div>

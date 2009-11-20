@@ -51,18 +51,18 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000047">create</a></li>
-              <li><a href="#M000048">find</a></li>
-              <li><a href="#M000049">new</a></li>
+              <li><a href="#M000053">create</a></li>
+              <li><a href="#M000054">find</a></li>
+              <li><a href="#M000055">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000051">args</a></li>
-              <li><a href="#M000055">full_name</a></li>
-              <li><a href="#M000050">library</a></li>
-              <li><a href="#M000053">option_help</a></li>
-              <li><a href="#M000052">option_parser</a></li>
-              <li><a href="#M000054">usage</a></li>
+              <li><a href="#M000057">args</a></li>
+              <li><a href="#M000061">full_name</a></li>
+              <li><a href="#M000056">library</a></li>
+              <li><a href="#M000059">option_help</a></li>
+              <li><a href="#M000058">option_parser</a></li>
+              <li><a href="#M000060">usage</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -80,8 +80,8 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000047'>
-                <a name='M000047'>      </a>
+              <div class='public-class method' id='method-M000053'>
+                <a name='M000053'>      </a>
                 <div class='synopsis'>
                   <span class='name'>create</span>
                   <span class='arguments'>(name, library)</span>
@@ -92,14 +92,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000047-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000053-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000047-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 5</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-identifier">new</span> (<span class="ruby-identifier">library</span>.<span class="ruby-identifier">commands_hash</span>[<span class="ruby-identifier">name</span>] <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>({<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">:lib=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">library</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">:namespace=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">library</span>.<span class="ruby-identifier">namespace</span>})&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000053-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 5</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-identifier">new</span> (<span class="ruby-identifier">library</span>.<span class="ruby-identifier">commands_hash</span>[<span class="ruby-identifier">name</span>] <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>({<span class="ruby-identifier">:name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">:lib=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">library</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">:namespace=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">library</span>.<span class="ruby-identifier">namespace</span>})&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000048'>
-                <a name='M000048'>      </a>
+              <div class='public-class method' id='method-M000054'>
+                <a name='M000054'>      </a>
                 <div class='synopsis'>
                   <span class='name'>find</span>
                   <span class='arguments'>(command, commands=Boson.commands)</span>
@@ -111,14 +111,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000048-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000054-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000048-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 11</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">command</span>, <span class="ruby-identifier">commands</span>=<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">commands</span>)&#x000A;      <span class="ruby-identifier">command</span>, <span class="ruby-identifier">subcommand</span> = <span class="ruby-identifier">command</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">'.'</span>, <span class="ruby-value">2</span>)&#x000A;      <span class="ruby-identifier">is_namespace_command</span> = <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">current_command</span><span class="ruby-operator">|</span>&#x000A;        [<span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">alias</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">subcommand</span>) <span class="ruby-operator">&amp;&amp;</span>&#x000A;        <span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">library</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">library</span>.<span class="ruby-identifier">namespace</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">command</span>)&#x000A;      }&#x000A;      <span class="ruby-identifier">find_lambda</span> = <span class="ruby-identifier">subcommand</span> <span class="ruby-value">? </span><span class="ruby-identifier">is_namespace_command</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">e</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">e</span>.<span class="ruby-identifier">alias</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">command</span>)}&#x000A;      <span class="ruby-identifier">commands</span>.<span class="ruby-identifier">find</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">find_lambda</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000054-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 11</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">command</span>, <span class="ruby-identifier">commands</span>=<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">commands</span>)&#x000A;      <span class="ruby-identifier">command</span>, <span class="ruby-identifier">subcommand</span> = <span class="ruby-identifier">command</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">'.'</span>, <span class="ruby-value">2</span>)&#x000A;      <span class="ruby-identifier">is_namespace_command</span> = <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">current_command</span><span class="ruby-operator">|</span>&#x000A;        [<span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">alias</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">subcommand</span>) <span class="ruby-operator">&amp;&amp;</span>&#x000A;        <span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">library</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">current_command</span>.<span class="ruby-identifier">library</span>.<span class="ruby-identifier">namespace</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">command</span>)&#x000A;      }&#x000A;      <span class="ruby-identifier">find_lambda</span> = <span class="ruby-identifier">subcommand</span> <span class="ruby-value">? </span><span class="ruby-identifier">is_namespace_command</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">e</span>.<span class="ruby-identifier">name</span>, <span class="ruby-identifier">e</span>.<span class="ruby-identifier">alias</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">command</span>)}&#x000A;      <span class="ruby-identifier">commands</span>.<span class="ruby-identifier">find</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">find_lambda</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000049'>
-                <a name='M000049'>      </a>
+              <div class='public-class method' id='method-M000055'>
+                <a name='M000055'>      </a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(hash)</span>
@@ -131,46 +131,49 @@
                   <p>
                   Attributes that can be configured:
                   </p>
-                  <ul>
-                  <li><b>:description</b>: Description that shows up in command listings
+                  <dl>
+                  <dt><b>:description</b></dt><dd>Description that shows up in command listings
                   
-                  </li>
-                  <li><b>:alias</b>: Alternative name for command
+                  </dd>
+                  <dt><b>:alias</b></dt><dd>Alternative name for command
                   
-                  </li>
-                  <li><b>:options</b>: Hash of options passed to <a
+                  </dd>
+                  <dt><b>:options</b></dt><dd>Hash of options passed to <a href="OptionParser.html">OptionParser</a>
+                  
+                  </dd>
+                  <dt><b>:render_options</b></dt><dd>Hash of rendering options passed to <a
                   href="OptionParser.html">OptionParser</a>
                   
-                  </li>
-                  <li><b>:render_options</b>: Hash of rendering options passed to <a
-                  href="OptionParser.html">OptionParser</a>
+                  </dd>
+                  <dt><b>:global_options</b></dt><dd>Boolean to enable using global options without having to define
+                  render_options or options.
                   
-                  </li>
-                  <li><b>:args</b>: Should only be set if not automatically set. This attribute
-                  is only important for commands that have options/render_options. Its value
-                  can be an array (as <a
-                  href="ArgumentInspector.html#M000041">ArgumentInspector.scrape_with_eval</a>
+                  </dd>
+                  <dt><b>:args</b></dt><dd>Should only be set if not automatically set. This attribute is only
+                  important for commands that have options/render_options. Its value can be
+                  an array (as <a
+                  href="ArgumentInspector.html#M000044">ArgumentInspector.scrape_with_eval</a>
                   produces), a number representing the number of arguments or &#8217;*&#8217;
                   if the command has a variable number of arguments.
                   
-                  </li>
-                  <li><b>:default_option</b> Only for an option command that has one argument.
-                  This treats the given option as an optional first argument. Example:
+                  </dd>
+                  <dt><b>:default_option</b></dt><dd>Only for an option command that has one or zero arguments. This treats the
+                  given option as an optional first argument. Example:
                   
                   <pre># For a command with default option 'query' and options --query and -v&#x000A;'some -v'   -&gt; '--query=some -v'&#x000A;'-v'        -&gt; '-v'</pre>
-                  </li>
-                  </ul>
+                  </dd>
+                  </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000049-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000055-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000049-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 40</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:name</span>] <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;      <span class="ruby-ivar">@lib</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:lib</span>] <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;      <span class="ruby-ivar">@alias</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:alias</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:alias</span>]&#x000A;      <span class="ruby-ivar">@description</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:description</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:description</span>]&#x000A;      <span class="ruby-ivar">@render_options</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:render_options</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:render_options</span>]&#x000A;      <span class="ruby-ivar">@options</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:options</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:options</span>]&#x000A;      <span class="ruby-ivar">@namespace</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:namespace</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:namespace</span>]&#x000A;      <span class="ruby-ivar">@default_option</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:default_option</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:default_option</span>]&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>]&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;          <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>]&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/^\d+/</span>]&#x000A;          <span class="ruby-ivar">@arg_size</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">to_i</span>&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">'*'</span>&#x000A;          <span class="ruby-ivar">@args</span> = [[<span class="ruby-value str">'*args'</span>]]&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000055-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 41</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:name</span>] <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;      <span class="ruby-ivar">@lib</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:lib</span>] <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;      [<span class="ruby-identifier">:alias</span>, <span class="ruby-identifier">:description</span>, <span class="ruby-identifier">:render_options</span>, <span class="ruby-identifier">:options</span>, <span class="ruby-identifier">:namespace</span>, <span class="ruby-identifier">:default_option</span>,&#x000A;        <span class="ruby-identifier">:global_options</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-node">&quot;@#{e}&quot;</span>, <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">e</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">e</span>]&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>]&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;          <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>]&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/^\d+/</span>]&#x000A;          <span class="ruby-ivar">@arg_size</span> = <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>].<span class="ruby-identifier">to_i</span>&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">:args</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">'*'</span>&#x000A;          <span class="ruby-ivar">@args</span> = [[<span class="ruby-value str">'*args'</span>]]&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000051'>
-                <a name='M000051'>      </a>
+              <div class='public-instance method' id='method-M000057'>
+                <a name='M000057'>      </a>
                 <div class='synopsis'>
                   <span class='name'>args</span>
                   <span class='arguments'>(lib=library)</span>
@@ -182,14 +185,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000051-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000057-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000051-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 66</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">args</span>(<span class="ruby-identifier">lib</span>=<span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-ivar">@args</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">begin</span>&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">lib</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">lib</span>.<span class="ruby-identifier">library_file</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>)&#x000A;          <span class="ruby-ivar">@file_parsed_args</span> = <span class="ruby-keyword kw">true</span>&#x000A;          <span class="ruby-identifier">file_string</span> = <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">FileLibrary</span>.<span class="ruby-identifier">read_library_file</span>(<span class="ruby-identifier">lib</span>.<span class="ruby-identifier">library_file</span>)&#x000A;          <span class="ruby-constant">ArgumentInspector</span>.<span class="ruby-identifier">scrape_with_text</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-ivar">@name</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000057-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 65</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">args</span>(<span class="ruby-identifier">lib</span>=<span class="ruby-identifier">library</span>)&#x000A;      <span class="ruby-ivar">@args</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword kw">begin</span>&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">lib</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">lib</span>.<span class="ruby-identifier">library_file</span> <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>)&#x000A;          <span class="ruby-ivar">@file_parsed_args</span> = <span class="ruby-keyword kw">true</span>&#x000A;          <span class="ruby-identifier">file_string</span> = <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">FileLibrary</span>.<span class="ruby-identifier">read_library_file</span>(<span class="ruby-identifier">lib</span>.<span class="ruby-identifier">library_file</span>)&#x000A;          <span class="ruby-constant">ArgumentInspector</span>.<span class="ruby-identifier">scrape_with_text</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-ivar">@name</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000055'>
-                <a name='M000055'>      </a>
+              <div class='public-instance method' id='method-M000061'>
+                <a name='M000061'>      </a>
                 <div class='synopsis'>
                   <span class='name'>full_name</span>
                   <span class='arguments'>()</span>
@@ -201,14 +204,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000055-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000061-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000055-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 100</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">full_name</span>&#x000A;      <span class="ruby-ivar">@namespace</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{@namespace}.#{@name}&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@name</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000061-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 99</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">full_name</span>&#x000A;      <span class="ruby-ivar">@namespace</span> <span class="ruby-operator">?</span> <span class="ruby-node">&quot;#{@namespace}.#{@name}&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-ivar">@name</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000050'>
-                <a name='M000050'>      </a>
+              <div class='public-instance method' id='method-M000056'>
+                <a name='M000056'>      </a>
                 <div class='synopsis'>
                   <span class='name'>library</span>
                   <span class='arguments'>()</span>
@@ -219,14 +222,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000050-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000056-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000050-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 61</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">library</span>&#x000A;      <span class="ruby-ivar">@library</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">library</span>(<span class="ruby-ivar">@lib</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000056-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 60</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">library</span>&#x000A;      <span class="ruby-ivar">@library</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">library</span>(<span class="ruby-ivar">@lib</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000053'>
-                <a name='M000053'>      </a>
+              <div class='public-instance method' id='method-M000059'>
+                <a name='M000059'>      </a>
                 <div class='synopsis'>
                   <span class='name'>option_help</span>
                   <span class='arguments'>()</span>
@@ -237,14 +240,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000053-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000059-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000053-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 82</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_help</span>&#x000A;      <span class="ruby-ivar">@options</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">option_parser</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">:</span> <span class="ruby-value str">''</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000059-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 81</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_help</span>&#x000A;      <span class="ruby-ivar">@options</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">option_parser</span>.<span class="ruby-identifier">to_s</span> <span class="ruby-operator">:</span> <span class="ruby-value str">''</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000052'>
-                <a name='M000052'>      </a>
+              <div class='public-instance method' id='method-M000058'>
+                <a name='M000058'>      </a>
                 <div class='synopsis'>
                   <span class='name'>option_parser</span>
                   <span class='arguments'>()</span>
@@ -255,14 +258,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000052-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000058-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000052-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 77</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_parser</span>&#x000A;      <span class="ruby-ivar">@option_parser</span> <span class="ruby-operator">||=</span> (<span class="ruby-ivar">@options</span> <span class="ruby-operator">?</span> <span class="ruby-constant">OptionParser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@options</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000058-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 76</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_parser</span>&#x000A;      <span class="ruby-ivar">@option_parser</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">OptionParser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@options</span> <span class="ruby-operator">||</span> {})&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000054'>
-                <a name='M000054'>      </a>
+              <div class='public-instance method' id='method-M000060'>
+                <a name='M000060'>      </a>
                 <div class='synopsis'>
                   <span class='name'>usage</span>
                   <span class='arguments'>()</span>
@@ -273,10 +276,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000054-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000060-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000054-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 87</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">usage</span>&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-value str">''</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">usage_args</span> = <span class="ruby-identifier">args</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@options</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">has_splat_args?</span> <span class="ruby-value">?&#x000A;</span>        (<span class="ruby-ivar">@default_option</span> <span class="ruby-operator">?</span> [[<span class="ruby-ivar">@default_option</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-ivar">@file_parsed_args</span> <span class="ruby-operator">?</span> <span class="ruby-value str">''</span>.<span class="ruby-identifier">inspect</span> <span class="ruby-operator">:</span> <span class="ruby-value str">''</span>]] <span class="ruby-operator">+</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>] <span class="ruby-operator">:</span>&#x000A;        <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>&#x000A;      <span class="ruby-identifier">str</span> = <span class="ruby-identifier">args</span> <span class="ruby-value">? </span><span class="ruby-identifier">usage_args</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>) <span class="ruby-operator">?</span> <span class="ruby-node">&quot;[#{e[0]}]&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]&quot;</span>&#x000A;      }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>) <span class="ruby-operator">:</span> <span class="ruby-value str">'[*unknown]'</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">option_help</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000060-source'><span class="ruby-comment cmt"># File lib/boson/command.rb, line 86</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">usage</span>&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-value str">''</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">usage_args</span> = <span class="ruby-identifier">args</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@options</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">has_splat_args?</span> <span class="ruby-value">?&#x000A;</span>        (<span class="ruby-ivar">@default_option</span> <span class="ruby-operator">?</span> [[<span class="ruby-ivar">@default_option</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-ivar">@file_parsed_args</span> <span class="ruby-operator">?</span> <span class="ruby-value str">''</span>.<span class="ruby-identifier">inspect</span> <span class="ruby-operator">:</span> <span class="ruby-value str">''</span>]] <span class="ruby-operator">+</span> <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>] <span class="ruby-operator">:</span>&#x000A;        <span class="ruby-identifier">args</span>[<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">-2</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>&#x000A;      <span class="ruby-identifier">str</span> = <span class="ruby-identifier">args</span> <span class="ruby-value">? </span><span class="ruby-identifier">usage_args</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;        (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>) <span class="ruby-operator">?</span> <span class="ruby-node">&quot;[#{e[0]}]&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]&quot;</span>&#x000A;      }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>) <span class="ruby-operator">:</span> <span class="ruby-value str">'[*unknown]'</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">option_help</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
