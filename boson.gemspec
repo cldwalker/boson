@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{boson}
-  s.version = "0.2.0"
+  s.version = "0.2.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gabriel Horner"]
-  s.date = %q{2009-11-07}
+  s.date = %q{2009-11-19}
   s.default_executable = %q{boson}
   s.description = %q{A command/task framework similar to rake and thor that opens your ruby universe to the commandline and irb.}
   s.email = %q{gabriel.horner@gmail.com}
@@ -33,15 +33,19 @@ Gem::Specification.new do |s|
     "lib/boson/inspectors/method_inspector.rb",
     "lib/boson/libraries/file_library.rb",
     "lib/boson/libraries/gem_library.rb",
+    "lib/boson/libraries/local_file_library.rb",
     "lib/boson/libraries/module_library.rb",
     "lib/boson/libraries/require_library.rb",
     "lib/boson/library.rb",
     "lib/boson/loader.rb",
     "lib/boson/manager.rb",
     "lib/boson/namespace.rb",
+    "lib/boson/option_command.rb",
     "lib/boson/option_parser.rb",
     "lib/boson/options.rb",
+    "lib/boson/pipe.rb",
     "lib/boson/repo.rb",
+    "lib/boson/repo_index.rb",
     "lib/boson/runner.rb",
     "lib/boson/runners/bin_runner.rb",
     "lib/boson/runners/console_runner.rb",
@@ -51,17 +55,18 @@ Gem::Specification.new do |s|
     "test/argument_inspector_test.rb",
     "test/bin_runner_test.rb",
     "test/comment_inspector_test.rb",
+    "test/config/index.marshal",
     "test/file_library_test.rb",
-    "test/index_test.rb",
     "test/loader_test.rb",
     "test/manager_test.rb",
     "test/method_inspector_test.rb",
     "test/option_parser_test.rb",
+    "test/pipe_test.rb",
+    "test/repo_index_test.rb",
     "test/repo_test.rb",
     "test/runner_test.rb",
     "test/scientist_test.rb",
-    "test/test_helper.rb",
-    "test/view_test.rb"
+    "test/test_helper.rb"
   ]
   s.homepage = %q{http://tagaholic.me/boson/}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -74,16 +79,16 @@ Gem::Specification.new do |s|
     "test/bin_runner_test.rb",
     "test/comment_inspector_test.rb",
     "test/file_library_test.rb",
-    "test/index_test.rb",
     "test/loader_test.rb",
     "test/manager_test.rb",
     "test/method_inspector_test.rb",
     "test/option_parser_test.rb",
+    "test/pipe_test.rb",
+    "test/repo_index_test.rb",
     "test/repo_test.rb",
     "test/runner_test.rb",
     "test/scientist_test.rb",
-    "test/test_helper.rb",
-    "test/view_test.rb"
+    "test/test_helper.rb"
   ]
 
   if s.respond_to? :specification_version then
