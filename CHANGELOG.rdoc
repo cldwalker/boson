@@ -1,3 +1,12 @@
+== 0.2.1
+* Added local libraries: Bosonfile and under local repositories
+* Added config method attribute.
+* Added default_option and global_options command attributes.
+* Added OptionParser.parse and OptionParser.usage for scripting use.
+* Improved auto-rendering from commandline.
+* Removed library reload.
+* Better docs.
+
 == 0.2.0
 * Command options
 ** Added custom global and render options for commands.
