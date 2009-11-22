@@ -7,6 +7,10 @@ module Boson
         ArgumentInspector.scrape_with_text(file_string, "blah")
       end
 
+      test "parses arguments of class method" do
+        args_from("    def YAML.blah( filepath )\n").should == [['filepath']]
+      end
+
       test "parses arguments with no spacing" do
         args_from("def bong; end\ndef blah(arg1,arg2='val2')\nend").should == [["arg1"], ['arg2', "'val2'"]]
       end
