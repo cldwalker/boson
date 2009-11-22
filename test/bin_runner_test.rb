@@ -55,7 +55,7 @@ module Boson
       end
 
       test "global option takes value with whitespace" do
-        View.expects(:render).with(anything, {:vertical=>true, :fields => [:name, :lib]}, anything)
+        View.expects(:render).with {|*args| args[1][:fields] == [:name, :lib] && args[1][:vertical] }
         start('commands', '-g', 'f=name,lib vertical')
       end
 

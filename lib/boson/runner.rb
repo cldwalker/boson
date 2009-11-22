@@ -37,12 +37,16 @@ module Boson
         {:verbose=>@options[:verbose]}
       end
 
+      def autoload_command(cmd)
+        Index.read
+        (lib = Index.find_library(cmd)) && Manager.load(lib, :verbose=>true)
+        lib
+      end
+
       def define_autoloader
         class << ::Boson.main_object
           def method_missing(method, *args, &block)
-            Boson::Index.read
-            if lib = Boson::Index.find_library(method.to_s)
-              Boson::Manager.load lib, :verbose=>true
+            if Runner.autoload_command(method.to_s)
               send(method, *args, &block) if respond_to?(method)
             else
               super
