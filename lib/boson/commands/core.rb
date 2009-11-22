@@ -14,7 +14,9 @@ module Boson::Commands::Core #:nodoc:
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"}},
         :render_options=>{
           :query=>{:keys=>command_attributes, :default_keys=>'full_name'},
-          :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes} }
+          :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes},
+          :filters=>{:default=>{:render_options=>:inspect, :options=>:inspect, :args=>:inspect}}
+        }
       },
       'libraries'=>{
         :description=>"List or search libraries", :default_option=>'query',
