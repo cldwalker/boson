@@ -53,7 +53,7 @@ module Boson
     ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :indexed_namespace]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
     # Private attribute for use within Boson.
-    attr_reader :no_alias_creation, :new_module, :new_commands
+    attr_reader :no_alias_creation, :new_module, :new_commands, :class_commands
     # Optional namespace name for a library. When enabled defaults to a library's name.
     attr_writer :namespace
 

@@ -63,12 +63,12 @@ module Boson
 
     # Array of array args with optional defaults. Scraped with ArgumentInspector.
     def args(lib=library)
-      @args ||= begin
-        if lib && File.exists?(lib.library_file || '')
-          @file_parsed_args = true
-          file_string = Boson::FileLibrary.read_library_file(lib.library_file)
-          ArgumentInspector.scrape_with_text(file_string, @name)
-        end
+      @args = !@args.nil? ? @args : begin
+        if lib
+          file_string, meth = file_string_and_method_for_args(lib)
+          (file_string && meth && (@file_parsed_args = true) &&
+            ArgumentInspector.scrape_with_text(file_string, meth))
+        end || false
       end
     end
 
@@ -101,6 +101,20 @@ module Boson
     end
 
     #:stopdoc:
+    def file_string_and_method_for_args(lib)
+      if !lib.is_a?(ModuleLibrary) && (klass_method = (lib.class_commands || {})[@name])
+        if RUBY_VERSION >= '1.9'
+          klass, meth = klass_method.split('.', 2)
+          if (meth_locations = MethodInspector.find_method_locations_for_19(klass, meth))
+            file_string = File.read meth_locations[0]
+          end
+        end
+      elsif File.exists?(lib.library_file || '')
+        file_string, meth = FileLibrary.read_library_file(lib.library_file), @name
+      end
+      [file_string, meth]
+    end
+
     def has_splat_args?
       @args && @args.any? {|e| e[0][/^\*/] }
     end

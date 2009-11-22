@@ -57,6 +57,13 @@ module Boson
     end
 
     #:stopdoc:
+    def find_method_locations_for_19(klass, meth)
+      if (klass = Util.any_const_get(klass)) && (meth_location = klass.method(meth).source_location) &&
+        meth_location[0]
+        meth_location
+      end
+    end
+
     # Hash of a module's method attributes i.e. descriptions, options by method and then attribute
     def store(mod=@current_module)
       @mod_store[mod]
