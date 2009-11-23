@@ -96,13 +96,13 @@ module Boson
       File.join(repo.config_dir, 'index.marshal')
     end
 
-    def find_library(command)
+    def find_library(command, object=false)
       read
       namespace_command = command.split('.')[0]
       if (lib = @libraries.find {|e| e.namespace == namespace_command })
-        lib.name
+        object ? lib : lib.name
       elsif (cmd = Command.find(command, @commands))
-        cmd.lib
+        object ? cmd.library : cmd.lib
       end
     end
 

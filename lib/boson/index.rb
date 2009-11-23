@@ -18,9 +18,9 @@ module Boson
       indexes.each {|e| e.read }
     end
 
-    def find_library(command)
+    def find_library(command, object=false)
       indexes.each {|e|
-        lib = e.find_library(command)
+        lib = e.find_library(command, object)
         return lib if lib
       }
       nil
