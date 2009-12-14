@@ -102,7 +102,7 @@ module Boson
       if (lib = @libraries.find {|e| e.namespace == namespace_command })
         object ? lib : lib.name
       elsif (cmd = Command.find(command, @commands))
-        object ? cmd.library : cmd.lib
+        object ? @libraries.find {|e| e.name == cmd.lib} : cmd.lib
       end
     end
 
