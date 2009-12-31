@@ -51,6 +51,7 @@ module Boson
 
     class <<self
       attr_accessor :command
+      attr_reader :options
       # Starts, processes and ends a commandline request.
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
