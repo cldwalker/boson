@@ -52,16 +52,16 @@ module Boson::Commands::Core #:nodoc:
     Hirb::Console.format_output(output, options.merge(:class=>"Hirb::Menu"), &block)
   end
 
-  def usage(name, options={})
-    msg = (command = Boson::Command.find(name)) ? "#{name} #{command.usage}" : "Command '#{name}' not found"
+  def usage(command, options={})
+    msg = (cmd = Boson::Command.find(command)) ? "#{command} #{cmd.usage}" : "Command '#{cmd}' not found"
     puts msg
-    if command && options[:verbose]
-      if command.options && !command.options.empty?
+    if cmd && options[:verbose]
+      if cmd.options && !cmd.options.empty?
         puts "\nLOCAL OPTIONS"
-        command.option_parser.print_usage_table
+        cmd.option_parser.print_usage_table
       end
       puts "\nGLOBAL OPTIONS"
-      Boson::Scientist.option_command(command).option_parser.print_usage_table
+      Boson::Scientist.option_command(cmd).option_parser.print_usage_table
     end
   end
 end
