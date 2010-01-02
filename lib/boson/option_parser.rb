@@ -299,6 +299,29 @@ module Boson
       (str.length > 1 ? "--" : "-") + str
     end
 
+    # List of option types
+    def types
+      @opt_types.values
+    end
+
+    # List of option names
+    def names
+      @opt_types.keys.map {|e| undasherize e }
+    end
+
+    # List of option aliases
+    def aliases
+      @opt_aliases.keys.map {|e| undasherize e }
+    end
+
+    def option_type(opt)
+      if opt =~ /^--no-(\w+)$/
+        @opt_types[opt] || @opt_types["--#{$1}"] || @opt_types[original_no_opt($1)]
+      else
+        @opt_types[opt]
+      end
+    end
+
     private
     def determine_option_type(value)
       return value if value.is_a?(Symbol)
@@ -387,14 +410,6 @@ module Boson
       @opt_aliases.key?(opt) ? @opt_aliases[opt] : opt
     end
     
-    def option_type(opt)
-      if opt =~ /^--no-(\w+)$/
-        @opt_types[opt] || @opt_types["--#{$1}"] || @opt_types[original_no_opt($1)]
-      else
-        @opt_types[opt]
-      end
-    end
-
     def original_no_opt(opt)
       @opt_aliases[dasherize(opt)]
     end
