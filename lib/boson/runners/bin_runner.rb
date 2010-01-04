@@ -51,7 +51,7 @@ module Boson
 
     class <<self
       attr_accessor :command
-      attr_reader :options
+
       # Starts, processes and ends a commandline request.
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
@@ -87,9 +87,14 @@ module Boson
         end
       end
 
+      # Hash of global options passed in from commandline
+      def options
+        @options ||= {}
+      end
+
       #:stopdoc:
       def print_error_message(message)
-        message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if @options && @options[:verbose]
+        message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if options[:verbose]
         $stderr.puts message
       end
 
