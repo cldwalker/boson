@@ -79,10 +79,12 @@ module Boson
     
     attr_reader :leading_non_opts, :trailing_non_opts, :opt_aliases
 
-    # Given options to pass to OptionParser.new, this method parses ARGV and returns a hash of
-    # parsed options. This is useful for scripts outside of Boson.
+    # Given options to pass to OptionParser.new, this method parses ARGV and returns the remaining arguments
+    # and a hash of parsed options. This is useful for scripts outside of Boson.
     def self.parse(options, args=ARGV)
-      (@opt_parser ||= new(options)).parse(args)
+      @opt_parser ||= new(options)
+      parsed_options = @opt_parser.parse(args)
+      [@opt_parser.non_opts, parsed_options]
     end
 
     # Usage string summarizing options defined in parse
