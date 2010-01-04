@@ -33,7 +33,6 @@ module Boson
     extend self
     # Handles all Scientist errors.
     class Error < StandardError; end
-    class EscapeGlobalOption < StandardError; end
 
     attr_accessor :global_options, :rendered
     @no_option_commands ||= []
@@ -85,34 +84,29 @@ module Boson
 
     def translate_and_render(obj, command, args)
       @global_options, @command = {}, command
-      args = translate_args(obj, command, args)
-      if @global_options[:verbose] || @global_options[:pretend]
-        puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
-      end
-      return @rendered = true if @global_options[:pretend]
-      render_or_raw yield(args)
-    rescue EscapeGlobalOption
-      Boson.invoke(:usage, command.name, :verbose=>@global_options[:verbose]) if @global_options[:help]
-    rescue OptionParser::Error, Error
-      $stderr.puts "Error: " + $!.message
-    end
-
-    def translate_args(obj, command, args)
       option_command.prepend_default_option(args)
       @global_options, parsed_options, args = option_command.parse(args)
-      raise EscapeGlobalOption if @global_options[:help]
-      if parsed_options
-        option_command.add_default_args(args, obj)
-        return args if @no_option_commands.include?(command)
-        args << parsed_options
-        option_command.check_argument_size(args)
+      if @global_options[:help]
+        Boson.invoke(:usage, command.name, :verbose=>@global_options[:verbose])
+      else
+        args = modify_args(parsed_options, obj, command, args) if parsed_options
+        if @global_options[:verbose] || @global_options[:pretend]
+          puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
+        end
+        return @rendered = true if @global_options[:pretend]
+        render_or_raw yield(args)
       end
-      args
-    rescue Error, ArgumentError, EscapeGlobalOption
-      raise
-    rescue Exception
+    rescue OptionParser::Error, Error
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
-      raise Error, message
+      $stderr.puts "Error: " + message
+    end
+
+    def modify_args(parsed_options, obj, command, args)
+      option_command.add_default_args(args, obj)
+      return args if @no_option_commands.include?(command)
+      args << parsed_options
+      option_command.check_argument_size(args)
+      args
     end
 
     def render_or_raw(result)
@@ -123,7 +117,7 @@ module Boson
       else
         Pipe.process(result, @global_options)
       end
-    rescue Exception
+    rescue StandardError
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       raise Error, message
     end

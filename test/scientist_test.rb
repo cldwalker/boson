@@ -131,11 +131,6 @@ module Boson
           capture_stderr { command_with_args('a1 -l') }.should =~ /Error.*level/
         end
 
-        test "with unexpected error in translation" do
-          Scientist.expects(:option_command).raises("unexpected")
-          capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
-        end
-
         test "with unexpected error in render" do
           Scientist.expects(:render?).raises("unexpected")
           capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
