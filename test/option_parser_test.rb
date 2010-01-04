@@ -345,7 +345,8 @@ module Boson
   context ":array type" do
     before(:all) {
       create :a=>:array, :b=>[1,2,3], :c=>{:type=>:array, :values=>%w{foo fa bar zebra}, :enum=>false},
-        :d=>{:type=>:array, :split=>" ", :values=>[:ab, :bc, :cd], :enum=>false}
+        :d=>{:type=>:array, :split=>" ", :values=>[:ab, :bc, :cd], :enum=>false},
+        :e=>{:type=>:array, :values=>%w{some so silly}, :regexp=>true}
     }
 
     it "supports array defaults" do
@@ -375,6 +376,10 @@ module Boson
     it "aliases * to all values" do
       parse("-c", '*')[:c].sort.should == %w{bar fa foo zebra}
       parse("-c", '*,ok')[:c].sort.should == %w{bar fa foo ok zebra}
+    end
+
+    it "aliases correctly with :regexp on" do
+      parse("-e", 'so')[:e].sort.should == %w{so some}
     end
   end
 

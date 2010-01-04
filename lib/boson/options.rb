@@ -61,10 +61,16 @@ module Boson
       splitter = current_attributes[:split] || ','
       array = value.split(splitter)
       if (values = current_attributes[:values]) && (values = values.sort_by {|e| e.to_s })
-        array.each {|e| array.delete(e) && array += values if e == '*'}
-        array.each_with_index {|e,i|
-          (value = auto_alias_value(values, e)) && array[i] = value
-        }
+        if current_attributes[:regexp]
+          array = array.map {|e|
+            (new_values = values.grep(/#{e}/)).empty? ? e : new_values
+          }.compact.flatten.uniq
+        else
+          array.each {|e| array.delete(e) && array += values if e == '*'}
+          array.each_with_index {|e,i|
+            (value = auto_alias_value(values, e)) && array[i] = value
+          }
+        end
       end
       array
     end

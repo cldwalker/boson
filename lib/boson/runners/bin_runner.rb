@@ -32,19 +32,15 @@ module Boson
   # * Any of these cases can be toggled to render/not render with the global option :render
   # To turn off auto-rendering by default, add a :no_auto_render: true entry to the main config.
   class BinRunner < Runner
-    def self.all_libraries #:nodoc:
-      @all_libraries ||= ((libs = super) +  libs.map {|e| File.basename(e) }).uniq
-    end
-
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
       :index=>{:type=>:array, :desc=>"Libraries to index. Libraries must be passed with '='.",
-        :bool_default=>nil, :values=>all_libraries, :enum=>false},
+        :bool_default=>nil, :values=>all_libraries, :regexp=>true},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
       :console=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
-      :load=>{:type=>:array, :values=>all_libraries,
-        :enum=>false, :desc=>"A comma delimited array of libraries to load"},
+      :load=>{:type=>:array, :values=>all_libraries, :regexp=>true,
+        :desc=>"A comma delimited array of libraries to load"},
       :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"},
       :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"}
     } #:nodoc:
