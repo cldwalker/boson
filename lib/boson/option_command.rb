@@ -124,14 +124,22 @@ module Boson
     #:stopdoc:
     def parse_options(args)
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
-      global_options = option_parser.parse @command.option_parser.leading_non_opts
+      global_options = parse_global_options
       new_args = option_parser.non_opts.dup + @command.option_parser.trailing_non_opts
+      [global_options, parsed_options, new_args]
+    rescue OptionParser::Error
+      global_options = parse_global_options
+      global_options[:help] ? [global_options, nil, []] : raise
+    end
+
+    def parse_global_options
+      global_options = option_parser.parse @command.option_parser.leading_non_opts
       if global_options[:global]
         global_opts = Shellwords.shellwords(global_options[:global]).map {|str|
           ((str[/^(.*?)=/,1] || str).length > 1 ? "--" : "-") + str }
         global_options.merge! option_parser.parse(global_opts)
       end
-      [global_options, parsed_options, new_args]
+      global_options
     end
 
     def option_parser
