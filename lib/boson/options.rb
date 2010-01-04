@@ -39,7 +39,8 @@ module Boson
     # Parse/create methods
     def create_string(value)
       if (values = current_attributes[:values]) && (values = values.sort_by {|e| e.to_s})
-        (val = auto_alias_value(values, value)) && value = val
+        value = auto_alias_value(values, value)
+        validate_enum_values(values, value)
       end
       value
     end
@@ -67,10 +68,9 @@ module Boson
           }.compact.flatten.uniq
         else
           array.each {|e| array.delete(e) && array += values if e == '*'}
-          array.each_with_index {|e,i|
-            (value = auto_alias_value(values, e)) && array[i] = value
-          }
+          array.map! {|e| auto_alias_value(values, e) }
         end
+        validate_enum_values(values, array)
       end
       array
     end
@@ -85,9 +85,13 @@ module Boson
       aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
       aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
       hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
-      keys ? hash.each {|k,v|
-              (new_key = auto_alias_value(keys, k)) && hash[new_key] = hash.delete(k)
-             } : hash
+      if keys
+        hash = hash.inject({}) {|h,(k,v)|
+          h[auto_alias_value(keys, k)] = v; h
+        }
+        validate_enum_values(keys, hash.keys)
+      end
+      hash
     end
 
     # Validation methods

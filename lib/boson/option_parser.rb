@@ -149,7 +149,7 @@ module Boson
     # [*:keys*] :hash option only. An array of values a hash option's keys can have. Keys can be aliased just like :values.
     # [*:default_keys*] For :hash option only. Default keys to assume when only a value is given. Multiple keys can be joined
     #                   by the :split character. Defaults to first key of :keys if :keys given.
-    # [*:regexp*] For :array option and with a :values attribute. Boolean indicating that each option value does a regular
+    # [*:regexp*] For :array option with a :values attribute. Boolean indicating that each option value does a regular
     #             expression search of :values. If there are values that match, they replace the original option value. If none,
     #             then the original option value is used.
     def initialize(opts)
@@ -355,8 +355,15 @@ module Boson
     end
 
     def auto_alias_value(values, possible_value)
-      values.find {|v| v.to_s =~ /^#{possible_value}/ } or (@option_attributes[@current_option][:enum] ?
-        raise(Error, "invalid value '#{possible_value}' for option '#{@current_option}'") : possible_value)
+      values.find {|v| v.to_s =~ /^#{possible_value}/ } || possible_value
+    end
+
+    def validate_enum_values(values, possible_values)
+      if current_attributes[:enum]
+        Array(possible_values).each {|e|
+          raise(Error, "invalid value '#{e}' for option '#{@current_option}'") if !values.include?(e)
+        }
+      end
     end
 
     def validate_option_value(type)
