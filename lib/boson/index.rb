@@ -20,8 +20,14 @@ module Boson
 
     def find_library(command, object=false)
       indexes.each {|e|
-        lib = e.find_library(command, object)
-        return lib if lib
+        (lib = e.find_library(command, object)) and return lib
+      }
+      nil
+    end
+
+    def find_command(command)
+      indexes.each {|e|
+        (cmd = Command.find(command, e.commands)) and return(cmd)
       }
       nil
     end
