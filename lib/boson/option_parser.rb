@@ -321,7 +321,7 @@ module Boson
 
     def option_type(opt)
       if opt =~ /^--no-(\w+)$/
-        @opt_types[opt] || @opt_types["--#{$1}"] || @opt_types[original_no_opt($1)]
+        @opt_types[opt] || @opt_types[dasherize($1)] || @opt_types[original_no_opt($1)]
       else
         @opt_types[opt]
       end
@@ -402,7 +402,7 @@ module Boson
     
     def valid?(arg)
       if arg.to_s =~ /^--no-(\w+)$/
-        @opt_types.key?(arg) or (@opt_types["--#{$1}"] == :boolean) or
+        @opt_types.key?(arg) or (@opt_types[dasherize($1)] == :boolean) or
           (@opt_types[original_no_opt($1)] == :boolean)
       else
         @opt_types.key?(arg) or @opt_aliases.key?(arg)

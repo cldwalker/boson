@@ -116,7 +116,12 @@ module Boson
       parse("--no-f")["foo"].should == false
       parse("--foo")["foo"].should == true
     end
-    
+
+    it "accepts --[no-]opt variant for single letter booleans" do
+      create :e=>true
+      parse("--no-e")[:e].should == false
+    end
+
     it "will prefer 'no-opt' variant over inverting 'opt' if explicitly set" do
       create "--no-foo" => true
       parse("--no-foo")["no-foo"].should == true
