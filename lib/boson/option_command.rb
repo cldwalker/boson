@@ -53,6 +53,9 @@ module Boson
   #   3 rows in set
   #   => true
   class OptionCommand
+    # ArgumentError specific to @command's arguments
+    class CommandArgumentError < ::ArgumentError; end
+
     BASIC_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
       :render=>{:type=>:boolean, :desc=>"Toggle a command's default rendering behavior"},
@@ -189,7 +192,7 @@ module Boson
       if args.size != @command.arg_size && !@command.has_splat_args?
         command_size, args_size = args.size > @command.arg_size ? [@command.arg_size, args.size] :
           [@command.arg_size - 1, args.size - 1]
-        raise ArgumentError, "wrong number of arguments (#{args_size} for #{command_size})"
+        raise CommandArgumentError, "wrong number of arguments (#{args_size} for #{command_size})"
       end
     end
 

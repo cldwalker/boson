@@ -137,7 +137,7 @@ module Boson
         end
 
         test "with no argument defined for options" do
-          assert_error(ArgumentError, '2 for 1') { command({:args=>1}, 'ok') }
+          assert_error(OptionCommand::CommandArgumentError, '2 for 1') { command({:args=>1}, 'ok') }
         end
       end
 
@@ -165,17 +165,17 @@ module Boson
         capture_stdout { command_with_args("-p ok") } =~ /Arguments.*ok/
       end
 
-      test "with not enough args raises ArgumentError" do
-        args = [ArgumentError, '0 for 1']
+      test "with not enough args raises CommandArgumentError" do
+        args = [OptionCommand::CommandArgumentError, '0 for 1']
         assert_error(*args) { command_with_args }
         assert_error(*args) { command_with_args '' }
         assert_error(*args) { command_with_arg_size }
         assert_error(*args) { command_with_arg_size '' }
       end
 
-      test "with too many args raises ArgumentError" do
+      test "with too many args raises CommandArgumentError" do
         args3 = [ArgumentError, '3 for 2']
-        args4 = [ArgumentError, '4 for 2']
+        args4 = [OptionCommand::CommandArgumentError, '4 for 2']
         assert_error(*args3) { command_with_args 1,2,3 }
         assert_error(*args4) { command_with_args '1 2 3' }
         assert_error(*args3) { command_with_arg_size 1,2,3 }

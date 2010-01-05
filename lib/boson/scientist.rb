@@ -93,7 +93,7 @@ module Boson
         run_pretend_option(args)
         render_or_raw yield(args) unless @global_options[:pretend]
       end
-    rescue ArgumentError
+    rescue OptionCommand::CommandArgumentError
       run_pretend_option(args ||= [])
       raise unless @global_options[:pretend]
     rescue OptionParser::Error, Error

@@ -107,12 +107,16 @@ module Boson
       end
 
       def execute_command
-        render_output Boson.full_invoke(@command, @args)
-      rescue ArgumentError
-        # for the rare case it's raised outside of boson
-        raise unless $!.backtrace.first.include?('boson/')
-        print_error_message "'#{@command}' was called incorrectly."
-        Boson.invoke(:usage, @command)
+        begin
+          output = Boson.full_invoke(@command, @args)
+        rescue ArgumentError
+          # for the rare case it's raised outside of boson
+          raise unless $!.backtrace.first.include?('boson/')
+          print_error_message "'#{@command}' was called incorrectly."
+          Boson.invoke(:usage, @command)
+          return
+        end
+        render_output output
       end
 
       def parse_args(args)
