@@ -83,22 +83,34 @@ module Boson
     end
 
     def translate_and_render(obj, command, args)
-      @global_options, @command = {}, command
+      @global_options, @command, original_args = {}, command, args.dup
       option_command.prepend_default_option(args)
       @global_options, parsed_options, args = option_command.parse(args)
-      if @global_options[:help]
-        Boson.invoke(:usage, command.name, :verbose=>@global_options[:verbose])
-      else
-        args = modify_args(parsed_options, obj, command, args) if parsed_options
-        run_pretend_option(args)
-        render_or_raw yield(args) unless @global_options[:pretend]
-      end
+      return run_help_option if @global_options[:help]
+      args = modify_args(parsed_options, obj, command, args) if parsed_options
+      run_pretend_option(args)
+      render_or_raw yield(args) unless @global_options[:pretend]
     rescue OptionCommand::CommandArgumentError
       run_pretend_option(args ||= [])
+      return if !@global_options[:pretend] && run_verbose_help(option_command, original_args)
       raise unless @global_options[:pretend]
     rescue OptionParser::Error, Error
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       $stderr.puts "Error: " + message
+    end
+
+    def run_verbose_help(option_command, original_args)
+      global_opts = option_command.parse_global_options(original_args)
+      if global_opts[:help] && global_opts[:verbose]
+        @global_options = global_opts
+        run_help_option
+        return true
+      end
+      false
+    end
+
+    def run_help_option
+      Boson.invoke(:usage, @command.name, :verbose=>@global_options[:verbose])
     end
 
     def run_pretend_option(args)

@@ -135,8 +135,8 @@ module Boson
       global_options[:help] ? [global_options, nil, []] : raise
     end
 
-    def parse_global_options
-      global_options = option_parser.parse @command.option_parser.leading_non_opts
+    def parse_global_options(args = @command.option_parser.leading_non_opts)
+      global_options = option_parser.parse args
       if global_options[:global]
         global_opts = Shellwords.shellwords(global_options[:global]).map {|str|
           ((str[/^(.*?)=/,1] || str).length > 1 ? "--" : "-") + str }
