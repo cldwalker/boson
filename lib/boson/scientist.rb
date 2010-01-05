@@ -90,15 +90,22 @@ module Boson
         Boson.invoke(:usage, command.name, :verbose=>@global_options[:verbose])
       else
         args = modify_args(parsed_options, obj, command, args) if parsed_options
-        if @global_options[:verbose] || @global_options[:pretend]
-          puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
-        end
-        return @rendered = true if @global_options[:pretend]
-        render_or_raw yield(args)
+        run_pretend_option(args)
+        render_or_raw yield(args) unless @global_options[:pretend]
       end
+    rescue ArgumentError
+      run_pretend_option(args ||= [])
+      raise unless @global_options[:pretend]
     rescue OptionParser::Error, Error
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       $stderr.puts "Error: " + message
+    end
+
+    def run_pretend_option(args)
+      if @global_options[:verbose] || @global_options[:pretend]
+        puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
+      end
+      @rendered = true if @global_options[:pretend]
     end
 
     def modify_args(parsed_options, obj, command, args)
