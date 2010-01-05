@@ -25,6 +25,7 @@ module Boson
       end
       @opt_cmd = Object.new.extend Blah
     }
+    after(:all) { Runner.in_shell = false }
 
     def command(hash, args)
       hash = {:name=>'blah', :lib=>'bling', :options=>{:force=>:boolean, :level=>2}}.merge(hash)
@@ -247,7 +248,7 @@ module Boson
       end
 
       test "parses normally from cmdline" do
-        Boson.expects(:const_defined?).returns true
+        Runner.expects(:in_shell?).returns true
         command(@cmd_attributes, ['--force', '--level=3']).should == {:level=>3, :force=>true}
       end
 
@@ -264,7 +265,7 @@ module Boson
       end
 
       test "prepends correctly from cmdline" do
-        Boson.expects(:const_defined?).returns true
+        Runner.expects(:in_shell?).returns true
         command(@cmd_attributes, ['3','-f']).should == {:level=>3, :force=>true}
       end
     end

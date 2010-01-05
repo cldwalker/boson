@@ -72,6 +72,7 @@ module Boson
 
       # Loads the given command.
       def init
+        Runner.in_shell = true
         super
         Index.update(:verbose=>true, :libraries=>@options[:index]) if @options.key?(:index)
         if @options[:load]

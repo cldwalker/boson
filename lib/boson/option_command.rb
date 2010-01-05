@@ -109,7 +109,7 @@ module Boson
         global_opt, parsed_options, args = parse_options Shellwords.shellwords(args[0])
       # last string argument interpreted as args + options
       elsif args.size > 1 && args[-1].is_a?(String)
-        temp_args = Boson.const_defined?(:BinRunner) ? args : Shellwords.shellwords(args.pop)
+        temp_args = Runner.in_shell? ? args : Shellwords.shellwords(args.pop)
         global_opt, parsed_options, new_args = parse_options temp_args
         args += new_args
       # add default options

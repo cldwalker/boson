@@ -24,7 +24,17 @@ module Boson
         Boson.repos.map {|e| e.all_libraries }.flatten.uniq
       end
 
+      # Returns true if commands are being executed from a non-ruby shell i.e. bash. Returns false if
+      # in a ruby shell i.e. irb.
+      def in_shell?
+        !!@in_shell
+      end
+
       #:stopdoc:
+      def in_shell=(val)
+        @in_shell = val
+      end
+
       def add_load_path
         Boson.repos.each {|repo|
           if repo.config[:add_load_path] || File.exists?(File.join(repo.dir, 'lib'))
