@@ -3,7 +3,11 @@ module Boson
   class Command
     # Creates a command given its name and a library.
     def self.create(name, library)
-      new (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name, :namespace=>library.namespace})
+      new new_options(name, library)
+    end
+
+    def self.new_options(name, library) #:nodoc:
+      (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name, :namespace=>library.namespace})
     end
 
     # Finds a command, namespaced or not and aliased or not. If found returns the
