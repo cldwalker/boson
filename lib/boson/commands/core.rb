@@ -10,7 +10,7 @@ module Boson::Commands::Core #:nodoc:
       'menu'=>{:description=>"Provide a menu to multi-select elements from a given array"},
       'usage'=>{:description=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
       'commands'=>{
-        :description=>"List or search commands", :default_option=>'query',
+        :description=>"List or search commands. Query must come before any options.", :default_option=>'query',
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"}},
         :render_options=>{
           :query=>{:keys=>command_attributes, :default_keys=>'full_name'},
@@ -19,7 +19,7 @@ module Boson::Commands::Core #:nodoc:
         }
       },
       'libraries'=>{
-        :description=>"List or search libraries", :default_option=>'query',
+        :description=>"List or search libraries. Query must come before any options.", :default_option=>'query',
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"} },
         :render_options=>{
           :query=>{:keys=>library_attributes, :default_keys=>'name'},
