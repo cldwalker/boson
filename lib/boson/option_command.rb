@@ -62,6 +62,7 @@ module Boson
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
       :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"},
+      :delete_options=>{:type=>:array, :desc=>'Deletes global options starting with given strings' }
     } #:nodoc:
 
     RENDER_OPTIONS = {

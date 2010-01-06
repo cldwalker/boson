@@ -84,10 +84,8 @@ module Boson
 
     def translate_and_render(obj, command, args)
       @global_options, @command, original_args = {}, command, args.dup
-      option_command.prepend_default_option(args)
-      @global_options, parsed_options, args = option_command.parse(args)
+      args = translate_args(obj, args)
       return run_help_option if @global_options[:help]
-      args = modify_args(parsed_options, obj, command, args) if parsed_options
       run_pretend_option(args)
       render_or_raw yield(args) unless @global_options[:pretend]
     rescue OptionCommand::CommandArgumentError
@@ -98,6 +96,24 @@ module Boson
       raise if Runner.in_shell?
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       $stderr.puts "Error: " + message
+    end
+
+    def translate_args(obj, args)
+      option_command.prepend_default_option(args)
+      @global_options, parsed_options, args = option_command.parse(args)
+      return if @global_options[:help]
+
+      (@global_options[:delete_options] || []).map {|e|
+        @global_options.keys.map {|k| k.to_s }.grep(/^#{e}/)
+      }.flatten.each {|e| @global_options.delete(e.to_sym) }
+
+      if parsed_options
+        option_command.add_default_args(args, obj)
+        return args if @no_option_commands.include?(@command)
+        args << parsed_options
+        option_command.check_argument_size(args)
+      end
+      args
     end
 
     def run_verbose_help(option_command, original_args)
@@ -119,14 +135,6 @@ module Boson
         puts "Arguments: #{args.inspect}", "Global options: #{@global_options.inspect}"
       end
       @rendered = true if @global_options[:pretend]
-    end
-
-    def modify_args(parsed_options, obj, command, args)
-      option_command.add_default_args(args, obj)
-      return args if @no_option_commands.include?(command)
-      args << parsed_options
-      option_command.check_argument_size(args)
-      args
     end
 
     def render_or_raw(result)

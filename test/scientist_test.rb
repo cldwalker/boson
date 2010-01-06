@@ -303,6 +303,11 @@ module Boson
         end
       end
 
+      test "delete_options deletes global options" do
+        local_and_global('--delete_options=r,p -rp -f').should ==
+          [{:foo=>true}, {:delete_options=>["r", "p"]}]
+      end
+
       test "global option after local one is invalid" do
         args_arr = ['-f --dude', '-f doh --dude', '-f --dude doh', [:doh, '-f --dude'] ]
         args_arr.each_with_index do |args, i|
@@ -314,7 +319,7 @@ module Boson
       end
 
       test "--global option adds additional global options" do
-        local_and_global('-g=d -d').should == [{:do=>true}, {:dude=>true, :global=>'d'}]
+        local_and_global('-g=dude -d').should == [{:do=>true}, {:dude=>true, :global=>'dude'}]
         local_and_global('-g "r dude" -d').should == [{:do=>true},
           {:global=>"r dude", :dude=>true, :render=>true}]
       end
