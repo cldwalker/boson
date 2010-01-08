@@ -41,6 +41,7 @@ module Boson
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
       :load=>{:type=>:array, :values=>all_libraries, :regexp=>true, :enum=>false,
         :desc=>"A comma delimited array of libraries to load"},
+      :unload=>{:type=>:string, :desc=>"Acts as a regular expression to unload default libraries"},
       :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"},
       :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"}
     } #:nodoc:
@@ -104,7 +105,8 @@ module Boson
       end
 
       def default_libraries
-        super + Boson.repos.map {|e| e.config[:bin_defaults] || [] }.flatten + Dir.glob('Bosonfile')
+        libs = super + Boson.repos.map {|e| e.config[:bin_defaults] || [] }.flatten + Dir.glob('Bosonfile')
+        @options[:unload] ?  libs.select {|e| e !~ /#{@options[:unload]}/} : libs
       end
 
       def execute_command
