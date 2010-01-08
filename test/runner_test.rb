@@ -35,7 +35,7 @@ module Boson
         start(:autoload_libraries=>true)
         Index.expects(:read)
         Index.expects(:find_library).with('blah').returns('blah')
-        Manager.expects(:load).with('blah', :verbose=>true)
+        Manager.expects(:load).with('blah', :verbose=>nil)
         Boson.main_object.blah
       end
     end

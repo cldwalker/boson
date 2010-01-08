@@ -30,7 +30,16 @@ module Boson
         !!@in_shell
       end
 
+      # Returns true if in commandline with verbose flag or if set explicitly. Useful in plugins.
+      def verbose?
+        @verbose.nil? ? Boson.const_defined?(:BinRunner) && BinRunner.options[:verbose] : @verbose
+      end
+
       #:stopdoc:
+      def verbose=(val)
+        @verbose = val
+      end
+
       def in_shell=(val)
         @in_shell = val
       end
@@ -49,7 +58,7 @@ module Boson
 
       def autoload_command(cmd)
         Index.read
-        (lib = Index.find_library(cmd)) && Manager.load(lib, :verbose=>true)
+        (lib = Index.find_library(cmd)) && Manager.load(lib, :verbose=>verbose?)
         lib
       end
 
