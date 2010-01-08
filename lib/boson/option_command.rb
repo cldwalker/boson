@@ -152,11 +152,7 @@ module Boson
     end
 
     def all_global_options
-      @command.render_options.each {|k,v|
-        if !v.is_a?(Hash) && !v.is_a?(Symbol)
-          @command.render_options[k] = {:default=>v}
-        end
-      }
+      OptionParser.make_mergeable! @command.render_options
       render_opts = Util.recursive_hash_merge(@command.render_options, Util.deep_copy(self.class.default_render_options))
       merged_opts = Util.recursive_hash_merge Util.deep_copy(self.class.default_pipe_options), render_opts
       opts = Util.recursive_hash_merge merged_opts, Util.deep_copy(BASIC_OPTIONS)

@@ -66,6 +66,14 @@ module Boson
     end
 
     #:stopdoc:
+    def class_config(klass)
+      opts = (Hirb::View.formatter_config[klass] || {}).dup
+      opts.delete(:ancestor)
+      opts.merge!((opts.delete(:options) || {}).dup)
+      OptionParser.make_mergeable!(opts)
+      opts
+    end
+
     def toggle_pager
       Hirb::View.toggle_pager
     end

@@ -92,6 +92,14 @@ module Boson
       @opt_parser.to_s
     end
 
+    def self.make_mergeable!(opts) #:nodoc:
+      opts.each {|k,v|
+        if !v.is_a?(Hash) && !v.is_a?(Symbol)
+          opts[k] = {:default=>v}
+        end
+      }
+    end
+
     # Array of arguments left after defined options have been parsed out by parse.
     def non_opts
       leading_non_opts + trailing_non_opts
