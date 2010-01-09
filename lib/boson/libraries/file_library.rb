@@ -125,8 +125,6 @@ module Boson
     def load_source_and_set_module
       detected = detect_additions(:modules=>true) { load_source }
       @module = determine_lib_module(detected[:modules]) unless @module
-      #without this, module's class methods weren't showing up
-      @module = Util.constantize(@module) if base_module != Commands
     end
 
     def determine_lib_module(detected_modules)
@@ -136,10 +134,7 @@ module Boson
       when 0 then lib_module = create_module_from_path(-1)
       else
         unless (lib_module = Util.constantize("boson/commands/#{@name}")) && lib_module.to_s[/^Boson::Commands/]
-          command_modules = detected_modules.select {|e| e.to_s[/^#{base_module}::/] }
-          unless command_modules.size == 1 && (lib_module = command_modules[0])
-            raise LoaderError, "Can't detect module. Specify a module in this library's config."
-          end
+          raise LoaderError, "Can't detect module. Specify a module in this library's config."
         end
       end
       lib_module
