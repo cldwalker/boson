@@ -30,8 +30,10 @@ module Boson
         command_exists?('blah')
       end
 
-      test "prints error for file library with no module" do
-        capture_stderr { load(:blah, :file_string=>"def blah; end") }.should =~ /Can't.*at least/
+      test "loads a plugin library by creating its module" do
+        load(:blah, :file_string=>"def blah; end")
+        library_has_module('blah', "Boson::Commands::Blah")
+        command_exists?('blah', false)
       end
 
       test "prints error for file library with multiple modules" do

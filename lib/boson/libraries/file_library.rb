@@ -115,8 +115,8 @@ module Boson
       Inspector.disable
     end
 
-    def create_module_from_path
-      @name.split('/')[0..-2].inject(Boson::Commands) {|base, e|
+    def create_module_from_path(index=-2)
+      @name.split('/')[0..index].inject(Boson::Commands) {|base, e|
         base.const_defined?(sub_mod = Util.camelize(e)) ? base.const_get(sub_mod) :
           Util.create_module(base, e)
       }
@@ -130,12 +130,13 @@ module Boson
     end
 
     def determine_lib_module(detected_modules)
+      detected_modules = detected_modules.select {|e| e.to_s[/^#{base_module}::/] }
       case detected_modules.size
       when 1 then lib_module = detected_modules[0]
-      when 0 then raise LoaderError, "Can't detect module. Make sure at least one module is defined in the library."
+      when 0 then lib_module = create_module_from_path(-1)
       else
         unless (lib_module = Util.constantize("boson/commands/#{@name}")) && lib_module.to_s[/^Boson::Commands/]
-          command_modules = detected_modules.map {|e| e.to_s}.grep(/^#{base_module}::/)
+          command_modules = detected_modules.select {|e| e.to_s[/^#{base_module}::/] }
           unless command_modules.size == 1 && (lib_module = command_modules[0])
             raise LoaderError, "Can't detect module. Specify a module in this library's config."
           end
