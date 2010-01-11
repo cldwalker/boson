@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gabriel Horner"]
-  s.date = %q{2009-11-19}
+  s.date = %q{2010-01-11}
   s.default_executable = %q{boson}
   s.description = %q{A command/task framework similar to rake and thor that opens your ruby universe to the commandline and irb.}
   s.email = %q{gabriel.horner@gmail.com}
@@ -55,7 +55,6 @@ Gem::Specification.new do |s|
     "test/argument_inspector_test.rb",
     "test/bin_runner_test.rb",
     "test/comment_inspector_test.rb",
-    "test/config/index.marshal",
     "test/file_library_test.rb",
     "test/loader_test.rb",
     "test/manager_test.rb",
