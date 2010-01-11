@@ -46,7 +46,7 @@ module Boson
     #                     Example:
     #                      :command_aliases=>{'libraries'=>'lib', 'commands'=>'com'}
     # [:defaults] Array of libraries to load at start up for commandline and irb. This is useful for extending boson i.e. adding your
-    #             own option types. Default is no libraries.
+    #             own option types since these are loaded before any other libraries. Default is no libraries.
     # [:console_defaults] Array of libraries to load at start up when used in irb. Default is to load all library files and libraries
     #                     defined in the config.
     # [:bin_defaults] Array of libraries to load at start up when used from the commandline. Default is no libraries.
