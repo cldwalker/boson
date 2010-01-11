@@ -82,12 +82,16 @@ module Boson
       @option_commands[cmd] ||= OptionCommand.new(cmd)
     end
 
-    def translate_and_render(obj, command, args)
+    def call_original_command(args, &block)
+      block.call(args)
+    end
+
+    def translate_and_render(obj, command, args, &block)
       @global_options, @command, original_args = {}, command, args.dup
       args = translate_args(obj, args)
       return run_help_option if @global_options[:help]
       run_pretend_option(args)
-      render_or_raw yield(args) unless @global_options[:pretend]
+      render_or_raw call_original_command(args, &block) unless @global_options[:pretend]
     rescue OptionCommand::CommandArgumentError
       run_pretend_option(args ||= [])
       return if !@global_options[:pretend] && run_verbose_help(option_command, original_args)
