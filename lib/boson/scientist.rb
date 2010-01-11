@@ -99,7 +99,7 @@ module Boson
     end
 
     def translate_args(obj, args)
-      option_command.prepend_default_option(args)
+      option_command.modify_args(args)
       @global_options, parsed_options, args = option_command.parse(args)
       return if @global_options[:help]
 
