@@ -248,7 +248,7 @@ module Boson
       end
 
       test "parses normally from cmdline" do
-        Runner.expects(:in_shell?).returns true
+        Runner.expects(:in_shell?).times(2).returns true
         command(@cmd_attributes, ['--force', '--level=3']).should == {:level=>3, :force=>true}
       end
 
@@ -265,7 +265,7 @@ module Boson
       end
 
       test "prepends correctly from cmdline" do
-        Runner.expects(:in_shell?).returns true
+        Runner.expects(:in_shell?).times(2).returns true
         command(@cmd_attributes, ['3','-f']).should == {:level=>3, :force=>true}
       end
     end

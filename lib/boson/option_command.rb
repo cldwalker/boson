@@ -112,7 +112,7 @@ module Boson
       elsif args.size > 1 && args[-1].is_a?(String)
         temp_args = Runner.in_shell? ? args : Shellwords.shellwords(args.pop)
         global_opt, parsed_options, new_args = parse_options temp_args
-        args += new_args
+        Runner.in_shell? ? args = new_args : args += new_args
       # add default options
       elsif @command.options.to_s.empty? || (!@command.has_splat_args? &&
         args.size <= (@command.arg_size - 1).abs) || (@command.has_splat_args? && !args[-1].is_a?(Hash))
@@ -128,15 +128,30 @@ module Boson
     #:stopdoc:
     def parse_options(args)
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
-      global_options = parse_global_options
-      new_args = option_parser.non_opts.dup + @command.option_parser.trailing_non_opts
+      trailing_non_opts, leftover = parse_trailing
+      global_options = parse_global_options @command.option_parser.leading_non_opts + trailing_non_opts
+      new_args = option_parser.non_opts.dup + leftover
+      new_args.shift if new_args[0] == '--'
       [global_options, parsed_options, new_args]
     rescue OptionParser::Error
-      global_options = parse_global_options
+      global_options = parse_global_options @command.option_parser.leading_non_opts + parse_trailing[0]
       global_options[:help] ? [global_options, nil, []] : raise
     end
 
-    def parse_global_options(args = @command.option_parser.leading_non_opts)
+    def parse_trailing
+      trailing_non_opts = @command.option_parser.trailing_non_opts
+      trailing_non_opts.shift if trailing_non_opts[0] == '-'
+      if trailing_non_opts[0] == '--'
+        trailing_non_opts.shift
+        leftover = trailing_non_opts.dup
+        trailing_non_opts = []
+      else
+        leftover = []
+      end
+      [trailing_non_opts, leftover]
+    end
+
+    def parse_global_options(args)
       global_options = option_parser.parse args
       if global_options[:global]
         global_opts = Shellwords.shellwords(global_options[:global]).map {|str|

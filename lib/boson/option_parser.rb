@@ -383,13 +383,12 @@ module Boson
     end
 
     def delete_invalid_opts
-      [@trailing_non_opts].each do |args|
-        args.delete_if {|e|
-          invalid = e.to_s[/^-/]
-          $stderr.puts "Deleted invalid option '#{e}'" if invalid
-          invalid
-        }
-      end
+      @trailing_non_opts.delete_if {|e|
+        break if %w{- --}.include? e
+        invalid = e.to_s[/^-/]
+        $stderr.puts "Deleted invalid option '#{e}'" if invalid
+        invalid
+      }
     end
 
     def peek
