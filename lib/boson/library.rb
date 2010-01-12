@@ -53,7 +53,7 @@ module Boson
     ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :indexed_namespace]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
     # Private attribute for use within Boson.
-    attr_reader :no_alias_creation, :new_module, :new_commands, :class_commands, :lib_file
+    attr_reader :no_alias_creation, :new_module, :new_commands, :class_commands, :lib_file, :repo_dir
     # Optional namespace name for a library. When enabled defaults to a library's name.
     attr_writer :namespace
 
@@ -123,7 +123,7 @@ module Boson
     end
 
     def local?
-      is_a?(LocalFileLibrary) || (Boson.local_repo.commands_dir == File.dirname(lib_file) rescue false)
+      is_a?(LocalFileLibrary) || (Boson.local_repo && Boson.local_repo.dir == @repo_dir)
     end
 
     def set_name(name)
