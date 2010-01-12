@@ -128,27 +128,24 @@ module Boson
     #:stopdoc:
     def parse_options(args)
       parsed_options = @command.option_parser.parse(args, :delete_invalid_opts=>true)
-      trailing_non_opts, leftover = parse_trailing
-      global_options = parse_global_options @command.option_parser.leading_non_opts + trailing_non_opts
-      new_args = option_parser.non_opts.dup + leftover
-      new_args.shift if new_args[0] == '--'
+      trailing, unparseable = split_trailing
+      global_options = parse_global_options @command.option_parser.leading_non_opts + trailing
+      new_args = option_parser.non_opts.dup + unparseable
       [global_options, parsed_options, new_args]
     rescue OptionParser::Error
-      global_options = parse_global_options @command.option_parser.leading_non_opts + parse_trailing[0]
+      global_options = parse_global_options @command.option_parser.leading_non_opts + split_trailing[0]
       global_options[:help] ? [global_options, nil, []] : raise
     end
 
-    def parse_trailing
-      trailing_non_opts = @command.option_parser.trailing_non_opts
-      trailing_non_opts.shift if trailing_non_opts[0] == '-'
-      if trailing_non_opts[0] == '--'
-        trailing_non_opts.shift
-        leftover = trailing_non_opts.dup
-        trailing_non_opts = []
+    def split_trailing
+      trailing = @command.option_parser.trailing_non_opts
+      if trailing[0] == '--'
+        trailing.shift
+        [ [], trailing ]
       else
-        leftover = []
+        trailing.shift if trailing[0] == '-'
+        [ trailing, [] ]
       end
-      [trailing_non_opts, leftover]
     end
 
     def parse_global_options(args)

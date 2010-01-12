@@ -323,7 +323,17 @@ module Boson
         local_and_global('-g "r dude" -d').should == [{:do=>true},
           {:global=>"r dude", :dude=>true, :render=>true}]
       end
-    end
 
+      test "global option after local one and -" do
+        local_and_global("doh -r -f - --dude").should == [{:foo=>true}, {:dude=>true, :render=>true}]
+      end
+
+      test "no options parsed after --" do
+        local_and_global('doh -f -- -r').should == [{:foo=>true}, {}]
+        local_and_global('doh -- -r -f').should == [{}, {}]
+        local_and_global('-- -r -f').should == [{}, {}]
+        local_and_global('doh -r -- -f').should == [{}, {:render=>true}]
+      end
+    end
   end
 end

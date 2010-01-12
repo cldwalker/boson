@@ -37,6 +37,7 @@ module Boson
   # * Each option type can have attributes to enable more features (see OptionParser.new).
   # * When options are parsed by parse(), an IndifferentAccessHash hash is returned.
   # * Options are also called switches, parameters, flags etc.
+  # * Option parsing stops when it comes across a '--'.
   #
   # Default option types:
   # [*:boolean*] This option has no passed value. To toogle a boolean, prepend with '--no-'.
@@ -222,7 +223,8 @@ module Boson
     # recognizes a valid option, it continues to parse until an non option argument is detected.
     # Flags that can be passed to the parser:
     # * :opts_before_args: When true options must come before arguments. Default is false.
-    # * :delete_invalid_opts: When true deletes any invalid options left after parsing. Default is false.
+    # * :delete_invalid_opts: When true deletes any invalid options left after parsing. Will stop deleting if
+    #   it comes across - or --. Default is false.
     def parse(args, flags={})
       @args = args
       # start with defaults
@@ -230,7 +232,7 @@ module Boson
       
       @leading_non_opts = []
       unless flags[:opts_before_args]
-        @leading_non_opts << shift until current_is_option? || @args.empty?
+        @leading_non_opts << shift until current_is_option? || @args.empty? || peek == '--'
       end
 
       while current_is_option?

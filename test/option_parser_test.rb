@@ -171,6 +171,13 @@ module Boson
       @opt.non_opts.should == ["foo", "bar", "--baz", "-T", "bang"]
     end
 
+    it "stopped by --" do
+      create :foo=>:boolean, :dude=>:boolean
+      parse("foo", "bar", "--", "-f").should == {}
+      @opt.leading_non_opts.should == %w{foo bar}
+      @opt.trailing_non_opts.should == %w{-- -f}
+    end
+
     context "with parse flag" do
       it ":delete_invalid_opts deletes and warns of invalid options" do
         create(:foo=>:boolean)
@@ -178,6 +185,16 @@ module Boson
           @opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
         }.should =~ /Deleted invalid option '-d'/
         @opt.non_opts.should == ['ok']
+      end
+
+      it ":delete_invalid_opts deletes until - or --" do
+        create(:foo=>:boolean, :bar=>:boolean)
+        %w{- --}.each do |stop_char|
+          capture_stderr {
+            @opt.parse(%w{ok -b -d} << stop_char << '-f', :delete_invalid_opts=>true)
+          }.should =~ /'-d'/
+          @opt.non_opts.should == %w{ok -d} << stop_char << '-f'
+        end
       end
 
       it ":opts_before_args only allows options before args" do
