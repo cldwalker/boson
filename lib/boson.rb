@@ -51,9 +51,14 @@ module Boson
     end
   end
 
-  # The array of loaded repositories containing the main repo and a possible local repo
+  # The array of loaded repositories containing the main repo and possible local and global repos
   def repos
-    @repos ||= [repo, local_repo].compact
+    @repos ||= [repo, local_repo, global_repo].compact
+  end
+
+  # Optional global repository at /etc/boson
+  def global_repo
+    File.exists?('/etc/boson') ? Repo.new('/etc/boson') : nil
   end
 
   def main_object=(value) #:nodoc:
