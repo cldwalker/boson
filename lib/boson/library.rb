@@ -122,6 +122,10 @@ module Boson
       @name[/\w+$/]
     end
 
+    def local?
+      is_a?(LocalFileLibrary) || (Boson.local_repo.commands_dir == File.dirname(lib_file) rescue false)
+    end
+
     def set_name(name)
       name.to_s
     end

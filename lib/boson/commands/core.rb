@@ -11,19 +11,21 @@ module Boson::Commands::Core #:nodoc:
       'usage'=>{:description=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
       'commands'=>{
         :description=>"List or search commands. Query must come before any options.", :default_option=>'query',
-        :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"}},
+        :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"},
+          :local=>{:type=>:boolean, :desc=>"Local commands only" } },
         :render_options=>{
           :query=>{:keys=>command_attributes, :default_keys=>'full_name'},
-          :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes},
+          :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes, :enum=>false},
           :filters=>{:default=>{:render_options=>:inspect, :options=>:inspect, :args=>:inspect}}
         }
       },
       'libraries'=>{
         :description=>"List or search libraries. Query must come before any options.", :default_option=>'query',
-        :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"} },
+        :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"},
+          :local=>{:type=>:boolean, :desc=>"Local libraries only" } },
         :render_options=>{
           :query=>{:keys=>library_attributes, :default_keys=>'name'},
-          :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes},
+          :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes, :enum=>false},
           :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}, :desc=>"Filters to apply to library fields" }}
       },
       'load_library'=>{:description=>"Load a library", :options=>{[:verbose,:V]=>true}}
@@ -33,11 +35,13 @@ module Boson::Commands::Core #:nodoc:
   end
 
   def commands(options={})
-    options[:index] ? (Boson::Index.read || true) && Boson::Index.commands : Boson.commands
+    cmds = options[:index] ? (Boson::Index.read || true) && Boson::Index.commands : Boson.commands
+    options[:local] ? cmds.select {|e| e.library && e.library.local? } : cmds
   end
 
   def libraries(options={})
-    options[:index] ? (Boson::Index.read || true) && Boson::Index.libraries : Boson.libraries
+    libs = options[:index] ? (Boson::Index.read || true) && Boson::Index.libraries : Boson.libraries
+    options[:local] ? libs.select {|e| e.local? } : libs
   end
 
   def load_library(library, options={})
