@@ -3,7 +3,7 @@ module Boson
   # merging should assume symbolic keys. Used by OptionParser.
   class IndifferentAccessHash < ::Hash
     #:stopdoc:
-    def initialize(hash)
+    def initialize(hash={})
       super()
       hash.each {|k,v| self[k] = v }
     end
