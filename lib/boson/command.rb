@@ -31,8 +31,8 @@ module Boson
     # [*:description*] Description that shows up in command listings
     # [*:alias*] Alternative name for command
     # [*:options*] Hash of options passed to OptionParser
-    # [*:render_options*] Hash of rendering options to pass to OptionParser. Or a string that should be a
-    #                     class auto-rendered by Hirb.
+    # [*:render_options*] Hash of rendering options to pass to OptionParser. If the key :output_class is passed,
+    #                     that class's Hirb config will serve as defaults for this rendering hash.
     # [*:global_options*] Boolean to enable using global options without having to define render_options or options.
     # [*:args*] Should only be set if not automatically set. This attribute is only
     #           important for commands that have options/render_options. Its value can be an array
@@ -50,8 +50,8 @@ module Boson
           instance_variable_set("@#{e}", hash[e]) if hash[e]
       end
 
-      if hash[:render_options] && !(@render_options = hash[:render_options]).is_a?(Hash)
-        @render_options = View.class_config(@render_options)
+      if hash[:render_options] && (@render_options = hash[:render_options])[:output_class]
+        @render_options = Util.recursive_hash_merge View.class_config(@render_options[:output_class]), @render_options
       end
 
       if hash[:args]
