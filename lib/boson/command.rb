@@ -22,7 +22,7 @@ module Boson
       commands.find(&find_lambda)
     end
 
-    ATTRIBUTES = [:name, :lib, :alias, :description, :options, :args]
+    ATTRIBUTES = [:name, :lib, :alias, :description, :options, :args, :config]
     attr_accessor *(ATTRIBUTES + [:render_options, :namespace, :default_option])
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
@@ -43,26 +43,29 @@ module Boson
     #                       # For a command with default option 'query' and options --query and -v
     #                       'some -v'   -> '--query=some -v'
     #                       '-v'        -> '-v'
-    def initialize(hash)
-      @name = hash[:name] or raise ArgumentError
-      @lib = hash[:lib] or raise ArgumentError
+    # [*:config*] A hash for third party libraries to get and set custom command attributes.
+    def initialize(attributes)
+      hash = attributes.dup
+      @name = hash.delete(:name) or raise ArgumentError
+      @lib = hash.delete(:lib) or raise ArgumentError
       [:alias, :description, :options, :namespace, :default_option, :global_options].each do |e|
-          instance_variable_set("@#{e}", hash[e]) if hash[e]
+          instance_variable_set("@#{e}", hash.delete(e)) if hash.key?(e)
       end
 
-      if hash[:render_options] && (@render_options = hash[:render_options])[:output_class]
+      if hash[:render_options] && (@render_options = hash.delete(:render_options))[:output_class]
         @render_options = Util.recursive_hash_merge View.class_config(@render_options[:output_class]), @render_options
       end
 
-      if hash[:args]
-        if hash[:args].is_a?(Array)
-          @args = hash[:args]
-        elsif hash[:args].to_s[/^\d+/]
-          @arg_size = hash[:args].to_i
-        elsif hash[:args] == '*'
+      if (args = hash.delete(:args))
+        if args.is_a?(Array)
+          @args = args
+        elsif args.to_s[/^\d+/]
+          @arg_size = args.to_i
+        elsif args == '*'
           @args = [['*args']]
         end
       end
+      @config = (hash.delete(:config) || {}).merge(hash)
     end
 
     # Library object a command belongs to.
