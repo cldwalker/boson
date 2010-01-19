@@ -16,7 +16,7 @@ module Boson::Commands::Core #:nodoc:
         :render_options=>{
           :query=>{:keys=>command_attributes, :default_keys=>'full_name'},
           :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes, :enum=>false},
-          :filters=>{:default=>{:render_options=>:inspect, :options=>:inspect, :args=>:inspect}}
+          :filters=>{:default=>{:render_options=>:inspect, :options=>:inspect, :args=>:inspect, :config=>:inspect}}
         }
       },
       'libraries'=>{

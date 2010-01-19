@@ -3,10 +3,11 @@ module Boson
   class Command
     # Creates a command given its name and a library.
     def self.create(name, library)
-      new new_options(name, library)
+      new new_attributes(name, library)
     end
 
-    def self.new_options(name, library) #:nodoc:
+    # Used to generate a command's initial attributes when creating a command object
+    def self.new_attributes(name, library)
       (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name, :namespace=>library.namespace})
     end
 
