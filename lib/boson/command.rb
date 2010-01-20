@@ -34,7 +34,7 @@ module Boson
     # [*:options*] Hash of options passed to OptionParser
     # [*:render_options*] Hash of rendering options to pass to OptionParser. If the key :output_class is passed,
     #                     that class's Hirb config will serve as defaults for this rendering hash.
-    # [*:global_options*] Boolean to enable using global options without having to define render_options or options.
+    # [*:option_command*] Boolean to wrap a command with an OptionCommand object i.e. allow commands to have options.
     # [*:args*] Should only be set if not automatically set. This attribute is only
     #           important for commands that have options/render_options. Its value can be an array
     #           (as ArgumentInspector.scrape_with_eval produces), a number representing
@@ -49,7 +49,7 @@ module Boson
       hash = attributes.dup
       @name = hash.delete(:name) or raise ArgumentError
       @lib = hash.delete(:lib) or raise ArgumentError
-      [:alias, :description, :options, :namespace, :default_option, :global_options].each do |e|
+      [:alias, :description, :options, :namespace, :default_option, :option_command].each do |e|
           instance_variable_set("@#{e}", hash.delete(e)) if hash.key?(e)
       end
 
@@ -133,7 +133,7 @@ module Boson
     end
 
     def option_command?
-      options || render_options || @global_options
+      options || render_options || @option_command
     end
 
     def arg_size
