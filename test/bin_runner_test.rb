@@ -55,8 +55,8 @@ module Boson
       end
 
       test "global option takes value with whitespace" do
-        View.expects(:render).with {|*args| args[1][:fields] == [:name, :lib] && args[1][:vertical] }
-        start('commands', '-g', 'f=name,lib vertical')
+        View.expects(:render).with {|*args| args[1][:fields] = %w{f1 f2} }
+        start('commands', '-f', 'f1, f2')
       end
 
       test "execute option errors are caught" do

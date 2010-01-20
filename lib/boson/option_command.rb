@@ -23,10 +23,11 @@ module Boson
   #   Global options: {:pretend=>true}
   #
   # If a global option conflicts with a local option, the local option takes precedence. You can get around
-  # this by passing a --global option which takes a string of options without their dashes. For example:
-  #   foo '-p --fields=f1,f2 -l=1'
+  # this by passing global options after a '-'. For example, if the global option -f (--fields) conflicts with
+  # a local -f (--force):
+  #   foo 'arg1 -v -f - -f=f1,f2'
   #   # is the same as
-  #   foo ' -g "p fields=f1,f2" -l=1 '
+  #   foo 'arg1 -v --fields=f1,f2 -f'
   #
   # === Toggling Views With the Basic Global Option --render
   # One of the more important global options is --render. This option toggles the rendering of a command's
@@ -60,7 +61,6 @@ module Boson
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
       :render=>{:type=>:boolean, :desc=>"Toggle a command's default rendering behavior"},
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
-      :global=>{:type=>:string, :desc=>"Pass a string of global options without the dashes"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"},
       :delete_options=>{:type=>:array, :desc=>'Deletes global options starting with given strings' }
     } #:nodoc:
@@ -149,13 +149,7 @@ module Boson
     end
 
     def parse_global_options(args)
-      global_options = option_parser.parse args
-      if global_options[:global]
-        global_opts = Shellwords.shellwords(global_options[:global]).map {|str|
-          ((str[/^(.*?)=/,1] || str).length > 1 ? "--" : "-") + str }
-        global_options.merge! option_parser.parse(global_opts)
-      end
-      global_options
+      option_parser.parse args
     end
 
     def option_parser

@@ -318,12 +318,6 @@ module Boson
         end
       end
 
-      test "--global option adds additional global options" do
-        local_and_global('-g=dude -d').should == [{:do=>true}, {:dude=>true, :global=>'dude'}]
-        local_and_global('-g "r dude" -d').should == [{:do=>true},
-          {:global=>"r dude", :dude=>true, :render=>true}]
-      end
-
       test "global option after local one and -" do
         local_and_global("doh -r -f - --dude").should == [{:foo=>true}, {:dude=>true, :render=>true}]
       end
