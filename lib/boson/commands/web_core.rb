@@ -9,7 +9,7 @@ module Boson::Commands::WebCore #:nodoc:
     commands['install'][:options] = {:name=>{:type=>:string, :desc=>"Library name to save to"},
       :force=>{:type=>:boolean, :desc=>'Overwrites an existing library'},
       :module_wrap=>{:type=>:boolean, :desc=>"Wraps a module around install using library name"},
-      :method_wrap=>{:type=>:boolean, :desc=>"Wraps a method and module around installe library using library name"}}
+      :method_wrap=>{:type=>:boolean, :desc=>"Wraps a method and module around installed library using library name"}}
     {:library_file=>File.expand_path(__FILE__), :commands=>commands, :namespace=>false}
   end
 
