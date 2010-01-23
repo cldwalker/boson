@@ -5,7 +5,7 @@ module Boson::Commands::WebCore #:nodoc:
     descriptions = {
       :install=>"Installs a library by url. Library should then be loaded with load_library.",
       :browser=>"Opens urls in a browser on a Mac", :get=>"Gets the body of a url", :post=>'Posts to url' }
-    commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:description=>v}; h}
+    commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:desc=>v}; h}
     commands['install'][:options] = {:name=>{:type=>:string, :desc=>"Library name to save to"},
       :force=>{:type=>:boolean, :desc=>'Overwrites an existing library'},
       :module_wrap=>{:type=>:boolean, :desc=>"Wraps a module around install using library name"},

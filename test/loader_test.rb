@@ -18,20 +18,20 @@ module Boson
 
       # if this test fails, other exists? using methods fail
       test "from callback recursively merges with user's config" do
-        with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:description=>'bling', :options=>{:num=>3}}}}}) do
+        with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:desc=>'bling', :options=>{:num=>3}}}}}) do
           File.stubs(:exists?).returns(true)
           load :blah, :file_string=> "module Blah; def self.config; {:commands=>{'blang'=>{:alias=>'ba'}, " +
             "'bling'=>{:options=>{:verbose=>:boolean}}}}; end; end"
           library('blah').command_object('bling').options.should == {:verbose=>:boolean, :num=>3}
-          library('blah').command_object('bling').description.should == 'bling'
+          library('blah').command_object('bling').desc.should == 'bling'
           library('blah').command_object('blang').alias.should == 'ba'
         end
       end
 
       test "non-hash from inspector overridden by user's config" do
-        with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:description=>'already'}}}}) do
+        with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:desc=>'already'}}}}) do
           load :blah, :file_string=>"module Blah; #from file\ndef bling; end; end"
-          library('blah').command_object('bling').description.should == 'already'
+          library('blah').command_object('bling').desc.should == 'already'
         end
       end
 

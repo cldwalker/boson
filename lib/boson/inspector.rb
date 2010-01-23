@@ -101,7 +101,7 @@ module Boson
 
     # translates from inspector attribute name to command attribute name
     def command_key(key)
-      {:method_args=>:args, :desc=>:description}[key] || key
+      {:method_args=>:args}[key] || key
     end
     #:startdoc:
   end

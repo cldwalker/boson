@@ -23,8 +23,8 @@ module Boson
   #   # Searches commands in the full_name field for 'lib' and sorts results by that field.
   #   bash> boson commands -q=f:lib -s=f    # or commands --query=full_name:lib --sort=full_name
   #
-  #   # Multiple fields can be searched if separated by a ','. This searches the full_name and description fields.
-  #   bash> boson commands -q=f,d:web   # or commands --query=full_name,description:web
+  #   # Multiple fields can be searched if separated by a ','. This searches the full_name and desc fields.
+  #   bash> boson commands -q=f,d:web   # or commands --query=full_name,desc:web
   #
   #   # All fields can be queried using a '*'.
   #   # Searches all library fields and then reverse sorts on name field

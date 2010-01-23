@@ -29,13 +29,13 @@ module Boson
       commands.find(&find_lambda)
     end
 
-    ATTRIBUTES = [:name, :lib, :alias, :description, :options, :args, :config]
+    ATTRIBUTES = [:name, :lib, :alias, :desc, :options, :args, :config]
     attr_accessor *(ATTRIBUTES + [:render_options, :namespace, :default_option])
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
     #
     # Attributes that can be configured:
-    # [*:description*] Description that shows up in command listings
+    # [*:desc*] Description that shows up in command listings
     # [*:alias*] Alternative name for command
     # [*:options*] Hash of options passed to OptionParser
     # [*:render_options*] Hash of rendering options to pass to OptionParser. If the key :output_class is passed,
@@ -55,7 +55,7 @@ module Boson
       hash = attributes.dup
       @name = hash.delete(:name) or raise ArgumentError
       @lib = hash.delete(:lib) or raise ArgumentError
-      [:alias, :description, :options, :namespace, :default_option, :option_command].each do |e|
+      [:alias, :desc, :options, :namespace, :default_option, :option_command].each do |e|
           instance_variable_set("@#{e}", hash.delete(e)) if hash.key?(e)
       end
 
@@ -156,16 +156,23 @@ module Boson
       @file_parsed_args
     end
 
+    # Deprecated method
+    def description
+      puts "@command.description has been changed to @command.desc. Delete your old " +
+        "Boson index at ~/.boson/command/index.marshal for Boson to work from the commandline."
+      Kernel.exit
+    end
+
     def marshal_dump
       if @args && @args.any? {|e| e[1].is_a?(Module) }
         @args.map! {|e| e.size == 2 ? [e[0], e[1].inspect] : e }
         @file_parsed_args = true
       end
-      [@name, @alias, @lib, @description, @options, @render_options, @args, @default_option]
+      [@name, @alias, @lib, @desc, @options, @render_options, @args, @default_option]
     end
 
     def marshal_load(ary)
-      @name, @alias, @lib, @description, @options, @render_options, @args, @default_option = ary
+      @name, @alias, @lib, @desc, @options, @render_options, @args, @default_option = ary
     end
     #:startdoc:
   end

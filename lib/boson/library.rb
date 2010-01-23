@@ -29,7 +29,7 @@ module Boson
   #       :commands:
   #         delete:
   #           :alias: d
-  #           :description: Http delete a given url
+  #           :desc: Http delete a given url
   #
   # When installing a third-party library, use the config file as a way to override default library and command attributes
   # without modifying the library.
@@ -69,7 +69,7 @@ module Boson
     #               for the given commands with command names pointing to their configs. See Command.new for a
     #               command's configurable attributes. If an array, the commands are set for the given library,
     #               overidding default command detection. Example:
-    #                :commands=>{'commands'=>{:description=>'Lists commands', :alias=>'com'}}
+    #                :commands=>{'commands'=>{:desc=>'Lists commands', :alias=>'com'}}
     # [*:class_commands*] A hash of commands to create. A hash key-pair can map command names to any string of ruby code
     #                     that ends with a method call. Or a key-pair can map a class to an array of its class methods
     #                     to create commands of the same name. Example:

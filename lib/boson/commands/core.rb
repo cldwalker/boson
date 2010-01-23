@@ -6,21 +6,22 @@ module Boson::Commands::Core #:nodoc:
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
 
     commands = {
-      'render'=>{:description=>"Render any object using Hirb"},
-      'menu'=>{:description=>"Provide a menu to multi-select elements from a given array"},
-      'usage'=>{:description=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
+      'render'=>{:desc=>"Render any object using Hirb"},
+      'menu'=>{:desc=>"Provide a menu to multi-select elements from a given array"},
+      'usage'=>{:desc=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
       'commands'=>{
-        :description=>"List or search commands. Query must come before any options.", :default_option=>'query',
+        :desc=>"List or search commands. Query must come before any options.", :default_option=>'query',
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"},
           :local=>{:type=>:boolean, :desc=>"Local commands only" } },
         :render_options=>{
+          :headers=>{:default=>{:desc=>'description'}},
           :query=>{:keys=>command_attributes, :default_keys=>'full_name'},
-          :fields=>{:default=>[:full_name, :lib, :alias, :usage, :description], :values=>command_attributes, :enum=>false},
+          :fields=>{:default=>[:full_name, :lib, :alias, :usage, :desc], :values=>command_attributes, :enum=>false},
           :filters=>{:default=>{:render_options=>:inspect, :options=>:inspect, :args=>:inspect, :config=>:inspect}}
         }
       },
       'libraries'=>{
-        :description=>"List or search libraries. Query must come before any options.", :default_option=>'query',
+        :desc=>"List or search libraries. Query must come before any options.", :default_option=>'query',
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"},
           :local=>{:type=>:boolean, :desc=>"Local libraries only" } },
         :render_options=>{
@@ -28,7 +29,7 @@ module Boson::Commands::Core #:nodoc:
           :fields=>{:default=>[:name, :commands, :gems, :library_type], :values=>library_attributes, :enum=>false},
           :filters=>{:default=>{:gems=>[:join, ','],:commands=>:size}, :desc=>"Filters to apply to library fields" }}
       },
-      'load_library'=>{:description=>"Load a library", :options=>{[:verbose,:V]=>true}}
+      'load_library'=>{:desc=>"Load a library", :options=>{[:verbose,:V]=>true}}
     }
 
     {:namespace=>false, :library_file=>File.expand_path(__FILE__), :commands=>commands}
