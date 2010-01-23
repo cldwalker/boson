@@ -1,3 +1,19 @@
+== 0.2.2
+* Renamed Boson::Command#description to #desc. Delete your index at ~/.boson/config/index.marshal.
+* Renamed Boson::Command#global_options to #option_command. Update your configs.
+* Bug fix for Windows and indexing (#4)
+* Added system wide Boson commands at /etc/boson (#2)
+* Added Boson::Command#config for plugins to set/get via @config
+* Added option_command and unload options to BinRunner
+* Added special option parsing characters: - and --
+* Added special :output_class key for global render_options
+* Added :delete_options global option
+* Fixed --no variant for single letter booleans
+* Fixed MethodInspector parsing arguments with special characters
+* Allow global -p to work even in failures
+* Allow -hv to default to verbose help
+* Boson::OptionParser tweaks
+
 == 0.2.1
 * Added local libraries: Bosonfile and under local repositories
 * Added config method attribute.

@@ -145,8 +145,7 @@ Having done that, let's start up irb:
 == Todo
 * More tests
 * Making commands out of existing gems easier and more powerful
-* Consider managing extensions to core and standard libraries
-* Features based on commands and their argument types i.e. aliasing, completion, piping
+* Features based on commands and their argument types i.e. completing and piping
 * Consider dropping alias gem dependency if not using its full potential
 
 == Bugs/Issues
