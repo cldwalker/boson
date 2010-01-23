@@ -5,10 +5,10 @@ module Boson
 
     # Creates a command given its name and a library.
     def self.create(name, library)
-      if @all_option_commands
-        attrs = new_attributes(name, library)
-        attrs[:args] ||= '*'
-        new(attrs.merge!(:option_command=>true))
+      if @all_option_commands && name != 'method_missing'
+        obj = new(new_attributes(name, library).merge(:option_command=>true))
+        obj.args = [['*args']] unless obj.args(library) || obj.arg_size
+        obj
       else
         new(new_attributes(name, library))
       end
