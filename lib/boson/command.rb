@@ -5,13 +5,11 @@ module Boson
 
     # Creates a command given its name and a library.
     def self.create(name, library)
+      obj = new(new_attributes(name, library))
       if @all_option_commands && !%w{get method_missing}.include?(name)
-        obj = new(new_attributes(name, library).merge(:option_command=>true))
-        obj.args = [['*args']] unless obj.args(library) || obj.arg_size
-        obj
-      else
-        new(new_attributes(name, library))
+        obj.make_option_command(library)
       end
+      obj
     end
 
     # Used to generate a command's initial attributes when creating a command object
@@ -138,6 +136,11 @@ module Boson
 
     def has_splat_args?
       !!(@args && @args[-1] && @args[-1][0][/^\*/])
+    end
+
+    def make_option_command(lib=library)
+      @option_command = true
+      @args = [['*args']] unless args(lib) || arg_size
     end
 
     def option_command?
