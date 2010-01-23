@@ -43,7 +43,8 @@ module Boson
         :desc=>"A comma delimited array of libraries to load"},
       :unload=>{:type=>:string, :desc=>"Acts as a regular expression to unload default libraries"},
       :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"},
-      :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"}
+      :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"},
+      :option_commands=>{:type=>:boolean, :desc=>"Toggles on all commands to be defined as option commands" }
     } #:nodoc:
 
     class <<self
@@ -74,6 +75,7 @@ module Boson
       # Loads the given command.
       def init
         Runner.in_shell = true
+        Command.all_option_commands = true if @options[:option_commands]
         super
         Index.update(:verbose=>true, :libraries=>@options[:index]) if @options.key?(:index)
         if @options[:load]

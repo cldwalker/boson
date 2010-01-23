@@ -1,9 +1,17 @@
 module Boson
   # A command starts with the functionality of a ruby method and adds benefits with options, render_options, etc.
   class Command
+    class <<self; attr_accessor :all_option_commands ; end
+
     # Creates a command given its name and a library.
     def self.create(name, library)
-      new new_attributes(name, library)
+      if @all_option_commands
+        attrs = new_attributes(name, library)
+        attrs[:args] ||= '*'
+        new(attrs.merge!(:option_command=>true))
+      else
+        new(new_attributes(name, library))
+      end
     end
 
     # Used to generate a command's initial attributes when creating a command object
