@@ -196,8 +196,7 @@ module Boson
         case type
         when TrueClass                     then  @defaults[nice_name] = true
         when FalseClass                    then  @defaults[nice_name] = false
-        else
-          @defaults[nice_name] = type unless type.is_a?(Symbol)
+        else @defaults[nice_name] = type unless type.is_a?(Symbol)
         end
         mem[name] = !type.nil? ? determine_option_type(type) : type
         mem
@@ -343,8 +342,7 @@ module Boson
       case value
       when TrueClass, FalseClass   then :boolean
       when Numeric                 then :numeric
-      else
-        Util.underscore(value.class.to_s).to_sym
+      else Util.underscore(value.class.to_s).to_sym
       end
     end
 
