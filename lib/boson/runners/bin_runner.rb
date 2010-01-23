@@ -33,7 +33,7 @@ module Boson
   # To turn off auto-rendering by default, add a :no_auto_render: true entry to the main config.
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
-      :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries or help"},
+      :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries, errors or help"},
       :index=>{:type=>:array, :desc=>"Libraries to index. Libraries must be passed with '='.",
         :bool_default=>nil, :values=>all_libraries, :regexp=>true, :enum=>false},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
