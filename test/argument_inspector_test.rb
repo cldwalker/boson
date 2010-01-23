@@ -31,7 +31,7 @@ module Boson
         Inspector.enable
         ::Boson::Commands::Aaa.module_eval(string)
         Inspector.disable
-        MethodInspector.store[:method_args]['blah']
+        MethodInspector.store[:args]['blah']
       end
 
       before(:all) { eval "module ::Boson::Commands::Aaa; end"; }

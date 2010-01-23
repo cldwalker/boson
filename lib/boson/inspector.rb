@@ -68,9 +68,8 @@ module Boson
 
     #:stopdoc:
     def add_method_scraped_data
-      (MethodInspector::METHODS + [:method_args]).each do |e|
-        key = command_key(e)
-        (@store[e] || []).each do |cmd, val|
+      (MethodInspector::METHODS + [:args]).each do |key|
+        (@store[key] || []).each do |cmd, val|
           @commands_hash[cmd] ||= {}
           add_scraped_data_to_config(key, val, cmd)
         end
@@ -94,14 +93,9 @@ module Boson
         scraped = CommentInspector.scrape(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module)
         @commands_hash[cmd] ||= {}
         MethodInspector::METHODS.each do |e|
-          add_scraped_data_to_config(command_key(e), scraped[e], cmd)
+          add_scraped_data_to_config(e, scraped[e], cmd)
         end
       end
-    end
-
-    # translates from inspector attribute name to command attribute name
-    def command_key(key)
-      {:method_args=>:args}[key] || key
     end
     #:startdoc:
   end
