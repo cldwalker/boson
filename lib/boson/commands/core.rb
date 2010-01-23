@@ -53,8 +53,8 @@ module Boson::Commands::Core #:nodoc:
     Boson::View.render(object, options)
   end
 
-  def menu(output, options={}, &block)
-    Hirb::Console.format_output(output, options.merge(:class=>"Hirb::Menu"), &block)
+  def menu(arr, options={}, &block)
+    Hirb::Console.format_output(arr, options.merge(:class=>"Hirb::Menu"), &block)
   end
 
   def usage(command, options={})
