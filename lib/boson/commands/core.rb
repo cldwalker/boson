@@ -14,7 +14,7 @@ module Boson::Commands::Core #:nodoc:
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"},
           :local=>{:type=>:boolean, :desc=>"Local commands only" } },
         :render_options=>{
-          :headers=>{:default=>{:desc=>'description'}},
+          [:headers,:H]=>{:default=>{:desc=>'description'}},
           :query=>{:keys=>command_attributes, :default_keys=>'full_name'},
           :fields=>{:default=>[:full_name, :lib, :alias, :usage, :desc], :values=>command_attributes, :enum=>false},
           :filters=>{:default=>{:render_options=>:inspect, :options=>:inspect, :args=>:inspect, :config=>:inspect}}
