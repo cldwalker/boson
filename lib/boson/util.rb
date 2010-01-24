@@ -114,5 +114,21 @@ module Boson
     def top_level_class_conflict(base_module, conflicting_module)
       (conflicting_module =~ /^#{base_module}.*::([^:]+)/) && Object.const_defined?($1) && $1
     end
+
+    # Regular expression search of a list with underscore anchoring of words.
+    # For example 'some_dang_long_word' can be specified as 's_d_l_w'.
+    def underscore_search(input, list)
+      input = input.to_s
+      if input.include?("_")
+        index = 0
+        input.split('_').map {|e| Regexp.escape(e) }.inject(list) {|acc,partial|
+          acc = acc.select {|f| f.to_s.split(/_+/)[index] =~ /^#{partial}/ }
+          index +=1; acc
+        }
+      else
+        escaped_input = Regexp.escape(input)
+        list.select {|e| e.to_s =~ /^#{escaped_input}/ }
+      end
+    end
   end
 end
