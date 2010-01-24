@@ -70,6 +70,8 @@ module Boson
     #                   depend on commands from other libraries. Default is false.
     # [:ignore_directories] Array of directories to ignore when detecting local repositories for Boson.local_repo.
     # [:no_auto_render] When set, turns off commandline auto-rendering of a command's output. Default is false.
+    # [:option_underscore_search] When set, OptionParser option values (with :values or :keys) are auto aliased with underscore searching.
+    #                             Default is false. See Util.underscore_search.
     def config(reload=false)
       if reload || @config.nil?
         begin

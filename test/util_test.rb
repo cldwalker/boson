@@ -7,8 +7,16 @@ module Boson
         Util.underscore_search(query, list).sort {|a,b| a.to_s <=> b.to_s }
       end
 
+      def first_search(query, list)
+        Util.underscore_search(query, list, true)
+      end
+
       test "matches non underscore strings" do
         search('some', %w{some words match sometimes}).should == %w{some sometimes}
+      end
+
+      test "matches first non underscore string" do
+        first_search('wo', %w{some work wobbles}).should == 'work'
       end
 
       test "matches non underscore symbols" do
@@ -18,6 +26,10 @@ module Boson
 
       test "matches underscore strings" do
         search('s_l', %w{some_long some_short some_lame}).should == %w{some_lame some_long}
+      end
+
+      test "matches first underscore string" do
+        first_search('s_l', %w{some_long some_short some_lame}).should == 'some_long'
       end
 
       test "matches underscore symbols" do

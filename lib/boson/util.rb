@@ -117,14 +117,15 @@ module Boson
 
     # Regular expression search of a list with underscore anchoring of words.
     # For example 'some_dang_long_word' can be specified as 's_d_l_w'.
-    def underscore_search(input, list)
+    def underscore_search(input, list, first_match=false)
+      meth = first_match ? :find : :select
       input = input.to_s
       if input.include?("_")
         underscore_regex = input.split('_').map {|e| Regexp.escape(e) }.join("([^_]+)?_")
-        list.select {|e| e.to_s =~ /^#{underscore_regex}/ }
+        list.send(meth) {|e| e.to_s =~ /^#{underscore_regex}/ }
       else
         escaped_input = Regexp.escape(input)
-        list.select {|e| e.to_s =~ /^#{escaped_input}/ }
+        list.send(meth) {|e| e.to_s =~ /^#{escaped_input}/ }
       end
     end
   end
