@@ -130,4 +130,15 @@ class Test::Unit::TestCase
       Boson::Manager.add_library(lib); lib
     }
   end
+
+  module OptionTestHelper
+    def create(opts)
+      @opt = Boson::OptionParser.new(opts)
+    end
+
+    def parse(*args)
+      @non_opts = []
+      @opt.parse(args.flatten)
+    end
+  end
 end
