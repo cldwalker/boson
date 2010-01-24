@@ -26,7 +26,7 @@ module Boson
       end
 
       test "matches full underscore string" do
-        search('some_long', %w{some_long some_short some_lame}).should == %w{some_long}
+        search('some_long_name', %w{some_long_name some_short some_lame}).should == %w{some_long_name}
       end
     end
   end

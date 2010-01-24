@@ -120,11 +120,8 @@ module Boson
     def underscore_search(input, list)
       input = input.to_s
       if input.include?("_")
-        index = 0
-        input.split('_').map {|e| Regexp.escape(e) }.inject(list) {|acc,partial|
-          acc = acc.select {|f| f.to_s.split(/_+/)[index] =~ /^#{partial}/ }
-          index +=1; acc
-        }
+        underscore_regex = input.split('_').map {|e| Regexp.escape(e) }.join("([^_]+)?_")
+        list.select {|e| e.to_s =~ /^#{underscore_regex}/ }
       else
         escaped_input = Regexp.escape(input)
         list.select {|e| e.to_s =~ /^#{escaped_input}/ }
