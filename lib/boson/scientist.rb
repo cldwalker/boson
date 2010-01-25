@@ -154,7 +154,7 @@ module Boson
     end
 
     def render?
-      !!@command.render_options ^ @global_options[:render]
+      (!!@command.render_options ^ @global_options[:render]) && !Pipe.any_no_render_pipes?(@global_options)
     end
     #:startdoc:
   end

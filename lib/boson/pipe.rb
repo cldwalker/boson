@@ -111,6 +111,11 @@ module Boson
       @pipe_options ||= Boson.repo.config[:pipe_options] || {}
     end
 
+    def any_no_render_pipes?(options)
+      !(pipes = options.keys & pipe_options.keys).empty? &&
+        pipes.any? {|e| pipe_options[e][:no_render] }
+    end
+
     def process_user_pipes(result, options)
       (options.keys & pipe_options.keys).each {|e|
         command = pipe_options[e][:pipe] ||= e
