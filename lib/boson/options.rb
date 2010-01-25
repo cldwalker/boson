@@ -76,15 +76,8 @@ module Boson
     end
 
     def create_hash(value)
-      splitter = current_attributes[:split] || ','
       (keys = current_attributes[:keys]) && keys = keys.sort_by {|e| e.to_s }
-      if !value.include?(':') && current_attributes[:default_keys]
-        value = current_attributes[:default_keys].to_s + ":#{value}"
-      end
-      # Creates array pairs, grouping array of keys with a value
-      aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
-      aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
-      hash = aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
+      hash = parse_hash(value, keys)
       if keys
         hash = hash.inject({}) {|h,(k,v)|
           h[auto_alias_value(keys, k)] = v; h
@@ -92,6 +85,18 @@ module Boson
         validate_enum_values(keys, hash.keys)
       end
       hash
+    end
+
+    def parse_hash(value, keys)
+      splitter = current_attributes[:split] || ','
+      if !value.include?(':') && current_attributes[:default_keys]
+        value = current_attributes[:default_keys].to_s + ":#{value}"
+      end
+
+      # Creates array pairs, grouping array of keys with a value
+      aoa = Hash[*value.split(/(?::)([^#{Regexp.quote(splitter)}]+)#{Regexp.quote(splitter)}?/)].to_a
+      aoa.each_with_index {|(k,v),i| aoa[i][0] = keys.join(splitter) if k == '*' } if keys
+      aoa.inject({}) {|t,(k,v)| k.split(splitter).each {|e| t[e] = v }; t }
     end
 
     # Validation methods
