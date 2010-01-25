@@ -4,7 +4,7 @@ module Boson
   # === Creating Your Own Option Type
   # Defining your own option type simply requires one method (create_@type) to parse the option value and create
   # the desired object. To create an option type :date, you could create the following create_date method:
-  #   # Drop this in your ~/.irbrc after require 'boson'
+  #   # Drop this in ~/.boson/commands/date_option.rb
   #   module Boson::Options::Date
   #     def create_date(value)
   #       # value should be mm/dd
@@ -12,6 +12,10 @@ module Boson
   #     end
   #   end
   #   Boson::OptionParser.send :include, Boson::Options::Date
+  #
+  # Modify your config to load this new library by default:
+  #   :defaults:
+  #   - date_option
   #
   # In a FileLibrary, we could then use this new option:
   #   module Calendar
