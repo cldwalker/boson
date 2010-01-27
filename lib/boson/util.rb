@@ -119,6 +119,7 @@ module Boson
     # For example 'some_dang_long_word' can be specified as 's_d_l_w'.
     def underscore_search(input, list, first_match=false)
       meth = first_match ? :find : :select
+      return (first_match ? input : [input]) if list.include?(input)
       input = input.to_s
       if input.include?("_")
         underscore_regex = input.split('_').map {|e| Regexp.escape(e) }.join("([^_]+)?_")
