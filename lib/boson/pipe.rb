@@ -71,7 +71,8 @@ module Boson
     extend self
 
     # Main method which processes all pipe commands, both default and user-defined ones.
-    def process(object, global_opt)
+    def process(object, global_opt, env={})
+      @env = env
       if object.is_a?(Array)
         object = search_object(object, global_opt[:query]) if global_opt[:query]
         object = sort_object(object, global_opt[:sort], global_opt[:reverse_sort]) if global_opt[:sort]
@@ -117,19 +118,27 @@ module Boson
       pipe_options[key] || {}
     end
 
-    def any_no_render_pipes?(global_opt)
-      !(pipes = global_opt.keys & pipe_options.keys).empty? &&
-        pipes.any? {|e| pipe(e)[:no_render] }
-    end
-
+    # global_opt can come from Hirb callback or Scientist
     def process_user_pipes(result, global_opt)
       pipes_to_process(global_opt).each {|e|
         args = [pipe(e)[:pipe], result]
         args << global_opt[e] unless pipe(e)[:type] == :boolean
+        args << get_env(e, global_opt) if pipe(e)[:env]
         pipe_result = Boson.invoke(*args)
         result = pipe_result if pipe(e)[:filter]
       }
       result
+    end
+
+    def get_env(key, global_opt)
+      { :global_options=>global_opt.merge(:delete_callbacks=>[:z_user_pipes]),
+        :config=>(@env[:config].dup[key] || {})
+      }
+    end
+
+    def any_no_render_pipes?(global_opt)
+      !(pipes = pipes_to_process(global_opt)).empty? &&
+        pipes.any? {|e| pipe(e)[:no_render] }
     end
 
     def pipes_to_process(global_opt)
