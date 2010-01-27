@@ -2,6 +2,14 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 module Boson
   class UtilTest < Test::Unit::TestCase
+    test "underscore converts camelcase to underscore" do
+      Util.underscore('Boson::MethodInspector').should == 'boson/method_inspector'
+    end
+
+    test "constantize converts string to class" do
+      Util.constantize("Boson").should == ::Boson
+    end
+
     context "underscore_search" do
       def search(query, list)
         Util.underscore_search(query, list).sort {|a,b| a.to_s <=> b.to_s }
