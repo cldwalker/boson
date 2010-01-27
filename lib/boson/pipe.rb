@@ -71,12 +71,12 @@ module Boson
     extend self
 
     # Main method which processes all pipe commands, both default and user-defined ones.
-    def process(object, options)
+    def process(object, global_opt)
       if object.is_a?(Array)
-        object = search_object(object, options[:query]) if options[:query]
-        object = sort_object(object, options[:sort], options[:reverse_sort]) if options[:sort]
+        object = search_object(object, global_opt[:query]) if global_opt[:query]
+        object = sort_object(object, global_opt[:sort], global_opt[:reverse_sort]) if global_opt[:sort]
       end
-      process_user_pipes(object, options)
+      process_user_pipes(object, global_opt)
     end
 
     # Searches an array of objects or hashes using the :query option.
@@ -108,22 +108,33 @@ module Boson
 
     #:stopdoc:
     def pipe_options
-      @pipe_options ||= Boson.repo.config[:pipe_options] || {}
+      @pipe_options ||= begin
+        (Boson.repo.config[:pipe_options] || {}).each {|k,v| v[:pipe] ||= k }
+      end
     end
 
-    def any_no_render_pipes?(options)
-      !(pipes = options.keys & pipe_options.keys).empty? &&
-        pipes.any? {|e| pipe_options[e][:no_render] }
+    def pipe(key)
+      pipe_options[key] || {}
     end
 
-    def process_user_pipes(result, options)
-      (options.keys & pipe_options.keys).each {|e|
-        command = pipe_options[e][:pipe] ||= e
-        pipe_result = pipe_options[e][:type] == :boolean ? Boson.invoke(command, result) :
-          Boson.invoke(command, result, options[e])
-        result = pipe_result if pipe_options[e][:filter]
+    def any_no_render_pipes?(global_opt)
+      !(pipes = global_opt.keys & pipe_options.keys).empty? &&
+        pipes.any? {|e| pipe(e)[:no_render] }
+    end
+
+    def process_user_pipes(result, global_opt)
+      pipes_to_process(global_opt).each {|e|
+        args = [pipe(e)[:pipe], result]
+        args << global_opt[e] unless pipe(e)[:type] == :boolean
+        pipe_result = Boson.invoke(*args)
+        result = pipe_result if pipe(e)[:filter]
       }
       result
+    end
+
+    def pipes_to_process(global_opt)
+      pipes = (global_opt.keys & pipe_options.keys)
+      (solo_pipe = pipes.find {|e| pipe(e)[:solo] }) ? [solo_pipe] : pipes
     end
     #:startdoc:
 
