@@ -107,11 +107,17 @@ module Boson
       $stderr.puts "Sort failed with nonexistant method '#{sort}'"
     end
 
+    def add_pipes(hash)
+      pipe_options.merge! setup_pipes(hash)
+    end
+
     #:stopdoc:
     def pipe_options
-      @pipe_options ||= begin
-        (Boson.repo.config[:pipe_options] || {}).each {|k,v| v[:pipe] ||= k }
-      end
+      @pipe_options ||= setup_pipes(Boson.repo.config[:pipe_options] || {})
+    end
+
+    def setup_pipes(hash)
+      hash.each {|k,v| v[:pipe] ||= k }
     end
 
     def pipe(key)
