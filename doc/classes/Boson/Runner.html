@@ -50,17 +50,19 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000067">all_libraries</a></li>
-              <li><a href="#M000065">default_libraries</a></li>
-              <li><a href="#M000066">detected_libraries</a></li>
-              <li><a href="#M000064">init</a></li>
+              <li><a href="#M000072">all_libraries</a></li>
+              <li><a href="#M000070">default_libraries</a></li>
+              <li><a href="#M000071">detected_libraries</a></li>
+              <li><a href="#M000073">in_shell?</a></li>
+              <li><a href="#M000069">init</a></li>
+              <li><a href="#M000074">verbose?</a></li>
             </ol>
           </div>
           <div id='section'>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000067'>
-                <a name='M000067'>      </a>
+              <div class='public-class method' id='method-M000072'>
+                <a name='M000072'>      </a>
                 <div class='synopsis'>
                   <span class='name'>all_libraries</span>
                   <span class='arguments'>()</span>
@@ -68,18 +70,18 @@
                 <div class='description'>
                   <p>
                   Libraries specified in config files and <a
-                  href="Runner.html#M000066">detected_libraries</a>
+                  href="Runner.html#M000071">detected_libraries</a>
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000067-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000072-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000067-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 23</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">all_libraries</span>&#x000A;        <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">all_libraries</span> }.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">uniq</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000072-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 23</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">all_libraries</span>&#x000A;        <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">all_libraries</span> }.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">uniq</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000065'>
-                <a name='M000065'>      </a>
+              <div class='public-class method' id='method-M000070'>
+                <a name='M000070'>      </a>
                 <div class='synopsis'>
                   <span class='name'>default_libraries</span>
                   <span class='arguments'>()</span>
@@ -90,14 +92,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000065-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000070-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000065-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 13</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_libraries</span>&#x000A;        [<span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Commands</span><span class="ruby-operator">::</span><span class="ruby-constant">Core</span>, <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Commands</span><span class="ruby-operator">::</span><span class="ruby-constant">WebCore</span>] <span class="ruby-operator">+</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:defaults</span>] <span class="ruby-operator">||</span> [] }.<span class="ruby-identifier">flatten</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000070-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 13</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_libraries</span>&#x000A;        <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:defaults</span>] <span class="ruby-operator">||</span> [] }.<span class="ruby-identifier">flatten</span> <span class="ruby-operator">+</span> [<span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Commands</span><span class="ruby-operator">::</span><span class="ruby-constant">Core</span>, <span class="ruby-constant">Boson</span><span class="ruby-operator">::</span><span class="ruby-constant">Commands</span><span class="ruby-operator">::</span><span class="ruby-constant">WebCore</span>]&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000066'>
-                <a name='M000066'>      </a>
+              <div class='public-class method' id='method-M000071'>
+                <a name='M000071'>      </a>
                 <div class='synopsis'>
                   <span class='name'>detected_libraries</span>
                   <span class='arguments'>()</span>
@@ -108,14 +110,33 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000066-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000071-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000066-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 18</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">detected_libraries</span>&#x000A;        <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">detected_libraries</span> }.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">uniq</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000071-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 18</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">detected_libraries</span>&#x000A;        <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repos</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">detected_libraries</span> }.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">uniq</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000064'>
-                <a name='M000064'>      </a>
+              <div class='public-class method' id='method-M000073'>
+                <a name='M000073'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>in_shell?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns true if commands are being executed from a non-ruby shell i.e.
+                  bash. Returns false if in a ruby shell i.e. irb.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000073-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 29</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">in_shell?</span>&#x000A;        <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-ivar">@in_shell</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-class method' id='method-M000069'>
+                <a name='M000069'>      </a>
                 <div class='synopsis'>
                   <span class='name'>init</span>
                   <span class='arguments'>()</span>
@@ -123,14 +144,33 @@
                 <div class='description'>
                   <p>
                   Enables view, adds local load path and loads <a
-                  href="Runner.html#M000065">default_libraries</a>
+                  href="Runner.html#M000070">default_libraries</a>
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000064-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000069-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000064-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 6</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">init</span>&#x000A;        <span class="ruby-constant">View</span>.<span class="ruby-identifier">enable</span>&#x000A;        <span class="ruby-identifier">add_load_path</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">default_libraries</span>, <span class="ruby-identifier">load_options</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000069-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 6</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">init</span>&#x000A;        <span class="ruby-constant">View</span>.<span class="ruby-identifier">enable</span>&#x000A;        <span class="ruby-identifier">add_load_path</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span> <span class="ruby-identifier">default_libraries</span>, <span class="ruby-identifier">load_options</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-class method' id='method-M000074'>
+                <a name='M000074'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>verbose?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns true if in commandline with verbose flag or if set explicitly.
+                  Useful in plugins.
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000074-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000074-source'><span class="ruby-comment cmt"># File lib/boson/runner.rb, line 34</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">verbose?</span>&#x000A;        <span class="ruby-ivar">@verbose</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-constant">Boson</span>.<span class="ruby-identifier">const_defined?</span>(<span class="ruby-identifier">:BinRunner</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">BinRunner</span>.<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>] <span class="ruby-operator">:</span> <span class="ruby-ivar">@verbose</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

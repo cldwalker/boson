@@ -47,7 +47,11 @@
             parse the option value and create the desired object. To create an option
             type :date, you could create the following create_date method:
             </p>
-            <pre># Drop this in your ~/.irbrc after require 'boson'&#x000A;module Boson::Options::Date&#x000A;  def create_date(value)&#x000A;    # value should be mm/dd&#x000A;    Date.parse(value + &quot;/#{Date.today.year}&quot;)&#x000A;  end&#x000A;end&#x000A;Boson::OptionParser.send :include, Boson::Options::Date</pre>
+            <pre># Drop this in ~/.boson/commands/date_option.rb&#x000A;module Boson::Options::Date&#x000A;  def create_date(value)&#x000A;    # value should be mm/dd&#x000A;    Date.parse(value + &quot;/#{Date.today.year}&quot;)&#x000A;  end&#x000A;end&#x000A;Boson::OptionParser.send :include, Boson::Options::Date</pre>
+            <p>
+            Modify your config to load this new library by default:
+            </p>
+            <pre>:defaults:&#x000A;- date_option</pre>
             <p>
             In a <a href="FileLibrary.html">FileLibrary</a>, we could then use this new
             option:
@@ -68,8 +72,8 @@
             
             </li>
             <li>To access the hash of attributes the current option has use <a
-            href="OptionParser.html#M000089">OptionParser.current_attributes</a>. See
-            <a href="OptionParser.html#M000083">OptionParser.new</a> for more about
+            href="OptionParser.html#M000098">OptionParser.current_attributes</a>. See
+            <a href="OptionParser.html#M000092">OptionParser.new</a> for more about
             option attributes.
             
             </li>
@@ -84,7 +88,7 @@
             option&#8217;s name (i.e. &#8212;day) and returns a usage string to be
             wrapped in &#8217;[ ]&#8217;. If no usage is defined the default would look
             like &#8217;[&#8212;day=:date]&#8217;. Consider using the <a
-            href="OptionParser.html#M000085">OptionParser.default_usage</a> helper
+            href="OptionParser.html#M000094">OptionParser.default_usage</a> helper
             method for your usage.
             </p>
           </div>

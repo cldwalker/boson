@@ -101,7 +101,7 @@
             configure a library&#8217;s commands. An example of a <a
             href="GemLibrary.html">GemLibrary</a> config:
             
-            <pre>:libraries:&#x000A;  httparty:&#x000A;   :class_commands:&#x000A;     delete: HTTParty.delete&#x000A;   :commands:&#x000A;     delete:&#x000A;       :alias: d&#x000A;       :description: Http delete a given url</pre>
+            <pre>:libraries:&#x000A;  httparty:&#x000A;   :class_commands:&#x000A;     delete: HTTParty.delete&#x000A;   :commands:&#x000A;     delete:&#x000A;       :alias: d&#x000A;       :desc: Http delete a given url</pre>
             </li>
             </ul>
             <p>
@@ -121,13 +121,13 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000092">new</a></li>
+              <li><a href="#M000105">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000093">library_type</a></li>
-              <li><a href="#M000094">namespace</a></li>
-              <li><a href="#M000095">namespace_object</a></li>
+              <li><a href="#M000106">library_type</a></li>
+              <li><a href="#M000107">namespace</a></li>
+              <li><a href="#M000108">namespace_object</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -161,6 +161,22 @@
               <div class='name-list'>
                 <table>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>class_commands</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      Private attribute for use within <a href="../Boson.html">Boson</a>.
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>lib_file</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      Private attribute for use within <a href="../Boson.html">Boson</a>.
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>namespace</td>
                     <td class='context-item-value'>[W]</td>
                     <td class='context-item-desc'>
@@ -193,13 +209,21 @@
                       Private attribute for use within <a href="../Boson.html">Boson</a>.
                     </td>
                   </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>repo_dir</td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      Private attribute for use within <a href="../Boson.html">Boson</a>.
+                    </td>
+                  </tr>
                 </table>
               </div>
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000092'>
-                <a name='M000092'>      </a>
+              <div class='public-class method' id='method-M000105'>
+                <a name='M000105'>      </a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(hash)</span>
@@ -223,11 +247,11 @@
                   </dd>
                   <dt><b>:commands</b></dt><dd>A hash or array of commands that belong to this library. A hash configures
                   command attributes for the given commands with command names pointing to
-                  their configs. See <a href="Command.html#M000055">Command.new</a> for a
+                  their configs. See <a href="Command.html#M000059">Command.new</a> for a
                   command&#8217;s configurable attributes. If an array, the commands are set
                   for the given library, overidding default command detection. Example:
                   
-                  <pre>:commands=&gt;{'commands'=&gt;{:description=&gt;'Lists commands', :alias=&gt;'com'}}</pre>
+                  <pre>:commands=&gt;{'commands'=&gt;{:desc=&gt;'Lists commands', :alias=&gt;'com'}}</pre>
                   </dd>
                   <dt><b>:class_commands</b></dt><dd>A hash of commands to create. A hash key-pair can map command names to any
                   string of ruby code that ends with a method call. Or a key-pair can map a
@@ -249,7 +273,7 @@
                   automatically namespaced to the library&#8217;s name. When a string, the
                   library is namespaced to the string. Default is nil. To control the
                   namespacing of all libraries see <a
-                  href="Repo.html#M000079">Boson::Repo.config</a>.
+                  href="Repo.html#M000088">Boson::Repo.config</a>.
                   
                   </dd>
                   <dt><b>:no_alias_creation</b></dt><dd>Boolean which doesn&#8217;t create aliases for a library. Useful for
@@ -260,15 +284,15 @@
                   </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000092-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000105-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000092-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 87</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">repo</span> = <span class="ruby-identifier">set_repo</span>&#x000A;      <span class="ruby-ivar">@repo_dir</span> = <span class="ruby-identifier">repo</span>.<span class="ruby-identifier">dir</span>&#x000A;      <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">set_name</span>(<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:name</span>)) <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Library missing required key :name&quot;</span>&#x000A;      <span class="ruby-ivar">@loaded</span> = <span class="ruby-keyword kw">false</span>&#x000A;      <span class="ruby-ivar">@commands_hash</span> = {}&#x000A;      <span class="ruby-ivar">@commands</span> = []&#x000A;      <span class="ruby-identifier">set_config</span> (<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:libraries</span>][<span class="ruby-ivar">@name</span>] <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>), <span class="ruby-keyword kw">true</span>&#x000A;      <span class="ruby-identifier">set_command_aliases</span>(<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:command_aliases</span>])&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000105-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 87</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">repo</span> = <span class="ruby-identifier">set_repo</span>&#x000A;      <span class="ruby-ivar">@repo_dir</span> = <span class="ruby-identifier">repo</span>.<span class="ruby-identifier">dir</span>&#x000A;      <span class="ruby-ivar">@name</span> = <span class="ruby-identifier">set_name</span>(<span class="ruby-identifier">hash</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:name</span>)) <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>, <span class="ruby-value str">&quot;Library missing required key :name&quot;</span>&#x000A;      <span class="ruby-ivar">@loaded</span> = <span class="ruby-keyword kw">false</span>&#x000A;      <span class="ruby-ivar">@commands_hash</span> = {}&#x000A;      <span class="ruby-ivar">@commands</span> = []&#x000A;      <span class="ruby-identifier">set_config</span> (<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:libraries</span>][<span class="ruby-ivar">@name</span>] <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>), <span class="ruby-keyword kw">true</span>&#x000A;      <span class="ruby-identifier">set_command_aliases</span>(<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:command_aliases</span>])&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000093'>
-                <a name='M000093'>      </a>
+              <div class='public-instance method' id='method-M000106'>
+                <a name='M000106'>      </a>
                 <div class='synopsis'>
                   <span class='name'>library_type</span>
                   <span class='arguments'>()</span>
@@ -280,27 +304,27 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000093-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000106-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000093-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 99</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">library_type</span>&#x000A;      <span class="ruby-identifier">str</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/::(\w+)Library$/</span>, <span class="ruby-value">1</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">'library'</span>&#x000A;      <span class="ruby-identifier">str</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000106-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 99</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">library_type</span>&#x000A;      <span class="ruby-identifier">str</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/::(\w+)Library$/</span>, <span class="ruby-value">1</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">'library'</span>&#x000A;      <span class="ruby-identifier">str</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000094'>
-                <a name='M000094'>      </a>
+              <div class='public-instance method' id='method-M000107'>
+                <a name='M000107'>      </a>
                 <div class='synopsis'>
                   <span class='name'>namespace</span>
                   <span class='arguments'>(orig=@namespace)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000094-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000107-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000094-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 104</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">namespace</span>(<span class="ruby-identifier">orig</span>=<span class="ruby-ivar">@namespace</span>)&#x000A;      <span class="ruby-ivar">@namespace</span> = [<span class="ruby-constant">String</span>,<span class="ruby-constant">FalseClass</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">orig</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">orig</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">begin</span>&#x000A;        <span class="ruby-keyword kw">if</span> (<span class="ruby-ivar">@namespace</span> <span class="ruby-operator">==</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">||</span> (<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:auto_namespace</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@index</span>))&#x000A;          <span class="ruby-ivar">@namespace</span> = <span class="ruby-identifier">clean_name</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-ivar">@namespace</span> = <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000107-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 104</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">namespace</span>(<span class="ruby-identifier">orig</span>=<span class="ruby-ivar">@namespace</span>)&#x000A;      <span class="ruby-ivar">@namespace</span> = [<span class="ruby-constant">String</span>,<span class="ruby-constant">FalseClass</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">orig</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">orig</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">begin</span>&#x000A;        <span class="ruby-keyword kw">if</span> (<span class="ruby-ivar">@namespace</span> <span class="ruby-operator">==</span> <span class="ruby-keyword kw">true</span> <span class="ruby-operator">||</span> (<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">repo</span>.<span class="ruby-identifier">config</span>[<span class="ruby-identifier">:auto_namespace</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@index</span>))&#x000A;          <span class="ruby-ivar">@namespace</span> = <span class="ruby-identifier">clean_name</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-ivar">@namespace</span> = <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000095'>
-                <a name='M000095'>      </a>
+              <div class='public-instance method' id='method-M000108'>
+                <a name='M000108'>      </a>
                 <div class='synopsis'>
                   <span class='name'>namespace_object</span>
                   <span class='arguments'>()</span>
@@ -311,10 +335,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000095-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000108-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000095-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 115</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">namespace_object</span>&#x000A;      <span class="ruby-ivar">@namespace_object</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">namespace</span> <span class="ruby-value">? </span><span class="ruby-constant">Boson</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-identifier">namespace</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000108-source'><span class="ruby-comment cmt"># File lib/boson/library.rb, line 115</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">namespace_object</span>&#x000A;      <span class="ruby-ivar">@namespace_object</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">namespace</span> <span class="ruby-value">? </span><span class="ruby-constant">Boson</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-identifier">namespace</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

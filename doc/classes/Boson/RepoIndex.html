@@ -56,13 +56,13 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000049">new</a></li>
+              <li><a href="#M000052">new</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000051">read</a></li>
-              <li><a href="#M000050">update</a></li>
-              <li><a href="#M000052">write</a></li>
+              <li><a href="#M000054">read</a></li>
+              <li><a href="#M000053">update</a></li>
+              <li><a href="#M000055">write</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -90,22 +90,22 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000049'>
-                <a name='M000049'>      </a>
+              <div class='public-class method' id='method-M000052'>
+                <a name='M000052'>      </a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(repo)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000049-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000052-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000049-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 11</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">repo</span>)&#x000A;      <span class="ruby-ivar">@repo</span> = <span class="ruby-identifier">repo</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000052-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 11</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">repo</span>)&#x000A;      <span class="ruby-ivar">@repo</span> = <span class="ruby-identifier">repo</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000051'>
-                <a name='M000051'>      </a>
+              <div class='public-instance method' id='method-M000054'>
+                <a name='M000054'>      </a>
                 <div class='synopsis'>
                   <span class='name'>read</span>
                   <span class='arguments'>()</span>
@@ -116,14 +116,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000051-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000054-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000051-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 35</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">read</span>&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@read</span>&#x000A;      <span class="ruby-ivar">@libraries</span>, <span class="ruby-ivar">@commands</span>, <span class="ruby-ivar">@lib_hashes</span> = <span class="ruby-identifier">exists?</span> <span class="ruby-value">? </span><span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-constant">File</span>.<span class="ruby-identifier">read</span>(<span class="ruby-identifier">marshal_file</span>)) <span class="ruby-operator">:</span> [[], [], {}]&#x000A;      <span class="ruby-identifier">delete_stale_libraries_and_commands</span>&#x000A;      <span class="ruby-identifier">set_command_namespaces</span>&#x000A;      <span class="ruby-ivar">@read</span> = <span class="ruby-keyword kw">true</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000054-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 35</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">read</span>&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@read</span>&#x000A;      <span class="ruby-ivar">@libraries</span>, <span class="ruby-ivar">@commands</span>, <span class="ruby-ivar">@lib_hashes</span> = <span class="ruby-identifier">exists?</span> <span class="ruby-value">?&#x000A;</span>        <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>( <span class="ruby-identifier">marshal_file</span>, <span class="ruby-value str">'rb'</span> ){<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>( <span class="ruby-identifier">f</span>.<span class="ruby-identifier">read</span> ) } <span class="ruby-operator">:</span> [[], [], {}]&#x000A;      <span class="ruby-identifier">delete_stale_libraries_and_commands</span>&#x000A;      <span class="ruby-identifier">set_command_namespaces</span>&#x000A;      <span class="ruby-ivar">@read</span> = <span class="ruby-keyword kw">true</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000050'>
-                <a name='M000050'>      </a>
+              <div class='public-instance method' id='method-M000053'>
+                <a name='M000053'>      </a>
                 <div class='synopsis'>
                   <span class='name'>update</span>
                   <span class='arguments'>(options={})</span>
@@ -134,14 +134,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000050-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000053-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000050-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 16</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update</span>(<span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-identifier">libraries_to_update</span> = <span class="ruby-operator">!</span><span class="ruby-identifier">exists?</span> <span class="ruby-value">? </span><span class="ruby-identifier">repo</span>.<span class="ruby-identifier">all_libraries</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:libraries</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">changed_libraries</span>&#x000A;      <span class="ruby-identifier">read_and_transfer</span>(<span class="ruby-identifier">libraries_to_update</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;        <span class="ruby-identifier">puts</span> <span class="ruby-operator">!</span><span class="ruby-identifier">exists?</span> <span class="ruby-value">? </span><span class="ruby-node">&quot;Generating index for all #{libraries_to_update.size} libraries. Patience ... is a bitch&quot;</span> <span class="ruby-operator">:</span>&#x000A;          (<span class="ruby-identifier">libraries_to_update</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-value">? </span><span class="ruby-value str">&quot;No libraries indexed&quot;</span> <span class="ruby-operator">:</span>&#x000A;          <span class="ruby-node">&quot;Indexing the following libraries: #{libraries_to_update.join(', ')}&quot;</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">failed_libraries</span> = []&#x000A;      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">libraries_to_update</span>.<span class="ruby-identifier">empty?</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">libraries_to_update</span>, <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">:index=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>))&#x000A;        <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">failed_libraries</span>.<span class="ruby-identifier">empty?</span>&#x000A;          <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-node">&quot;Error: These libraries failed to load while indexing: #{Manager.failed_libraries.join(', ')}&quot;</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">write</span>(<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">failed_libraries</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000053-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 16</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">update</span>(<span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-identifier">libraries_to_update</span> = <span class="ruby-operator">!</span><span class="ruby-identifier">exists?</span> <span class="ruby-value">? </span><span class="ruby-identifier">repo</span>.<span class="ruby-identifier">all_libraries</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:libraries</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">changed_libraries</span>&#x000A;      <span class="ruby-identifier">read_and_transfer</span>(<span class="ruby-identifier">libraries_to_update</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:verbose</span>]&#x000A;        <span class="ruby-identifier">puts</span> <span class="ruby-operator">!</span><span class="ruby-identifier">exists?</span> <span class="ruby-value">? </span><span class="ruby-node">&quot;Generating index for all #{libraries_to_update.size} libraries. Patience ... is a bitch&quot;</span> <span class="ruby-operator">:</span>&#x000A;          (<span class="ruby-identifier">libraries_to_update</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-value">? </span><span class="ruby-value str">&quot;No libraries indexed&quot;</span> <span class="ruby-operator">:</span>&#x000A;          <span class="ruby-node">&quot;Indexing the following libraries: #{libraries_to_update.join(', ')}&quot;</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">failed_libraries</span> = []&#x000A;      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">libraries_to_update</span>.<span class="ruby-identifier">empty?</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">libraries_to_update</span>, <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">:index=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>))&#x000A;        <span class="ruby-keyword kw">unless</span> <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">failed_libraries</span>.<span class="ruby-identifier">empty?</span>&#x000A;          <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span>(<span class="ruby-node">&quot;Error: These libraries failed to load while indexing: #{Manager.failed_libraries.join(', ')}&quot;</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">write</span>(<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">failed_libraries</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000052'>
-                <a name='M000052'>      </a>
+              <div class='public-instance method' id='method-M000055'>
+                <a name='M000055'>      </a>
                 <div class='synopsis'>
                   <span class='name'>write</span>
                   <span class='arguments'>(failed_libraries=[])</span>
@@ -152,10 +152,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000052-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000055-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000052-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 44</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">write</span>(<span class="ruby-identifier">failed_libraries</span>=[])&#x000A;      <span class="ruby-identifier">latest</span> = <span class="ruby-identifier">latest_hashes</span>&#x000A;      <span class="ruby-identifier">failed_libraries</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">latest</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">e</span>) }&#x000A;      <span class="ruby-identifier">save_marshal_index</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>([<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">libraries</span>, <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">commands</span>, <span class="ruby-identifier">latest</span>])&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000055-source'><span class="ruby-comment cmt"># File lib/boson/repo_index.rb, line 45</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">write</span>(<span class="ruby-identifier">failed_libraries</span>=[])&#x000A;      <span class="ruby-identifier">latest</span> = <span class="ruby-identifier">latest_hashes</span>&#x000A;      <span class="ruby-identifier">failed_libraries</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">latest</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">e</span>) }&#x000A;      <span class="ruby-identifier">save_marshal_index</span> <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>([<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">libraries</span>, <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">commands</span>, <span class="ruby-identifier">latest</span>])&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

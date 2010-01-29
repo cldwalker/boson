@@ -82,10 +82,10 @@
             <a href="../files/lib/boson/repo_rb.html">lib/boson/repo.rb</a>
           </li>
           <li class='other'>
-            <a href="../files/lib/boson/repo_index_rb.html">lib/boson/repo_index.rb</a>
+            <a href="../files/lib/boson/runner_rb.html">lib/boson/runner.rb</a>
           </li>
           <li class='other'>
-            <a href="../files/lib/boson/runner_rb.html">lib/boson/runner.rb</a>
+            <a href="../files/lib/boson/repo_index_rb.html">lib/boson/repo_index.rb</a>
           </li>
           <li class='other'>
             <a href="../files/lib/boson/runners/bin_runner_rb.html">lib/boson/runners/bin_runner.rb</a>
@@ -129,7 +129,7 @@
             href="Boson.html">Boson</a> from the ruby console
             
             </li>
-            <li><a href="Boson/Repo.html#M000079">Boson::Repo.config</a> - Explains main
+            <li><a href="Boson/Repo.html#M000088">Boson::Repo.config</a> - Explains main
             config file
             
             </li>
@@ -154,14 +154,15 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000008">can_invoke?</a></li>
+              <li><a href="#M000009">can_invoke?</a></li>
               <li><a href="#M000002">commands</a></li>
-              <li><a href="#M000007">invoke</a></li>
+              <li><a href="#M000006">global_repo</a></li>
+              <li><a href="#M000008">invoke</a></li>
               <li><a href="#M000001">libraries</a></li>
               <li><a href="#M000004">local_repo</a></li>
               <li><a href="#M000003">repo</a></li>
               <li><a href="#M000005">repos</a></li>
-              <li><a href="#M000006">start</a></li>
+              <li><a href="#M000007">start</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -240,8 +241,8 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000008'>
-                <a name='M000008'>      </a>
+              <div class='public-instance method' id='method-M000009'>
+                <a name='M000009'>      </a>
                 <div class='synopsis'>
                   <span class='name'>can_invoke?</span>
                   <span class='arguments'>(meth, priv=true)</span>
@@ -252,10 +253,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000008-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000009-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000008-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 86</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">can_invoke?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">priv</span>=<span class="ruby-keyword kw">true</span>)&#x000A;    <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">meth</span>, <span class="ruby-identifier">priv</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000009-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 91</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">can_invoke?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">priv</span>=<span class="ruby-keyword kw">true</span>)&#x000A;    <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">respond_to?</span> <span class="ruby-identifier">meth</span>, <span class="ruby-identifier">priv</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='public-instance method' id='method-M000002'>
@@ -276,8 +277,26 @@
                   <pre id='M000002-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 35</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commands</span>&#x000A;    <span class="ruby-ivar">@commands</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000007'>
-                <a name='M000007'>      </a>
+              <div class='public-instance method' id='method-M000006'>
+                <a name='M000006'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>global_repo</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Optional global repository at /etc/boson
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000006-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000006-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 60</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">global_repo</span>&#x000A;    <span class="ruby-constant">File</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-value str">'/etc/boson'</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">Repo</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">'/etc/boson'</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword kw">nil</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-instance method' id='method-M000008'>
+                <a name='M000008'>      </a>
                 <div class='synopsis'>
                   <span class='name'>invoke</span>
                   <span class='arguments'>(*args, &amp;block)</span>
@@ -288,10 +307,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000007-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000008-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000007-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 74</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">invoke</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000008-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 79</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">invoke</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <div class='public-instance method' id='method-M000001'>
@@ -356,19 +375,19 @@
                 </div>
                 <div class='description'>
                   <p>
-                  The array of loaded repositories containing the main repo and a possible
-                  local repo
+                  The array of loaded repositories containing the main repo and possible
+                  local and global repos
                   </p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('M000005-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000005-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 55</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">repos</span>&#x000A;    <span class="ruby-ivar">@repos</span> <span class="ruby-operator">||=</span> [<span class="ruby-identifier">repo</span>, <span class="ruby-identifier">local_repo</span>].<span class="ruby-identifier">compact</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000005-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 55</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">repos</span>&#x000A;    <span class="ruby-ivar">@repos</span> <span class="ruby-operator">||=</span> [<span class="ruby-identifier">repo</span>, <span class="ruby-identifier">local_repo</span>, <span class="ruby-identifier">global_repo</span>].<span class="ruby-identifier">compact</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000006'>
-                <a name='M000006'>      </a>
+              <div class='public-instance method' id='method-M000007'>
+                <a name='M000007'>      </a>
                 <div class='synopsis'>
                   <span class='name'>start</span>
                   <span class='arguments'>(options={})</span>
@@ -377,15 +396,15 @@
                   <p>
                   Start <a href="Boson.html">Boson</a> by loading repositories and their
                   configured libraries. See <a
-                  href="Boson/ConsoleRunner.html#M000072">ConsoleRunner.start</a> for its
+                  href="Boson/ConsoleRunner.html#M000081">ConsoleRunner.start</a> for its
                   options.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000006-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000007-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000006-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 69</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>={})&#x000A;    <span class="ruby-constant">ConsoleRunner</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000007-source'><span class="ruby-comment cmt"># File lib/boson.rb, line 74</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>={})&#x000A;    <span class="ruby-constant">ConsoleRunner</span>.<span class="ruby-identifier">start</span>(<span class="ruby-identifier">options</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
