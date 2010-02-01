@@ -25,14 +25,14 @@ begin
     s.authors = ["Gabriel Horner"]
     s.has_rdoc = true
     s.rubyforge_project = 'tagaholic'
-    s.add_dependency 'hirb', '>= 0.2.8'
+    s.add_dependency 'hirb', '>= 0.2.10'
     s.add_dependency 'alias', '>= 0.2.1'
     s.extra_rdoc_files = ["README.rdoc", "LICENSE.txt"]
     s.files = FileList["Rakefile", "VERSION.yml", "README.rdoc", "LICENSE.txt", "{bin,lib,test}/**/*"]
   end
 
 rescue LoadError
-  puts "Jeweler not available. Install it for jeweler-related tasks with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+  puts "Jeweler not available. Install it for jeweler-related tasks with: sudo gem install jeweler"
 end
 
 Rake::TestTask.new do |t|
