@@ -62,6 +62,7 @@ module Boson
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
       :render=>{:type=>:boolean, :desc=>"Toggle a command's default rendering behavior"},
       :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
+      :usage_options=>{:type=>:string, :desc=>"Render options to pass to usage/help"},
       :pretend=>{:type=>:boolean, :desc=>"Display what a command would execute without executing it"},
       :delete_options=>{:type=>:array, :desc=>'Deletes global options starting with given strings' }
     } #:nodoc:
