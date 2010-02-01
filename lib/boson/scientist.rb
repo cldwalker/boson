@@ -88,12 +88,12 @@ module Boson
 
     def translate_and_render(obj, command, args, &block)
       @global_options, @command, original_args = {}, command, args.dup
-      args = translate_args(obj, args)
+      @args = translate_args(obj, args)
       return run_help_option if @global_options[:help]
-      run_pretend_option(args)
-      render_or_raw call_original_command(args, &block) unless @global_options[:pretend]
+      run_pretend_option(@args)
+      render_or_raw call_original_command(@args, &block) unless @global_options[:pretend]
     rescue OptionCommand::CommandArgumentError
-      run_pretend_option(args ||= [])
+      run_pretend_option(@args ||= [])
       return if !@global_options[:pretend] && run_verbose_help(option_command, original_args)
       raise unless @global_options[:pretend]
     rescue OptionParser::Error, Error
@@ -104,17 +104,17 @@ module Boson
 
     def translate_args(obj, args)
       option_command.modify_args(args)
-      @global_options, parsed_options, args = option_command.parse(args)
+      @global_options, @current_options, args = option_command.parse(args)
       return if @global_options[:help]
 
       (@global_options[:delete_options] || []).map {|e|
         @global_options.keys.map {|k| k.to_s }.grep(/^#{e}/)
       }.flatten.each {|e| @global_options.delete(e.to_sym) }
 
-      if parsed_options
+      if @current_options
         option_command.add_default_args(args, obj)
         return args if @no_option_commands.include?(@command)
-        args << parsed_options
+        args << @current_options
         option_command.check_argument_size(args)
       end
       args
@@ -143,11 +143,12 @@ module Boson
 
     def render_or_raw(result)
       if (@rendered = render?)
-        result = Pipe.process(result, @global_options, :config=>@command.config) if @global_options.key?(:class) ||
-          @global_options.key?(:method)
+        if @global_options.key?(:class) || @global_options.key?(:method)
+          result = Pipe.process(result, @global_options, :config=>@command.config, :args=>@args, :options=>@current_options)
+        end
         View.render(result, OptionCommand.delete_non_render_options(@global_options.dup), false)
       else
-        Pipe.process(result, @global_options, :config=>@command.config)
+        Pipe.process(result, @global_options, :config=>@command.config, :args=>@args, :options=>@current_options)
       end
     rescue StandardError
       raise Error, $!.message, $!.backtrace

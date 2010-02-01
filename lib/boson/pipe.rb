@@ -138,7 +138,9 @@ module Boson
 
     def get_env(key, global_opt)
       { :global_options=>global_opt.merge(:delete_callbacks=>[:z_user_pipes]),
-        :config=>(@env[:config].dup[key] || {})
+        :config=>(@env[:config].dup[key] || {}),
+        :args=>@env[:args],
+        :options=>@env[:options] || {}
       }
     end
 
