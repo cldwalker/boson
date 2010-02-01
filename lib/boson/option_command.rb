@@ -1,9 +1,10 @@
 require 'shellwords'
 module Boson
   # A class used by Scientist to wrap around Command objects. It's main purpose is to parse
-  # a command's global options (basic options, render options, pipe options) and local options.
+  # a command's global options (basic, render and pipe types) and local options.
   # As the names imply, global options are available to all commands while local options are specific to a command.
   # When passing options to commands, global ones _must_ be passed first, then local ones.
+  # Also, options _must_ all be passed either before or after arguments.
   # For more about pipe and render options see Pipe and View respectively.
   #
   # === Basic Global Options
