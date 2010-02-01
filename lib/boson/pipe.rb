@@ -1,5 +1,5 @@
 module Boson
-  # This module passes a command's return value through methods/commands specified as pipe options. Pipe options
+  # This module passes an original command's return value through methods/commands specified as pipe options. Pipe options
   # are processed in this order:
   # * A :query option searches an array of objects or hashes using Pipe.search_object.
   # * A :sort option sorts an array of objects or hashes using Pipe.sort_object.
@@ -10,9 +10,9 @@ module Boson
   #   command loaded when used. The easiest way to do this is by adding the pipe command's library to :defaults in main config.
   # * By default, pipe commands do not modify the value their given. This means you can activate multiple pipes using
   #   a method's original return value.
-  # * If you want a pipe command to modify the value its given, set its pipe option's :filter attribute to true.
   # * A pipe command expects a command's return value as its first argument. If the pipe option takes an argument, it's passed
   #   on as a second argument.
+  # * See User Pipes section below for more about user pipes.
   # * When piping occurs in relation to rendering depends on the Hirb view. With the default Hirb view, piping occurs
   #   occurs in the middle of the rendering, after Hirb has converted the return value into an array of hashes.
   #   If using a custom Hirb view, piping occurs before rendering.
@@ -38,7 +38,19 @@ module Boson
   # for these commands because they already default to it when not present. This behavior comes from the default_option
   # attribute a command can have.
   #
-  # === User-defined Pipes
+  # === User Pipes
+  # User pipes have the following attributes which alter their behavior:
+  # [*:pipe*] Pipe command the pipe executes when called. Default is the pipe's name.
+  # [*:env*] Boolean which enables passing an additional hash to the pipe command. This hash contains information from the first
+  #          command's input with the following keys: :args (command's arguments), :options (command's options),
+  #          :global_options (command's global options) and :config (a command's configuration hash). Default is false.
+  # [*:filter*] Boolean which has the pipe command modify the original command's output with the value it returns. Default is false.
+  # [*:no_render*] Boolean to turn off auto-rendering of the original command's final output. Only applicable to :filter enabled
+  #                pipes. Default is false.
+  # [*:solo*] Boolean to indicate this pipe should not be run with other user pipes. If a user calls multiple solo pipes,
+  #           only the first one detected is called.
+  #
+  # === User Pipes Example
   # Let's say you want to have two commands, browser and copy, you want to make available as pipe options:
   #    # Opens url in browser. This command already ships with Boson.
   #    def browser(url)
@@ -107,6 +119,8 @@ module Boson
       $stderr.puts "Sort failed with nonexistant method '#{sort}'"
     end
 
+    # A hash that defines user pipes in the same way as the :pipe_options key in Repo.config.
+    # This method should be called when a pipe's library is loading.
     def add_pipes(hash)
       pipe_options.merge! setup_pipes(hash)
     end
