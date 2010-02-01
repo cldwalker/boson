@@ -280,20 +280,31 @@ module Boson
 
     # More verbose option help in the form of a table.
     def print_usage_table(render_options={})
+      fields = get_usage_fields render_options.delete(:fields)
       aliases = @opt_aliases.invert
-      additional = [:desc, :values].select {|e| (@option_attributes || {}).values.any? {|f| f.key?(e) } }
-      additional_opts = {:desc=>[:desc], :values=>[:values, :keys]}
       opts = @opt_types.keys.sort.inject([]) {|t,e|
-        h = {:name=>e, :aliases=>aliases[e], :type=>@opt_types[e]}
-        additional.each {|f|
-          h[f] = additional_opts[f].map {|g| (@option_attributes[undasherize(e)] || {})[g]}.flatten.compact
+        h = {:name=>e, :alias=>aliases[e], :type=>@opt_types[e]}
+        (fields - h.keys).each {|f|
+          h[f] = (@option_attributes[undasherize(e)] || {})[f]
         }
         t << h
       }
-      render_options = {:headers=>{:name=>"Option", :aliases=>"Alias", :desc=>'Description', :values=>'Values/Keys', :type=>'Type'},
-        :fields=>[:name, :aliases, :type] + additional, :description=>false, :filters=>{:values=>lambda {|e| (e || []).join(',')} }
+      safe_comma_join = lambda {|e| Array(e).join(',')}
+      render_options = {:headers=>{:name=>"Option", :alias=>"Alias", :desc=>'Description', :values=>'Values', :type=>'Type',
+         :keys=>'Keys'}, :fields=>fields, :description=>false, :filters=>{:values=>safe_comma_join, :keys=>safe_comma_join }
       }.merge(render_options)
       View.render opts, render_options
+    end
+
+    def get_usage_fields(fields) #:nodoc:
+      default_fields = [:name, :alias, :type]
+      if fields
+        fields = @option_attributes.map {|k,v| v.keys }.flatten + default_fields if fields == '*'
+      else
+        fields = default_fields + [:desc, :values, :keys].select {|e|
+          (@option_attributes || {}).values.any? {|f| f.key?(e) } }
+      end
+      fields.uniq
     end
 
     # Hash of option attributes for the currently parsed option. _Any_ hash keys

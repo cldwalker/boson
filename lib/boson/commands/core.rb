@@ -8,7 +8,9 @@ module Boson::Commands::Core #:nodoc:
     commands = {
       'render'=>{:desc=>"Render any object using Hirb"},
       'menu'=>{:desc=>"Provide a menu to multi-select elements from a given array"},
-      'usage'=>{:desc=>"Print a command's usage", :options=>{[:verbose, :V]=>:boolean}},
+      'usage'=>{:desc=>"Print a command's usage", :options=>{
+        :verbose=>{:desc=>"Display global options", :type=>:boolean},
+        :render_options=>{:desc=>"Render options for option tables", :default=>{}, :keys=>[:vertical, :fields]} } },
       'commands'=>{
         :desc=>"List or search commands. Query must come before any options.", :default_option=>'query',
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"},
@@ -58,15 +60,15 @@ module Boson::Commands::Core #:nodoc:
   end
 
   def usage(command, options={})
-    msg = (cmd = Boson::Command.find(command)) ? "#{command} #{cmd.usage}" : "Command '#{cmd}' not found"
+    msg = (cmd = Boson::Command.find(command)) ? "#{command} #{cmd.usage}" : "Command '#{command}' not found"
     puts msg
+    if cmd && cmd.options && !cmd.options.empty?
+      puts "\nLOCAL OPTIONS"
+      cmd.option_parser.print_usage_table options[:render_options].dup
+    end
     if cmd && options[:verbose]
-      if cmd.options && !cmd.options.empty?
-        puts "\nLOCAL OPTIONS"
-        cmd.option_parser.print_usage_table
-      end
       puts "\nGLOBAL OPTIONS"
-      Boson::Scientist.option_command(cmd).option_parser.print_usage_table
+      Boson::Scientist.option_command(cmd).option_parser.print_usage_table options[:render_options].dup
     end
   end
 end
