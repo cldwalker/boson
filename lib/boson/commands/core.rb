@@ -10,7 +10,8 @@ module Boson::Commands::Core #:nodoc:
       'menu'=>{:desc=>"Provide a menu to multi-select elements from a given array"},
       'usage'=>{:desc=>"Print a command's usage", :options=>{
         :verbose=>{:desc=>"Display global options", :type=>:boolean},
-        :render_options=>{:desc=>"Render options for option tables", :default=>{}, :keys=>[:vertical, :fields]} } },
+        :render_options=>{:desc=>"Render options for option tables", :default=>{},
+          :keys=>[:vertical, :fields, :hide_empty_values]} } },
       'commands'=>{
         :desc=>"List or search commands. Query must come before any options.", :default_option=>'query',
         :options=>{ :index=>{:type=>:boolean, :desc=>"Searches index"},
