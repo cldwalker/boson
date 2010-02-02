@@ -289,10 +289,8 @@ module Boson
         }
         t << h
       }
-      safe_comma_join = lambda {|e| Array(e).join(',')}
-      render_options = {:headers=>{:name=>"Option", :alias=>"Alias", :desc=>'Description', :values=>'Values', :type=>'Type',
-         :keys=>'Keys'}, :fields=>fields, :description=>false, :filters=>{:values=>safe_comma_join, :keys=>safe_comma_join }
-      }.merge(render_options)
+      render_options = {:header_filter=>:capitalize, :fields=>fields, :description=>false, :filter_values=>true,
+        :filter_classes=>{Array=>[:join, ',']}}.merge(render_options)
       View.render opts, render_options
     end
 
