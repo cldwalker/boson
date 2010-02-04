@@ -148,9 +148,9 @@ module Boson
     #               Default is false.
     # [*:alias*] Alternative way to define option aliases with an option name or an array of them. Useful in yaml files.
     #            Setting to false will prevent creating an automatic alias.
-    # [*:values*] An array of values an option can have. Available for :array and :string options.  Values here
-    #             can be aliased by typing a unique string it starts with. For example, for values foo, odd, optional,
-    #             f refers to foo, o to odd and op to optional.
+    # [*:values*] An array of values an option can have. Available for :array and :string options. Values here
+    #             can be aliased by typing a unique string it starts with or underscore aliasing (see Util.underscore_search).
+    #             For example, for values foo, odd and obnoxiously_long, f refers to foo, od to odd and o_l to obnoxiously_long.
     # [*:enum*] Boolean indicating if an option enforces values in :values or :keys. Default is true. For
     #           :array, :hash and :string options.
     # [*:split*] For :array and :hash options. A string or regular expression on which an array value splits
