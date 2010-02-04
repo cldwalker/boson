@@ -53,6 +53,7 @@ module Boson
     def safe_require(lib)
       begin
         require lib
+        true
       rescue LoadError
         false
       end
