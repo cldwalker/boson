@@ -15,7 +15,7 @@ module Boson::Commands::WebCore
     {:library_file=>File.expand_path(__FILE__), :commands=>commands, :namespace=>false}
   end
 
-  # Requires libs only once before defining method with given block
+  # Requires libraries only once before defining method with given block
   def self.def_which_requires(meth, *libs, &block)
     define_method(meth) do |*args|
       libs.each {|e| require e }
@@ -26,47 +26,7 @@ module Boson::Commands::WebCore
   def_which_requires(:get, 'uri', 'net/http') do |url, options|
     options ||= {}
     url = build_url(url, options[:params]) if options[:params]
-    body = get_url(url, options)
-    body && options[:parse] ? parse_body(body, options.merge(:url=>url)) : body
-  end
-
-  # Returns nil if dependencies or parsing fails
-  def parse_body(body, options)
-    parse_type = determine_parse_type(options[:url], options[:parse])
-    case parse_type
-    when :json
-      unless ::Boson::Util.safe_require 'json'
-        return puts("Install the json gem to parse json: sudo gem install json")
-      end
-      JSON.parse body
-    when :yaml
-      YAML::load body
-    else
-      puts "Can't parse this format."
-    end
-  rescue
-    options[:raise_error] ? raise : puts("Error while parsing #{parse_type}: #{$!.class}")
-  end
-
-  def determine_parse_type(url, parse_type)
-    return parse_type if [:json, :yaml].include?(parse_type)
-    return :json if url[/\.json$/]
-    return :yaml if url[/(\.yaml|\.yml)$/]
-    nil
-  end
-
-  # Used by get() to get body of url. Returns body string if successful or nil if not.
-  def get_url(url, options)
-    if options[:success_only]
-      url = URI.parse(url)
-      res = Net::HTTP.start(url.host, url.port) {|http| http.get(url.request_uri) }
-      res.code == '200' ? res.body : nil
-    else
-      Net::HTTP.get(URI.parse(url))
-    end
-  rescue
-    options[:raise_error] ? raise :
-      puts("Error: GET '#{url}' -> #{$!.class}: #{$!.message}")
+    Get.new(url).request(options)
   end
 
   def_which_requires(:build_url, 'cgi') do |url, params|
@@ -77,7 +37,7 @@ module Boson::Commands::WebCore
     Net::HTTP.post_form(URI.parse(url), options)
   end
 
-  def install(url, options={})
+  def install(url, options={}) #:nodoc:
     options[:name] ||= strip_name_from_url(url)
     return puts("Please give a library name for this url.") if options[:name].empty?
     filename = File.join ::Boson.repo.commands_dir, "#{options[:name]}.rb"
@@ -104,5 +64,66 @@ module Boson::Commands::WebCore
   private
   def strip_name_from_url(url)
     url[/\/([^\/.]+)(\.[a-z]+)?$/, 1].to_s.gsub('-', '_').gsub(/[^a-zA-Z_]/, '')
+  end
+
+  # Used by the get command to make get requests and optionally parse json and yaml.
+  # Ruby 1.8.x is dependent on json gem for parsing json.
+  # See Get.request for options a request can take.
+  class Get
+    def initialize(url, options={})
+      @url, @options = url, {:success_only=>true}.merge(options)
+    end
+
+    # Returns the response body string or a parsed data structure. Returns nil if request fails.
+    # ==== Options:
+    # [:success_only] Only return the body if the request code is successful i.e. 200. Default is true.
+    # [:parse] Parse the body into either json or yaml. Expects a valid format or if true autodetects one.
+    #          Default is false.
+    # [:raise_error] Raises any original errors when parsing or fetching url instead of handling errors silently.
+    def request(options={})
+      @options.merge! options
+      body = get_body
+      body && @options[:parse] ? parse_body(body) : body
+    end
+
+    private
+    # Returns body string if successful or nil if not.
+    def get_body
+      url = URI.parse(@url)
+      if @options[:success_only]
+        res = Net::HTTP.start(url.host, url.port) {|http| http.get(url.request_uri) }
+        res.code == '200' ? res.body : nil
+      else
+        Net::HTTP.get(url)
+      end
+    rescue
+      @options[:raise_error] ? raise :
+        puts("Error: GET '#{@url}' -> #{$!.class}: #{$!.message}")
+    end
+
+    # Returns nil if dependencies or parsing fails
+    def parse_body(body)
+      format = determine_format(@options[:parse])
+      case format
+      when :json
+        unless ::Boson::Util.safe_require 'json'
+          return puts("Install the json gem to parse json: sudo gem install json")
+        end
+        JSON.parse body
+      when :yaml
+        YAML::load body
+      else
+        puts "Can't parse this format."
+      end
+    rescue
+      @options[:raise_error] ? raise : puts("Error while parsing #{format} response of '#{@url}': #{$!.class}")
+    end
+
+    def determine_format(format)
+      return format.to_sym if %w{json yaml}.include?(format.to_s)
+      return :json if @url[/\.json$/]
+      return :yaml if @url[/(\.yaml|\.yml)$/]
+      nil
+    end
   end
 end
