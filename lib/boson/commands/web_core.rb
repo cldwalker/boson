@@ -12,6 +12,7 @@ module Boson::Commands::WebCore
       :force=>{:type=>:boolean, :desc=>'Overwrites an existing library'},
       :module_wrap=>{:type=>:boolean, :desc=>"Wraps a module around install using library name"},
       :method_wrap=>{:type=>:boolean, :desc=>"Wraps a method and module around installed library using library name"}}
+    commands['install'][:args] = [['url'],['options', {}]]
     {:library_file=>File.expand_path(__FILE__), :commands=>commands, :namespace=>false}
   end
 
