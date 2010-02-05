@@ -97,7 +97,7 @@ module Boson::Commands::WebCore
     # Returns body string if successful or nil if not.
     def get_body
       uri = URI.parse(@url)
-      @response = Net::HTTP.start(uri.host, uri.port) {|http| http.get(uri.request_uri) }
+      @response = Net::HTTP.get_response uri
       (@options[:any_response] || @response.code == '200') ? @response.body : nil
     rescue
       @options[:raise_error] ? raise : puts("Error: GET '#{@url}' -> #{$!.class}: #{$!.message}")
