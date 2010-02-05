@@ -65,7 +65,7 @@ module Boson::Commands::Core #:nodoc:
     puts msg
     if cmd && cmd.options && !cmd.options.empty?
       puts "\nLOCAL OPTIONS"
-      cmd.option_parser.print_usage_table options[:render_options].dup
+      cmd.option_parser.print_usage_table options[:render_options].dup.merge(:local=>true)
     end
     if cmd && options[:verbose]
       puts "\nGLOBAL OPTIONS"

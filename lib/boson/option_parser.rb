@@ -280,27 +280,45 @@ module Boson
 
     # More verbose option help in the form of a table.
     def print_usage_table(render_options={})
-      fields = get_usage_fields render_options.delete(:fields)
+      user_fields = render_options.delete(:fields)
+      fields = get_usage_fields user_fields
+      (fields << :default).uniq! if render_options.delete(:local) || user_fields == '*'
+      opts = all_options_with_fields fields
+      fields.delete(:default) if fields.include?(:default) && opts.all? {|e| e[:default].nil? }
+      render_options = default_render_options.merge(:fields=>fields).merge(render_options)
+      View.render opts, render_options
+    end
+
+    def all_options_with_fields(fields) #:nodoc:
       aliases = @opt_aliases.invert
-      opts = @opt_types.keys.sort.inject([]) {|t,e|
-        h = {:name=>e, :alias=>aliases[e], :type=>@opt_types[e]}
+      @opt_types.keys.sort.inject([]) {|t,e|
+        nice_name = undasherize(e)
+        h = {:name=>e, :alias=>aliases[e], :type=>@opt_types[e] }
+        h[:default] = @defaults[nice_name] if fields.include?(:default)
         (fields - h.keys).each {|f|
-          h[f] = (@option_attributes[undasherize(e)] || {})[f]
+          h[f] = (option_attributes[nice_name] || {})[f]
         }
         t << h
       }
-      render_options = {:header_filter=>:capitalize, :fields=>fields, :description=>false, :filter_values=>true,
-        :filter_classes=>{Array=>[:join, ',']}}.merge(render_options)
-      View.render opts, render_options
+    end
+
+    def default_render_options #:nodoc:
+      {:header_filter=>:capitalize, :description=>false, :filter_values=>true,
+        :filter_classes=>{Array=>[:join, ',']}, :hide_empty=>true}
+    end
+
+    # Hash of option names mapped to hash of its external attributes
+    def option_attributes
+      @option_attributes || {}
     end
 
     def get_usage_fields(fields) #:nodoc:
       default_fields = [:name, :alias, :type]
       if fields
-        fields = (@option_attributes || {}).map {|k,v| v.keys }.flatten + default_fields if fields == '*'
+        fields = option_attributes.map {|k,v| v.keys }.flatten + default_fields if fields == '*'
       else
         fields = default_fields + [:desc, :values, :keys].select {|e|
-          (@option_attributes || {}).values.any? {|f| f.key?(e) } }
+          option_attributes.values.any? {|f| f.key?(e) } }
       end
       fields.uniq
     end
