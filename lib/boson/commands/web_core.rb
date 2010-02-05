@@ -43,17 +43,12 @@ module Boson::Commands::WebCore
     return puts("Please give a library name for this url.") if options[:name].empty?
     filename = File.join ::Boson.repo.commands_dir, "#{options[:name]}.rb"
     return puts("Library name #{options[:name]} already exists. Try a different name.") if File.exists?(filename) && !options[:force]
-    File.open(filename, 'w') {|f| f.write get(url) }
 
-    if options[:method_wrap] || options[:module_wrap]
-      file_string = File.read(filename)
-      file_string = "def #{options[:name]}\n#{file_string}\nend" if options[:method_wrap]
-      unless (mod_name = ::Boson::Util.camelize(options[:name]))
-        return puts("Can't wrap install with name #{options[:name]}")
-      end
-      file_string = "module #{mod_name}\n#{file_string}\nend"
-      File.open(filename, 'w') {|f| f.write file_string }
-    end
+    file_string = get(url)
+    file_string = "# Originally from #{url}\n"+file_string
+    file_string = wrap_install(file_string, options) if options[:method_wrap] || options[:module_wrap]
+
+    File.open(filename, 'w') {|f| f.write file_string }
     puts "Saved to #{filename}."
   end
 
@@ -63,6 +58,17 @@ module Boson::Commands::WebCore
   end
 
   private
+  def wrap_install(file_string, options)
+    indent = "  "
+    unless (mod_name = ::Boson::Util.camelize(options[:name]))
+      return puts("Can't wrap install with name #{options[:name]}")
+    end
+
+    file_string.gsub!(/(^)/,'\1'+indent)
+    file_string = "def #{options[:name]}\n#{file_string}\nend".gsub(/(^)/,'\1'+indent) if options[:method_wrap]
+    "module #{mod_name}\n#{file_string}\nend"
+  end
+
   def strip_name_from_url(url)
     url[/\/([^\/.]+)(\.[a-z]+)?$/, 1].to_s.gsub('-', '_').gsub(/[^a-zA-Z_]/, '')
   end
