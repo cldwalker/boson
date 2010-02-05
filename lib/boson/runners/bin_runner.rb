@@ -118,7 +118,7 @@ module Boson
           # for the rare case it's raised outside of boson
           raise unless $!.backtrace.first.include?('boson/')
           print_error_message "'#{@command}' was called incorrectly."
-          Boson.invoke(:usage, @command)
+          Boson.invoke(:usage, @command, :one_line=>true)
           return
         end
         render_output output
