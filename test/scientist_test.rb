@@ -322,6 +322,10 @@ module Boson
         local_and_global("doh -r -f - --dude").should == [{:foo=>true}, {:dude=>true, :render=>true}]
       end
 
+      test "conflicting global option after -" do
+        local_and_global('doh - -f=1,2').should == [{}, {:fields=>["1", "2"]}]
+      end
+
       test "no options parsed after --" do
         local_and_global('doh -f -- -r').should == [{:foo=>true}, {}]
         local_and_global('doh -- -r -f').should == [{}, {}]

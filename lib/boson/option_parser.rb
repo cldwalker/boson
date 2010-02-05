@@ -77,6 +77,7 @@ module Boson
     EQ_RE       = /^(--\w+[-\w+]*|-[a-zA-Z])=(.*)$/i
     SHORT_SQ_RE = /^-([a-zA-Z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-zA-Z])#{NUMERIC}$/i
+    STOP_STRINGS = %w{-- -}
     
     attr_reader :leading_non_opts, :trailing_non_opts, :opt_aliases
 
@@ -231,7 +232,7 @@ module Boson
       
       @leading_non_opts = []
       unless flags[:opts_before_args]
-        @leading_non_opts << shift until current_is_option? || @args.empty? || peek == '--'
+        @leading_non_opts << shift until current_is_option? || @args.empty? || STOP_STRINGS.include?(peek)
       end
 
       while current_is_option?
@@ -419,7 +420,7 @@ module Boson
 
     def delete_invalid_opts
       @trailing_non_opts.delete_if {|e|
-        break if %w{- --}.include? e
+        break if STOP_STRINGS.include? e
         invalid = e.to_s[/^-/]
         $stderr.puts "Deleted invalid option '#{e}'" if invalid
         invalid
