@@ -71,13 +71,19 @@ module Boson::Commands::WebCore
   # Ruby 1.8.x is dependent on json gem for parsing json.
   # See Get.request for options a request can take.
   class Get
+    FORMAT_HEADERS = {
+      :json=>%w{application/json text/json application/javascript text/javascript},
+      :yaml=>%w{application/x-yaml text/yaml}
+    } #:nodoc:
+
     def initialize(url, options={})
-      @url, @options = url, {:success_only=>true}.merge(options)
+      @url, @options = url, options
     end
 
-    # Returns the response body string or a parsed data structure. Returns nil if request fails.
+    # Returns the response body string or a parsed data structure. Returns nil if request fails. By default expects response
+    # to be 200.
     # ==== Options:
-    # [:success_only] Only return the body if the request code is successful i.e. 200. Default is true.
+    # [:any_response] Returns body string for any response code. Default is false
     # [:parse] Parse the body into either json or yaml. Expects a valid format or if true autodetects one.
     #          Default is false.
     # [:raise_error] Raises any original errors when parsing or fetching url instead of handling errors silently.
@@ -90,16 +96,11 @@ module Boson::Commands::WebCore
     private
     # Returns body string if successful or nil if not.
     def get_body
-      url = URI.parse(@url)
-      if @options[:success_only]
-        res = Net::HTTP.start(url.host, url.port) {|http| http.get(url.request_uri) }
-        res.code == '200' ? res.body : nil
-      else
-        Net::HTTP.get(url)
-      end
+      uri = URI.parse(@url)
+      @response = Net::HTTP.start(uri.host, uri.port) {|http| http.get(uri.request_uri) }
+      (@options[:any_response] || @response.code == '200') ? @response.body : nil
     rescue
-      @options[:raise_error] ? raise :
-        puts("Error: GET '#{@url}' -> #{$!.class}: #{$!.message}")
+      @options[:raise_error] ? raise : puts("Error: GET '#{@url}' -> #{$!.class}: #{$!.message}")
     end
 
     # Returns nil if dependencies or parsing fails
@@ -122,8 +123,8 @@ module Boson::Commands::WebCore
 
     def determine_format(format)
       return format.to_sym if %w{json yaml}.include?(format.to_s)
-      return :json if @url[/\.json$/]
-      return :yaml if @url[/(\.yaml|\.yml)$/]
+      return :json if FORMAT_HEADERS[:json].include?(@response.content_type)
+      return :yaml if FORMAT_HEADERS[:yaml].include?(@response.content_type)
       nil
     end
   end
