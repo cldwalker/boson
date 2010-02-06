@@ -51,6 +51,10 @@ module Boson
       $stderr.puts "Sort failed with nonexistant method '#{sort}'"
     end
 
+    def pipes_pipe(obj, arr)
+      arr.inject(obj) {|acc,e| Boson.full_invoke(e, [acc]) }
+    end
+
     def search_hash(obj, options) #:nodoc:
       !options[:query] ? obj : begin
         options[:query].map {|field,query|

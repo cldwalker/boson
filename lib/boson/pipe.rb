@@ -67,6 +67,7 @@ module Boson
         object = Pipes.search_pipe(object, global_opt[:query]) if global_opt[:query]
         object = Pipes.sort_pipe(object, global_opt[:sort], global_opt[:reverse_sort]) if global_opt[:sort]
       end
+      object = Pipes.pipes_pipe(object, global_opt[:pipes]) if global_opt[:pipes]
       process_user_pipes(object, global_opt)
     end
 

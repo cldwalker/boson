@@ -78,6 +78,7 @@ module Boson
       :sort=>{:type=>:string, :desc=>"Sort by given field"},
       :reverse_sort=>{:type=>:boolean, :desc=>"Reverse a given sort"},
       :query=>{:type=>:hash, :desc=>"Queries fields given field:search pairs"},
+      :pipes=>{:alias=>'P', :type=>:array, :desc=>"Pipe to commands sequentially"}
     } #:nodoc:
 
     class <<self
