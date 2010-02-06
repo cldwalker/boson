@@ -26,9 +26,12 @@ module Boson
     # This option is a hash of fields mapped to their search terms. Searches are OR-ed.
     # When searching hashes, numerical string keys in query_hash are converted to actual numbers to
     # interface with Hirb.
-    def search_pipe(object, query_hash)
+    def query_pipe(object, query_hash)
       if object[0].is_a?(Hash)
-        search_hash(object, :query=>query_hash)
+        query_hash.map {|field,query|
+          field = field.to_i if field.to_s[/^\d+$/]
+          object.select {|e| e[field].to_s =~ /#{query}/i }
+        }.flatten.uniq
       else
         query_hash.map {|field,query| object.select {|e| e.send(field).to_s =~ /#{query}/i } }.flatten.uniq
       end
@@ -37,40 +40,28 @@ module Boson
     end
 
     # Sorts an array of objects or hashes using a sort field. Sort is reversed with reverse_sort set to true.
-    def sort_pipe(object, sort, reverse_sort=false)
+    def sort_pipe(object, sort)
+      sort_lambda = lambda {}
       if object[0].is_a?(Hash)
-        sort_hash(object, :sort=>sort, :reverse_sort=>reverse_sort)
+        sort = sort.to_i if sort.to_s[/^\d+$/]
+        sort_lambda = (object.all? {|e| e[sort].respond_to?(:<=>) } ? lambda {|e| e[sort] } : lambda {|e| e[sort].to_s })
       else
         sort_lambda = object.all? {|e| e.send(sort).respond_to?(:<=>) } ? lambda {|e| e.send(sort) || ''} :
           lambda {|e| e.send(sort).to_s }
-        object = object.sort_by &sort_lambda
-        object = object.reverse if reverse_sort
-        object
       end
+      object.sort_by &sort_lambda
     rescue NoMethodError, ArgumentError
       $stderr.puts "Sort failed with nonexistant method '#{sort}'"
     end
 
+    # Reverse an object
+    def reverse_sort_pipe(object, extra=nil)
+      object.reverse
+    end
+
+    # Pipes multiple commands
     def pipes_pipe(obj, arr)
       arr.inject(obj) {|acc,e| Boson.full_invoke(e, [acc]) }
-    end
-
-    def search_hash(obj, options) #:nodoc:
-      !options[:query] ? obj : begin
-        options[:query].map {|field,query|
-          field = field.to_i if field.to_s[/^\d+$/]
-          obj.select {|e| e[field].to_s =~ /#{query}/i }
-        }.flatten.uniq
-      end
-    end
-
-    def sort_hash(obj, options) #:nodoc:
-      return obj unless options[:sort]
-      sort =  options[:sort].to_s[/^\d+$/] ? options[:sort].to_i : options[:sort]
-      sort_lambda = (obj.all? {|e| e[sort].respond_to?(:<=>) } ? lambda {|e| e[sort] } : lambda {|e| e[sort].to_s })
-      obj = obj.sort_by &sort_lambda
-      obj = obj.reverse if options[:reverse_sort]
-      obj
     end
   end
 end

@@ -60,22 +60,19 @@ module Boson
   module Pipe
     extend self
 
-    # Main method which processes all pipe commands, both default and user-defined ones.
-    def process(object, global_opt, env={})
+    # Process pipes from scientist
+    def scientist_process(object, global_opt, env={})
       @env = env
-      if object.is_a?(Array)
-        object = Pipes.search_pipe(object, global_opt[:query]) if global_opt[:query]
-        object = Pipes.sort_pipe(object, global_opt[:sort], global_opt[:reverse_sort]) if global_opt[:sort]
-      end
-      object = Pipes.pipes_pipe(object, global_opt[:pipes]) if global_opt[:pipes]
-      process_user_pipes(object, global_opt)
+      [:query, :sort, :reverse_sort].each {|e| global_opt.delete(e) } unless object.is_a?(Array)
+      process_pipes(object, global_opt)
     end
 
-    # Process pipes in same order as process
-    def callback_process(obj, options) #:nodoc:
-      obj = Pipes.search_hash(obj, options)
-      obj = Pipes.sort_hash(obj, options)
-      Pipe.process_user_pipes(obj, options)
+    # Main method which processes all pipe commands, both default and user-defined ones.
+    def process_pipes(obj, options)
+      [:query, :sort, :reverse_sort, :pipes].each {|pipe|
+        obj = Pipes.send("#{pipe}_pipe", obj, options[pipe]) if options[pipe]
+      }
+      process_user_pipes(obj, options)
     end
 
     # A hash that defines user pipes in the same way as the :pipe_options key in Repo.config.
@@ -132,7 +129,7 @@ module Boson
     module TableCallbacks
       # Processes boson's pipes
       def z_boson_pipes_callback(obj, options)
-        Pipe.callback_process(obj, options)
+        Pipe.process_pipes(obj, options)
       end
     end
   end

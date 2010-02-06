@@ -146,11 +146,11 @@ module Boson
     def render_or_raw(result)
       if (@rendered = render?)
         if @global_options.key?(:class) || @global_options.key?(:method)
-          result = Pipe.process(result, @global_options, :config=>@command.config, :args=>@args, :options=>@current_options)
+          result = Pipe.scientist_process(result, @global_options, :config=>@command.config, :args=>@args, :options=>@current_options)
         end
         View.render(result, OptionCommand.delete_non_render_options(@global_options.dup), false)
       else
-        Pipe.process(result, @global_options, :config=>@command.config, :args=>@args, :options=>@current_options)
+        Pipe.scientist_process(result, @global_options, :config=>@command.config, :args=>@args, :options=>@current_options)
       end
     rescue StandardError
       raise Error, $!.message, $!.backtrace
