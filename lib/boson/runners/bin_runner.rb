@@ -68,7 +68,7 @@ module Boson
       rescue Exception
         is_invalid_command = lambda {|command| !Boson.can_invoke?(command[/\w+/]) ||
           (Boson.can_invoke?(command[/\w+/]) && command.include?('.') && $!.is_a?(NoMethodError)) }
-        print_error_message @command && is_invalid_command.call(@command) ?
+        print_error_message @command[/\w+/] && is_invalid_command.call(@command) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
       end
 
