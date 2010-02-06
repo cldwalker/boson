@@ -1,8 +1,8 @@
 module Boson
   # This module passes an original command's return value through methods/commands specified as pipe options. Pipe options
   # are processed in this order:
-  # * A :query option searches an array of objects or hashes using Pipe.search_object.
-  # * A :sort option sorts an array of objects or hashes using Pipe.sort_object.
+  # * A :query option searches an array of objects or hashes using Pipes.search_pipe.
+  # * A :sort option sorts an array of objects or hashes using Pipe.sort_pipe.
   # * All user-defined pipe options (:pipe_options key in Repo.config) are processed in random order.
   #
   # Some points:
@@ -86,37 +86,17 @@ module Boson
     def process(object, global_opt, env={})
       @env = env
       if object.is_a?(Array)
-        object = search_object(object, global_opt[:query]) if global_opt[:query]
-        object = sort_object(object, global_opt[:sort], global_opt[:reverse_sort]) if global_opt[:sort]
+        object = Pipes.search_pipe(object, global_opt[:query]) if global_opt[:query]
+        object = Pipes.sort_pipe(object, global_opt[:sort], global_opt[:reverse_sort]) if global_opt[:sort]
       end
       process_user_pipes(object, global_opt)
     end
 
-    # Searches an array of objects or hashes using the :query option.
-    # This option is a hash of fields mapped to their search terms. Searches are OR-ed.
-    def search_object(object, query_hash)
-      if object[0].is_a?(Hash)
-        TableCallbacks.search_callback(object, :query=>query_hash)
-      else
-        query_hash.map {|field,query| object.select {|e| e.send(field).to_s =~ /#{query}/i } }.flatten.uniq
-      end
-    rescue NoMethodError
-      $stderr.puts "Query failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'"
-    end
-
-    # Sorts an array of objects or hashes using a sort field. Sort is reversed with reverse_sort set to true.
-    def sort_object(object, sort, reverse_sort=false)
-      if object[0].is_a?(Hash)
-        TableCallbacks.sort_callback(object, :sort=>sort, :reverse_sort=>reverse_sort)
-      else
-        sort_lambda = object.all? {|e| e.send(sort).respond_to?(:<=>) } ? lambda {|e| e.send(sort) || ''} :
-          lambda {|e| e.send(sort).to_s }
-        object = object.sort_by &sort_lambda
-        object = object.reverse if reverse_sort
-        object
-      end
-    rescue NoMethodError, ArgumentError
-      $stderr.puts "Sort failed with nonexistant method '#{sort}'"
+    # Process pipes in same order as process
+    def callback_process(obj, options) #:nodoc:
+      obj = Pipes.search_hash(obj, options)
+      obj = Pipes.sort_hash(obj, options)
+      Pipe.process_user_pipes(obj, options)
     end
 
     # A hash that defines user pipes in the same way as the :pipe_options key in Repo.config.
@@ -151,7 +131,7 @@ module Boson
     end
 
     def get_env(key, global_opt)
-      { :global_options=>global_opt.merge(:delete_callbacks=>[:z_user_pipes]),
+      { :global_options=>global_opt.merge(:delete_callbacks=>[:z_boson_pipes]),
         :config=>(@env[:config].dup[key] || {}),
         :args=>@env[:args],
         :options=>@env[:options] || {}
@@ -171,32 +151,9 @@ module Boson
 
     # Callbacks used by Hirb::Helpers::Table to search,sort and run custom pipe commands on arrays of hashes.
     module TableCallbacks
-      extend self
-      # Case-insensitive searches an array of hashes using the option :query. Numerical string keys
-      # in :query are converted to actual numbers to interface with Hirb. See Pipe.search_object for more
-      # about :query.
-      def search_callback(obj, options)
-        !options[:query] ? obj : begin
-          options[:query].map {|field,query|
-            field = field.to_i if field.to_s[/^\d+$/]
-            obj.select {|e| e[field].to_s =~ /#{query}/i }
-          }.flatten.uniq
-        end
-      end
-
-      # Sorts an array of hashes using :sort option and reverses the sort with :reverse_sort option.
-      def sort_callback(obj, options)
-        return obj unless options[:sort]
-        sort =  options[:sort].to_s[/^\d+$/] ? options[:sort].to_i : options[:sort]
-        sort_lambda = (obj.all? {|e| e[sort].respond_to?(:<=>) } ? lambda {|e| e[sort] } : lambda {|e| e[sort].to_s })
-        obj = obj.sort_by &sort_lambda
-        obj = obj.reverse if options[:reverse_sort]
-        obj
-      end
-
-      # Processes user-defined pipes in random order.
-      def z_user_pipes_callback(obj, options)
-        Pipe.process_user_pipes(obj, options)
+      # Processes boson's pipes
+      def z_boson_pipes_callback(obj, options)
+        Pipe.callback_process(obj, options)
       end
     end
   end
