@@ -12,31 +12,9 @@ module Boson
   #   a method's original return value.
   # * A pipe command expects a command's return value as its first argument. If the pipe option takes an argument, it's passed
   #   on as a second argument.
-  # * See User Pipes section below for more about user pipes.
   # * When piping occurs in relation to rendering depends on the Hirb view. With the default Hirb view, piping occurs
   #   occurs in the middle of the rendering, after Hirb has converted the return value into an array of hashes.
   #   If using a custom Hirb view, piping occurs before rendering.
-  #
-  # === Default Pipes: Search and Sort
-  # The default pipe options, :query, :sort and :reverse_sort, are quite useful for searching and sorting arrays:
-  # Some examples using default commands:
-  #   # Searches commands in the full_name field for 'lib' and sorts results by that field.
-  #   bash> boson commands -q=f:lib -s=f    # or commands --query=full_name:lib --sort=full_name
-  #
-  #   # Multiple fields can be searched if separated by a ','. This searches the full_name and desc fields.
-  #   bash> boson commands -q=f,d:web   # or commands --query=full_name,desc:web
-  #
-  #   # All fields can be queried using a '*'.
-  #   # Searches all library fields and then reverse sorts on name field
-  #   bash> boson libraries -q=*:core -s=n -R  # or libraries --query=*:core --sort=name --reverse_sort
-  #
-  #   # Multiple searches can be joined together by ','
-  #   # Searches for libraries that have the name matching core or a library_type matching gem
-  #   bash> boson libraries -q=n:core,l:gem   # or libraries --query=name:core,library_type:gem
-  #
-  # In these examples, we queried commands and examples with an explicit --query. However, -q or --query isn't necessary
-  # for these commands because they already default to it when not present. This behavior comes from the default_option
-  # attribute a command can have.
   #
   # === User Pipes
   # User pipes have the following attributes which alter their behavior:

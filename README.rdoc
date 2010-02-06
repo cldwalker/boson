@@ -18,8 +18,8 @@ Note: To read a linkable version of this README, {see here}[http://tagaholic.me/
   * can have any number of local and global options (Boson::OptionCommand). Options are defined with Boson::OptionParser.
   * can have any view associated to it (via Hirb) without adding view code to the command's method.
     These views can be toggled on and manipulated via global render options (Boson::View and Boson::OptionCommand).
-  * can pipe their return value into multiple commands with pipe options. Default pipe options give the ability
-    to search and sort an array of any objects (Boson::Pipe).
+  * can pipe their return value into custom pipe options (Boson::Pipe).
+  * has default pipe options to search and sort an array of any objects (Boson::Pipes).
 * Option parser (Boson::OptionParser)
   * provides option types that map to objects i.e. :array type creates Array objects.
   * come with 5 default option types: boolean, array, string, hash and numeric.
