@@ -51,7 +51,10 @@ module Boson
 
     # Enables hirb and reads a config file from the main repo's config/hirb.yml.
     def enable
-      Hirb::View.enable(:config_file=>File.join(Boson.repo.config_dir, 'hirb.yml')) unless @enabled
+      unless @enabled
+        Hirb::View.enable(:config_file=>File.join(Boson.repo.config_dir, 'hirb.yml'))
+        Hirb::Helpers::Table.filter_any = true
+      end
       @enabled = true
     end
 

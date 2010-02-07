@@ -304,7 +304,7 @@ module Boson
     end
 
     def default_render_options #:nodoc:
-      {:header_filter=>:capitalize, :description=>false, :filter_values=>true,
+      {:header_filter=>:capitalize, :description=>false, :filter_any=>true,
         :filter_classes=>{Array=>[:join, ',']}, :hide_empty=>true}
     end
 
