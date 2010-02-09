@@ -207,7 +207,7 @@ module Boson
       @opt_aliases = @opt_aliases.sort.inject({}) {|h, (nice_name, aliases)|
         name = dasherize nice_name
         # allow for aliases as symbols
-        aliases.map! {|e| e.to_s.index('-') != 0 ? dasherize(e.to_s) : e }
+        aliases.map! {|e| e.to_s.index('-') == 0 || e == false ? e : dasherize(e.to_s) }
         if aliases.empty? and nice_name.length > 1
           opt_alias = nice_name[0,1]
           opt_alias = h.key?("-"+opt_alias) ? "-"+opt_alias.capitalize : "-"+opt_alias
@@ -294,7 +294,7 @@ module Boson
       aliases = @opt_aliases.invert
       @opt_types.keys.sort.inject([]) {|t,e|
         nice_name = undasherize(e)
-        h = {:name=>e, :alias=>aliases[e], :type=>@opt_types[e] }
+        h = {:name=>e, :type=>@opt_types[e], :alias=>aliases[e] || '' }
         h[:default] = @defaults[nice_name] if fields.include?(:default)
         (fields - h.keys).each {|f|
           h[f] = (option_attributes[nice_name] || {})[f]
