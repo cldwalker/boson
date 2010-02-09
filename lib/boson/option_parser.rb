@@ -316,7 +316,9 @@ module Boson
     def get_usage_fields(fields) #:nodoc:
       default_fields = [:name, :alias, :type]
       if fields
-        fields = option_attributes.map {|k,v| v.keys }.flatten + default_fields if fields == '*'
+        all_fields = option_attributes.map {|k,v| v.keys }.flatten.uniq + default_fields
+        fields = fields == '*' ? all_fields :
+          fields.split('.').map {|e| Util.underscore_search(e, all_fields.sort_by {|f| f.to_s}, true) }
       else
         fields = default_fields + [:desc, :values, :keys].select {|e|
           option_attributes.values.any? {|f| f.key?(e) } }
