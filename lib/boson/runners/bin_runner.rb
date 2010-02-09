@@ -65,10 +65,10 @@ module Boson
         else
           execute_command
         end
-      rescue Exception
+      rescue
         is_invalid_command = lambda {|command| !Boson.can_invoke?(command[/\w+/]) ||
           (Boson.can_invoke?(command[/\w+/]) && command.include?('.') && $!.is_a?(NoMethodError)) }
-        print_error_message @command[/\w+/] && is_invalid_command.call(@command) ?
+        print_error_message @command.to_s[/\w+/] && is_invalid_command.call(@command) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
       end
 
@@ -115,8 +115,9 @@ module Boson
         begin
           output = Boson.full_invoke(@command, @args)
         rescue ArgumentError
-          # for the rare case it's raised outside of boson
-          raise unless $!.backtrace.first.include?('boson/')
+          raise unless $!.message[/wrong number of arguments/] &&
+            # Throw out errors that aren't external or from option_command
+            ($!.backtrace.first[/boson/].nil? || $!.backtrace.first[/boson\/option_command.rb/])
           print_error_message "'#{@command}' was called incorrectly."
           Boson.invoke(:usage, @command, :one_line=>true)
           return
