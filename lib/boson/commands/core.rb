@@ -63,15 +63,15 @@ module Boson::Commands::Core #:nodoc:
   def usage(command, options={})
     msg = (cmd = Boson::Command.find(command)) ? "#{command} #{cmd.usage}" : "Command '#{command}' not found"
     puts msg
-    return if options[:one_line]
+    return if options[:one_line] || !cmd
 
-    if cmd && cmd.options && !cmd.options.empty?
+    if cmd.options && !cmd.options.empty?
       puts "\nLOCAL OPTIONS"
       cmd.option_parser.print_usage_table options[:render_options].dup.merge(:local=>true)
     end
-    if cmd && options[:verbose]
+    if options[:verbose]
       puts "\nGLOBAL OPTIONS"
-      Boson::Scientist.option_command(cmd).option_parser.print_usage_table options[:render_options].dup
+      cmd.render_option_parser.print_usage_table options[:render_options].dup
     end
   end
 end
