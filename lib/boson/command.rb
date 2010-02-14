@@ -140,7 +140,7 @@ module Boson
     end
 
     def has_splat_args?
-      !!(@args && @args[-1] && @args[-1][0][/^\*/])
+      !!(args && @args[-1] && @args[-1][0][/^\*/])
     end
 
     def make_option_command(lib=library)
