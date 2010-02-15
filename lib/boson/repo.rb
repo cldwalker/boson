@@ -86,6 +86,16 @@ module Boson
       @config
     end
 
+    # Updates main config file by passing config into a block to be modified and then saved
+    def update_config
+      yield(config)
+      write_config_file
+    end
+
+    def write_config_file #:nodoc:
+      File.open(config_file, 'w') {|f| f.write config.to_yaml }
+    end
+
     def detected_libraries #:nodoc:
       Dir[File.join(commands_dir, '**/*.rb')].map {|e| e.gsub(/^#{commands_dir}\/|\.rb$/, '') }
     end

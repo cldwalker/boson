@@ -10,6 +10,7 @@ module Boson::Commands::WebCore
     commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:desc=>v}; h}
     commands['install'][:options] = {:name=>{:type=>:string, :desc=>"Library name to save to"},
       :force=>{:type=>:boolean, :desc=>'Overwrites an existing library'},
+      :default=>{:type=>:boolean, :desc=>'Adds library as a default library to main config file'},
       :module_wrap=>{:type=>:boolean, :desc=>"Wraps a module around install using library name"},
       :method_wrap=>{:type=>:boolean, :desc=>"Wraps a method and module around installed library using library name"}}
     commands['install'][:args] = [['url'],['options', {}]]
@@ -49,6 +50,7 @@ module Boson::Commands::WebCore
     file_string = wrap_install(file_string, options) if options[:method_wrap] || options[:module_wrap]
 
     File.open(filename, 'w') {|f| f.write file_string }
+    Boson.repo.update_config {|c| (c[:defaults] ||= []) << options[:name] } if options[:default]
     puts "Saved to #{filename}."
   end
 
