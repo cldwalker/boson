@@ -125,6 +125,11 @@ module Boson
     end
 
     #:stopdoc:
+    # until @config is consistent in index + actual loading
+    def config
+      @config ||= {}
+    end
+
     def file_string_and_method_for_args(lib)
       if !lib.is_a?(ModuleLibrary) && (klass_method = (lib.class_commands || {})[@name])
         if RUBY_VERSION >= '1.9'

@@ -25,8 +25,8 @@ module Boson
   # [*:filter*] Boolean which has the pipe command modify the original command's output with the value it returns. Default is false.
   # [*:no_render*] Boolean to turn off auto-rendering of the original command's final output. Only applicable to :filter enabled
   #                pipes. Default is false.
-  # [*:solo*] Boolean to indicate this pipe should not be run with other user pipes. If a user calls multiple solo pipes,
-  #           only the first one detected is called.
+  # [*:solo*] Boolean to indicate this pipe can't run with other user pipes or pipes from :pipes option.
+  #           If a user calls multiple solo pipes, only the first one detected is called.
   #
   # === User Pipes Example
   # Let's say you want to have two commands, browser and copy, you want to make available as pipe options:
@@ -69,7 +69,7 @@ module Boson
 
     # Main method which processes all pipe commands, both default and user-defined ones.
     def process_pipes(obj, options)
-      [:query, :sort, :reverse_sort, :pipes].each {|pipe|
+      internal_pipes(options).each {|pipe|
         obj = Pipes.send("#{pipe}_pipe", obj, options[pipe]) if options[pipe]
       }
       process_user_pipes(obj, options)
@@ -82,6 +82,12 @@ module Boson
     end
 
     #:stopdoc:
+    def internal_pipes(global_opt)
+      internals = [:query, :sort, :reverse_sort, :pipes]
+      internals.delete(:pipes) if pipes_to_process(global_opt).any? {|e| pipe(e)[:solo] }
+      internals
+    end
+
     def pipe_options
       @pipe_options ||= setup_pipes(Boson.repo.config[:pipe_options] || {})
     end
