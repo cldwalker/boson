@@ -32,7 +32,10 @@ module Boson::Commands::WebCore
   end
 
   def_which_requires(:build_url, 'cgi') do |url, params|
-    url + (url[/\?/] ? '&' : "?") + params.map {|k,v| "#{k}=#{CGI.escape(v)}" }.join("&")
+    url + (url[/\?/] ? '&' : "?") + params.map {|k,v|
+      v = v.is_a?(Array) ? v.join(' ') : v.to_s
+      "#{k}=#{CGI.escape(v)}"
+    }.join("&")
   end
 
   def_which_requires(:post, 'uri', 'net/http') do |url, options|
