@@ -72,7 +72,7 @@ module Boson
           @args = [['*args']]
         end
       end
-      @config = (hash.delete(:config) || {}).merge(hash)
+      @config = Util.recursive_hash_merge hash, hash.delete(:config) || {}
     end
 
     # Library object a command belongs to.
