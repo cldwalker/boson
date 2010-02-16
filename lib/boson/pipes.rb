@@ -3,18 +3,18 @@ module Boson
   # The default pipe options, :query, :sort and :reverse_sort, are quite useful for searching and sorting arrays:
   # Some examples using default commands:
   #   # Searches commands in the full_name field for 'lib' and sorts results by that field.
-  #   bash> boson commands -q=f:lib -s=f    # or commands --query=full_name:lib --sort=full_name
+  #   $ boson commands -q=f:lib -s=f    # or commands --query=full_name:lib --sort=full_name
   #
   #   # Multiple fields can be searched if separated by a ','. This searches the full_name and desc fields.
-  #   bash> boson commands -q=f,d:web   # or commands --query=full_name,desc:web
+  #   $ boson commands -q=f,d:web   # or commands --query=full_name,desc:web
   #
   #   # All fields can be queried using a '*'.
   #   # Searches all library fields and then reverse sorts on name field
-  #   bash> boson libraries -q=*:core -s=n -R  # or libraries --query=*:core --sort=name --reverse_sort
+  #   $ boson libraries -q=*:core -s=n -R  # or libraries --query=*:core --sort=name --reverse_sort
   #
   #   # Multiple searches can be joined together by ','
   #   # Searches for libraries that have the name matching core or a library_type matching gem
-  #   bash> boson libraries -q=n:core,l:gem   # or libraries --query=name:core,library_type:gem
+  #   $ boson libraries -q=n:core,l:gem   # or libraries --query=name:core,library_type:gem
   #
   # In these examples, we queried commands and examples with an explicit --query. However, -q or --query isn't necessary
   # for these commands because they already default to it when not present. This behavior comes from the default_option
@@ -59,7 +59,7 @@ module Boson
       object.reverse
     end
 
-    # Pipes multiple commands
+    # Pipes output of multiple commands recursively, given initial object
     def pipes_pipe(obj, arr)
       arr.inject(obj) {|acc,e| Boson.full_invoke(e, [acc]) }
     end

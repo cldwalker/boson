@@ -1,8 +1,10 @@
 module Boson
   # This module passes an original command's return value through methods/commands specified as pipe options. Pipe options
   # are processed in this order:
-  # * A :query option searches an array of objects or hashes using Pipes.search_pipe.
-  # * A :sort option sorts an array of objects or hashes using Pipe.sort_pipe.
+  # * A :query option searches an array of objects or hashes using Pipes.query_pipe.
+  # * A :sort option sorts an array of objects or hashes using Pipes.sort_pipe.
+  # * A :reverse_sort pipe option reverses an array.
+  # * A :pipes option takes an array of commands that modify the return value using Pipes.pipes_pipe.
   # * All user-defined pipe options (:pipe_options key in Repo.config) are processed in random order.
   #
   # Some points:
@@ -15,6 +17,8 @@ module Boson
   # * When piping occurs in relation to rendering depends on the Hirb view. With the default Hirb view, piping occurs
   #   occurs in the middle of the rendering, after Hirb has converted the return value into an array of hashes.
   #   If using a custom Hirb view, piping occurs before rendering.
+  # * What the pipe command should expect as a return value depends on the type of command. If it's a command rendered with hirb's
+  #   tables, the return value is a an array of hashes. For everything else, it's the method's original return value.
   #
   # === User Pipes
   # User pipes have the following attributes which alter their behavior:
@@ -53,14 +57,14 @@ module Boson
   #
   # Some examples of these options using commands from {my libraries}[http://github.com/cldwalker/irbfiles]:
   #    # Creates a gist and then opens url in browser and copies it.
-  #    bash> cat some_file | boson gist -bC        # or cat some_file | boson gist --browser --copy
+  #    $ cat some_file | boson gist -bC        # or cat some_file | boson gist --browser --copy
   #
   #    # Generates rdoc in current directory and then opens it in browser
   #    irb>> rdoc '-b'    # or rdoc '--browser'
   module Pipe
     extend self
 
-    # Process pipes from scientist
+    # Process pipes for Scientist
     def scientist_process(object, global_opt, env={})
       @env = env
       [:query, :sort, :reverse_sort].each {|e| global_opt.delete(e) } unless object.is_a?(Array)

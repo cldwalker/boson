@@ -18,8 +18,8 @@ module Boson
   #   end
   #
   # Once loaded, this library can be run from the commandline or irb:
-  #  bash> boson take_over world
-  #  irb>> take_over 'world'
+  #  $ boson take_over world
+  #  >> take_over 'world'
   #
   # If the library is namespaced, the command would be run as brain.take_over.
   #
@@ -33,8 +33,8 @@ module Boson
   #   end
   #
   # From the commandline and irb this runs as:
-  #   bash> boson take_over world -e initiate_brainiac
-  #   irb>> take_over 'world -e initiate_brainiac'
+  #   $ boson take_over world -e initiate_brainiac
+  #   >> take_over 'world -e initiate_brainiac'
   #
   # Since Boson aims to make your libraries just standard ruby, we can achieve the above
   # by making options a commented method attribute:
@@ -53,11 +53,11 @@ module Boson
   # * See Inspector for other method attributes, like config and render_options, that can be placed above a method.
   #
   # Once a command has a defined option, a command can also recognize a slew of global options:
-  #   irb>> take_over '-h'
+  #   >> take_over '-h'
   #   take_over [destination] [--execute=STRING]
   #
   #   # prints much more verbose help
-  #   irb>> take_over '-hv'
+  #   >> take_over '-hv'
   #
   # For more about these global options see OptionCommand and View.
   class FileLibrary < Library

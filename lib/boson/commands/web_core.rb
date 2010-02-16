@@ -94,7 +94,7 @@ module Boson::Commands::WebCore
     # Returns the response body string or a parsed data structure. Returns nil if request fails. By default expects response
     # to be 200.
     # ==== Options:
-    # [:any_response] Returns body string for any response code. Default is false
+    # [:any_response] Returns body string for any response code. Default is false.
     # [:parse] Parse the body into either json or yaml. Expects a valid format or if true autodetects one.
     #          Default is false.
     # [:raise_error] Raises any original errors when parsing or fetching url instead of handling errors silently.
