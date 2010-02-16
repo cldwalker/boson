@@ -1,3 +1,11 @@
+== 0.2.3
+* Added improved support and additional attributes for user pipe options
+* Added :pipes global command option
+* Added json + yaml parsing to get()
+* Added underscore searching to option values
+* Added build_install() command
+* Added :usage_options commandline option
+
 == 0.2.2
 * Renamed Boson::Command#description to #desc. Delete your index at ~/.boson/config/index.marshal.
 * Renamed Boson::Command#global_options to #option_command. Update your configs.
