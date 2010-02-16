@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{boson}
-  s.version = "0.2.2"
+  s.version = "0.2.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Gabriel Horner"]
-  s.date = %q{2010-01-23}
+  s.date = %q{2010-02-16}
   s.default_executable = %q{boson}
   s.description = %q{A command/task framework similar to rake and thor that opens your ruby universe to the commandline and irb.}
   s.email = %q{gabriel.horner@gmail.com}
@@ -47,6 +47,7 @@ Gem::Specification.new do |s|
      "lib/boson/option_parser.rb",
      "lib/boson/options.rb",
      "lib/boson/pipe.rb",
+     "lib/boson/pipes.rb",
      "lib/boson/repo.rb",
      "lib/boson/repo_index.rb",
      "lib/boson/runner.rb",
@@ -63,12 +64,14 @@ Gem::Specification.new do |s|
      "test/manager_test.rb",
      "test/method_inspector_test.rb",
      "test/option_parser_test.rb",
-     "test/pipe_test.rb",
+     "test/options_test.rb",
+     "test/pipes_test.rb",
      "test/repo_index_test.rb",
      "test/repo_test.rb",
      "test/runner_test.rb",
      "test/scientist_test.rb",
-     "test/test_helper.rb"
+     "test/test_helper.rb",
+     "test/util_test.rb"
   ]
   s.homepage = %q{http://tagaholic.me/boson/}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -85,12 +88,14 @@ Gem::Specification.new do |s|
      "test/manager_test.rb",
      "test/method_inspector_test.rb",
      "test/option_parser_test.rb",
-     "test/pipe_test.rb",
+     "test/options_test.rb",
+     "test/pipes_test.rb",
      "test/repo_index_test.rb",
      "test/repo_test.rb",
      "test/runner_test.rb",
      "test/scientist_test.rb",
-     "test/test_helper.rb"
+     "test/test_helper.rb",
+     "test/util_test.rb"
   ]
 
   if s.respond_to? :specification_version then
@@ -98,14 +103,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<hirb>, [">= 0.2.8"])
+      s.add_runtime_dependency(%q<hirb>, [">= 0.2.10"])
       s.add_runtime_dependency(%q<alias>, [">= 0.2.1"])
     else
-      s.add_dependency(%q<hirb>, [">= 0.2.8"])
+      s.add_dependency(%q<hirb>, [">= 0.2.10"])
       s.add_dependency(%q<alias>, [">= 0.2.1"])
     end
   else
-    s.add_dependency(%q<hirb>, [">= 0.2.8"])
+    s.add_dependency(%q<hirb>, [">= 0.2.10"])
     s.add_dependency(%q<alias>, [">= 0.2.1"])
   end
 end
