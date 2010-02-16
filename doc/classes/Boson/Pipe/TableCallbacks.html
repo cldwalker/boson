@@ -47,70 +47,28 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000043">search_callback</a></li>
-              <li><a href="#M000044">sort_callback</a></li>
-              <li><a href="#M000045">z_user_pipes_callback</a></li>
+              <li><a href="#M000046">z_boson_pipes_callback</a></li>
             </ol>
           </div>
           <div id='section'>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000043'>
-                <a name='M000043'>      </a>
+              <div class='public-instance method' id='method-M000046'>
+                <a name='M000046'>      </a>
                 <div class='synopsis'>
-                  <span class='name'>search_callback</span>
+                  <span class='name'>z_boson_pipes_callback</span>
                   <span class='arguments'>(obj, options)</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Case-insensitive searches an array of hashes using the option :query.
-                  Numerical string keys in :query are converted to actual numbers to
-                  interface with Hirb. See <a
-                  href="../Pipe.html#M000040">Pipe.search_object</a> for more about :query.
+                  Processes boson&#8217;s pipes
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000043-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000046-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000043-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 162</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">search_callback</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;        <span class="ruby-operator">!</span><span class="ruby-identifier">options</span>[<span class="ruby-identifier">:query</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">obj</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">begin</span>&#x000A;          <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:query</span>].<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">field</span>,<span class="ruby-identifier">query</span><span class="ruby-operator">|</span>&#x000A;            <span class="ruby-identifier">field</span> = <span class="ruby-identifier">field</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">field</span>.<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/^\d+$/</span>]&#x000A;            <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">select</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-identifier">field</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-operator">=~</span> <span class="ruby-node">/#{query}/i</span> }&#x000A;          }.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">uniq</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000044'>
-                <a name='M000044'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>sort_callback</span>
-                  <span class='arguments'>(obj, options)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Sorts an array of hashes using :sort option and reverses the sort with
-                  :reverse_sort option.
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000044-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000044-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 172</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sort_callback</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;        <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:sort</span>]&#x000A;        <span class="ruby-identifier">sort</span> =  <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:sort</span>].<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/^\d+$/</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:sort</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:sort</span>]&#x000A;        <span class="ruby-identifier">sort_lambda</span> = (<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">all?</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-identifier">sort</span>].<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:&lt;=&gt;</span>) } <span class="ruby-operator">?</span> <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-identifier">sort</span>] } <span class="ruby-operator">:</span> <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-identifier">sort</span>].<span class="ruby-identifier">to_s</span> })&#x000A;        <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">sort_by</span> <span class="ruby-operator">&amp;</span><span class="ruby-identifier">sort_lambda</span>&#x000A;        <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">reverse</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:reverse_sort</span>]&#x000A;        <span class="ruby-identifier">obj</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000045'>
-                <a name='M000045'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>z_user_pipes_callback</span>
-                  <span class='arguments'>(obj, options)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Processes user-defined pipes in random order.
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000045-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000045-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 182</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">z_user_pipes_callback</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;        <span class="ruby-constant">Pipe</span>.<span class="ruby-identifier">process_user_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000046-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 140</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">z_boson_pipes_callback</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;        <span class="ruby-constant">Pipe</span>.<span class="ruby-identifier">process_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

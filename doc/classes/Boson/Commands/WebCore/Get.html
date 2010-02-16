@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::Commands::WebCore::Get [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Class</span>
+          Boson::Commands::WebCore::Get
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../../files/lib/boson/commands/web_core_rb.html">lib/boson/commands/web_core.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Parent:
+          <strong>Object</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            <p>
+            Used by the get command to make get requests and optionally parse json and
+            yaml. Ruby 1.8.x is dependent on json gem for parsing json. See <a
+            href="Get.html#M000024">Get.request</a> for options a request can take.
+            </p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000023">new</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000024">request</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='public-class method' id='method-M000023'>
+                <a name='M000023'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(url, options={})</span>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000023-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000023-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 90</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">url</span>, <span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-ivar">@url</span>, <span class="ruby-ivar">@options</span> = <span class="ruby-identifier">url</span>, <span class="ruby-identifier">options</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000024'>
+                <a name='M000024'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>request</span>
+                  <span class='arguments'>(options={})</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Returns the response body string or a parsed data structure. Returns nil if
+                  request fails. By default expects response to be 200.
+                  </p>
+                  <h4>Options:</h4>
+                  <dl>
+                  <dt>:any_response</dt><dd>Returns body string for any response code. Default is false
+                  
+                  </dd>
+                  <dt>:parse</dt><dd>Parse the body into either json or yaml. Expects a valid format or if true
+                  autodetects one. Default is false.
+                  
+                  </dd>
+                  <dt>:raise_error</dt><dd>Raises any original errors when parsing or fetching url instead of handling
+                  errors silently.
+                  
+                  </dd>
+                  </dl>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000024-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000024-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 101</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">request</span>(<span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-ivar">@options</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">options</span>&#x000A;      <span class="ruby-identifier">body</span> = <span class="ruby-identifier">get_body</span>&#x000A;      <span class="ruby-identifier">body</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:parse</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">parse_body</span>(<span class="ruby-identifier">body</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">body</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

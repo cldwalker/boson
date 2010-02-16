@@ -39,21 +39,25 @@
         <div id='text'>
           <div id='description'>
             <p>
-            This module passes a command&#8217;s return value through methods/commands
-            specified as pipe options. <a href="Pipe.html">Pipe</a> options are
-            processed in this order:
+            This module passes an original command&#8217;s return value through
+            methods/commands specified as pipe options. <a href="Pipe.html">Pipe</a>
+            options are processed in this order:
             </p>
             <ul>
-            <li>A :query option searches an array of objects or hashes using <a
-            href="Pipe.html#M000040">Pipe.search_object</a>.
+            <li>A :query option searches an array of objects or hashes using
+            Pipes.search_pipe.
             
             </li>
             <li>A :sort option sorts an array of objects or hashes using <a
-            href="Pipe.html#M000041">Pipe.sort_object</a>.
+            href="Pipes.html#M000052">Pipes.sort_pipe</a>.
+            
+            </li>
+            <li>A :pipes option takes an array of commands that modify the return value
+            using <a href="Pipes.html#M000054">Pipes.pipes_pipe</a>.
             
             </li>
             <li>All user-defined pipe options (:pipe_options key in <a
-            href="Repo.html#M000088">Repo.config</a>) are processed in random order.
+            href="Repo.html#M000094">Repo.config</a>) are processed in random order.
             
             </li>
             </ul>
@@ -72,10 +76,6 @@
             value.
             
             </li>
-            <li>If you want a pipe command to modify the value its given, set its pipe
-            option&#8217;s :filter attribute to true.
-            
-            </li>
             <li>A pipe command expects a command&#8217;s return value as its first
             argument. If the pipe option takes an argument, it&#8217;s passed on as a
             second argument.
@@ -87,20 +87,44 @@
             a custom Hirb view, piping occurs before rendering.
             
             </li>
+            <li>What the pipe command should expect as a return value depends on the type
+            of command. If it&#8217;s a command rendered with hirb&#8217;s tables, the
+            return value is a an array of hashes. For everything else, it&#8217;s the
+            method&#8217;s original return value.
+            
+            </li>
             </ul>
-            <h3>Default Pipes: Search and Sort</h3>
+            <h3>User <a href="Pipes.html">Pipes</a></h3>
             <p>
-            The default pipe options, :query, :sort and :reverse_sort, are quite useful
-            for searching and sorting arrays: Some examples using default commands:
+            User pipes have the following attributes which alter their behavior:
             </p>
-            <pre># Searches commands in the full_name field for 'lib' and sorts results by that field.&#x000A;bash&gt; boson commands -q=f:lib -s=f    # or commands --query=full_name:lib --sort=full_name&#x000A;&#x000A;# Multiple fields can be searched if separated by a ','. This searches the full_name and desc fields.&#x000A;bash&gt; boson commands -q=f,d:web   # or commands --query=full_name,desc:web&#x000A;&#x000A;# All fields can be queried using a '*'.&#x000A;# Searches all library fields and then reverse sorts on name field&#x000A;bash&gt; boson libraries -q=*:core -s=n -R  # or libraries --query=*:core --sort=name --reverse_sort&#x000A;&#x000A;# Multiple searches can be joined together by ','&#x000A;# Searches for libraries that have the name matching core or a library_type matching gem&#x000A;bash&gt; boson libraries -q=n:core,l:gem   # or libraries --query=name:core,library_type:gem</pre>
-            <p>
-            In these examples, we queried commands and examples with an explicit
-            &#8212;query. However, -q or &#8212;query isn&#8217;t necessary for these
-            commands because they already default to it when not present. This behavior
-            comes from the default_option attribute a command can have.
-            </p>
-            <h3>User-defined Pipes</h3>
+            <dl>
+            <dt><b>:pipe</b></dt><dd><a href="Pipe.html">Pipe</a> command the pipe executes when called. Default
+            is the pipe&#8217;s name.
+            
+            </dd>
+            <dt><b>:env</b></dt><dd>Boolean which enables passing an additional hash to the pipe command. This
+            hash contains information from the first command&#8217;s input with the
+            following keys: :args (command&#8217;s arguments), :options
+            (command&#8217;s options), :global_options (command&#8217;s global options)
+            and :config (a command&#8217;s configuration hash). Default is false.
+            
+            </dd>
+            <dt><b>:filter</b></dt><dd>Boolean which has the pipe command modify the original command&#8217;s
+            output with the value it returns. Default is false.
+            
+            </dd>
+            <dt><b>:no_render</b></dt><dd>Boolean to turn off auto-rendering of the original command&#8217;s final
+            output. Only applicable to :filter enabled pipes. Default is false.
+            
+            </dd>
+            <dt><b>:solo</b></dt><dd>Boolean to indicate this pipe can&#8217;t run with other user pipes or
+            pipes from :pipes option. If a user calls multiple solo pipes, only the
+            first one detected is called.
+            
+            </dd>
+            </dl>
+            <h3>User <a href="Pipes.html">Pipes</a> Example</h3>
             <p>
             Let&#8217;s say you want to have two commands, browser and copy, you want
             to make available as pipe options:
@@ -118,16 +142,15 @@
             Some examples of these options using commands from <a
             href="http://github.com/cldwalker/irbfiles">my libraries</a>:
             </p>
-            <pre># Creates a gist and then opens url in browser and copies it.&#x000A;bash&gt; cat some_file | boson gist -bC        # or cat some_file | boson gist --browser --copy&#x000A;&#x000A;# Generates rdoc in current directory and then opens it in browser&#x000A;irb&gt;&gt; rdoc '-b'    # or rdoc '--browser'</pre>
+            <pre># Creates a gist and then opens url in browser and copies it.&#x000A;$ cat some_file | boson gist -bC        # or cat some_file | boson gist --browser --copy&#x000A;&#x000A;# Generates rdoc in current directory and then opens it in browser&#x000A;irb&gt;&gt; rdoc '-b'    # or rdoc '--browser'</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000042">add_pipes</a></li>
-              <li><a href="#M000039">process</a></li>
-              <li><a href="#M000040">search_object</a></li>
-              <li><a href="#M000041">sort_object</a></li>
+              <li><a href="#M000045">add_pipes</a></li>
+              <li><a href="#M000044">process_pipes</a></li>
+              <li><a href="#M000043">scientist_process</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -137,24 +160,31 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000042'>
-                <a name='M000042'>      </a>
+              <div class='public-instance method' id='method-M000045'>
+                <a name='M000045'>      </a>
                 <div class='synopsis'>
                   <span class='name'>add_pipes</span>
                   <span class='arguments'>(hash)</span>
                 </div>
+                <div class='description'>
+                  <p>
+                  A hash that defines user pipes in the same way as the :pipe_options key in
+                  <a href="Repo.html#M000094">Repo.config</a>. This method should be called
+                  when a pipe&#8217;s library is loading.
+                  </p>
+                </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000042-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000045-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000042-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 110</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">pipe_options</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">setup_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000045-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 83</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">pipe_options</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">setup_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000039'>
-                <a name='M000039'>      </a>
+              <div class='public-instance method' id='method-M000044'>
+                <a name='M000044'>      </a>
                 <div class='synopsis'>
-                  <span class='name'>process</span>
-                  <span class='arguments'>(object, global_opt, env={})</span>
+                  <span class='name'>process_pipes</span>
+                  <span class='arguments'>(obj, options)</span>
                 </div>
                 <div class='description'>
                   <p>
@@ -163,48 +193,28 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000039-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000044-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000039-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 74</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">process</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>, <span class="ruby-identifier">env</span>={})&#x000A;      <span class="ruby-ivar">@env</span> = <span class="ruby-identifier">env</span>&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;        <span class="ruby-identifier">object</span> = <span class="ruby-identifier">search_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>[<span class="ruby-identifier">:query</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">global_opt</span>[<span class="ruby-identifier">:query</span>]&#x000A;        <span class="ruby-identifier">object</span> = <span class="ruby-identifier">sort_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>[<span class="ruby-identifier">:sort</span>], <span class="ruby-identifier">global_opt</span>[<span class="ruby-identifier">:reverse_sort</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">global_opt</span>[<span class="ruby-identifier">:sort</span>]&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">process_user_pipes</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000044-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 74</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">process_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-identifier">internal_pipes</span>(<span class="ruby-identifier">options</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">pipe</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">obj</span> = <span class="ruby-constant">Pipes</span>.<span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;#{pipe}_pipe&quot;</span>, <span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">pipe</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">pipe</span>]&#x000A;      }&#x000A;      <span class="ruby-identifier">process_user_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000040'>
-                <a name='M000040'>      </a>
+              <div class='public-instance method' id='method-M000043'>
+                <a name='M000043'>      </a>
                 <div class='synopsis'>
-                  <span class='name'>search_object</span>
-                  <span class='arguments'>(object, query_hash)</span>
+                  <span class='name'>scientist_process</span>
+                  <span class='arguments'>(object, global_opt, env={})</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Searches an array of objects or hashes using the :query option. This option
-                  is a hash of fields mapped to their search terms. Searches are OR-ed.
+                  Process pipes from scientist
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000040-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000043-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000040-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 85</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">search_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">query_hash</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">object</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;        <span class="ruby-constant">TableCallbacks</span>.<span class="ruby-identifier">search_callback</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">:query=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">query_hash</span>)&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-identifier">query_hash</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">field</span>,<span class="ruby-identifier">query</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">select</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">field</span>).<span class="ruby-identifier">to_s</span> <span class="ruby-operator">=~</span> <span class="ruby-node">/#{query}/i</span> } }.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">uniq</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">NoMethodError</span>&#x000A;      <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Query failed with nonexistant method '#{$!.message[/`(.*)'/,1]}'&quot;</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
-                </div>
-              </div>
-              <div class='public-instance method' id='method-M000041'>
-                <a name='M000041'>      </a>
-                <div class='synopsis'>
-                  <span class='name'>sort_object</span>
-                  <span class='arguments'>(object, sort, reverse_sort=false)</span>
-                </div>
-                <div class='description'>
-                  <p>
-                  Sorts an array of objects or hashes using a sort field. Sort is reversed
-                  with reverse_sort set to true.
-                  </p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000041-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='M000041-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 96</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sort_object</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">sort</span>, <span class="ruby-identifier">reverse_sort</span>=<span class="ruby-keyword kw">false</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">object</span>[<span class="ruby-value">0</span>].<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;        <span class="ruby-constant">TableCallbacks</span>.<span class="ruby-identifier">sort_callback</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">:sort=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">sort</span>, <span class="ruby-identifier">:reverse_sort=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">reverse_sort</span>)&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-identifier">sort_lambda</span> = <span class="ruby-identifier">object</span>.<span class="ruby-identifier">all?</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">sort</span>).<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">:&lt;=&gt;</span>) } <span class="ruby-operator">?</span> <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">sort</span>) <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>} <span class="ruby-operator">:</span>&#x000A;          <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">sort</span>).<span class="ruby-identifier">to_s</span> }&#x000A;        <span class="ruby-identifier">object</span> = <span class="ruby-identifier">object</span>.<span class="ruby-identifier">sort_by</span> <span class="ruby-operator">&amp;</span><span class="ruby-identifier">sort_lambda</span>&#x000A;        <span class="ruby-identifier">object</span> = <span class="ruby-identifier">object</span>.<span class="ruby-identifier">reverse</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">reverse_sort</span>&#x000A;        <span class="ruby-identifier">object</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">NoMethodError</span>, <span class="ruby-constant">ArgumentError</span>&#x000A;      <span class="ruby-identifier">$stderr</span>.<span class="ruby-identifier">puts</span> <span class="ruby-node">&quot;Sort failed with nonexistant method '#{sort}'&quot;</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000043-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 67</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scientist_process</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>, <span class="ruby-identifier">env</span>={})&#x000A;      <span class="ruby-ivar">@env</span> = <span class="ruby-identifier">env</span>&#x000A;      [<span class="ruby-identifier">:query</span>, <span class="ruby-identifier">:sort</span>, <span class="ruby-identifier">:reverse_sort</span>].<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">global_opt</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">e</span>) } <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;      <span class="ruby-identifier">process_pipes</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

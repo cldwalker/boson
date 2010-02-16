@@ -50,7 +50,7 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000080">load</a></li>
+              <li><a href="#M000086">load</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -68,8 +68,8 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000080'>
-                <a name='M000080'>      </a>
+              <div class='public-class method' id='method-M000086'>
+                <a name='M000086'>      </a>
                 <div class='synopsis'>
                   <span class='name'>load</span>
                   <span class='arguments'>(libraries, options={})</span>
@@ -88,7 +88,7 @@
                   <pre>Manager.load 'my_commands'  -&gt; Loads a FileLibrary object from ~/.boson/commands/my_commands.rb&#x000A;Manager.load 'method_lister' -&gt; Loads a GemLibrary object which requires the method_lister gem</pre>
                   <p>
                   Any options that aren&#8217;t listed here are passed as library attributes
-                  to the libraries (see <a href="Library.html#M000105">Library.new</a>)
+                  to the libraries (see <a href="Library.html#M000113">Library.new</a>)
                   </p>
                   <h4>Options:</h4>
                   <dl>
@@ -99,10 +99,10 @@
                   </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000080-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000086-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000080-source'><span class="ruby-comment cmt"># File lib/boson/manager.rb, line 20</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load</span>(<span class="ruby-identifier">libraries</span>, <span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-constant">Array</span>(<span class="ruby-identifier">libraries</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;          (<span class="ruby-ivar">@library</span> = <span class="ruby-identifier">load_once</span>(<span class="ruby-identifier">e</span>, <span class="ruby-identifier">options</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">after_load</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>&#x000A;        }.<span class="ruby-identifier">all?</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000086-source'><span class="ruby-comment cmt"># File lib/boson/manager.rb, line 20</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">load</span>(<span class="ruby-identifier">libraries</span>, <span class="ruby-identifier">options</span>={})&#x000A;        <span class="ruby-constant">Array</span>(<span class="ruby-identifier">libraries</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span>&#x000A;          (<span class="ruby-ivar">@library</span> = <span class="ruby-identifier">load_once</span>(<span class="ruby-identifier">e</span>, <span class="ruby-identifier">options</span>)) <span class="ruby-operator">?</span> <span class="ruby-identifier">after_load</span> <span class="ruby-operator">:</span> <span class="ruby-keyword kw">false</span>&#x000A;        }.<span class="ruby-identifier">all?</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>: Boson::Commands::WebCore [RDoc Documentation]</title>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type'>
+    <link href='../../../rdoc-style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>Module</span>
+          Boson::Commands::WebCore
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/boson/commands/web_core_rb.html">lib/boson/commands/web_core.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>public class</h3>
+            <ol>
+              <li><a href="#M000021">def_which_requires</a></li>
+            </ol>
+            <h3>public instance</h3>
+            <ol>
+              <li><a href="#M000022">browser</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='class-list'>
+              <h2>Classes and Modules</h2>
+              Class <a href="WebCore/Get.html" class="link">Boson::Commands::WebCore::Get</a><br />
+            </div>
+            <div id='methods'>
+              <h2>Public class methods</h2>
+              <div class='public-class method' id='method-M000021'>
+                <a name='M000021'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>def_which_requires</span>
+                  <span class='arguments'>(meth, *libs, &amp;block)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  Requires libraries only once before defining method with given block
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000021-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000021-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 21</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">def_which_requires</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">libs</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;    <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">meth</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">args</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">libs</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">e</span> }&#x000A;      <span class="ruby-identifier">define_method</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">block</span>).<span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <h2>Public instance methods</h2>
+              <div class='public-instance method' id='method-M000022'>
+                <a name='M000022'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>browser</span>
+                  <span class='arguments'>(*urls)</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  non-mac users should override this with the launchy gem
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000022-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000022-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 61</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">browser</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">urls</span>)&#x000A;    <span class="ruby-identifier">system</span>(<span class="ruby-value str">'open'</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">urls</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
