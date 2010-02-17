@@ -63,8 +63,17 @@ module Boson
         capture_stderr { start("-e", "raise 'blah'") }.should =~ /^Error:/
       end
 
-      test "command and too many arguments prints error" do
-        capture_stdout { capture_stderr { start('commands','1','2','3') }.should =~ /'commands'.*incorrect/ }
+      test "option command and too many arguments prints error" do
+        capture_stdout {
+          capture_stderr { start('commands','1','2','3') }.should =~ /'commands'.*incorrect/
+        }
+      end
+
+      # td: too many arguments occuring within a command
+      test "normal command and too many arguments prints error" do
+        capture_stdout {
+          capture_stderr { start('render') }.should =~ /'render'.*incorrect/
+        }
       end
 
       test "failed subcommand prints error and not command not found" do

@@ -115,12 +115,14 @@ module Boson
         begin
           output = Boson.full_invoke(@command, @args)
         rescue ArgumentError
-          raise unless $!.message[/wrong number of arguments/] &&
-            # Throw out errors that aren't external or from option_command
-            ($!.backtrace.first[/boson/].nil? || $!.backtrace.first[/boson\/option_command.rb/])
-          print_error_message "'#{@command}' was called incorrectly."
-          Boson.invoke(:usage, @command, :one_line=>true)
-          return
+          if $!.class == OptionCommand::CommandArgumentError || ($!.message[/wrong number of arguments/] &&
+            (cmd = Command.find(@command)) && cmd.arg_size != @args.size)
+            print_error_message "'#{@command}' was called incorrectly."
+            Boson.invoke(:usage, @command, :one_line=>true)
+            return
+          else
+            raise
+          end
         end
         render_output output
       end
