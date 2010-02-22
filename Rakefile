@@ -16,8 +16,11 @@ end
 
 begin
   require 'jeweler'
+  require File.dirname(__FILE__) + "/lib/boson/version"
+
   Jeweler::Tasks.new do |s|
     s.name = "boson"
+    s.version = Boson::VERSION
     s.description = "A command/task framework similar to rake and thor that opens your ruby universe to the commandline and irb."
     s.summary =  "Boson provides users with the power to turn any ruby method into a full-fledged commandline tool. Boson achieves this with powerful options (borrowed from thor) and views (thanks to hirb). Some other unique features that differentiate it from rake and thor include being accessible from irb and the commandline, being able to write boson commands in non-dsl ruby and toggling a pretty view of a command's output without additional view code."
     s.email = "gabriel.horner@gmail.com"

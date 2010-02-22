@@ -34,6 +34,7 @@ module Boson
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :verbose=>{:type=>:boolean, :desc=>"Verbose description of loading libraries, errors or help"},
+      :version=>{:type=>:boolean, :desc=>"Prints the current version"},
       :index=>{:type=>:array, :desc=>"Libraries to index. Libraries must be passed with '='.",
         :bool_default=>nil, :values=>all_libraries, :regexp=>true, :enum=>false},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
@@ -53,6 +54,7 @@ module Boson
       # Starts, processes and ends a commandline request.
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
+        return puts(Boson::VERSION) if @options[:version]
         return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
         return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
         init
