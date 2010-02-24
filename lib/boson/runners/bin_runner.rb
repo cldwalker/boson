@@ -48,6 +48,8 @@ module Boson
       :option_commands=>{:type=>:boolean, :desc=>"Toggles on all commands to be defined as option commands" }
     } #:nodoc:
 
+    PIPE = '+'
+
     class <<self
       attr_accessor :command
 
@@ -114,26 +116,43 @@ module Boson
       end
 
       def execute_command
-        begin
-          output = Boson.full_invoke(@command, @args)
-        rescue ArgumentError
-          if $!.class == OptionCommand::CommandArgumentError || ($!.message[/wrong number of arguments/] &&
-            (cmd = Command.find(@command)) && cmd.arg_size != @args.size)
-            print_error_message "'#{@command}' was called incorrectly."
-            Boson.invoke(:usage, @command, :one_line=>true)
-            return
-          else
-            raise
+        all_cmds = [[@command, @args]] + @all_args.slice(1..-1)
+        output = all_cmds.inject('') {|acc, (command,args)|
+          begin
+            args = translate_args(args, acc)
+            Boson.full_invoke(command, args)
+          rescue ArgumentError
+            if $!.class == OptionCommand::CommandArgumentError || ($!.message[/wrong number of arguments/] &&
+              (cmd = Command.find(command)) && cmd.arg_size != args.size)
+              print_error_message "'#{command}' was called incorrectly."
+              Boson.invoke(:usage, command, :one_line=>true)
+              return
+            else
+              raise
+            end
           end
-        end
+        }
         render_output output
       end
 
+      def translate_args(args, piped)
+        args.nil? || args.empty? ? piped : args
+      end
+
       def parse_args(args)
+        @all_args = split_array_by(args, PIPE)
+        args = @all_args[0]
         @option_parser = OptionParser.new(GLOBAL_OPTIONS)
         options = @option_parser.parse(args.dup, :opts_before_args=>true)
         new_args = @option_parser.non_opts
         [new_args.shift, options, new_args]
+      end
+
+      def split_array_by(arr, divider)
+        arr.inject([[]]) {|results, element|
+          (divider == element) ? (results << []) : (results.last << element)
+          results
+        }
       end
 
       def render_output(output)
