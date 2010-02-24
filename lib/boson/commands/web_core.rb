@@ -39,7 +39,8 @@ module Boson::Commands::WebCore
   end
 
   def_which_requires(:post, 'uri', 'net/http') do |url, options|
-    Net::HTTP.post_form(URI.parse(url), options)
+    options ||= {}
+    (res = Net::HTTP.post_form(URI.parse(url), options)) && res.body
   end
 
   def install(url, options={}) #:nodoc:
