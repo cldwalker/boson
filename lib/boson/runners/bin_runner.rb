@@ -70,12 +70,13 @@ module Boson
         else
           execute_command
         end
-      rescue
-        is_invalid_command = lambda {|command|
-          !(Index.read && Index.find_command(command[/\w+/])) ||
-          (command.include?('.') && $!.is_a?(NoMethodError)) }
-        print_error_message @command.to_s[/\w+/] && is_invalid_command.call(@command) ?
+      rescue NoMethodError
+        message = @command.to_s[/\w+/] &&
+          (!(Index.read && Index.find_command(@command[/\w+/])) || @command.include?('.')) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
+        print_error_message message
+      rescue
+        print_error_message "Error: #{$!.message}"
       end
 
       # Loads libraries and handles non-critical options

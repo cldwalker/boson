@@ -114,7 +114,7 @@ module Boson
       end
     end
 
-    context "load_command_by_index" do
+    context "autoload_command" do
       def index(options={})
         Manager.expects(:load).with {|*args| args[0][0].is_a?(Module) ? true : args[0] == options[:load]
           }.at_least(1).returns(!options[:fails])
@@ -146,12 +146,6 @@ module Boson
         Index.indexes[0].expects(:write)
         Boson.main_object.expects(:send).with('libraries')
         capture_stdout { start 'libraries'}.should_not =~ /index/i
-      end
-
-      test "with non-core command finding library doesn't update index" do
-        Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
-        Index.indexes[0].expects(:update).never
-        capture_stderr { start("sweet") }.should =~ /sweet/
       end
 
       test "with non-core command not finding library, does update index" do
