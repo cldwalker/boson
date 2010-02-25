@@ -102,7 +102,7 @@ module Boson
 
       # Commands to executed, in order given by user
       def commands
-        @all_args.map {|e| e[0]}
+        @commands ||= @all_args.map {|e| e[0]}
       end
       #:stopdoc:
       def print_error_message(message)
@@ -126,17 +126,17 @@ module Boson
       end
 
       def execute_command
-        output = @all_args.inject(nil) {|acc, (command,*args)|
+        output = @all_args.inject(nil) {|acc, (cmd,*args)|
           begin
-            @command = command # for external errors
-            autoload_command command
+            @command = cmd # for external errors
+            autoload_command cmd
             args = translate_args(args, acc)
-            Boson.full_invoke(command, args)
+            Boson.full_invoke(cmd, args)
           rescue ArgumentError
             if $!.class == OptionCommand::CommandArgumentError || ($!.message[/wrong number of arguments/] &&
-              (cmd = Command.find(command)) && cmd.arg_size != args.size)
-              print_error_message "'#{command}' was called incorrectly."
-              Boson.invoke(:usage, command, :one_line=>true)
+              (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
+              print_error_message "'#{cmd}' was called incorrectly."
+              Boson.invoke(:usage, cmd, :one_line=>true)
               return
             else
               raise
