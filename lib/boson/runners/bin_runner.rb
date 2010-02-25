@@ -71,8 +71,9 @@ module Boson
           execute_command
         end
       rescue
-        is_invalid_command = lambda {|command| !Boson.can_invoke?(command[/\w+/]) ||
-          (Boson.can_invoke?(command[/\w+/]) && command.include?('.') && $!.is_a?(NoMethodError)) }
+        is_invalid_command = lambda {|command|
+          !(Index.read && Index.find_command(command[/\w+/])) ||
+          (command.include?('.') && $!.is_a?(NoMethodError)) }
         print_error_message @command.to_s[/\w+/] && is_invalid_command.call(@command) ?
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
       end
@@ -127,6 +128,7 @@ module Boson
       def execute_command
         output = @all_args.inject(nil) {|acc, (command,*args)|
           begin
+            @command = command # for external errors
             autoload_command command
             args = translate_args(args, acc)
             Boson.full_invoke(command, args)
