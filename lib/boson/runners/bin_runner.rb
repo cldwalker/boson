@@ -99,6 +99,10 @@ module Boson
         @options ||= {}
       end
 
+      # Commands to executed, in order given by user
+      def commands
+        @all_args.map {|e| e[0]}
+      end
       #:stopdoc:
       def print_error_message(message)
         message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if options[:verbose]
@@ -121,7 +125,7 @@ module Boson
       end
 
       def execute_command
-        output = @all_args.inject('') {|acc, (command,*args)|
+        output = @all_args.inject(nil) {|acc, (command,*args)|
           begin
             autoload_command command
             args = translate_args(args, acc)
@@ -141,7 +145,8 @@ module Boson
       end
 
       def translate_args(args, piped)
-        args.nil? || args.empty? ? piped : args
+        args.unshift piped if piped
+        args
       end
 
       def parse_args(args)
