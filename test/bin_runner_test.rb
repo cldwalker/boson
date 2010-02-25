@@ -86,7 +86,7 @@ module Boson
       end
 
       test "undiscovered command prints error" do
-         BinRunner.expects(:load_command_by_index).returns(false)
+         BinRunner.expects(:autoload_command).returns(false)
         capture_stderr { start('blah') }.should =~ /Error.*not found/
       end
 
@@ -149,14 +149,13 @@ module Boson
       end
 
       test "with non-core command finding library doesn't update index" do
-        Index.expects(:find_library).returns('sweet_lib')
         Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
         Index.indexes[0].expects(:update).never
         capture_stderr { start("sweet") }.should =~ /sweet/
       end
 
       test "with non-core command not finding library, does update index" do
-        Index.expects(:find_library).returns(nil, 'sweet_lib').times(2)
+        Index.expects(:find_library).returns(nil, 'sweet_lib')
         Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
         Index.indexes[0].expects(:update).returns(true)
         capture_stderr { start("sweet") }.should =~ /sweet/

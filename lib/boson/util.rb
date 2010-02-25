@@ -103,6 +103,14 @@ module Boson
       (conflicting_module =~ /^#{base_module}.*::([^:]+)/) && Object.const_defined?($1) && $1
     end
 
+    # Splits array into array of arrays with given element
+    def split_array_by(arr, divider)
+      arr.inject([[]]) {|results, element|
+        (divider == element) ? (results << []) : (results.last << element)
+        results
+      }
+    end
+
     # Regular expression search of a list with underscore anchoring of words.
     # For example 'some_dang_long_word' can be specified as 's_d_l_w'.
     def underscore_search(input, list, first_match=false)

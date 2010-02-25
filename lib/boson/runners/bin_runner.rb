@@ -60,11 +60,12 @@ module Boson
         return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
         return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
         init
-        View.toggle_pager if @options[:pager_toggle]
 
         if @options[:help]
+          autoload_command @command
           Boson.invoke(:usage, @command, :verbose=>@options[:verbose])
         elsif @options[:execute]
+          define_autoloader
           Boson.main_object.instance_eval @options[:execute]
         else
           execute_command
@@ -76,19 +77,21 @@ module Boson
           "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
       end
 
-      # Loads the given command.
+      # Loads libraries and handles non-critical options
       def init
         Runner.in_shell = true
         Command.all_option_commands = true if @options[:option_commands]
         super
-        Index.update(:verbose=>true, :libraries=>@options[:index]) if @options.key?(:index)
-        if @options[:load]
-          Manager.load @options[:load], load_options
-        elsif @options[:execute]
-          define_autoloader
-        else
-          load_command_by_index
+
+        if @options.key?(:index)
+          Index.update(:verbose=>true, :libraries=>@options[:index])
+          @index_updated = true
+        elsif !@options[:help] && @command && Boson.can_invoke?(@command)
+          Index.update(:verbose=>@options[:verbose])
+          @index_updated = true
         end
+        Manager.load @options[:load], load_options if @options[:load]
+        View.toggle_pager if @options[:pager_toggle]
       end
 
       # Hash of global options passed in from commandline
@@ -102,11 +105,13 @@ module Boson
         $stderr.puts message
       end
 
-      def load_command_by_index
-        Index.update(:verbose=>@options[:verbose]) if !@options.key?(:index) && Boson.can_invoke?(@command) && !@options[:help]
-        if !Boson.can_invoke?(@command, false) && ((lib = Index.find_library(@command)) ||
-          (Index.update(:verbose=>@options[:verbose]) && (lib = Index.find_library(@command))))
-          Manager.load lib, load_options
+      def autoload_command(cmd)
+        if !Boson.can_invoke?(cmd, false)
+          unless @index_updated
+            Index.update(:verbose=>@options[:verbose])
+            @index_updated = true
+          end
+          super(cmd, load_options)
         end
       end
 
@@ -116,9 +121,9 @@ module Boson
       end
 
       def execute_command
-        all_cmds = [[@command, @args]] + @all_args.slice(1..-1)
-        output = all_cmds.inject('') {|acc, (command,args)|
+        output = @all_args.inject('') {|acc, (command,*args)|
           begin
+            autoload_command command
             args = translate_args(args, acc)
             Boson.full_invoke(command, args)
           rescue ArgumentError
@@ -140,19 +145,13 @@ module Boson
       end
 
       def parse_args(args)
-        @all_args = split_array_by(args, PIPE)
+        @all_args = Util.split_array_by(args, PIPE)
         args = @all_args[0]
         @option_parser = OptionParser.new(GLOBAL_OPTIONS)
         options = @option_parser.parse(args.dup, :opts_before_args=>true)
         new_args = @option_parser.non_opts
-        [new_args.shift, options, new_args]
-      end
-
-      def split_array_by(arr, divider)
-        arr.inject([[]]) {|results, element|
-          (divider == element) ? (results << []) : (results.last << element)
-          results
-        }
+        @all_args[0] = new_args
+        [new_args[0], options, new_args[1..-1]]
       end
 
       def render_output(output)
