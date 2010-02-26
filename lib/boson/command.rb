@@ -20,7 +20,7 @@ module Boson
     # Finds a command, namespaced or not and aliased or not. If found returns the
     # command object, otherwise returns nil.
     def self.find(command, commands=Boson.commands)
-      command, subcommand = command.to_s.split('.', 2)
+      command, subcommand = command.to_s.split(NAMESPACE, 2)
       is_namespace_command = lambda {|current_command|
         [current_command.name, current_command.alias].include?(subcommand) &&
         current_command.library && (current_command.library.namespace == command)
@@ -133,7 +133,7 @@ module Boson
     def file_string_and_method_for_args(lib)
       if !lib.is_a?(ModuleLibrary) && (klass_method = (lib.class_commands || {})[@name])
         if RUBY_VERSION >= '1.9'
-          klass, meth = klass_method.split('.', 2)
+          klass, meth = klass_method.split(NAMESPACE, 2)
           if (meth_locations = MethodInspector.find_method_locations_for_19(klass, meth))
             file_string = File.read meth_locations[0]
           end

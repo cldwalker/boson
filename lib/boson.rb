@@ -20,6 +20,7 @@ $:.unshift File.dirname(__FILE__) unless $:.include? File.expand_path(File.dirna
 module Boson
   # Module which is extended by Boson.main_object to give it command functionality.
   module Universe; include Commands::Namespace; end
+  NAMESPACE = '.' # Delimits namespace from command
   extend self
   # The object which holds and executes all command functionality
   attr_accessor :main_object
@@ -82,7 +83,7 @@ module Boson
 
   # Invoke command string even with namespaces
   def full_invoke(cmd, args) #:nodoc:
-    command, subcommand = cmd.include?('.') ? cmd.split('.', 2) : [cmd, nil]
+    command, subcommand = cmd.include?(NAMESPACE) ? cmd.split(NAMESPACE, 2) : [cmd, nil]
     dispatcher = subcommand ? Boson.invoke(command) : Boson.main_object
     dispatcher.send(subcommand || command, *args)
   end

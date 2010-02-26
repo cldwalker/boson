@@ -79,11 +79,11 @@ module Boson
       def no_method_error_message #:nodoc:
         @command = @command.to_s
         if $!.backtrace.grep(/`(invoke|full_invoke)'$/).empty? ||
-          !$!.message[/undefined method `(\w+\.)?#{@command.split('.')[-1]}'/]
+          !$!.message[/undefined method `(\w+\.)?#{@command.split(NAMESPACE)[-1]}'/]
             default_error_message
         else
           @command.to_s[/\w+/] &&
-            (!(Index.read && Index.find_command(@command[/\w+/])) || @command.include?('.')) ?
+            (!(Index.read && Index.find_command(@command[/\w+/])) || @command.include?(NAMESPACE)) ?
             "Error: Command '#{@command}' not found" : default_error_message
         end
       end

@@ -99,7 +99,7 @@ module Boson
 
     def find_library(command, object=false)
       read
-      namespace_command = command.split('.')[0]
+      namespace_command = command.split(NAMESPACE)[0]
       if (lib = @libraries.find {|e| e.namespace == namespace_command })
         object ? lib : lib.name
       elsif (cmd = Command.find(command, @commands))
