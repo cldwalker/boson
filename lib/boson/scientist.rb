@@ -34,7 +34,7 @@ module Boson
     # Handles all Scientist errors.
     class Error < StandardError; end
 
-    attr_accessor :global_options, :rendered
+    attr_accessor :global_options, :rendered, :render
     @no_option_commands ||= []
     @option_commands ||= {}
 
@@ -144,7 +144,7 @@ module Boson
     end
 
     def render_or_raw(result)
-      if (@rendered = render?)
+      if (@rendered = can_render?)
         if @global_options.key?(:class) || @global_options.key?(:method)
           result = Pipe.scientist_process(result, @global_options, :config=>@command.config, :args=>@args, :options=>@current_options)
         end
@@ -156,7 +156,11 @@ module Boson
       raise Error, $!.message, $!.backtrace
     end
 
-    def render?
+    def can_render?
+      render.nil? ? command_renders? : render
+    end
+
+    def command_renders?
       (!!@command.render_options ^ @global_options[:render]) && !Pipe.any_no_render_pipes?(@global_options)
     end
     #:startdoc:

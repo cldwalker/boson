@@ -133,7 +133,7 @@ module Boson
         end
 
         test "with unexpected error in render" do
-          Scientist.expects(:render?).raises("unexpected")
+          Scientist.expects(:can_render?).raises("unexpected")
           capture_stderr { command_with_args('a1') }.should =~ /Error.*unexpected/
         end
 
@@ -222,7 +222,7 @@ module Boson
 
       test "without non-render options" do
         render_expected :fields=>['f1']
-        Scientist.expects(:render?).returns(true)
+        Scientist.expects(:can_render?).returns(true)
         args = ["--render --fields f1 ab"]
         basic_command({:render_options=>{:fields=>{:values=>['f1', 'f2']}} }, args)
       end
@@ -277,7 +277,7 @@ module Boson
 
     context "global options:" do
       def local_and_global(*args)
-        Scientist.stubs(:render?).returns(false) # turn off rendering caused by :render_options
+        Scientist.stubs(:can_render?).returns(false) # turn off rendering caused by :render_options
         @non_opts = basic_command(@command_options, args)
         @non_opts.slice!(-1,1) << Scientist.global_options
       end
