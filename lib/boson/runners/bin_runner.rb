@@ -71,12 +71,21 @@ module Boson
           execute_command
         end
       rescue NoMethodError
-        message = @command.to_s[/\w+/] &&
-          (!(Index.read && Index.find_command(@command[/\w+/])) || @command.include?('.')) ?
-          "Error: Command '#{@command}' not found" : "Error: #{$!.message}"
-        print_error_message message
+        print_error_message no_method_error_message
       rescue
-        print_error_message "Error: #{$!.message}"
+        print_error_message default_error_message
+      end
+
+      def no_method_error_message #:nodoc:
+        @command = @command.to_s
+        if $!.backtrace.grep(/`(invoke|full_invoke)'$/).empty? ||
+          !$!.message[/undefined method `(\w+\.)?#{@command.split('.')[-1]}'/]
+            default_error_message
+        else
+          @command.to_s[/\w+/] &&
+            (!(Index.read && Index.find_command(@command[/\w+/])) || @command.include?('.')) ?
+            "Error: Command '#{@command}' not found" : default_error_message
+        end
       end
 
       # Loads libraries and handles non-critical options
@@ -109,6 +118,10 @@ module Boson
       def print_error_message(message)
         message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if options[:verbose]
         $stderr.puts message
+      end
+
+      def default_error_message
+        "Error: #{$!.message}"
       end
 
       def autoload_command(cmd)
