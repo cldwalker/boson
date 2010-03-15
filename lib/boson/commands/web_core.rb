@@ -2,18 +2,21 @@ module Boson::Commands::WebCore
   extend self
 
   def config #:nodoc:
-    descriptions = {
-      :install=>"Installs a library by url. Library should then be loaded with load_library.",
-      :browser=>"Opens urls in a browser on a Mac", :get=>"Gets the body of a url", :post=>'Posts to url',
-      :build_url=>"Builds a url, escaping the given params"
+    commands = {
+      'get'=>{ :desc=>"Gets the body of a url", :args=>[['url'],['options', {}]]},
+      'post'=>{ :desc=>'Posts to a url', :args=>[['url'],['options', {}]]},
+      'build_url'=>{ :desc=>"Builds a url, escaping the given params", :args=>[['url'],['params']]},
+      'browser'=>{ :desc=>"Opens urls in a browser on a Mac"},
+      'install'=>{ :desc=>"Installs a library by url. Library should then be loaded with load_library.",
+        :args=>[['url'],['options', {}]],
+        :options=> { :name=>{:type=>:string, :desc=>"Library name to save to"},
+          :force=>{:type=>:boolean, :desc=>'Overwrites an existing library'},
+          :default=>{:type=>:boolean, :desc=>'Adds library as a default library to main config file'},
+          :module_wrap=>{:type=>:boolean, :desc=>"Wraps a module around install using library name"},
+          :method_wrap=>{:type=>:boolean, :desc=>"Wraps a method and module around installed library using library name"}}
+      }
     }
-    commands = descriptions.inject({}) {|h,(k,v)| h[k.to_s] = {:desc=>v}; h}
-    commands['install'][:options] = {:name=>{:type=>:string, :desc=>"Library name to save to"},
-      :force=>{:type=>:boolean, :desc=>'Overwrites an existing library'},
-      :default=>{:type=>:boolean, :desc=>'Adds library as a default library to main config file'},
-      :module_wrap=>{:type=>:boolean, :desc=>"Wraps a module around install using library name"},
-      :method_wrap=>{:type=>:boolean, :desc=>"Wraps a method and module around installed library using library name"}}
-    commands['install'][:args] = [['url'],['options', {}]]
+
     {:library_file=>File.expand_path(__FILE__), :commands=>commands, :namespace=>false}
   end
 
