@@ -1,11 +1,19 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-module Boson
-  class OptionParserTest < Test::Unit::TestCase
-  include OptionTestHelper
+context "OptionParser" do
+  def create(opts)
+    @opt = Boson::OptionParser.new(opts)
+  end
+
+  def opt; @opt; end
+  
+  def parse(*args)
+    @non_opts = []
+    opt.parse(args.flatten)
+  end
 
   context "IndifferentAccessHash" do
-    before(:each) {
+    before {
       @hash = IndifferentAccessHash.new 'foo' => 'bar', 'baz' => 'bee'
     }
     it "can access values indifferently" do
@@ -159,41 +167,41 @@ module Boson
       parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").should == {
         :foo => "12", :bar => true
       }
-      @opt.leading_non_opts.should == ["foo", "bar", "--baz"]
-      @opt.trailing_non_opts.should == ["-T", "bang"]
-      @opt.non_opts.should == ["foo", "bar", "--baz", "-T", "bang"]
+      opt.leading_non_opts.should == ["foo", "bar", "--baz"]
+      opt.trailing_non_opts.should == ["-T", "bang"]
+      opt.non_opts.should == ["foo", "bar", "--baz", "-T", "bang"]
     end
 
     it "stopped by --" do
       create :foo=>:boolean, :dude=>:boolean
       parse("foo", "bar", "--", "-f").should == {}
-      @opt.leading_non_opts.should == %w{foo bar}
-      @opt.trailing_non_opts.should == %w{-- -f}
+      opt.leading_non_opts.should == %w{foo bar}
+      opt.trailing_non_opts.should == %w{-- -f}
     end
 
     context "with parse flag" do
       it ":delete_invalid_opts deletes and warns of invalid options" do
         create(:foo=>:boolean)
         capture_stderr {
-          @opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
+          opt.parse(%w{-f -d ok}, :delete_invalid_opts=>true)
         }.should =~ /Deleted invalid option '-d'/
-        @opt.non_opts.should == ['ok']
+        opt.non_opts.should == ['ok']
       end
 
       it ":delete_invalid_opts deletes until - or --" do
         create(:foo=>:boolean, :bar=>:boolean)
         %w{- --}.each do |stop_char|
           capture_stderr {
-            @opt.parse(%w{ok -b -d} << stop_char << '-f', :delete_invalid_opts=>true)
+            opt.parse(%w{ok -b -d} << stop_char << '-f', :delete_invalid_opts=>true)
           }.should =~ /'-d'/
-          @opt.non_opts.should == %w{ok -d} << stop_char << '-f'
+          opt.non_opts.should == %w{ok -d} << stop_char << '-f'
         end
       end
 
       it ":opts_before_args only allows options before args" do
         create(:foo=>:boolean)
-        @opt.parse(%w{ok -f}, :opts_before_args=>true).should == {}
-        @opt.parse(%w{-f ok}, :opts_before_args=>true).should == {:foo=>true}
+        opt.parse(%w{ok -f}, :opts_before_args=>true).should == {}
+        opt.parse(%w{-f ok}, :opts_before_args=>true).should == {:foo=>true}
       end
     end
 
@@ -225,16 +233,16 @@ module Boson
   end
 
   context ":required option attribute" do
-    before(:all) {
+    before_all {
       create "--foo" => {:type=>:string, :required=>true}, :bar => {:type=>:hash, :required=>true}
     }
 
     it "raises an error if string option isn't given" do
-      assert_error(OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str:ok") }
+      assert_error(Boson::OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str:ok") }
     end
 
     it "raises an error if non-string option isn't given" do
-      assert_error(OptionParser::Error, 'no value.*required.*bar') { parse("--foo", "yup") }
+      assert_error(Boson::OptionParser::Error, 'no value.*required.*bar') { parse("--foo", "yup") }
     end
 
     it "raises no error when given arguments" do
@@ -243,7 +251,7 @@ module Boson
   end
 
   context ":bool_default option attribute" do
-    before(:all) {
+    before_all {
       create :foo=>{:type=>:string, :bool_default=>'whoop'}, :bar=>{:type=>:array, :bool_default=>'1'},
         :verbose=>:boolean, :yep=>{:type=>:string, :bool_default=>true}
     }
@@ -273,7 +281,7 @@ module Boson
   context "option with attributes" do
     it "can get type from :type" do
       create :foo=>{:type=>:numeric}
-      parse("-f", '3')[:foo] == 3
+      parse("-f", '3')[:foo].should == 3
     end
 
     it "can get type and default from :default" do
@@ -289,7 +297,7 @@ module Boson
   end
   
   def usage
-    @opt.formatted_usage.split(" ").sort
+    opt.formatted_usage.split(" ").sort
   end
 
   context "#formatted_usage" do
@@ -315,7 +323,7 @@ module Boson
   end
 
   context "user defined option class" do
-    before(:all) {
+    before_all {
       ::FooBoo = Struct.new(:name)
       module ::Boson::Options::FooBoo
         def create_foo_boo(value)
@@ -344,7 +352,7 @@ module Boson
     end
 
     test "has its validation called" do
-      @opt.expects(:validate_foo_boo)
+      opt.expects(:validate_foo_boo)
       parse("-a", 'blah')
     end
 
@@ -353,8 +361,7 @@ module Boson
     end
 
     test "when nonexistant raises error" do
-      assert_error(OptionParser::Error, "invalid.*:blah_blah") { parse("-c", 'ok') }
+      assert_error(Boson::OptionParser::Error, "invalid.*:blah_blah") { parse("-c", 'ok') }
     end
   end
-end
 end

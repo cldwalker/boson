@@ -1,24 +1,12 @@
-require 'rubygems'
 require 'mocha'
-if ENV['SPEC'] # run with rspec for ruby 1.9
-  require 'spec/test/unit'
-
-  module Spec::Example::ExampleGroupMethods
-    alias_method :test, :it
-  end
-  Spec::Runner.configure do |config|
-    config.mock_with :mocha
-  end
-else
-  require 'test/unit'
-  require 'context' #gem install jeremymcanally-context --source http://gems.github.com
-  require 'matchy' #gem install jeremymcanally-matchy --source http://gems.github.com
-end
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
+require 'bacon'
+require File.dirname(__FILE__)+'/bacon_extensions'
+require 'mocha'
+require 'mocha-on-bacon'
 require 'boson'
-require 'test_benchmark' if ENV['BENCHMARK']
+include Boson
 
-class Test::Unit::TestCase
+module TestHelpers
   # make local so it doesn't pick up my real boson dir
   Boson.repo.dir = File.dirname(__FILE__)
   # prevent extra File.exists? calls which interfere with stubs for it
@@ -130,15 +118,13 @@ class Test::Unit::TestCase
       Boson::Manager.add_library(lib); lib
     }
   end
-
-  module OptionTestHelper
-    def create(opts)
-      @opt = Boson::OptionParser.new(opts)
-    end
-
-    def parse(*args)
-      @non_opts = []
-      @opt.parse(args.flatten)
-    end
-  end
 end
+
+class Bacon::Context
+  include TestHelpers
+  include BaconExtensions
+  alias_method :context, :describe
+  alias_method :test, :it
+end
+
+def context(*args, &block); describe(*args, &block); end
