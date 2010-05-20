@@ -18,7 +18,7 @@ context "repl_runner" do
   end
 
   test "doesn't call init twice" do
-    start
+    capture_stderr { start }
     ConsoleRunner.expects(:init).never
     start
   end
@@ -36,4 +36,5 @@ context "repl_runner" do
     Manager.expects(:load).with('blah', anything)
     Boson.main_object.blah
   end
+  after_all { Dir.rmdir File.dirname(__FILE__)+'/config/' }
 end
