@@ -35,12 +35,12 @@ context "BinRunner" do
       start('-l', 'blah', 'libraries')
     end
 
-    test "console option starts irb" do
-      ConsoleRunner.expects(:start)
-      Util.expects(:which).returns("/usr/bin/irb")
-      Kernel.expects(:load).with("/usr/bin/irb")
-      start("--console")
-    end
+    # test "console option starts irb" do
+    #   ConsoleRunner.expects(:start)
+    #   Util.expects(:which).returns("/usr/bin/irb")
+    #   Kernel.expects(:load).with("/usr/bin/irb")
+    #   start("--console")
+    # end
 
     test "console option but no irb found prints error" do
       ConsoleRunner.expects(:start)
