@@ -48,9 +48,12 @@ context "BinRunner" do
       capture_stderr { start("--console") }.should =~ /Console not found/
     end
 
+    # td: stderr
     test "execute option executes string" do
       BinRunner.expects(:define_autoloader)
-      capture_stdout { start("-e", "p 1 + 1") }.should == "2\n"
+      capture_stderr {
+        capture_stdout { start("-e", "p 1 + 1") }.should == "2\n"
+      }
     end
 
     # test "global option takes value with whitespace" do
