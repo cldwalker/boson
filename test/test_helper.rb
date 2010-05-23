@@ -4,7 +4,7 @@ require File.dirname(__FILE__)+'/bacon_extensions'
 require 'mocha'
 require 'mocha-on-bacon'
 require 'boson'
-include Boson
+Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
 
 module TestHelpers
   # make local so it doesn't pick up my real boson dir

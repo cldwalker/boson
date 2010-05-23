@@ -1,5 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 require 'boson/runners/bin_runner'
+BinRunner = Boson::BinRunner
 
 context "BinRunner" do
   def start(*args)
@@ -8,7 +9,7 @@ context "BinRunner" do
   end
 
   before {|e|
-    Boson::BinRunner.instance_variables.each {|e| Boson::BinRunner.instance_variable_set(e, nil)}
+    BinRunner.instance_variables.each {|e| BinRunner.instance_variable_set(e, nil)}
   }
   context "at commandline" do
     before_all { reset }
@@ -25,9 +26,9 @@ context "BinRunner" do
       capture_stdout { start '-h' }.should =~ /^boson/
     end
 
-    # test "help option and command prints help" do
-    #   capture_stdout { start('-h', 'commands') }.should =~ /^commands/
-    # end
+    test "help option and command prints help" do
+      capture_stdout { start('-h', 'commands') }.should =~ /^commands/
+    end
 
     test "load option loads libraries" do
       Manager.expects(:load).with {|*args| args[0][0].is_a?(Module) ? true : args[0][0] == 'blah'}.times(2)
@@ -48,18 +49,15 @@ context "BinRunner" do
       capture_stderr { start("--console") }.should =~ /Console not found/
     end
 
-    # td: stderr
     test "execute option executes string" do
       BinRunner.expects(:define_autoloader)
-      capture_stderr {
-        capture_stdout { start("-e", "p 1 + 1") }.should == "2\n"
-      }
+      capture_stdout { start("-e", "p 1 + 1") }.should == "2\n"
     end
 
-    # test "global option takes value with whitespace" do
-    #   View.expects(:render).with {|*args| args[1][:fields] = %w{f1 f2} }
-    #   start('commands', '-f', 'f1, f2')
-    # end
+    test "global option takes value with whitespace" do
+      View.expects(:render).with {|*args| args[1][:fields] = %w{f1 f2} }
+      start('commands', '-f', 'f1, f2')
+    end
 
     test "execute option errors are caught" do
       capture_stderr { start("-e", "raise 'blah'") }.should =~ /^Error:/
@@ -71,12 +69,11 @@ context "BinRunner" do
       }
     end
 
-    # td: too many arguments occuring within a command
-    # test "normal command and too many arguments prints error" do
-    #   capture_stdout {
-    #     capture_stderr { start('render') }.should =~ /'render'.*incorrect/
-    #   }
-    # end
+    test "normal command and too many arguments prints error" do
+      capture_stdout {
+        capture_stderr { start('render') }.should =~ /'render'.*incorrect/
+      }
+    end
 
     test "failed subcommand prints error and not command not found" do
       BinRunner.expects(:execute_command).raises("bling")
@@ -144,11 +141,11 @@ context "BinRunner" do
       }.should =~ /Error:.*failed.*changed/
     end
 
-    # test "with core command updates index and doesn't print index message" do
-    #   Index.indexes[0].expects(:write)
-    #   Boson.main_object.expects(:send).with('libraries')
-    #   capture_stdout { start 'libraries'}.should !~ /index/i
-    # end
+    test "with core command updates index and doesn't print index message" do
+      Index.indexes[0].expects(:write)
+      Boson.main_object.expects(:send).with('libraries')
+      capture_stdout { start 'libraries'}.should.not =~ /index/i
+    end
 
     test "with non-core command not finding library, does update index" do
       Index.expects(:find_library).returns(nil, 'sweet_lib')
