@@ -1,11 +1,11 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "Loader" do
+describe "Loader" do
   def load_namespace_library
     Manager.load([Boson::Commands::Namespace])
   end
 
-  context "config" do
+  describe "config" do
     before { reset }
     test "from callback overridden by user's config" do
       with_config(:libraries=>{'blih'=>{:namespace=>false}}) do
@@ -47,7 +47,7 @@ context "Loader" do
     end
   end
 
-  context "load" do
+  describe "load" do
     before { reset }
     test "calls included callback" do
       capture_stdout {
@@ -139,7 +139,7 @@ context "Loader" do
       library_has_command('chwhat2', 'chwhat')
     end
 
-    context "module library" do
+    describe "module library" do
       def mock_library(*args); end
 
       test "loads a module library and all its class methods by default" do
@@ -164,7 +164,7 @@ context "Loader" do
       end
     end
 
-    context "gem library" do
+    describe "gem library" do
       def mock_library(lib, options={})
         options[:file_string] ||= ''
         File.stubs(:exists?).returns(false)
@@ -201,7 +201,7 @@ context "Loader" do
     end
   end
 
-  context "library with namespace" do
+  describe "library with namespace" do
     before_all { reset_main_object }
     before { reset_boson }
 

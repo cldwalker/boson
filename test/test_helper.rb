@@ -124,8 +124,5 @@ end
 class Bacon::Context
   include TestHelpers
   include BaconExtensions
-  alias_method :context, :describe
   alias_method :test, :it
 end
-
-def context(*args, &block); describe(*args, &block); end

@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context Scientist do
+describe Scientist do
   before_all {
     Runner.in_shell = nil
     eval <<-EOF
@@ -60,7 +60,7 @@ context Scientist do
 
   ALL_COMMANDS = [:command_with_args, :command_with_arg_size, :command_with_splat_args]
 
-  context "all commands" do
+  describe "all commands" do
     test "translate arg and options as one string" do
       args_are_equal ['a1 -f'], ['a1', {:force=>true, :level=>2}]
     end
@@ -97,8 +97,8 @@ context Scientist do
     end
   end
 
-  context "command" do
-    context "with arg defaults" do
+  describe "command" do
+    describe "with arg defaults" do
       test "sets defaults with stringified args" do
         command_with_arg_defaults('1').should == ["1", "some default", {:level=>2}]
       end
@@ -123,7 +123,7 @@ context Scientist do
       end
     end
 
-    context "prints error" do
+    describe "prints error" do
       test "with option error" do
         capture_stderr { command_with_args('a1 -l') }.should =~ /Error.*level/
       end
@@ -188,7 +188,7 @@ context Scientist do
     View.expects(:render).with(anything, options || anything, false)
   end
 
-  context "render" do
+  describe "render" do
     test "called for command with render_options" do
       render_expected
       command_with_render('1')
@@ -210,7 +210,7 @@ context Scientist do
     end
   end
 
-  context "command renders" do
+  describe "command renders" do
     test "with basic render options" do
       render_expected :fields => ['f1', 'f2']
       command_with_render("--fields f1,f2 ab")
@@ -236,7 +236,7 @@ context Scientist do
     end
   end
 
-  context "command with default option" do
+  describe "command with default option" do
     before_all { @cmd_attributes = {:name=>'default_option', :default_option=>'level', :args=>1} }
 
     test "parses normally from irb" do
@@ -271,7 +271,7 @@ context Scientist do
     command({:args=>2, :options=>nil, :render_options=>{:fields=>:array}}, ["--fields f1 ab ok"])
   end
 
-  context "global options:" do
+  describe "global options:" do
     def local_and_global(*args)
       Scientist.stubs(:can_render?).returns(false) # turn off rendering caused by :render_options
       @non_opts = basic_command(@command_options, args)

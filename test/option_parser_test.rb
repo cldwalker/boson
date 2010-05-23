@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "OptionParser" do
+describe "OptionParser" do
   def create(opts)
     @opt = OptionParser.new(opts)
   end
@@ -12,7 +12,7 @@ context "OptionParser" do
     opt.parse(args.flatten)
   end
 
-  context "IndifferentAccessHash" do
+  describe "IndifferentAccessHash" do
     before {
       @hash = IndifferentAccessHash.new 'foo' => 'bar', 'baz' => 'bee'
     }
@@ -39,7 +39,7 @@ context "OptionParser" do
     end
   end
 
-  context "naming" do
+  describe "naming" do
     it "automatically aliases long options with their first letter" do
       create "--foo" => true
       parse("-f")["foo"].should == true
@@ -130,7 +130,7 @@ context "OptionParser" do
     
   end
 
-  context "option values can be set with" do
+  describe "option values can be set with" do
     it "a opt=<value> assignment" do
       create :foo => :string
       parse("--foo=12")["foo"].should == "12"
@@ -161,7 +161,7 @@ context "OptionParser" do
     end
   end
 
-  context "parse" do
+  describe "parse" do
     it "extracts non-option arguments" do
       create "--foo" => :string, "--bar" => true
       parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").should == {
@@ -179,7 +179,7 @@ context "OptionParser" do
       opt.trailing_non_opts.should == %w{-- -f}
     end
 
-    context "with parse flag" do
+    describe "with parse flag" do
       it ":delete_invalid_opts deletes and warns of invalid options" do
         create(:foo=>:boolean)
         capture_stderr {
@@ -205,7 +205,7 @@ context "OptionParser" do
       end
     end
 
-    context "with no arguments" do
+    describe "with no arguments" do
       it "and no options returns an empty hash" do
         create({})
         parse.should == {}
@@ -218,7 +218,7 @@ context "OptionParser" do
     end
   end
 
-  context "option hashes" do
+  describe "option hashes" do
     it "make hash keys available as symbols as well" do
       create "--foo" => :string
       parse("--foo", "12")[:foo].should == "12"
@@ -232,7 +232,7 @@ context "OptionParser" do
     end
   end
 
-  context ":required option attribute" do
+  describe ":required option attribute" do
     before_all {
       create "--foo" => {:type=>:string, :required=>true}, :bar => {:type=>:hash, :required=>true}
     }
@@ -250,7 +250,7 @@ context "OptionParser" do
     end
   end
 
-  context ":bool_default option attribute" do
+  describe ":bool_default option attribute" do
     before_all {
       create :foo=>{:type=>:string, :bool_default=>'whoop'}, :bar=>{:type=>:array, :bool_default=>'1'},
         :verbose=>:boolean, :yep=>{:type=>:string, :bool_default=>true}
@@ -278,7 +278,7 @@ context "OptionParser" do
     end
   end
 
-  context "option with attributes" do
+  describe "option with attributes" do
     it "can get type from :type" do
       create :foo=>{:type=>:numeric}
       parse("-f", '3')[:foo].should == 3
@@ -300,7 +300,7 @@ context "OptionParser" do
     opt.formatted_usage.split(" ").sort
   end
 
-  context "#formatted_usage" do
+  describe "#formatted_usage" do
     it "outputs string args with sample values" do
       create "--repo" => :string, "--branch" => "bugfix", "-n" => 6
       usage.should == %w([--branch=bugfix] [--repo=REPO] [-n=6])
@@ -322,7 +322,7 @@ context "OptionParser" do
     end
   end
 
-  context "user defined option class" do
+  describe "user defined option class" do
     before_all {
       ::FooBoo = Struct.new(:name)
       module Options::FooBoo

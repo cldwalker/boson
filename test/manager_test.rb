@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "Manager" do
-  context "after_load" do
+describe "Manager" do
+  describe "after_load" do
     def load_library(hash)
       new_attributes = {:name=>hash[:name], :commands=>[], :created_dependencies=>[], :loaded=>true}
       [:module, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
@@ -23,7 +23,7 @@ context "Manager" do
       command_exists?('meatwad')
     end
 
-    context "command aliases" do
+    describe "command aliases" do
       before { eval %[module ::Aquateen; def frylock; end; end] }
       after { Object.send(:remove_const, "Aquateen") }
 
@@ -62,7 +62,7 @@ context "Manager" do
     end
   end
 
-  context "option commands without args" do
+  describe "option commands without args" do
     before_all {
       reset_boson
       @library = Library.new(:name=>'blah', :commands=>['foo', 'bar'])
@@ -84,7 +84,7 @@ context "Manager" do
     end
   end
 
-  context "loaded" do
+  describe "loaded" do
     before { reset_libraries }
 
     test "returns false when library isn't loaded" do

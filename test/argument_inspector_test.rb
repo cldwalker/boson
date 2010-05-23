@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "scrape_with_text" do
+describe "scrape_with_text" do
   def args_from(file_string)
     ArgumentInspector.scrape_with_text(file_string, "blah")
   end
@@ -22,7 +22,7 @@ context "scrape_with_text" do
   end
 end
 
-context "scrape_with_eval" do
+describe "scrape_with_eval" do
   def args_from(string)
     # methods need options to have their args parsed with ArgumentInspector
     string.gsub!(/(def blah)/, 'options :a=>1; \1')

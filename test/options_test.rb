@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "Options" do
+describe "Options" do
   def create(opts)
     @opt = OptionParser.new(opts)
   end
@@ -10,7 +10,7 @@ context "Options" do
     @opt.parse(args.flatten)
   end
 
-  context ":string type" do
+  describe ":string type" do
     before {
       create "--foo" => :string, "--bar" => :string, :blah=>{:type=>:string, :default=>:huh}
     }
@@ -41,7 +41,7 @@ context "Options" do
     end
   end
 
-  context ":string type with :values attribute" do
+  describe ":string type with :values attribute" do
     before_all { create :foo=>{:type=>:string, :values=>%w{angola abu abib}} }
     it "auto aliases if a match exists" do
       parse("-f", "an")[:foo].should == 'angola'
@@ -61,7 +61,7 @@ context "Options" do
     end
   end
 
-  context ":string type with default value" do
+  describe ":string type with default value" do
     before { create "--branch" => "master" }
   
     it "should get the specified value" do
@@ -73,7 +73,7 @@ context "Options" do
     end
   end
   
-  context ":numeric type" do
+  describe ":numeric type" do
     before { create "n" => :numeric, "m" => 5 }
   
     it "supports numeric defaults" do
@@ -93,7 +93,7 @@ context "Options" do
     end
   end
 
-  context ":array type" do
+  describe ":array type" do
     before_all {
       create :a=>:array, :b=>[1,2,3], :c=>{:type=>:array, :values=>%w{foo fa bar zebra}, :enum=>false},
         :d=>{:type=>:array, :split=>" ", :values=>[:ab, :bc, :cd], :enum=>false},
@@ -134,7 +134,7 @@ context "Options" do
     end
   end
 
-  context ":hash type" do
+  describe ":hash type" do
     before_all {
       create :a=>:hash, :b=>{:default=>{:a=>'b'}}, :c=>{:type=>:hash, :keys=>%w{one two three}},
         :e=>{:type=>:hash, :keys=>[:one, :two, :three], :default_keys=>:three},

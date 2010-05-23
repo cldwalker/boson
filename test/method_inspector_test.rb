@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "MethodInspector" do
+describe "MethodInspector" do
   test "non commands module can't set anything" do
     eval "module Blah; end"
     MethodInspector.current_module = Blah
@@ -11,7 +11,7 @@ context "MethodInspector" do
     MethodInspector.store[:options].empty?.should == true
   end
 
-  context "commands module with" do
+  describe "commands module with" do
     def parse(string)
       Inspector.enable
       ::Boson::Commands::Zzz.module_eval(string)

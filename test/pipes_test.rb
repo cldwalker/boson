@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context Pipes do
+describe Pipes do
   before_all { Ab = Struct.new(:a, :b) }
-  context "query_pipe" do
+  describe "query_pipe" do
     before_all {
       @hashes = [{:a=>'some', :b=>'thing'}, {:a=>:more, :b=>:yep}]
       @objects = [Ab.new('some', 'thing'), Ab.new(:more, :yep)]
@@ -31,7 +31,7 @@ context Pipes do
     end
   end
 
-  context "sort_pipe" do
+  describe "sort_pipe" do
     before_all {
       @hashes = [{:a=>'some', :b=>'thing'}, {:a=>:more, :b=>:yep}]
       @objects = [Ab.new('some', 'thing'), Ab.new(:more, :yep)]

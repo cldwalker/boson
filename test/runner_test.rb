@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "repl_runner" do
+describe "repl_runner" do
   def start(hash={})
     Hirb.stubs(:enable)
     Boson.start(hash.merge(:verbose=>false))

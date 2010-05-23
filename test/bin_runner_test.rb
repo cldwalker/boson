@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 require 'boson/runners/bin_runner'
 BinRunner = Boson::BinRunner
 
-context "BinRunner" do
+describe "BinRunner" do
   def start(*args)
     Hirb.stubs(:enable)
     BinRunner.start(args)
@@ -11,7 +11,7 @@ context "BinRunner" do
   before {|e|
     BinRunner.instance_variables.each {|e| BinRunner.instance_variable_set(e, nil)}
   }
-  context "at commandline" do
+  describe "at commandline" do
     before_all { reset }
 
     test "no arguments prints usage" do
@@ -113,7 +113,7 @@ context "BinRunner" do
     end
   end
 
-  context "autoload_command" do
+  describe "autoload_command" do
     def index(options={})
       Manager.expects(:load).with {|*args| args[0][0].is_a?(Module) ? true : args[0] == options[:load]
         }.at_least(1).returns(!options[:fails])
@@ -155,7 +155,7 @@ context "BinRunner" do
     end
   end
 
-  context "render_output" do
+  describe "render_output" do
     before { Scientist.rendered = false; BinRunner.instance_eval "@options = {}" }
 
     test "doesn't render when nil, false or true" do

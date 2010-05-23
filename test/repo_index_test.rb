@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "RepoIndex" do
+describe "RepoIndex" do
   # since we're defining our own @commands, @libraries, @lib_hashes
   def index
     @index ||= begin
@@ -10,7 +10,7 @@ context "RepoIndex" do
     end
   end
 
-  context "read_and_transfer" do
+  describe "read_and_transfer" do
     before { reset_boson; index.instance_eval "@libraries = @commands = nil" }
 
     def transfers(options={})
@@ -41,7 +41,7 @@ context "RepoIndex" do
     end
   end
 
-  context "find_library" do
+  describe "find_library" do
     before_all {
       reset_boson
       commands = [Command.new(:name=>'blurb', :lib=>'blah', :alias=>'bb'), 
@@ -75,7 +75,7 @@ context "RepoIndex" do
     end
   end
 
-  context "changed_libraries" do
+  describe "changed_libraries" do
     before_all { index.instance_eval "@lib_hashes = nil" }
 
     def changed(string, all_libs=['file1'])
@@ -99,7 +99,7 @@ context "RepoIndex" do
     end
   end
 
-  context "write" do
+  describe "write" do
     before_all {
       reset_boson
       Boson.commands << Command.new(:name=>'blah', :lib=>'blah', :args=>[['arg1', {}], ['arg2', self.class]])

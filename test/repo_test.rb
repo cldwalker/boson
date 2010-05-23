@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "config" do
+describe "config" do
   before_all { reset }
   before { @repo = Repo.new(File.dirname(__FILE__)) }
 

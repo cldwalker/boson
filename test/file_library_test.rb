@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-context "file library" do
+describe "file library" do
   before { reset; FileLibrary.reset_file_cache }
 
   test "loads" do
