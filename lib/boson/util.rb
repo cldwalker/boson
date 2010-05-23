@@ -35,7 +35,7 @@ module Boson
     # Valid options and possible returned keys are :methods, :object_methods, :modules, :gems.
     def detect(options={}, &block)
       options = {:methods=>true, :object_methods=>true}.merge!(options)
-      original_gems = Gem.loaded_specs.keys if Object.const_defined? :Gem
+      original_gems = Object.const_defined?(:Gem) ? Gem.loaded_specs.keys : []
       original_object_methods = Object.instance_methods
       original_instance_methods = class << Boson.main_object; instance_methods end
       original_modules = modules if options[:modules]
