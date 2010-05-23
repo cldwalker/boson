@@ -22,15 +22,15 @@ describe "RepoIndex" do
       Boson.commands.map {|e| e.name}.should == options[:commands]
     end
 
-    test "transfers libraries with no libraries to ignore" do
+    it "transfers libraries with no libraries to ignore" do
       transfers :libraries=>%w{blah bling}, :commands=>%w{blurb}, :ignored=>[]
     end
 
-    test "transfers libraries and commands except for ignored libraries and its commands" do
+    it "transfers libraries and commands except for ignored libraries and its commands" do
       transfers :libraries=>%w{bling}, :commands=>[], :ignored=>%w{blah}
     end
 
-    test "doesn't replace existing libraries" do
+    it "doesn't replace existing libraries" do
       lib = Library.new(:name=>'blah')
       cmd = Command.new(:name=>'blurb', :lib=>'blah')
       Boson.libraries << lib
@@ -51,26 +51,26 @@ describe "RepoIndex" do
       index.instance_variable_set "@libraries", [Library.new(:name=>'blah'), Library.new(:name=>'bling', :namespace=>'bling')]
     }
 
-    test "finds command aliased or not" do
+    it "finds command aliased or not" do
       index.find_library('blurb').should == 'blah'
       index.find_library('bb').should == 'blah'
     end
 
-    test "doesn't find command" do
+    it "doesn't find command" do
       index.find_library('blah').should == nil
     end
 
-    test "finds a subcommand aliased or not" do
+    it "finds a subcommand aliased or not" do
       index.find_library('bling.sub').should == 'bling'
       # @index.find_library('bl.s').should == 'bling'
     end
 
-    test "finds namespace command aliased or not without a subcommand" do
+    it "finds namespace command aliased or not without a subcommand" do
       index.find_library('bling').should == 'bling'
       # @index.find_library('bl').should == 'bling'
     end
 
-    test "doesn't find a subcommand" do
+    it "doesn't find a subcommand" do
       index.find_library('d.d').should == nil
     end
   end
@@ -86,15 +86,15 @@ describe "RepoIndex" do
       index.changed_libraries
     end
 
-    test "detects changed libraries" do
+    it "detects changed libraries" do
       changed("state2").should == %w{file1}
     end
 
-    test "detects new libraries" do
+    it "detects new libraries" do
       changed("state1", ['file2']).should == %w{file2}
     end
 
-    test "detects no changed libraries" do
+    it "detects no changed libraries" do
       changed("state1").should == []
     end
   end
@@ -111,11 +111,11 @@ describe "RepoIndex" do
       @index_hash = {:libraries=>libraries, :commands=>commands}
     }
 
-    test "saves library module constants as strings" do
+    it "saves library module constants as strings" do
       @index_hash[:libraries][0].module.class.should == String
     end
 
-    test "save commands with arg values as strings" do
+    it "save commands with arg values as strings" do
       @index_hash[:commands][0].args.each {|e| e[1].class.should == String}
     end
   end

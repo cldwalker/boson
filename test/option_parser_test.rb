@@ -336,31 +336,31 @@ describe "OptionParser" do
         :d=>{:type=>:foo_boo, :type=>::FooBoo.new('bling')}
     }
 
-    test "created from symbol" do
+    it "created from symbol" do
       (obj = parse('-a', 'whoop')[:a]).class.should == ::FooBoo
       obj.name.should == 'whoop'
     end
 
-    test "created from default" do
+    it "created from default" do
       (obj = parse[:b]).class.should == ::FooBoo
       obj.name.should == 'blah'
     end
 
-    test "created from type attribute" do
+    it "created from type attribute" do
       (obj = parse('-d', 'whoop')[:d]).class.should == ::FooBoo
       obj.name.should == 'whoop'
     end
 
-    test "has its validation called" do
+    it "has its validation called" do
       opt.expects(:validate_foo_boo)
       parse("-a", 'blah')
     end
 
-    test "has default usage" do
+    it "has default usage" do
       usage[0].should == "[-a=:foo_boo]"
     end
 
-    test "when nonexistant raises error" do
+    it "when nonexistant raises error" do
       assert_error(OptionParser::Error, "invalid.*:blah_blah") { parse("-c", 'ok') }
     end
   end

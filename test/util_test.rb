@@ -1,11 +1,11 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "Util" do
-  test "underscore converts camelcase to underscore" do
+  it "underscore converts camelcase to underscore" do
     Util.underscore('Boson::MethodInspector').should == 'boson/method_inspector'
   end
 
-  test "constantize converts string to class" do
+  it "constantize converts string to class" do
     Util.constantize("Boson").should == ::Boson
   end
 
@@ -18,37 +18,37 @@ describe "Util" do
       Util.underscore_search(query, list, true)
     end
 
-    test "matches non underscore strings" do
+    it "matches non underscore strings" do
       search('som', %w{some words match sometimes}).should == %w{some sometimes}
     end
 
-    test "matches first non underscore string" do
+    it "matches first non underscore string" do
       first_search('wo', %w{some work wobbles}).should == 'work'
     end
 
-    test "matches non underscore symbols" do
+    it "matches non underscore symbols" do
       search(:som, [:some, :words, :match, :sometimes]).should == [:some, :sometimes]
       search('som', [:some, :words, :match, :sometimes]).should == [:some, :sometimes]
     end
 
-    test "matches underscore strings" do
+    it "matches underscore strings" do
       search('s_l', %w{some_long some_short some_lame}).should == %w{some_lame some_long}
     end
 
-    test "matches first underscore string" do
+    it "matches first underscore string" do
       first_search('s_l', %w{some_long some_short some_lame}).should == 'some_long'
     end
 
-    test "matches underscore symbols" do
+    it "matches underscore symbols" do
       search(:s_l, [:some_long, :some_short, :some_lame]).should == [:some_lame, :some_long]
       search('s_l', [:some_long, :some_short, :some_lame]).should == [:some_lame, :some_long]
     end
 
-    test "matches full underscore string" do
+    it "matches full underscore string" do
       search('some_long_name', %w{some_long_name some_short some_lame}).should == %w{some_long_name}
     end
 
-    test "only matches exact match if multiple matches that start with exact match" do
+    it "only matches exact match if multiple matches that start with exact match" do
       search('bl', %w{bl blang bling}).should == ['bl']
       first_search('bl', %w{bl blang bling}).should == 'bl'
     end

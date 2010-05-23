@@ -124,5 +124,4 @@ end
 class Bacon::Context
   include TestHelpers
   include BaconExtensions
-  alias_method :test, :it
 end

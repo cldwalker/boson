@@ -7,7 +7,7 @@ describe "Loader" do
 
   describe "config" do
     before { reset }
-    test "from callback overridden by user's config" do
+    it "from callback overridden by user's config" do
       with_config(:libraries=>{'blih'=>{:namespace=>false}}) do
         load :blih, :file_string=>"module Blah; def self.config; {:namespace=>'bling'}; end; end"
         library('blih').namespace.should == false
@@ -15,7 +15,7 @@ describe "Loader" do
     end
 
     # if this test fails, other exists? using methods fail
-    test "from callback recursively merges with user's config" do
+    it "from callback recursively merges with user's config" do
       with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:desc=>'bling', :options=>{:num=>3}}}}}) do
         File.stubs(:exists?).returns(true)
         load :blah, :file_string=> "module Blah; def self.config; {:commands=>{'blang'=>{:alias=>'ba'}, " +
@@ -26,19 +26,19 @@ describe "Loader" do
       end
     end
 
-    test "non-hash from inspector overridden by user's config" do
+    it "non-hash from inspector overridden by user's config" do
       with_config(:libraries=>{'blah'=>{:commands=>{'bling'=>{:desc=>'already'}}}}) do
         load :blah, :file_string=>"module Blah; #from file\ndef bling; end; end"
         library('blah').command_object('bling').desc.should == 'already'
       end
     end
 
-    test "from inspector attribute config sets command's config" do
+    it "from inspector attribute config sets command's config" do
       load :blah, :file_string=>"module Blah; config :alias=>'ok'\n; def bling; end; end"
       library('blah').command_object('bling').alias.should == 'ok'
     end
 
-    test "hash from inspector recursively merged with user's config" do
+    it "hash from inspector recursively merged with user's config" do
       with_config(:libraries=>{'blah'=>{:commands=>{'blung'=>{:args=>[], :render_options=>{:sort=>'this'}}}}}) do
         CommentInspector.expects(:scrape).returns({:render_options=>{:fields=>['this']}})
         load :blah, :file_string=>"module Blah; def blung; end; end"
@@ -49,32 +49,32 @@ describe "Loader" do
 
   describe "load" do
     before { reset }
-    test "calls included callback" do
+    it "calls included callback" do
       capture_stdout {
         load :blah, :file_string=>"module Blah; def self.included(mod); puts 'included blah'; end; def blah; end; end"
       }.should =~ /included blah/
     end
 
-    test "calls after_included callback" do
+    it "calls after_included callback" do
       capture_stdout {
         load :blah, :file_string=>"module Blah; def self.after_included; puts 'yo'; end; end"
       }.should == "yo\n"
     end
 
-    test "prints error if library module conflicts with top level constant/module" do
+    it "prints error if library module conflicts with top level constant/module" do
       capture_stderr {
         load :blah, :file_string=>"module Object; def self.blah; end; end"
       }.should =~ /conflict.*'Object'/
       library_loaded?('blah')
     end
 
-    test "prints error and returns false for existing library" do
+    it "prints error and returns false for existing library" do
       libs = create_library('blah', :loaded=>true)
       Manager.stubs(:loader_create).returns(libs[0])
       capture_stderr { load('blah', :no_mock=>true, :verbose=>true).should == false }.should =~ /already exists/
     end
 
-    test "loads and strips aliases from a library's commands" do
+    it "loads and strips aliases from a library's commands" do
       with_config(:command_aliases=>{"blah"=>'b'}) do
         load :blah, :file_string=>"module Blah; def blah; end; alias_method(:b, :blah); end"
         library_loaded?('blah')
@@ -82,7 +82,7 @@ describe "Loader" do
       end
     end
 
-    test "loads a library and creates its class commands" do
+    it "loads a library and creates its class commands" do
       with_config(:libraries=>{"blah"=>{:class_commands=>{"bling"=>"Blah.bling", "Blah"=>['hmm']}}}) do
         load :blah, :file_string=>"module Blah; def self.bling; end; def self.hmm; end; end"
         command_exists? 'bling'
@@ -90,7 +90,7 @@ describe "Loader" do
       end
     end
 
-    test "loads a library with dependencies" do
+    it "loads a library with dependencies" do
       File.stubs(:exists?).returns(true)
       File.stubs(:read).returns("module Water; def water; end; end", "module Oaks; def oaks; end; end")
       with_config(:libraries=>{"water"=>{:dependencies=>"oaks"}}) do
@@ -102,7 +102,7 @@ describe "Loader" do
       end
     end
 
-    test "prints error for library with invalid dependencies" do
+    it "prints error for library with invalid dependencies" do
       GemLibrary.stubs(:is_a_gem?).returns(true) #mock all as gem libs
       Util.stubs(:safe_require).returns(true)
       with_config(:libraries=>{"water"=>{:dependencies=>"fire"}, "fire"=>{:dependencies=>"man"}}) do
@@ -113,7 +113,7 @@ describe "Loader" do
       end
     end
 
-    test "prints error for method conflicts with main_object method" do
+    it "prints error for method conflicts with main_object method" do
       with_config(:error_method_conflicts=>true) do
         capture_stderr {
           load('blah', :file_string=>"module Blah; def require; end; end")
@@ -121,7 +121,7 @@ describe "Loader" do
       end
     end
 
-    test "prints error for method conflicts with config error_method_conflicts" do
+    it "prints error for method conflicts with config error_method_conflicts" do
       with_config(:error_method_conflicts=>true) do
         load('blah', :file_string=>"module Blah; def chwhat; end; end")
         capture_stderr {
@@ -130,7 +130,7 @@ describe "Loader" do
       end
     end
 
-    test "namespaces a library that has a method conflict" do
+    it "namespaces a library that has a method conflict" do
       load('blah', :file_string=>"module Blah; def chwhat; end; end")
       capture_stderr {
         load('chwhat2', :file_string=>"module Chwhat2; def chwhat; end; end")
@@ -142,21 +142,21 @@ describe "Loader" do
     describe "module library" do
       def mock_library(*args); end
 
-      test "loads a module library and all its class methods by default" do
+      it "loads a module library and all its class methods by default" do
         eval %[module ::Harvey; def self.bird; end; def self.eagle; end; end]
         load ::Harvey, :no_mock=>true
         library_has_command('harvey', 'bird')
         library_has_command('harvey', 'eagle')
       end
 
-      test "loads a module library with specified commands" do
+      it "loads a module library with specified commands" do
         eval %[module ::Peanut; def self.bird; end; def self.eagle; end; end]
         load ::Peanut, :no_mock=>true, :commands=>%w{bird}
         library('peanut').commands.size.should == 1
         library_has_command('peanut', 'bird')
       end
 
-      test "loads a module library as a class" do
+      it "loads a module library as a class" do
         eval %[class ::Mentok; def self.bird; end; def self.eagle; end; end]
         load ::Mentok, :no_mock=>true, :commands=>%w{bird}
         library('mentok').commands.size.should == 1
@@ -172,7 +172,7 @@ describe "Loader" do
         Util.expects(:safe_require).with { eval options.delete(:file_string) || ''; true}.returns(true)
       end
 
-      test "loads" do
+      it "loads" do
         with_config(:libraries=>{"dude"=>{:module=>'Dude'}}) do
           load "dude", :file_string=>"module ::Dude; def blah; end; end"
           library_has_module('dude', "Dude")
@@ -180,18 +180,18 @@ describe "Loader" do
         end
       end
 
-      test "with kernel methods loads" do
+      it "with kernel methods loads" do
         load "dude", :file_string=>"module ::Kernel; def dude; end; end"
         library_loaded? 'dude'
         library('dude').module.should == nil
         command_exists?("dude")
       end
 
-      test "prints error when nonexistent" do
+      it "prints error when nonexistent" do
         capture_stderr { load('blah') }.should =~ /Unable.*load/
       end
 
-      test "with invalid module prints error" do
+      it "with invalid module prints error" do
         with_config(:libraries=>{"coolio"=>{:module=>"Cool"}}) do
           capture_stderr {
             load('coolio', :file_string=>"module ::Coolio; def coolio; end; end")
@@ -205,14 +205,14 @@ describe "Loader" do
     before_all { reset_main_object }
     before { reset_boson }
 
-    test "loads and defaults to library name" do
+    it "loads and defaults to library name" do
       with_config(:libraries=>{'blang'=>{:namespace=>true}}) do
         load 'blang', :file_string=>"module Blang; def bling; end; end"
         library_has_command('blang', 'bling')
       end
     end
 
-    test "loads with config namespace" do
+    it "loads with config namespace" do
       with_config(:libraries=>{'blung'=>{:namespace=>'dope'}}) do
         load 'blung', :file_string=>"module Blung; def bling; end; end"
         library_has_command('blung', 'bling')
@@ -220,7 +220,7 @@ describe "Loader" do
       end
     end
 
-    test "prints error if namespace conflicts with existing commands" do
+    it "prints error if namespace conflicts with existing commands" do
       eval "module Conflict; def self.bleng; end; end"
       load Conflict, :no_mock=>true
       with_config(:libraries=>{'bleng'=>{:namespace=>true}}) do

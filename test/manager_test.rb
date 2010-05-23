@@ -11,12 +11,12 @@ describe "Manager" do
 
     before { reset_boson }
 
-    test "loads basic library" do
+    it "loads basic library" do
       load_library :name=>'blah'
       library_loaded? 'blah'
     end
 
-    test "loads library with commands" do
+    it "loads library with commands" do
       load_library :name=>'blah', :commands=>['frylock','meatwad']
       library_loaded? 'blah'
       command_exists?('frylock')
@@ -27,7 +27,7 @@ describe "Manager" do
       before { eval %[module ::Aquateen; def frylock; end; end] }
       after { Object.send(:remove_const, "Aquateen") }
 
-      test "created with command specific config" do
+      it "created with command specific config" do
         with_config(:command_aliases=>{'frylock'=>'fr'}) do
           Manager.expects(:create_instance_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
           load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
@@ -35,7 +35,7 @@ describe "Manager" do
         end
       end
 
-      test "created with config command_aliases" do
+      it "created with config command_aliases" do
         with_config(:command_aliases=>{"frylock"=>"fr"}) do
           Manager.expects(:create_instance_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
           load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
@@ -43,7 +43,7 @@ describe "Manager" do
         end
       end
 
-      test "not created and warns for commands with no module" do
+      it "not created and warns for commands with no module" do
         with_config(:command_aliases=>{'frylock'=>'fr'}) do
           capture_stderr {
             load_library(:name=>'aquateen', :commands=>['frylock'])
@@ -54,7 +54,7 @@ describe "Manager" do
       end
     end
 
-    test "merges with existing created library" do
+    it "merges with existing created library" do
       create_library('blah')
       load_library :name=>'blah'
       library_loaded? 'blah'
@@ -72,12 +72,12 @@ describe "Manager" do
       Boson.commands << Command.new(:name=>'bar', :lib=>'blah', :options=>{:bah=>:string})
     }
 
-    test "are deleted" do
+    it "are deleted" do
       Scientist.expects(:redefine_command).with(anything, @foo)
       Manager.redefine_commands(@library, @library.commands)
     end
 
-    test "are deleted and printed when verbose" do
+    it "are deleted and printed when verbose" do
       Scientist.expects(:redefine_command).with(anything, @foo)
       @library.instance_eval("@options = {:verbose=>true}")
       capture_stdout { Manager.redefine_commands(@library, @library.commands) } =~ /options.*blah/
@@ -87,12 +87,12 @@ describe "Manager" do
   describe "loaded" do
     before { reset_libraries }
 
-    test "returns false when library isn't loaded" do
+    it "returns false when library isn't loaded" do
       create_library('blah')
       Manager.loaded?('blah').should == false
     end
 
-    test "returns true when library is loaded" do
+    it "returns true when library is loaded" do
       create_library('blah', :loaded=>true)
       Manager.loaded?('blah').should == true
     end
