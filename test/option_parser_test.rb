@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 context "OptionParser" do
   def create(opts)
-    @opt = Boson::OptionParser.new(opts)
+    @opt = OptionParser.new(opts)
   end
 
   def opt; @opt; end
@@ -238,11 +238,11 @@ context "OptionParser" do
     }
 
     it "raises an error if string option isn't given" do
-      assert_error(Boson::OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str:ok") }
+      assert_error(OptionParser::Error, 'no value.*required.*foo') { parse("--bar", "str:ok") }
     end
 
     it "raises an error if non-string option isn't given" do
-      assert_error(Boson::OptionParser::Error, 'no value.*required.*bar') { parse("--foo", "yup") }
+      assert_error(OptionParser::Error, 'no value.*required.*bar') { parse("--foo", "yup") }
     end
 
     it "raises no error when given arguments" do
@@ -325,13 +325,13 @@ context "OptionParser" do
   context "user defined option class" do
     before_all {
       ::FooBoo = Struct.new(:name)
-      module ::Boson::Options::FooBoo
+      module Options::FooBoo
         def create_foo_boo(value)
           ::FooBoo.new(value)
         end
         def validate_foo_boo(value); end
       end
-      ::Boson::OptionParser.send :include, ::Boson::Options::FooBoo
+      ::OptionParser.send :include, Options::FooBoo
       create :a=>:foo_boo, :b=>::FooBoo.new('blah'), :c=>:blah_blah,
         :d=>{:type=>:foo_boo, :type=>::FooBoo.new('bling')}
     }
@@ -361,7 +361,7 @@ context "OptionParser" do
     end
 
     test "when nonexistant raises error" do
-      assert_error(Boson::OptionParser::Error, "invalid.*:blah_blah") { parse("-c", 'ok') }
+      assert_error(OptionParser::Error, "invalid.*:blah_blah") { parse("-c", 'ok') }
     end
   end
 end

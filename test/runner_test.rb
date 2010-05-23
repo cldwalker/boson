@@ -7,10 +7,10 @@ context "repl_runner" do
   end
 
   before_all { reset }
-  before { Boson::ConsoleRunner.instance_eval("@initialized = false") }
+  before { ConsoleRunner.instance_eval("@initialized = false") }
 
   test "loads default libraries and libraries in :console_defaults config" do
-    defaults = Boson::Runner.default_libraries + ['yo']
+    defaults = Runner.default_libraries + ['yo']
     with_config(:console_defaults=>['yo']) do
       Manager.expects(:load).with {|*args| args[0] == defaults }
       start

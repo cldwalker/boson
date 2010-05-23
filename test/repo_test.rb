@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 context "config" do
   before_all { reset }
-  before { @repo = Boson::Repo.new(File.dirname(__FILE__)) }
+  before { @repo = Repo.new(File.dirname(__FILE__)) }
 
   test "reloads config when passed true" do
     @repo.config.object_id.should.not == @repo.config(true).object_id

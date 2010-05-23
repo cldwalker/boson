@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 context "Options" do
   def create(opts)
-    @opt = Boson::OptionParser.new(opts)
+    @opt = OptionParser.new(opts)
   end
   
   def parse(*args)
@@ -25,11 +25,11 @@ context "Options" do
     end
 
     it "raises error if passed another valid option" do
-      assert_error(Boson::OptionParser::Error, "cannot pass.*'foo'") { parse("--foo", "--bar") }
+      assert_error(OptionParser::Error, "cannot pass.*'foo'") { parse("--foo", "--bar") }
     end
 
     it "raises error if not passed a value" do
-      assert_error(Boson::OptionParser::Error, "no value.*'foo'") { parse("--foo") }
+      assert_error(OptionParser::Error, "no value.*'foo'") { parse("--foo") }
     end
 
     it "overwrites earlier values with later values" do
@@ -52,7 +52,7 @@ context "Options" do
     end
 
     it "raises error if option doesn't auto alias or match given values" do
-      assert_error(Boson::OptionParser::Error, "invalid.*'z'") { parse("-f", "z") }
+      assert_error(OptionParser::Error, "invalid.*'z'") { parse("-f", "z") }
     end
 
     it "doesn't raise error for a nonmatch if enum is false" do
@@ -85,11 +85,11 @@ context "Options" do
     end
   
     it "raises error when value isn't numeric" do
-	  assert_error(Boson::OptionParser::Error, "expected numeric value for.*'n'") { parse("-n", "foo") }
+	  assert_error(OptionParser::Error, "expected numeric value for.*'n'") { parse("-n", "foo") }
     end
   
     it "raises error when opt is present without value" do
-	    assert_error(Boson::OptionParser::Error, "no value.*'n'") { parse("-n") }
+	    assert_error(OptionParser::Error, "no value.*'n'") { parse("-n") }
     end
   end
 
@@ -109,7 +109,7 @@ context "Options" do
     end
 
     it "raises error when option has no value" do
-      assert_error(Boson::OptionParser::Error, "no value.*'a'") { parse("-a") }
+      assert_error(OptionParser::Error, "no value.*'a'") { parse("-a") }
     end
 
     it "auto aliases :values attribute" do
@@ -150,11 +150,11 @@ context "Options" do
     end
 
     it "raises error when option has no value" do
-      assert_error(Boson::OptionParser::Error, "no value.*'a'") { parse("-a") }
+      assert_error(OptionParser::Error, "no value.*'a'") { parse("-a") }
     end
 
     it "raises error if invalid key-value pair given for unknown keys" do
-      assert_error(Boson::OptionParser::Error, "invalid.*pair.*'a'") { parse("-a", 'b') }
+      assert_error(OptionParser::Error, "invalid.*pair.*'a'") { parse("-a", 'b') }
     end
 
     it "auto aliases :keys attribute" do

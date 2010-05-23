@@ -4,6 +4,7 @@ require File.dirname(__FILE__)+'/bacon_extensions'
 require 'mocha'
 require 'mocha-on-bacon'
 require 'boson'
+Object.send :remove_const, :OptionParser
 Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
 
 module TestHelpers
@@ -30,7 +31,7 @@ module TestHelpers
   def reset_main_object
     Boson.send :remove_const, "Universe"
     eval "module ::Boson::Universe; include ::Boson::Commands::Namespace; end"
-    Boson::Commands.send :remove_const, "Blah" if Boson::Commands.const_defined?("Blah")
+    Commands.send :remove_const, "Blah" if Commands.const_defined?("Blah")
     Boson.main_object = Object.new
   end
 
@@ -44,11 +45,11 @@ module TestHelpers
   end
 
   def command_exists?(name, bool=true)
-    (!!Boson::Command.find(name)).should == bool
+    (!!Command.find(name)).should == bool
   end
 
   def library_loaded?(name, bool=true)
-    Boson::Manager.loaded?(name).should == bool
+    Manager.loaded?(name).should == bool
   end
 
   def library(name)
@@ -56,7 +57,7 @@ module TestHelpers
   end
 
   def library_has_module(lib, lib_module)
-    Boson::Manager.loaded?(lib).should == true
+    Manager.loaded?(lib).should == true
     test_lib = library(lib)
     (test_lib.module.is_a?(Module) && (test_lib.module.to_s == lib_module)).should == true
   end
@@ -68,17 +69,17 @@ module TestHelpers
   # mocks as a file library
   def mock_library(lib, options={})
     options = {:file_string=>'', :exists=>true}.merge!(options)
-    File.expects(:exists?).with(Boson::FileLibrary.library_file(lib.to_s, Boson.repo.dir)).
+    File.expects(:exists?).with(FileLibrary.library_file(lib.to_s, Boson.repo.dir)).
       at_least(1).returns(options.delete(:exists))
     File.expects(:read).returns(options.delete(:file_string))
   end
 
   def load(lib, options={})
     # prevent conflicts with existing File.read stubs
-    Boson::MethodInspector.stubs(:inspector_in_file?).returns(false)
+    MethodInspector.stubs(:inspector_in_file?).returns(false)
     mock_library(lib, options) unless options.delete(:no_mock)
-    result = Boson::Manager.load([lib], options)
-    Boson::FileLibrary.reset_file_cache
+    result = Manager.load([lib], options)
+    FileLibrary.reset_file_cache
     result
   end
 
@@ -114,8 +115,8 @@ module TestHelpers
   def create_library(libraries, attributes={})
     libraries = [libraries] unless libraries.is_a?(Array)
     libraries.map {|e|
-      lib = Boson::Library.new({:name=>e}.update(attributes))
-      Boson::Manager.add_library(lib); lib
+      lib = Library.new({:name=>e}.update(attributes))
+      Manager.add_library(lib); lib
     }
   end
 end

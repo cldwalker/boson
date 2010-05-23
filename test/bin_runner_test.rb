@@ -105,7 +105,7 @@ context "BinRunner" do
     end
 
     test "bin_defaults config loads by default" do
-      defaults = Boson::Runner.default_libraries + ['yo']
+      defaults = Runner.default_libraries + ['yo']
       with_config(:bin_defaults=>['yo']) do
         Manager.expects(:load).with {|*args| args[0] == defaults }
         capture_stderr { start 'blah' }
