@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 context Scientist do
   before_all {
-    Boson.send :remove_const, :BinRunner if Boson.const_defined?(:BinRunner)
+    Runner.in_shell = nil
     eval <<-EOF
     module Blah
       def blah(arg1, options={})
