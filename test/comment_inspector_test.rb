@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "CommentInspector" do
-  before_all { eval "module Optional; def self.bling; {:a=>'bling'}; end; end" }
+  before_all { eval "module ::Optional; def self.bling; {:a=>'bling'}; end; end" }
   describe "scrapes description" do
     before { 
       @lines = ["module Foo", "  # some comments yay", "  def foo", "  end", "end"]

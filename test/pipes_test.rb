@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-describe Pipes do
-  before_all { Ab = Struct.new(:a, :b) }
+describe "Pipes" do
+  before_all { ::Ab = Struct.new(:a, :b) }
   describe "query_pipe" do
     before_all {
       @hashes = [{:a=>'some', :b=>'thing'}, {:a=>:more, :b=>:yep}]

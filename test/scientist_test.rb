@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
-describe Scientist do
+describe "Scientist" do
   before_all {
     Runner.in_shell = nil
     eval <<-EOF
@@ -58,7 +58,9 @@ describe Scientist do
     command_with_splat_args(*args).should == array
   end
 
-  ALL_COMMANDS = [:command_with_args, :command_with_arg_size, :command_with_splat_args]
+  def all_commands
+    [:command_with_args, :command_with_arg_size, :command_with_splat_args]
+  end
 
   describe "all commands" do
     it "translate arg and options as one string" do
@@ -82,7 +84,7 @@ describe Scientist do
     end
 
     it "with invalid options print errors and delete them" do
-      ALL_COMMANDS.each do |cmd|
+      all_commands.each do |cmd|
         capture_stderr {
           send(cmd, 'cool -f -z').should == ['cool', {:force=>true, :level=>2}]
         }.should =~/invalid.*z/
@@ -90,7 +92,7 @@ describe Scientist do
     end
 
     it "print help with help option" do
-      ALL_COMMANDS.each do |cmd|
+      all_commands.each do |cmd|
         Boson.expects(:invoke).with(:usage, anything, anything)
         send(cmd, '-h')
       end
