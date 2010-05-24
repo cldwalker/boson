@@ -77,7 +77,7 @@ module Boson
       end
 
       def load_dependencies(lib, options={})
-        lib_dependencies[lib] = (lib.dependencies || []).map do |e|
+        lib_dependencies[lib] = Array(lib.dependencies).map do |e|
           next if loaded?(e)
           load_once(e, options.merge(:dependency=>true)) ||
             raise(LoaderError, "Can't load dependency #{e}")

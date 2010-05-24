@@ -5,6 +5,7 @@ describe "Loader" do
     Manager.load([Boson::Commands::Namespace])
   end
 
+  before { Gem.stubs(:loaded_specs).returns({}) } if RUBY_VERSION >= '1.9.2'
   describe "config" do
     before { reset }
     it "from callback overridden by user's config" do
@@ -221,7 +222,7 @@ describe "Loader" do
     end
 
     it "prints error if namespace conflicts with existing commands" do
-      eval "module Conflict; def self.bleng; end; end"
+      eval "module ::Conflict; def self.bleng; end; end"
       load Conflict, :no_mock=>true
       with_config(:libraries=>{'bleng'=>{:namespace=>true}}) do
         capture_stderr {
@@ -230,5 +231,5 @@ describe "Loader" do
       end
     end
   end
-  after_all { Dir.rmdir File.dirname(__FILE__)+'/commands/' }
+  after_all { FileUtils.rm_r File.dirname(__FILE__)+'/commands/', :force=>true }
 end
