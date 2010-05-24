@@ -56,7 +56,7 @@ module Boson
       # Starts, processes and ends a commandline request.
       def start(args=ARGV)
         @command, @options, @args = parse_args(args)
-        return puts(Boson::VERSION) if @options[:version]
+        return puts("boson #{Boson::VERSION}") if @options[:version]
         return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
         return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
         init
