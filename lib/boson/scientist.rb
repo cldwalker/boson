@@ -37,6 +37,7 @@ module Boson
     attr_accessor :global_options, :rendered, :render
     @no_option_commands ||= []
     @option_commands ||= {}
+    @object_methods = {}
 
     # Redefines an object's method with a Command of the same name.
     def redefine_command(obj, command)
@@ -72,12 +73,19 @@ module Boson
 
     # The actual method which redefines a command's original method
     def redefine_command_block(obj, command)
+      object_methods(obj)[command.name] ||= obj.method(command.name)
       lambda {|*args|
-        Boson::Scientist.translate_and_render(obj, command, args) {|args| super(*args) }
+        Scientist.translate_and_render(obj, command, args) {|args|
+          Scientist.object_methods(obj)[command.name].call(*args)
+        }
       }
     end
 
     #:stopdoc:
+    def object_methods(obj)
+      @object_methods[obj] ||= {}
+    end
+
     def option_command(cmd=@command)
       @option_commands[cmd] ||= OptionCommand.new(cmd)
     end
