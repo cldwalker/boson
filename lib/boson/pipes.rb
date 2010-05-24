@@ -44,14 +44,18 @@ module Boson
       sort_lambda = lambda {}
       if object[0].is_a?(Hash)
         sort = sort.to_i if sort.to_s[/^\d+$/]
-        sort_lambda = (object.all? {|e| e[sort].respond_to?(:<=>) } ? lambda {|e| e[sort] } : lambda {|e| e[sort].to_s })
+        sort_lambda = untouched_sort?(object.map {|e| e[sort] }) ? lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }
       else
-        sort_lambda = object.all? {|e| e.send(sort).respond_to?(:<=>) } ? lambda {|e| e.send(sort) || ''} :
+        sort_lambda = untouched_sort?(object.map {|e| e.send(sort) }) ? lambda {|e| e.send(sort) || ''} :
           lambda {|e| e.send(sort).to_s }
       end
       object.sort_by &sort_lambda
     rescue NoMethodError, ArgumentError
       $stderr.puts "Sort failed with nonexistant method '#{sort}'"
+    end
+
+    def untouched_sort?(values) #:nodoc:
+      values.all? {|e| e.respond_to?(:<=>) } && values.map {|e| e.class }.uniq.size == 1
     end
 
     # Reverse an object
