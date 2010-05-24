@@ -19,5 +19,5 @@ describe "config" do
     @repo.config[:command_aliases].class.should == Hash
     @repo.config[:libraries].class.should == Hash
   end
-  after_all { FileUtils.rm_r File.dirname(__FILE__)+'/config' if File.exists? File.dirname(__FILE__)+'/config' }
+  after_all { FileUtils.rm_r File.dirname(__FILE__)+'/config', :force=>true }
 end

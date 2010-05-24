@@ -36,5 +36,5 @@ describe "repl_runner" do
     Manager.expects(:load).with('blah', anything)
     Boson.main_object.blah
   end
-  after_all { FileUtils.rm_r File.dirname(__FILE__)+'/config' if File.exists? File.dirname(__FILE__)+'/config' }
+  after_all { FileUtils.rm_r File.dirname(__FILE__)+'/config', :force=>true }
 end
