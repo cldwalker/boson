@@ -1,9 +1,9 @@
+To read a linkable version of this README, {see here}[http://tagaholic.me/boson/doc/].
+
 == Description
 A command/task framework similar to rake and thor that opens your ruby universe to the commandline
 and irb. For my libraries that use this, see {irbfiles}[http://github.com/cldwalker/irbfiles].
-Works with Ruby 1.8.6 and 1.9.1.
-
-Note: To read a linkable version of this README, {see here}[http://tagaholic.me/boson/doc/].
+Works with all major ruby versions.
 
 == Features
 * Simple organization: Commands are just methods on an object (default is main) and command libraries are just modules.
@@ -161,8 +161,8 @@ My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby conso
 
 == Acknowledgements
 Boson stands on the shoulders of these people and their ideas:
-* Yehuda Katz for inspiring me with Thor's power and elegant design
-* Yehuda Katz and Daniel Berger for an awesome option parser (Boson::OptionParser)
+* Yehuda Katz for inspiring me with Thor and its awesome option parser (Boson::OptionParser).
+* Daniel Berger for his original work on thor's awesome option parser.
 * Dave Thomas for scraping a method's comments (Boson::CommentInspector)
 * Mauricio Fernandez for scraping a method's arguments (Boson::ArgumentInspector)
 * Chris Wanstrath for inspiring Boson's libraries with Rip's packages.
