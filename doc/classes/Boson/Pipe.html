@@ -44,20 +44,23 @@
             options are processed in this order:
             </p>
             <ul>
-            <li>A :query option searches an array of objects or hashes using
-            Pipes.search_pipe.
+            <li>A :query option searches an array of objects or hashes using <a
+            href="Pipes.html#M000052">Pipes.query_pipe</a>.
             
             </li>
             <li>A :sort option sorts an array of objects or hashes using <a
-            href="Pipes.html#M000052">Pipes.sort_pipe</a>.
+            href="Pipes.html#M000053">Pipes.sort_pipe</a>.
+            
+            </li>
+            <li>A :reverse_sort pipe option reverses an array.
             
             </li>
             <li>A :pipes option takes an array of commands that modify the return value
-            using <a href="Pipes.html#M000054">Pipes.pipes_pipe</a>.
+            using <a href="Pipes.html#M000055">Pipes.pipes_pipe</a>.
             
             </li>
             <li>All user-defined pipe options (:pipe_options key in <a
-            href="Repo.html#M000094">Repo.config</a>) are processed in random order.
+            href="Repo.html#M000096">Repo.config</a>) are processed in random order.
             
             </li>
             </ul>
@@ -148,9 +151,9 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000045">add_pipes</a></li>
-              <li><a href="#M000044">process_pipes</a></li>
-              <li><a href="#M000043">scientist_process</a></li>
+              <li><a href="#M000046">add_pipes</a></li>
+              <li><a href="#M000045">process_pipes</a></li>
+              <li><a href="#M000044">scientist_process</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -160,8 +163,8 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000045'>
-                <a name='M000045'>      </a>
+              <div class='public-instance method' id='method-M000046'>
+                <a name='M000046'>      </a>
                 <div class='synopsis'>
                   <span class='name'>add_pipes</span>
                   <span class='arguments'>(hash)</span>
@@ -169,19 +172,19 @@
                 <div class='description'>
                   <p>
                   A hash that defines user pipes in the same way as the :pipe_options key in
-                  <a href="Repo.html#M000094">Repo.config</a>. This method should be called
+                  <a href="Repo.html#M000096">Repo.config</a>. This method should be called
                   when a pipe&#8217;s library is loading.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000045-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000046-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000045-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 83</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">pipe_options</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">setup_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000046-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 84</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;      <span class="ruby-identifier">pipe_options</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">setup_pipes</span>(<span class="ruby-identifier">hash</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000044'>
-                <a name='M000044'>      </a>
+              <div class='public-instance method' id='method-M000045'>
+                <a name='M000045'>      </a>
                 <div class='synopsis'>
                   <span class='name'>process_pipes</span>
                   <span class='arguments'>(obj, options)</span>
@@ -193,28 +196,28 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000044-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000045-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000044-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 74</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">process_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-identifier">internal_pipes</span>(<span class="ruby-identifier">options</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">pipe</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">obj</span> = <span class="ruby-constant">Pipes</span>.<span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;#{pipe}_pipe&quot;</span>, <span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">pipe</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">pipe</span>]&#x000A;      }&#x000A;      <span class="ruby-identifier">process_user_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000045-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 75</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">process_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-identifier">internal_pipes</span>(<span class="ruby-identifier">options</span>).<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">pipe</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">obj</span> = <span class="ruby-constant">Pipes</span>.<span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;#{pipe}_pipe&quot;</span>, <span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">pipe</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">pipe</span>]&#x000A;      }&#x000A;      <span class="ruby-identifier">process_user_pipes</span>(<span class="ruby-identifier">obj</span>, <span class="ruby-identifier">options</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000043'>
-                <a name='M000043'>      </a>
+              <div class='public-instance method' id='method-M000044'>
+                <a name='M000044'>      </a>
                 <div class='synopsis'>
                   <span class='name'>scientist_process</span>
                   <span class='arguments'>(object, global_opt, env={})</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Process pipes from scientist
+                  Process pipes for <a href="Scientist.html">Scientist</a>
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000043-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000044-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000043-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 67</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scientist_process</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>, <span class="ruby-identifier">env</span>={})&#x000A;      <span class="ruby-ivar">@env</span> = <span class="ruby-identifier">env</span>&#x000A;      [<span class="ruby-identifier">:query</span>, <span class="ruby-identifier">:sort</span>, <span class="ruby-identifier">:reverse_sort</span>].<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">global_opt</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">e</span>) } <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;      <span class="ruby-identifier">process_pipes</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000044-source'><span class="ruby-comment cmt"># File lib/boson/pipe.rb, line 68</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scientist_process</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>, <span class="ruby-identifier">env</span>={})&#x000A;      <span class="ruby-ivar">@env</span> = <span class="ruby-identifier">env</span>&#x000A;      [<span class="ruby-identifier">:query</span>, <span class="ruby-identifier">:sort</span>, <span class="ruby-identifier">:reverse_sort</span>].<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">global_opt</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">e</span>) } <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;      <span class="ruby-identifier">process_pipes</span>(<span class="ruby-identifier">object</span>, <span class="ruby-identifier">global_opt</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

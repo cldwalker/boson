@@ -130,12 +130,25 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000073">init</a></li>
-              <li><a href="#M000074">options</a></li>
-              <li><a href="#M000072">start</a></li>
+              <li><a href="#M000076">commands</a></li>
+              <li><a href="#M000074">init</a></li>
+              <li><a href="#M000075">options</a></li>
+              <li><a href="#M000073">start</a></li>
             </ol>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PIPE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'+'</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
@@ -150,26 +163,44 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000073'>
-                <a name='M000073'>      </a>
+              <div class='public-class method' id='method-M000076'>
+                <a name='M000076'>      </a>
+                <div class='synopsis'>
+                  <span class='name'>commands</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  <p>
+                  <a href="Commands.html">Commands</a> to executed, in order given by user
+                  </p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000076-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='M000076-source'><span class="ruby-comment cmt"># File lib/boson/runners/bin_runner.rb, line 114</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">commands</span>&#x000A;        <span class="ruby-ivar">@commands</span> <span class="ruby-operator">||=</span> <span class="ruby-ivar">@all_args</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-value">0</span>]}&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                </div>
+              </div>
+              <div class='public-class method' id='method-M000074'>
+                <a name='M000074'>      </a>
                 <div class='synopsis'>
                   <span class='name'>init</span>
                   <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Loads the given command.
+                  Loads libraries and handles non-critical options
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000074-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000073-source'><span class="ruby-comment cmt"># File lib/boson/runners/bin_runner.rb, line 76</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">init</span>&#x000A;        <span class="ruby-constant">Runner</span>.<span class="ruby-identifier">in_shell</span> = <span class="ruby-keyword kw">true</span>&#x000A;        <span class="ruby-constant">Command</span>.<span class="ruby-identifier">all_option_commands</span> = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:option_commands</span>]&#x000A;        <span class="ruby-keyword kw">super</span>&#x000A;        <span class="ruby-constant">Index</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:libraries=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:index</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:index</span>)&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:load</span>]&#x000A;          <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:load</span>], <span class="ruby-identifier">load_options</span>&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:execute</span>]&#x000A;          <span class="ruby-identifier">define_autoloader</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">load_command_by_index</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000074-source'><span class="ruby-comment cmt"># File lib/boson/runners/bin_runner.rb, line 92</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">init</span>&#x000A;        <span class="ruby-constant">Runner</span>.<span class="ruby-identifier">in_shell</span> = <span class="ruby-keyword kw">true</span>&#x000A;        <span class="ruby-constant">Command</span>.<span class="ruby-identifier">all_option_commands</span> = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:option_commands</span>]&#x000A;        <span class="ruby-keyword kw">super</span>&#x000A;&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:index</span>)&#x000A;          <span class="ruby-constant">Index</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">:libraries=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:index</span>])&#x000A;          <span class="ruby-ivar">@index_updated</span> = <span class="ruby-keyword kw">true</span>&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:help</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@command</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">can_invoke?</span>(<span class="ruby-ivar">@command</span>)&#x000A;          <span class="ruby-constant">Index</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:verbose</span>])&#x000A;          <span class="ruby-ivar">@index_updated</span> = <span class="ruby-keyword kw">true</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-constant">Manager</span>.<span class="ruby-identifier">load</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:load</span>], <span class="ruby-identifier">load_options</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:load</span>]&#x000A;        <span class="ruby-constant">View</span>.<span class="ruby-identifier">toggle_pager</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:pager_toggle</span>]&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000074'>
-                <a name='M000074'>      </a>
+              <div class='public-class method' id='method-M000075'>
+                <a name='M000075'>      </a>
                 <div class='synopsis'>
                   <span class='name'>options</span>
                   <span class='arguments'>()</span>
@@ -180,14 +211,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000074-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000075-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000074-source'><span class="ruby-comment cmt"># File lib/boson/runners/bin_runner.rb, line 91</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">options</span>&#x000A;        <span class="ruby-ivar">@options</span> <span class="ruby-operator">||=</span> {}&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000075-source'><span class="ruby-comment cmt"># File lib/boson/runners/bin_runner.rb, line 109</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">options</span>&#x000A;        <span class="ruby-ivar">@options</span> <span class="ruby-operator">||=</span> {}&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000072'>
-                <a name='M000072'>      </a>
+              <div class='public-class method' id='method-M000073'>
+                <a name='M000073'>      </a>
                 <div class='synopsis'>
                   <span class='name'>start</span>
                   <span class='arguments'>(args=ARGV)</span>
@@ -198,10 +229,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000072-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000073-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000072-source'><span class="ruby-comment cmt"># File lib/boson/runners/bin_runner.rb, line 54</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">args</span>=<span class="ruby-constant">ARGV</span>)&#x000A;        <span class="ruby-ivar">@command</span>, <span class="ruby-ivar">@options</span>, <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">parse_args</span>(<span class="ruby-identifier">args</span>)&#x000A;        <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">print_usage</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> (<span class="ruby-ivar">@command</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:console</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:execute</span>])&#x000A;        <span class="ruby-keyword kw">return</span> <span class="ruby-constant">ConsoleRunner</span>.<span class="ruby-identifier">bin_start</span>(<span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:console</span>], <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:load</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:console</span>]&#x000A;        <span class="ruby-identifier">init</span>&#x000A;        <span class="ruby-constant">View</span>.<span class="ruby-identifier">toggle_pager</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:pager_toggle</span>]&#x000A;&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:help</span>]&#x000A;          <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-identifier">:usage</span>, <span class="ruby-ivar">@command</span>, <span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:verbose</span>])&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:execute</span>]&#x000A;          <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:execute</span>]&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">execute_command</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">rescue</span>&#x000A;        <span class="ruby-identifier">is_invalid_command</span> = <span class="ruby-identifier">lambda</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">command</span><span class="ruby-operator">|</span> <span class="ruby-operator">!</span><span class="ruby-constant">Boson</span>.<span class="ruby-identifier">can_invoke?</span>(<span class="ruby-identifier">command</span>[<span class="ruby-regexp re">/\w+/</span>]) <span class="ruby-operator">||</span>&#x000A;          (<span class="ruby-constant">Boson</span>.<span class="ruby-identifier">can_invoke?</span>(<span class="ruby-identifier">command</span>[<span class="ruby-regexp re">/\w+/</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">command</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value str">'.'</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">$!</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">NoMethodError</span>)) }&#x000A;        <span class="ruby-identifier">print_error_message</span> <span class="ruby-ivar">@command</span>.<span class="ruby-identifier">to_s</span>[<span class="ruby-regexp re">/\w+/</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">is_invalid_command</span>.<span class="ruby-identifier">call</span>(<span class="ruby-ivar">@command</span>) <span class="ruby-operator">?</span>&#x000A;          <span class="ruby-node">&quot;Error: Command '#{@command}' not found&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;Error: #{$!.message}&quot;</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000073-source'><span class="ruby-comment cmt"># File lib/boson/runners/bin_runner.rb, line 57</span>&#x000A;      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">start</span>(<span class="ruby-identifier">args</span>=<span class="ruby-constant">ARGV</span>)&#x000A;        <span class="ruby-ivar">@command</span>, <span class="ruby-ivar">@options</span>, <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">parse_args</span>(<span class="ruby-identifier">args</span>)&#x000A;        <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">puts</span>(<span class="ruby-node">&quot;boson #{Boson::VERSION}&quot;</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:version</span>]&#x000A;        <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">print_usage</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> (<span class="ruby-ivar">@command</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:console</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:execute</span>])&#x000A;        <span class="ruby-keyword kw">return</span> <span class="ruby-constant">ConsoleRunner</span>.<span class="ruby-identifier">bin_start</span>(<span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:console</span>], <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:load</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:console</span>]&#x000A;        <span class="ruby-identifier">init</span>&#x000A;&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:help</span>]&#x000A;          <span class="ruby-identifier">autoload_command</span> <span class="ruby-ivar">@command</span>&#x000A;          <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">invoke</span>(<span class="ruby-identifier">:usage</span>, <span class="ruby-ivar">@command</span>, <span class="ruby-identifier">:verbose=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:verbose</span>])&#x000A;        <span class="ruby-keyword kw">elsif</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:execute</span>]&#x000A;          <span class="ruby-identifier">define_autoloader</span>&#x000A;          <span class="ruby-constant">Boson</span>.<span class="ruby-identifier">main_object</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:execute</span>]&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">execute_command</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">NoMethodError</span>&#x000A;        <span class="ruby-identifier">print_error_message</span> <span class="ruby-identifier">no_method_error_message</span>&#x000A;      <span class="ruby-keyword kw">rescue</span>&#x000A;        <span class="ruby-identifier">print_error_message</span> <span class="ruby-identifier">default_error_message</span>&#x000A;      <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

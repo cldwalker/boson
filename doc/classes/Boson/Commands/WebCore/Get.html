@@ -72,7 +72,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000023-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000023-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 90</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">url</span>, <span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-ivar">@url</span>, <span class="ruby-ivar">@options</span> = <span class="ruby-identifier">url</span>, <span class="ruby-identifier">options</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000023-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 94</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">url</span>, <span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-ivar">@url</span>, <span class="ruby-ivar">@options</span> = <span class="ruby-identifier">url</span>, <span class="ruby-identifier">options</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
@@ -89,7 +89,7 @@
                   </p>
                   <h4>Options:</h4>
                   <dl>
-                  <dt>:any_response</dt><dd>Returns body string for any response code. Default is false
+                  <dt>:any_response</dt><dd>Returns body string for any response code. Default is false.
                   
                   </dd>
                   <dt>:parse</dt><dd>Parse the body into either json or yaml. Expects a valid format or if true
@@ -106,7 +106,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('M000024-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000024-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 101</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">request</span>(<span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-ivar">@options</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">options</span>&#x000A;      <span class="ruby-identifier">body</span> = <span class="ruby-identifier">get_body</span>&#x000A;      <span class="ruby-identifier">body</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:parse</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">parse_body</span>(<span class="ruby-identifier">body</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">body</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000024-source'><span class="ruby-comment cmt"># File lib/boson/commands/web_core.rb, line 105</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">request</span>(<span class="ruby-identifier">options</span>={})&#x000A;      <span class="ruby-ivar">@options</span>.<span class="ruby-identifier">merge!</span> <span class="ruby-identifier">options</span>&#x000A;      <span class="ruby-identifier">body</span> = <span class="ruby-identifier">get_body</span>&#x000A;      <span class="ruby-identifier">body</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:parse</span>] <span class="ruby-operator">?</span> <span class="ruby-identifier">parse_body</span>(<span class="ruby-identifier">body</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">body</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

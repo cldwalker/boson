@@ -65,7 +65,7 @@
             
             </li>
             <li>Each option type can have attributes to enable more features (see <a
-            href="OptionParser.html#M000099">OptionParser.new</a>).
+            href="OptionParser.html#M000101">OptionParser.new</a>).
             
             </li>
             <li>When options are parsed by parse(), an <a
@@ -101,7 +101,7 @@
             </dd>
             <dt><b>:array</b></dt><dd>Sets values as :string does. Multiple values are split by a configurable
             character Default is &#8217;,&#8217; (see <a
-            href="OptionParser.html#M000099">OptionParser.new</a>). Passing
+            href="OptionParser.html#M000101">OptionParser.new</a>). Passing
             &#8217;*&#8217; refers to all known :values.
             
             <pre>'--fields 1,2,3' -&gt; {:fields=&gt;['1','2','3']}&#x000A;'--fields *'     -&gt; {:fields=&gt;['1','2','3']}</pre>
@@ -124,26 +124,26 @@
             <h2>Methods</h2>
             <h3>public class</h3>
             <ol>
-              <li><a href="#M000099">new</a></li>
-              <li><a href="#M000096">parse</a></li>
-              <li><a href="#M000097">usage</a></li>
+              <li><a href="#M000101">new</a></li>
+              <li><a href="#M000098">parse</a></li>
+              <li><a href="#M000099">usage</a></li>
             </ol>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000111">aliases</a></li>
-              <li><a href="#M000106">current_attributes</a></li>
-              <li><a href="#M000108">dasherize</a></li>
-              <li><a href="#M000101">default_usage</a></li>
-              <li><a href="#M000102">formatted_usage</a></li>
-              <li><a href="#M000110">names</a></li>
-              <li><a href="#M000098">non_opts</a></li>
-              <li><a href="#M000105">option_attributes</a></li>
-              <li><a href="#M000112">option_type</a></li>
-              <li><a href="#M000100">parse</a></li>
-              <li><a href="#M000104">print_usage_table</a></li>
-              <li><a href="#M000103">to_s</a></li>
-              <li><a href="#M000109">types</a></li>
-              <li><a href="#M000107">undasherize</a></li>
+              <li><a href="#M000113">aliases</a></li>
+              <li><a href="#M000108">current_attributes</a></li>
+              <li><a href="#M000110">dasherize</a></li>
+              <li><a href="#M000103">default_usage</a></li>
+              <li><a href="#M000104">formatted_usage</a></li>
+              <li><a href="#M000112">names</a></li>
+              <li><a href="#M000100">non_opts</a></li>
+              <li><a href="#M000107">option_attributes</a></li>
+              <li><a href="#M000114">option_type</a></li>
+              <li><a href="#M000102">parse</a></li>
+              <li><a href="#M000106">print_usage_table</a></li>
+              <li><a href="#M000105">to_s</a></li>
+              <li><a href="#M000111">types</a></li>
+              <li><a href="#M000109">undasherize</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -217,8 +217,8 @@
             </div>
             <div id='methods'>
               <h2>Public class methods</h2>
-              <div class='public-class method' id='method-M000099'>
-                <a name='M000099'>      </a>
+              <div class='public-class method' id='method-M000101'>
+                <a name='M000101'>      </a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
                   <span class='arguments'>(opts)</span>
@@ -254,7 +254,7 @@
                   <pre>Boson::OptionParser.new :fields=&gt;{:type=&gt;:array, :values=&gt;%w{f1 f2 f3},&#x000A; :enum=&gt;false}</pre>
                   <p>
                   These attributes are available when an option is parsed via <a
-                  href="OptionParser.html#M000106">current_attributes</a>(). Here are the
+                  href="OptionParser.html#M000108">current_attributes</a>(). Here are the
                   available option attributes for the default option types:
                   </p>
                   <dl>
@@ -285,7 +285,7 @@
                   <dt><b>:values</b></dt><dd>An array of values an option can have. Available for :array and :string
                   options. Values here can be aliased by typing a unique string it starts
                   with or underscore aliasing (see <a
-                  href="Util.html#M000038">Util.underscore_search</a>). For example, for
+                  href="Util.html#M000039">Util.underscore_search</a>). For example, for
                   values foo, odd and obnoxiously_long, f refers to foo, od to odd and o_l to
                   obnoxiously_long.
                   
@@ -317,14 +317,14 @@
                   </dl>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000099-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000101-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000099-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 165</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-ivar">@defaults</span> = {}&#x000A;      <span class="ruby-ivar">@opt_aliases</span> = {}&#x000A;      <span class="ruby-ivar">@leading_non_opts</span>, <span class="ruby-ivar">@trailing_non_opts</span> = [], []&#x000A;&#x000A;      <span class="ruby-comment cmt"># build hash of dashed options to option types</span>&#x000A;      <span class="ruby-comment cmt"># type can be a hash of opt attributes, a default value or a type symbol</span>&#x000A;      <span class="ruby-ivar">@opt_types</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">inject</span>({}) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mem</span>, (<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>)<span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">aliases</span> = <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;        <span class="ruby-identifier">name</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>&#x000A;        <span class="ruby-comment cmt"># we need both nice and dasherized form of option name</span>&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'-'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;          <span class="ruby-identifier">nice_name</span> = <span class="ruby-identifier">undasherize</span> <span class="ruby-identifier">name</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">nice_name</span> = <span class="ruby-identifier">name</span>&#x000A;          <span class="ruby-identifier">name</span> = <span class="ruby-identifier">dasherize</span> <span class="ruby-identifier">name</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-comment cmt"># store for later</span>&#x000A;        <span class="ruby-ivar">@opt_aliases</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">aliases</span> <span class="ruby-operator">||</span> []&#x000A;&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;          <span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">||=</span> {}&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span>&#x000A;          <span class="ruby-ivar">@opt_aliases</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">type</span>[<span class="ruby-identifier">:alias</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:alias</span>)&#x000A;          <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>]&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>][<span class="ruby-identifier">:enum</span>] = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:values</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:keys</span>)) <span class="ruby-operator">&amp;&amp;</span>&#x000A;            <span class="ruby-operator">!</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:enum</span>)&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>][<span class="ruby-identifier">:default_keys</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:keys</span>][<span class="ruby-value">0</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:keys</span>)&#x000A;          <span class="ruby-identifier">type</span> = <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:type</span>] <span class="ruby-operator">||</span> (<span class="ruby-operator">!</span><span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-identifier">determine_option_type</span>(<span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">:boolean</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-comment cmt"># set defaults</span>&#x000A;        <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">type</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">TrueClass</span>                     <span class="ruby-keyword kw">then</span>  <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-keyword kw">true</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">FalseClass</span>                    <span class="ruby-keyword kw">then</span>  <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-keyword kw">else</span> <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">mem</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-operator">!</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-identifier">determine_option_type</span>(<span class="ruby-identifier">type</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">type</span>&#x000A;        <span class="ruby-identifier">mem</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-comment cmt"># generate hash of dashed aliases to dashed options</span>&#x000A;      <span class="ruby-ivar">@opt_aliases</span> = <span class="ruby-ivar">@opt_aliases</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">inject</span>({}) {<span class="ruby-operator">|</span><span class="ruby-identifier">h</span>, (<span class="ruby-identifier">nice_name</span>, <span class="ruby-identifier">aliases</span>)<span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">name</span> = <span class="ruby-identifier">dasherize</span> <span class="ruby-identifier">nice_name</span>&#x000A;        <span class="ruby-comment cmt"># allow for aliases as symbols</span>&#x000A;        <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">map!</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'-'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">==</span> <span class="ruby-keyword kw">false</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">dasherize</span>(<span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>) }&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">nice_name</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;          <span class="ruby-identifier">opt_alias</span> = <span class="ruby-identifier">nice_name</span>[<span class="ruby-value">0</span>,<span class="ruby-value">1</span>]&#x000A;          <span class="ruby-identifier">opt_alias</span> = <span class="ruby-identifier">h</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>) <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>.<span class="ruby-identifier">capitalize</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>&#x000A;          <span class="ruby-identifier">h</span>[<span class="ruby-identifier">opt_alias</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">opt_alias</span>)&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">e</span>] = <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword kw">false</span> }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">h</span>&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000101-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 165</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-ivar">@defaults</span> = {}&#x000A;      <span class="ruby-ivar">@opt_aliases</span> = {}&#x000A;      <span class="ruby-ivar">@leading_non_opts</span>, <span class="ruby-ivar">@trailing_non_opts</span> = [], []&#x000A;&#x000A;      <span class="ruby-comment cmt"># build hash of dashed options to option types</span>&#x000A;      <span class="ruby-comment cmt"># type can be a hash of opt attributes, a default value or a type symbol</span>&#x000A;      <span class="ruby-ivar">@opt_types</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">inject</span>({}) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mem</span>, (<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>)<span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">aliases</span> = <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;        <span class="ruby-identifier">name</span> = <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>&#x000A;        <span class="ruby-comment cmt"># we need both nice and dasherized form of option name</span>&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'-'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;          <span class="ruby-identifier">nice_name</span> = <span class="ruby-identifier">undasherize</span> <span class="ruby-identifier">name</span>&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">nice_name</span> = <span class="ruby-identifier">name</span>&#x000A;          <span class="ruby-identifier">name</span> = <span class="ruby-identifier">dasherize</span> <span class="ruby-identifier">name</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-comment cmt"># store for later</span>&#x000A;        <span class="ruby-ivar">@opt_aliases</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">aliases</span> <span class="ruby-operator">||</span> []&#x000A;&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;          <span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">||=</span> {}&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span>&#x000A;          <span class="ruby-ivar">@opt_aliases</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">type</span>[<span class="ruby-identifier">:alias</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:alias</span>)&#x000A;          <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>]&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>][<span class="ruby-identifier">:enum</span>] = <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> (<span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:values</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:keys</span>)) <span class="ruby-operator">&amp;&amp;</span>&#x000A;            <span class="ruby-operator">!</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:enum</span>)&#x000A;          <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-identifier">nice_name</span>][<span class="ruby-identifier">:default_keys</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:keys</span>][<span class="ruby-value">0</span>] <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">:keys</span>)&#x000A;          <span class="ruby-identifier">type</span> = <span class="ruby-identifier">type</span>[<span class="ruby-identifier">:type</span>] <span class="ruby-operator">||</span> (<span class="ruby-operator">!</span><span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>].<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-identifier">determine_option_type</span>(<span class="ruby-identifier">type</span>[<span class="ruby-identifier">:default</span>]) <span class="ruby-operator">:</span> <span class="ruby-identifier">:boolean</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-comment cmt"># set defaults</span>&#x000A;        <span class="ruby-keyword kw">case</span> <span class="ruby-identifier">type</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">TrueClass</span>                     <span class="ruby-keyword kw">then</span>  <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-keyword kw">true</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">FalseClass</span>                    <span class="ruby-keyword kw">then</span>  <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-keyword kw">false</span>&#x000A;        <span class="ruby-keyword kw">else</span> <span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">nice_name</span>] = <span class="ruby-identifier">type</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">type</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">mem</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-operator">!</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-value">? </span><span class="ruby-identifier">determine_option_type</span>(<span class="ruby-identifier">type</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">type</span>&#x000A;        <span class="ruby-identifier">mem</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-comment cmt"># generate hash of dashed aliases to dashed options</span>&#x000A;      <span class="ruby-ivar">@opt_aliases</span> = <span class="ruby-ivar">@opt_aliases</span>.<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">inject</span>({}) {<span class="ruby-operator">|</span><span class="ruby-identifier">h</span>, (<span class="ruby-identifier">nice_name</span>, <span class="ruby-identifier">aliases</span>)<span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">name</span> = <span class="ruby-identifier">dasherize</span> <span class="ruby-identifier">nice_name</span>&#x000A;        <span class="ruby-comment cmt"># allow for aliases as symbols</span>&#x000A;        <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">map!</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">index</span>(<span class="ruby-value str">'-'</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">==</span> <span class="ruby-keyword kw">false</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">dasherize</span>(<span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span>) }&#x000A;        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">nice_name</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;          <span class="ruby-identifier">opt_alias</span> = <span class="ruby-identifier">nice_name</span>[<span class="ruby-value">0</span>,<span class="ruby-value">1</span>]&#x000A;          <span class="ruby-identifier">opt_alias</span> = <span class="ruby-identifier">h</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>) <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>.<span class="ruby-identifier">capitalize</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;-&quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">opt_alias</span>&#x000A;          <span class="ruby-identifier">h</span>[<span class="ruby-identifier">opt_alias</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">opt_alias</span>)&#x000A;        <span class="ruby-keyword kw">else</span>&#x000A;          <span class="ruby-identifier">aliases</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">e</span>] = <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">if</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">key?</span>(<span class="ruby-identifier">e</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword kw">false</span> }&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;        <span class="ruby-identifier">h</span>&#x000A;      }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000096'>
-                <a name='M000096'>      </a>
+              <div class='public-class method' id='method-M000098'>
+                <a name='M000098'>      </a>
                 <div class='synopsis'>
                   <span class='name'>parse</span>
                   <span class='arguments'>(options, args=ARGV)</span>
@@ -332,20 +332,20 @@
                 <div class='description'>
                   <p>
                   Given options to pass to <a
-                  href="OptionParser.html#M000099">OptionParser.new</a>, this method parses
+                  href="OptionParser.html#M000101">OptionParser.new</a>, this method parses
                   ARGV and returns the remaining arguments and a hash of parsed options. This
                   is useful for scripts outside of <a href="../Boson.html">Boson</a>.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000096-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000098-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000096-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 86</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">args</span>=<span class="ruby-constant">ARGV</span>)&#x000A;      <span class="ruby-ivar">@opt_parser</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-identifier">parsed_options</span> = <span class="ruby-ivar">@opt_parser</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">args</span>)&#x000A;      [<span class="ruby-ivar">@opt_parser</span>.<span class="ruby-identifier">non_opts</span>, <span class="ruby-identifier">parsed_options</span>]&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000098-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 86</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">options</span>, <span class="ruby-identifier">args</span>=<span class="ruby-constant">ARGV</span>)&#x000A;      <span class="ruby-ivar">@opt_parser</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">options</span>)&#x000A;      <span class="ruby-identifier">parsed_options</span> = <span class="ruby-ivar">@opt_parser</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">args</span>)&#x000A;      [<span class="ruby-ivar">@opt_parser</span>.<span class="ruby-identifier">non_opts</span>, <span class="ruby-identifier">parsed_options</span>]&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-class method' id='method-M000097'>
-                <a name='M000097'>      </a>
+              <div class='public-class method' id='method-M000099'>
+                <a name='M000099'>      </a>
                 <div class='synopsis'>
                   <span class='name'>usage</span>
                   <span class='arguments'>()</span>
@@ -356,15 +356,15 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000097-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000099-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000097-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 93</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">usage</span>&#x000A;      <span class="ruby-ivar">@opt_parser</span>.<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000099-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 93</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">usage</span>&#x000A;      <span class="ruby-ivar">@opt_parser</span>.<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000111'>
-                <a name='M000111'>      </a>
+              <div class='public-instance method' id='method-M000113'>
+                <a name='M000113'>      </a>
                 <div class='synopsis'>
                   <span class='name'>aliases</span>
                   <span class='arguments'>()</span>
@@ -375,14 +375,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000111-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000113-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000111-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 349</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">aliases</span>&#x000A;      <span class="ruby-ivar">@opt_aliases</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">undasherize</span> <span class="ruby-identifier">e</span> }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000113-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 349</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">aliases</span>&#x000A;      <span class="ruby-ivar">@opt_aliases</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">undasherize</span> <span class="ruby-identifier">e</span> }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000106'>
-                <a name='M000106'>      </a>
+              <div class='public-instance method' id='method-M000108'>
+                <a name='M000108'>      </a>
                 <div class='synopsis'>
                   <span class='name'>current_attributes</span>
                   <span class='arguments'>()</span>
@@ -396,14 +396,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000106-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000108-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000106-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 324</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">current_attributes</span>&#x000A;      <span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-ivar">@current_option</span>] <span class="ruby-operator">||</span> {}&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000108-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 324</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">current_attributes</span>&#x000A;      <span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@option_attributes</span>[<span class="ruby-ivar">@current_option</span>] <span class="ruby-operator">||</span> {}&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000108'>
-                <a name='M000108'>      </a>
+              <div class='public-instance method' id='method-M000110'>
+                <a name='M000110'>      </a>
                 <div class='synopsis'>
                   <span class='name'>dasherize</span>
                   <span class='arguments'>(str)</span>
@@ -415,14 +415,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000108-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000110-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000108-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 334</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">dasherize</span>(<span class="ruby-identifier">str</span>)&#x000A;      (<span class="ruby-identifier">str</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;--&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;-&quot;</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">str</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000110-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 334</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">dasherize</span>(<span class="ruby-identifier">str</span>)&#x000A;      (<span class="ruby-identifier">str</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-value str">&quot;--&quot;</span> <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;-&quot;</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">str</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000101'>
-                <a name='M000101'>      </a>
+              <div class='public-instance method' id='method-M000103'>
+                <a name='M000103'>      </a>
                 <div class='synopsis'>
                   <span class='name'>default_usage</span>
                   <span class='arguments'>(opt, val)</span>
@@ -434,14 +434,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000101-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000103-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000101-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 267</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_usage</span>(<span class="ruby-identifier">opt</span>, <span class="ruby-identifier">val</span>)&#x000A;      <span class="ruby-identifier">opt</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;=&quot;</span> <span class="ruby-operator">+</span> (<span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">opt</span>)] <span class="ruby-operator">||</span> <span class="ruby-identifier">val</span>).<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000103-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 267</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">default_usage</span>(<span class="ruby-identifier">opt</span>, <span class="ruby-identifier">val</span>)&#x000A;      <span class="ruby-identifier">opt</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;=&quot;</span> <span class="ruby-operator">+</span> (<span class="ruby-ivar">@defaults</span>[<span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">opt</span>)] <span class="ruby-operator">||</span> <span class="ruby-identifier">val</span>).<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000102'>
-                <a name='M000102'>      </a>
+              <div class='public-instance method' id='method-M000104'>
+                <a name='M000104'>      </a>
                 <div class='synopsis'>
                   <span class='name'>formatted_usage</span>
                   <span class='arguments'>()</span>
@@ -452,14 +452,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000102-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000104-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000102-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 272</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">formatted_usage</span>&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-value str">&quot;&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opt</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">val</span> = <span class="ruby-identifier">respond_to?</span>(<span class="ruby-node">&quot;usage_for_#{type}&quot;</span>, <span class="ruby-keyword kw">true</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;usage_for_#{type}&quot;</span>, <span class="ruby-identifier">opt</span>) <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{opt}=:#{type}&quot;</span>&#x000A;        <span class="ruby-value str">&quot;[&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">val</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;]&quot;</span>&#x000A;      <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot; &quot;</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000104-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 272</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">formatted_usage</span>&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-value str">&quot;&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">opt</span>, <span class="ruby-identifier">type</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">val</span> = <span class="ruby-identifier">respond_to?</span>(<span class="ruby-node">&quot;usage_for_#{type}&quot;</span>, <span class="ruby-keyword kw">true</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;usage_for_#{type}&quot;</span>, <span class="ruby-identifier">opt</span>) <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{opt}=:#{type}&quot;</span>&#x000A;        <span class="ruby-value str">&quot;[&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">val</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;]&quot;</span>&#x000A;      <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot; &quot;</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000110'>
-                <a name='M000110'>      </a>
+              <div class='public-instance method' id='method-M000112'>
+                <a name='M000112'>      </a>
                 <div class='synopsis'>
                   <span class='name'>names</span>
                   <span class='arguments'>()</span>
@@ -470,14 +470,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000110-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000112-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000110-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 344</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">names</span>&#x000A;      <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">undasherize</span> <span class="ruby-identifier">e</span> }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000112-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 344</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">names</span>&#x000A;      <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">undasherize</span> <span class="ruby-identifier">e</span> }&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000098'>
-                <a name='M000098'>      </a>
+              <div class='public-instance method' id='method-M000100'>
+                <a name='M000100'>      </a>
                 <div class='synopsis'>
                   <span class='name'>non_opts</span>
                   <span class='arguments'>()</span>
@@ -489,14 +489,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000098-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000100-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000098-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 106</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">non_opts</span>&#x000A;      <span class="ruby-identifier">leading_non_opts</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">trailing_non_opts</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000100-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 106</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">non_opts</span>&#x000A;      <span class="ruby-identifier">leading_non_opts</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">trailing_non_opts</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000105'>
-                <a name='M000105'>      </a>
+              <div class='public-instance method' id='method-M000107'>
+                <a name='M000107'>      </a>
                 <div class='synopsis'>
                   <span class='name'>option_attributes</span>
                   <span class='arguments'>()</span>
@@ -507,27 +507,27 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000105-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000107-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000105-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 312</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_attributes</span>&#x000A;      <span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">||</span> {}&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000107-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 312</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_attributes</span>&#x000A;      <span class="ruby-ivar">@option_attributes</span> <span class="ruby-operator">||</span> {}&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000112'>
-                <a name='M000112'>      </a>
+              <div class='public-instance method' id='method-M000114'>
+                <a name='M000114'>      </a>
                 <div class='synopsis'>
                   <span class='name'>option_type</span>
                   <span class='arguments'>(opt)</span>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000112-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000114-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000112-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 353</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_type</span>(<span class="ruby-identifier">opt</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">opt</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^--no-(\w+)$/</span>&#x000A;        <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">opt</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">dasherize</span>(<span class="ruby-identifier">$1</span>)] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">original_no_opt</span>(<span class="ruby-identifier">$1</span>)]&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">opt</span>]&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000114-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 353</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">option_type</span>(<span class="ruby-identifier">opt</span>)&#x000A;      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">opt</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp re">/^--no-(\w+)$/</span>&#x000A;        <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">opt</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">dasherize</span>(<span class="ruby-identifier">$1</span>)] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">original_no_opt</span>(<span class="ruby-identifier">$1</span>)]&#x000A;      <span class="ruby-keyword kw">else</span>&#x000A;        <span class="ruby-ivar">@opt_types</span>[<span class="ruby-identifier">opt</span>]&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000100'>
-                <a name='M000100'>      </a>
+              <div class='public-instance method' id='method-M000102'>
+                <a name='M000102'>      </a>
                 <div class='synopsis'>
                   <span class='name'>parse</span>
                   <span class='arguments'>(args, flags={})</span>
@@ -552,14 +552,14 @@
                   </ul>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000100-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000102-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000100-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 228</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse</span>(<span class="ruby-identifier">args</span>, <span class="ruby-identifier">flags</span>={})&#x000A;      <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>&#x000A;      <span class="ruby-comment cmt"># start with defaults</span>&#x000A;      <span class="ruby-identifier">hash</span> = <span class="ruby-constant">IndifferentAccessHash</span>.<span class="ruby-identifier">new</span> <span class="ruby-ivar">@defaults</span>&#x000A;      &#x000A;      <span class="ruby-ivar">@leading_non_opts</span> = []&#x000A;      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">flags</span>[<span class="ruby-identifier">:opts_before_args</span>]&#x000A;        <span class="ruby-ivar">@leading_non_opts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">shift</span> <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">current_is_option?</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-constant">STOP_STRINGS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">peek</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">current_is_option?</span>&#x000A;        <span class="ruby-keyword kw">case</span> <span class="ruby-ivar">@original_current_option</span> = <span class="ruby-identifier">shift</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">SHORT_SQ_RE</span>&#x000A;          <span class="ruby-identifier">unshift</span> <span class="ruby-identifier">$1</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">''</span>).<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;-#{f}&quot;</span> }&#x000A;          <span class="ruby-keyword kw">next</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">EQ_RE</span>, <span class="ruby-constant">SHORT_NUM</span>&#x000A;          <span class="ruby-identifier">unshift</span> <span class="ruby-identifier">$2</span>&#x000A;          <span class="ruby-identifier">option</span> = <span class="ruby-identifier">$1</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">LONG_RE</span>, <span class="ruby-constant">SHORT_RE</span>&#x000A;          <span class="ruby-identifier">option</span> = <span class="ruby-identifier">$1</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-identifier">dashed_option</span> = <span class="ruby-identifier">normalize_option</span>(<span class="ruby-identifier">option</span>)&#x000A;        <span class="ruby-ivar">@current_option</span> = <span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">dashed_option</span>)&#x000A;        <span class="ruby-identifier">type</span> = <span class="ruby-identifier">option_type</span>(<span class="ruby-identifier">dashed_option</span>)&#x000A;        <span class="ruby-identifier">validate_option_value</span>(<span class="ruby-identifier">type</span>)&#x000A;        <span class="ruby-identifier">value</span> = <span class="ruby-identifier">create_option_value</span>(<span class="ruby-identifier">type</span>)&#x000A;        <span class="ruby-comment cmt"># set on different line since current_option may change</span>&#x000A;        <span class="ruby-identifier">hash</span>[<span class="ruby-ivar">@current_option</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-identifier">value</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-ivar">@trailing_non_opts</span> = <span class="ruby-ivar">@args</span>&#x000A;      <span class="ruby-identifier">check_required!</span> <span class="ruby-identifier">hash</span>&#x000A;      <span class="ruby-identifier">delete_invalid_opts</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">flags</span>[<span class="ruby-identifier">:delete_invalid_opts</span>]&#x000A;      <span class="ruby-identifier">hash</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000102-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 228</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">parse</span>(<span class="ruby-identifier">args</span>, <span class="ruby-identifier">flags</span>={})&#x000A;      <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>&#x000A;      <span class="ruby-comment cmt"># start with defaults</span>&#x000A;      <span class="ruby-identifier">hash</span> = <span class="ruby-constant">IndifferentAccessHash</span>.<span class="ruby-identifier">new</span> <span class="ruby-ivar">@defaults</span>&#x000A;      &#x000A;      <span class="ruby-ivar">@leading_non_opts</span> = []&#x000A;      <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">flags</span>[<span class="ruby-identifier">:opts_before_args</span>]&#x000A;        <span class="ruby-ivar">@leading_non_opts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">shift</span> <span class="ruby-keyword kw">until</span> <span class="ruby-identifier">current_is_option?</span> <span class="ruby-operator">||</span> <span class="ruby-ivar">@args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">||</span> <span class="ruby-constant">STOP_STRINGS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">peek</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-keyword kw">while</span> <span class="ruby-identifier">current_is_option?</span>&#x000A;        <span class="ruby-keyword kw">case</span> <span class="ruby-ivar">@original_current_option</span> = <span class="ruby-identifier">shift</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">SHORT_SQ_RE</span>&#x000A;          <span class="ruby-identifier">unshift</span> <span class="ruby-identifier">$1</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">''</span>).<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;-#{f}&quot;</span> }&#x000A;          <span class="ruby-keyword kw">next</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">EQ_RE</span>, <span class="ruby-constant">SHORT_NUM</span>&#x000A;          <span class="ruby-identifier">unshift</span> <span class="ruby-identifier">$2</span>&#x000A;          <span class="ruby-identifier">option</span> = <span class="ruby-identifier">$1</span>&#x000A;        <span class="ruby-keyword kw">when</span> <span class="ruby-constant">LONG_RE</span>, <span class="ruby-constant">SHORT_RE</span>&#x000A;          <span class="ruby-identifier">option</span> = <span class="ruby-identifier">$1</span>&#x000A;        <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;        <span class="ruby-identifier">dashed_option</span> = <span class="ruby-identifier">normalize_option</span>(<span class="ruby-identifier">option</span>)&#x000A;        <span class="ruby-ivar">@current_option</span> = <span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">dashed_option</span>)&#x000A;        <span class="ruby-identifier">type</span> = <span class="ruby-identifier">option_type</span>(<span class="ruby-identifier">dashed_option</span>)&#x000A;        <span class="ruby-identifier">validate_option_value</span>(<span class="ruby-identifier">type</span>)&#x000A;        <span class="ruby-identifier">value</span> = <span class="ruby-identifier">create_option_value</span>(<span class="ruby-identifier">type</span>)&#x000A;        <span class="ruby-comment cmt"># set on different line since current_option may change</span>&#x000A;        <span class="ruby-identifier">hash</span>[<span class="ruby-ivar">@current_option</span>.<span class="ruby-identifier">to_sym</span>] = <span class="ruby-identifier">value</span>&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;&#x000A;      <span class="ruby-ivar">@trailing_non_opts</span> = <span class="ruby-ivar">@args</span>&#x000A;      <span class="ruby-identifier">check_required!</span> <span class="ruby-identifier">hash</span>&#x000A;      <span class="ruby-identifier">delete_invalid_opts</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">flags</span>[<span class="ruby-identifier">:delete_invalid_opts</span>]&#x000A;      <span class="ruby-identifier">hash</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000104'>
-                <a name='M000104'>      </a>
+              <div class='public-instance method' id='method-M000106'>
+                <a name='M000106'>      </a>
                 <div class='synopsis'>
                   <span class='name'>print_usage_table</span>
                   <span class='arguments'>(render_options={})</span>
@@ -570,26 +570,26 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000104-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000106-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000104-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 283</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">print_usage_table</span>(<span class="ruby-identifier">render_options</span>={})&#x000A;      <span class="ruby-identifier">user_fields</span> = <span class="ruby-identifier">render_options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:fields</span>)&#x000A;      <span class="ruby-identifier">fields</span> = <span class="ruby-identifier">get_usage_fields</span> <span class="ruby-identifier">user_fields</span>&#x000A;      (<span class="ruby-identifier">fields</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">:default</span>).<span class="ruby-identifier">uniq!</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">render_options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:local</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">user_fields</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'*'</span>&#x000A;      <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">all_options_with_fields</span> <span class="ruby-identifier">fields</span>&#x000A;      <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:default</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">:default</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">all?</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-identifier">:default</span>].<span class="ruby-identifier">nil?</span> }&#x000A;      <span class="ruby-identifier">render_options</span> = <span class="ruby-identifier">default_render_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">:fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">fields</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">render_options</span>)&#x000A;      <span class="ruby-constant">View</span>.<span class="ruby-identifier">render</span> <span class="ruby-identifier">opts</span>, <span class="ruby-identifier">render_options</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000106-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 283</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">print_usage_table</span>(<span class="ruby-identifier">render_options</span>={})&#x000A;      <span class="ruby-identifier">user_fields</span> = <span class="ruby-identifier">render_options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:fields</span>)&#x000A;      <span class="ruby-identifier">fields</span> = <span class="ruby-identifier">get_usage_fields</span> <span class="ruby-identifier">user_fields</span>&#x000A;      (<span class="ruby-identifier">fields</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">:default</span>).<span class="ruby-identifier">uniq!</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">render_options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:local</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">user_fields</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'*'</span>&#x000A;      <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">all_options_with_fields</span> <span class="ruby-identifier">fields</span>&#x000A;      <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:default</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">fields</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">:default</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">all?</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>[<span class="ruby-identifier">:default</span>].<span class="ruby-identifier">nil?</span> }&#x000A;      <span class="ruby-identifier">render_options</span> = <span class="ruby-identifier">default_render_options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">:fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">fields</span>).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">render_options</span>)&#x000A;      <span class="ruby-constant">View</span>.<span class="ruby-identifier">render</span> <span class="ruby-identifier">opts</span>, <span class="ruby-identifier">render_options</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000103'>
-                <a name='M000103'>      </a>
+              <div class='public-instance method' id='method-M000105'>
+                <a name='M000105'>      </a>
                 <div class='synopsis'>
                   <span class='name'>to_s</span>
                   <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   <p>
-                  Alias for <a href="OptionParser.html#M000102">formatted_usage</a>
+                  Alias for <a href="OptionParser.html#M000104">formatted_usage</a>
                   </p>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000109'>
-                <a name='M000109'>      </a>
+              <div class='public-instance method' id='method-M000111'>
+                <a name='M000111'>      </a>
                 <div class='synopsis'>
                   <span class='name'>types</span>
                   <span class='arguments'>()</span>
@@ -600,14 +600,14 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000109-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000111-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000109-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 339</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">types</span>&#x000A;      <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">values</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000111-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 339</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">types</span>&#x000A;      <span class="ruby-ivar">@opt_types</span>.<span class="ruby-identifier">values</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000107'>
-                <a name='M000107'>      </a>
+              <div class='public-instance method' id='method-M000109'>
+                <a name='M000109'>      </a>
                 <div class='synopsis'>
                   <span class='name'>undasherize</span>
                   <span class='arguments'>(str)</span>
@@ -619,10 +619,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000107-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000109-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000107-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 329</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">str</span>)&#x000A;      <span class="ruby-identifier">str</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-regexp re">/^-{1,2}/</span>, <span class="ruby-value str">''</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000109-source'><span class="ruby-comment cmt"># File lib/boson/option_parser.rb, line 329</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">undasherize</span>(<span class="ruby-identifier">str</span>)&#x000A;      <span class="ruby-identifier">str</span>.<span class="ruby-identifier">sub</span>(<span class="ruby-regexp re">/^-{1,2}/</span>, <span class="ruby-value str">''</span>)&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

@@ -74,7 +74,7 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000042">scrape</a></li>
+              <li><a href="#M000043">scrape</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -92,8 +92,8 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000042'>
-                <a name='M000042'>      </a>
+              <div class='public-instance method' id='method-M000043'>
+                <a name='M000043'>      </a>
                 <div class='synopsis'>
                   <span class='name'>scrape</span>
                   <span class='arguments'>(file_string, line, mod, attribute=nil)</span>
@@ -105,10 +105,10 @@
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000042-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000043-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000042-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/comment_inspector.rb, line 24</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">line</span>, <span class="ruby-identifier">mod</span>, <span class="ruby-identifier">attribute</span>=<span class="ruby-keyword kw">nil</span>)&#x000A;      <span class="ruby-identifier">hash</span> = <span class="ruby-identifier">scrape_file</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">line</span>) <span class="ruby-operator">||</span> {}&#x000A;      <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">select</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">attribute</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">attribute</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">k</span>) }.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-constant">EVAL_ATTRIBUTES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">eval_comment</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>), <span class="ruby-identifier">mod</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">attribute</span> <span class="ruby-value">? </span><span class="ruby-identifier">hash</span>[<span class="ruby-identifier">attribute</span>] <span class="ruby-operator">:</span> <span class="ruby-identifier">hash</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000043-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/comment_inspector.rb, line 24</span>&#x000A;    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">line</span>, <span class="ruby-identifier">mod</span>, <span class="ruby-identifier">attribute</span>=<span class="ruby-keyword kw">nil</span>)&#x000A;      <span class="ruby-identifier">hash</span> = <span class="ruby-identifier">scrape_file</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">line</span>) <span class="ruby-operator">||</span> {}&#x000A;      <span class="ruby-identifier">hash</span>.<span class="ruby-identifier">select</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">attribute</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">attribute</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">k</span>) }.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">hash</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-constant">EVAL_ATTRIBUTES</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">eval_comment</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>), <span class="ruby-identifier">mod</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">' '</span>)&#x000A;      <span class="ruby-keyword kw">end</span>&#x000A;      <span class="ruby-identifier">attribute</span> <span class="ruby-value">? </span><span class="ruby-identifier">hash</span>[<span class="ruby-identifier">attribute</span>] <span class="ruby-operator">:</span> <span class="ruby-identifier">hash</span>&#x000A;    <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>

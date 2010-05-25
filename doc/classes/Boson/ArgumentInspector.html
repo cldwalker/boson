@@ -49,8 +49,8 @@
             <h2>Methods</h2>
             <h3>public instance</h3>
             <ol>
-              <li><a href="#M000048">scrape_with_eval</a></li>
-              <li><a href="#M000047">scrape_with_text</a></li>
+              <li><a href="#M000049">scrape_with_eval</a></li>
+              <li><a href="#M000048">scrape_with_text</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -66,7 +66,7 @@
                     <td class='context-item-desc'>
                       
                       Max number of arguments extracted per method with <a
-                      href="ArgumentInspector.html#M000048">scrape_with_eval</a>
+                      href="ArgumentInspector.html#M000049">scrape_with_eval</a>
                     </td>
                   </tr>
                 </table>
@@ -74,8 +74,8 @@
             </div>
             <div id='methods'>
               <h2>Public instance methods</h2>
-              <div class='public-instance method' id='method-M000048'>
-                <a name='M000048'>      </a>
+              <div class='public-instance method' id='method-M000049'>
+                <a name='M000049'>      </a>
                 <div class='synopsis'>
                   <span class='name'>scrape_with_eval</span>
                   <span class='arguments'>(meth, klass, object)</span>
@@ -90,14 +90,14 @@
                   <pre>def meth1(arg1, arg2='val', options={}) -&gt; [['arg1'], ['arg2', 'val'], ['options', {}]]&#x000A;def meth2(*args) -&gt; [['*args']]</pre>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000048-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000049-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000048-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/argument_inspector.rb, line 21</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape_with_eval</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">klass</span>, <span class="ruby-identifier">object</span>)&#x000A;    <span class="ruby-keyword kw">unless</span> <span class="ruby-node">%w[initialize]</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>)&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">object</span>; <span class="ruby-identifier">private_instance_methods</span>(<span class="ruby-keyword kw">true</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span> } <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>)&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-identifier">params</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">arity</span>, <span class="ruby-identifier">num_args</span> = <span class="ruby-identifier">trace_method_args</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">klass</span>, <span class="ruby-identifier">object</span>)&#x000A;    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">local_variables</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">params</span> <span class="ruby-comment cmt"># nothing new found</span>&#x000A;    <span class="ruby-identifier">format_arguments</span>(<span class="ruby-identifier">params</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">arity</span>, <span class="ruby-identifier">num_args</span>)&#x000A;    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span>&#x000A;      <span class="ruby-comment cmt"># puts &quot;#{klass}.#{meth}: #{$!.message}&quot;</span>&#x000A;    <span class="ruby-keyword kw">ensure</span>&#x000A;      <span class="ruby-identifier">set_trace_func</span>(<span class="ruby-keyword kw">nil</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000049-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/argument_inspector.rb, line 21</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape_with_eval</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">klass</span>, <span class="ruby-identifier">object</span>)&#x000A;    <span class="ruby-keyword kw">unless</span> <span class="ruby-node">%w[initialize]</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>)&#x000A;      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">object</span>; <span class="ruby-identifier">private_instance_methods</span>(<span class="ruby-keyword kw">true</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">to_s</span> } <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">meth</span>.<span class="ruby-identifier">to_s</span>)&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;    <span class="ruby-identifier">params</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">arity</span>, <span class="ruby-identifier">num_args</span> = <span class="ruby-identifier">trace_method_args</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">klass</span>, <span class="ruby-identifier">object</span>)&#x000A;    <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">local_variables</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">params</span> <span class="ruby-comment cmt"># nothing new found</span>&#x000A;    <span class="ruby-identifier">format_arguments</span>(<span class="ruby-identifier">params</span>, <span class="ruby-identifier">values</span>, <span class="ruby-identifier">arity</span>, <span class="ruby-identifier">num_args</span>)&#x000A;    <span class="ruby-keyword kw">rescue</span> <span class="ruby-constant">Exception</span>&#x000A;      <span class="ruby-comment cmt"># puts &quot;#{klass}.#{meth}: #{$!.message}&quot;</span>&#x000A;    <span class="ruby-keyword kw">ensure</span>&#x000A;      <span class="ruby-identifier">set_trace_func</span>(<span class="ruby-keyword kw">nil</span>)&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
-              <div class='public-instance method' id='method-M000047'>
-                <a name='M000047'>      </a>
+              <div class='public-instance method' id='method-M000048'>
+                <a name='M000048'>      </a>
                 <div class='synopsis'>
                   <span class='name'>scrape_with_text</span>
                   <span class='arguments'>(file_string, meth)</span>
@@ -105,15 +105,15 @@
                 <div class='description'>
                   <p>
                   Returns same argument arrays as <a
-                  href="ArgumentInspector.html#M000048">scrape_with_eval</a> but argument
+                  href="ArgumentInspector.html#M000049">scrape_with_eval</a> but argument
                   defaults haven&#8217;t been evaluated.
                   </p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('M000047-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('M000048-source'); return false">
                     [show source]
                   </a>
-                  <pre id='M000047-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/argument_inspector.rb, line 7</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape_with_text</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">meth</span>)&#x000A;    <span class="ruby-identifier">tabspace</span> = <span class="ruby-value str">&quot;[ \t]&quot;</span>&#x000A;    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">match</span> = <span class="ruby-node">/^#{tabspace}*def#{tabspace}+(?:\w+\.)?#{Regexp.quote(meth)}#{tabspace}*($|(?:\(|\s+)([^\n\)]+)\s*\)?\s*$)/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">file_string</span>)&#x000A;      (<span class="ruby-identifier">match</span>.<span class="ruby-identifier">to_a</span>[<span class="ruby-value">2</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*,\s*/</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*=\s*/</span>)}&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
+                  <pre id='M000048-source'><span class="ruby-comment cmt"># File lib/boson/inspectors/argument_inspector.rb, line 7</span>&#x000A;  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">scrape_with_text</span>(<span class="ruby-identifier">file_string</span>, <span class="ruby-identifier">meth</span>)&#x000A;    <span class="ruby-identifier">tabspace</span> = <span class="ruby-value str">&quot;[ \t]&quot;</span>&#x000A;    <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">match</span> = <span class="ruby-node">/^#{tabspace}*def#{tabspace}+(?:\w+\.)?#{Regexp.quote(meth)}#{tabspace}*($|(?:\(|\s+)([^\n\)]+)\s*\)?\s*$)/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">file_string</span>)&#x000A;      (<span class="ruby-identifier">match</span>.<span class="ruby-identifier">to_a</span>[<span class="ruby-value">2</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">''</span>).<span class="ruby-identifier">strip</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*,\s*/</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s*=\s*/</span>)}&#x000A;    <span class="ruby-keyword kw">end</span>&#x000A;  <span class="ruby-keyword kw">end</span></pre>
                 </div>
               </div>
             </div>
