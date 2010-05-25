@@ -46,6 +46,8 @@ module Boson
       [command.name, command.alias].compact.each {|e|
         obj.instance_eval("class<<self;self;end").send(:define_method, e, cmd_block)
       }
+    rescue Error
+      $stderr.puts "Error: #{$!.message}"
     end
 
     # A wrapper around redefine_command that doesn't depend on a Command object. Rather you
@@ -73,7 +75,11 @@ module Boson
 
     # The actual method which redefines a command's original method
     def redefine_command_block(obj, command)
-      object_methods(obj)[command.name] ||= obj.method(command.name)
+      object_methods(obj)[command.name] ||= begin
+        obj.method(command.name)
+      rescue NameError
+        raise Error, "No method exists to redefine command '#{command.name}'."
+      end
       lambda {|*args|
         Scientist.translate_and_render(obj, command, args) {|args|
           Scientist.object_methods(obj)[command.name].call(*args)

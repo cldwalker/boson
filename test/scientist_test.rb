@@ -273,6 +273,12 @@ describe "Scientist" do
     command({:args=>2, :options=>nil, :render_options=>{:fields=>:array}}, ["--fields f1 ab ok"])
   end
 
+  it "redefine_command prints error for command with nonexistant method" do
+    capture_stderr {
+      Scientist.redefine_command Object.new, Command.new(:name=>'blah', :lib=>'blah')
+    }.should =~ /Error: No method.*'blah'/
+  end
+
   describe "global options:" do
     def local_and_global(*args)
       Scientist.stubs(:can_render?).returns(false) # turn off rendering caused by :render_options
