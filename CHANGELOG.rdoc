@@ -1,3 +1,6 @@
+== 0.2.5
+* Fixed critical gemspec error
+
 == 0.2.4
 * Tests use bacon and pass on all major ruby versions
 * Fixed bug for 1.8.7 and super (#10)
