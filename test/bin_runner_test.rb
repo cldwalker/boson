@@ -19,7 +19,7 @@ describe "BinRunner" do
     end
 
     it "invalid option value prints error" do
-      capture_stderr { start("-l") }.should =~ /Error:/
+      aborts_with(/Error: no value/) { start("-l") }
     end
 
     it "help option but no arguments prints usage" do
@@ -60,7 +60,7 @@ describe "BinRunner" do
     end
 
     it "execute option errors are caught" do
-      capture_stderr { start("-e", "raise 'blah'") }.should =~ /^Error:/
+      aborts_with(/^Error:/) { start("-e", "raise 'blah'") }
     end
 
     it "option command and too many arguments prints error" do
@@ -77,16 +77,16 @@ describe "BinRunner" do
 
     it "failed subcommand prints error and not command not found" do
       BinRunner.expects(:execute_command).raises("bling")
-      capture_stderr { start("commands.to_s") }.should =~ /Error: bling/
+      aborts_with(/Error: bling/) { start("commands.to_s") }
     end
 
     it "nonexistant subcommand prints command not found" do
-      capture_stderr { start("to_s.bling") }.should =~ /'to_s.bling' not found/
+      aborts_with(/'to_s.bling' not found/) { start("to_s.bling") }
     end
 
     it "undiscovered command prints error" do
-       BinRunner.expects(:autoload_command).returns(false)
-      capture_stderr { start('blah') }.should =~ /Error.*not found/
+      BinRunner.expects(:autoload_command).returns(false)
+      aborts_with(/Error.*not found/) { start 'blah' }
     end
 
     it "basic command executes" do
@@ -108,7 +108,7 @@ describe "BinRunner" do
       defaults = Runner.default_libraries + ['yo']
       with_config(:bin_defaults=>['yo']) do
         Manager.expects(:load).with {|*args| args[0] == defaults }
-        capture_stderr { start 'blah' }
+        aborts_with(/blah/) { start 'blah' }
       end
     end
   end
@@ -151,7 +151,7 @@ describe "BinRunner" do
       Index.expects(:find_library).returns(nil, 'sweet_lib')
       Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
       Index.indexes[0].expects(:update).returns(true)
-      capture_stderr { start("sweet") }.should =~ /sweet/
+      aborts_with(/sweet/) { start 'sweet' }
     end
   end
 

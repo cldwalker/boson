@@ -119,6 +119,11 @@ module TestHelpers
       Manager.add_library(lib); lib
     }
   end
+
+  def aborts_with(regex)
+    BinRunner.expects(:abort).with {|e| e[regex] }
+    yield
+  end
 end
 
 class Bacon::Context

@@ -71,9 +71,9 @@ module Boson
           execute_command
         end
       rescue NoMethodError
-        print_error_message no_method_error_message
+        abort_with no_method_error_message
       rescue
-        print_error_message default_error_message
+        abort_with default_error_message
       end
 
       def no_method_error_message #:nodoc:
@@ -114,7 +114,13 @@ module Boson
       def commands
         @commands ||= @all_args.map {|e| e[0]}
       end
+
       #:stopdoc:
+      def abort_with(message)
+        message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if options[:verbose]
+        abort message
+      end
+
       def print_error_message(message)
         message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if options[:verbose]
         $stderr.puts message
