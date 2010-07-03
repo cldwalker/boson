@@ -61,17 +61,17 @@ module Boson::Commands::Core #:nodoc:
   end
 
   def usage(command, options={})
-    msg = (cmd = Boson::Command.find(command)) ? "#{command} #{cmd.usage}" : "Command '#{command}' not found"
-    puts msg
-    return if options[:one_line] || !cmd
+    puts Boson::Command.usage(command)
 
-    if cmd.options && !cmd.options.empty?
-      puts "\nLOCAL OPTIONS"
-      cmd.option_parser.print_usage_table options[:render_options].dup.merge(:local=>true)
-    end
-    if options[:verbose] && cmd.render_option_parser
-      puts "\nGLOBAL OPTIONS"
-      cmd.render_option_parser.print_usage_table options[:render_options].dup
+    if (cmd = Boson::Command.find(command))
+      if cmd.options && !cmd.options.empty?
+        puts "\nLOCAL OPTIONS"
+        cmd.option_parser.print_usage_table options[:render_options].dup.merge(:local=>true)
+      end
+      if options[:verbose] && cmd.render_option_parser
+        puts "\nGLOBAL OPTIONS"
+        cmd.render_option_parser.print_usage_table options[:render_options].dup
+      end
     end
   end
 end

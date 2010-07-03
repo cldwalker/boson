@@ -121,11 +121,6 @@ module Boson
         abort message
       end
 
-      def print_error_message(message)
-        message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if options[:verbose]
-        $stderr.puts message
-      end
-
       def default_error_message
         "Error: #{$!.message}"
       end
@@ -155,9 +150,7 @@ module Boson
           rescue ArgumentError
             if $!.class == OptionCommand::CommandArgumentError || ($!.message[/wrong number of arguments/] &&
               (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
-              print_error_message "'#{cmd}' was called incorrectly."
-              Boson.invoke(:usage, cmd, :one_line=>true)
-              return
+              abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
             else
               raise
             end

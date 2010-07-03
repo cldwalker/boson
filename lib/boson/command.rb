@@ -29,6 +29,11 @@ module Boson
       commands.find(&find_lambda)
     end
 
+    # One line usage for a command if it exists
+    def self.usage(command)
+      (cmd = find(command)) ? "#{command} #{cmd.usage}" : "Command '#{command}' not found"
+    end
+
     ATTRIBUTES = [:name, :lib, :alias, :desc, :options, :args, :config]
     attr_accessor *(ATTRIBUTES + [:render_options, :namespace, :default_option])
     # A hash of attributes which map to instance variables and values. :name

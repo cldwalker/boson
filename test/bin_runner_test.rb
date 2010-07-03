@@ -65,13 +65,13 @@ describe "BinRunner" do
 
     it "option command and too many arguments prints error" do
       capture_stdout {
-        capture_stderr { start('commands','1','2','3') }.should =~ /'commands'.*incorrect/
+        aborts_with(/'commands'.*incorrect/) { start('commands','1','2','3') }
       }
     end
 
     it "normal command and too many arguments prints error" do
       capture_stdout {
-        capture_stderr { start('render') }.should =~ /'render'.*incorrect/
+        aborts_with(/'render'.*incorrect/) { start('render') }
       }
     end
 
