@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.executables = ['boson']
   s.add_dependency 'hirb', '>= 0.3.2'
   s.add_dependency 'alias', '>= 0.2.1'
-  s.files = Dir.glob(%w[{lib,test}/**/*.rb bin/* [A-Z]*.{txt,rdoc} ext/**/*.{rb,c}]) + %w{Rakefile gemspec}
+  s.files = Dir.glob(%w[{lib,test}/**/*.rb bin/* [A-Z]*.{txt,rdoc} ext/**/*.{rb,c}]) + %w{Rakefile .gemspec}
   s.extra_rdoc_files = ["README.rdoc", "LICENSE.txt"]
+  s.license = 'MIT'
 end
