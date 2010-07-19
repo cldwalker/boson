@@ -159,7 +159,7 @@ My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby conso
 * http://tagaholic.me/2009/10/15/boson-and-hirb-interactions.html
 * http://tagaholic.me/2009/10/19/how-boson-enhances-your-irb-experience.html
 
-== Acknowledgements
+== Credits
 Boson stands on the shoulders of these people and their ideas:
 * Yehuda Katz for inspiring me with Thor and its awesome option parser (Boson::OptionParser).
 * Daniel Berger for his original work on thor's awesome option parser.
