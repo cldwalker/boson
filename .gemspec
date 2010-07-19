@@ -14,8 +14,12 @@ Gem::Specification.new do |s|
   s.rubyforge_project = 'tagaholic'
   s.executables = ['boson']
   s.add_dependency 'hirb', '>= 0.3.2'
-  s.add_dependency 'alias', '>= 0.2.1'
-  s.files = Dir.glob(%w[{lib,test}/**/*.rb bin/* [A-Z]*.{txt,rdoc} ext/**/*.{rb,c}]) + %w{Rakefile .gemspec}
+  s.add_dependency 'alias', '>= 0.2.2'
+  s.add_development_dependency 'mocha'
+  s.add_development_dependency 'bacon', '>= 1.1.0'
+  s.add_development_dependency 'mocha-on-bacon'
+  s.add_development_dependency 'bacon-bits'
+  s.files = Dir.glob(%w[{lib,test}/**/*.rb bin/* [A-Z]*.{txt,rdoc} ext/**/*.{rb,c} **/deps.rip]) + %w{Rakefile .gemspec}
   s.extra_rdoc_files = ["README.rdoc", "LICENSE.txt"]
   s.license = 'MIT'
 end
