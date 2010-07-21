@@ -23,6 +23,13 @@ describe "Manager" do
       command_exists?('meatwad')
     end
 
+    it "prints error for library with SyntaxError" do
+      Manager.expects(:loader_create).raises(SyntaxError)
+      capture_stderr {
+        Manager.load 'blah'
+      }.should =~ /Unable to load library blah. Reason: SyntaxError/
+    end
+
     describe "command aliases" do
       before { eval %[module ::Aquateen; def frylock; end; end] }
       after { Object.send(:remove_const, "Aquateen") }

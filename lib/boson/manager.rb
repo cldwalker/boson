@@ -44,7 +44,7 @@ module Boson
         FileLibrary.reset_file_cache(library.to_s)
         failed_libraries << library
         $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
-      rescue StandardError=>e
+      rescue StandardError, SyntaxError =>e
         FileLibrary.reset_file_cache(library.to_s)
         failed_libraries << library
         message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
