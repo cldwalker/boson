@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "Manager" do
-  describe "after_load" do
+  describe ".after_load" do
     def load_library(hash)
       new_attributes = {:name=>hash[:name], :commands=>[], :created_dependencies=>[], :loaded=>true}
       [:module, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
@@ -28,6 +28,13 @@ describe "Manager" do
       capture_stderr {
         Manager.load 'blah'
       }.should =~ /Unable to load library blah. Reason: SyntaxError/
+    end
+
+    it "prints error for library with LoadError" do
+      Manager.expects(:loader_create).raises(LoadError)
+      capture_stderr {
+        Manager.load 'blah'
+      }.should =~ /Unable to load library blah. Reason: LoadError/
     end
 
     describe "command aliases" do
@@ -91,7 +98,7 @@ describe "Manager" do
     end
   end
 
-  describe "loaded" do
+  describe ".loaded?" do
     before { reset_libraries }
 
     it "returns false when library isn't loaded" do
