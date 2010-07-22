@@ -31,6 +31,21 @@ describe "MethodInspector" do
       parse("options :z=>'b'; def zee; end")[:options].should == {"zee"=>{:z=>'b'}}
     end
 
+    it "option sets options" do
+      parse("option :z, 'b'; option :y, :boolean; def zee; end")[:options].should ==
+        {"zee"=>{:z=>'b', :y=>:boolean}}
+    end
+
+    it "option(s) sets options" do
+      parse("options :z=>'b'; option :y, :string; def zee; end")[:options].should ==
+        {"zee"=>{:z=>'b', :y=>:string}}
+    end
+
+    it "option(s) option overrides options" do
+      parse("options :z=>'b'; option :z, :string; def zee; end")[:options].should ==
+        {"zee"=>{:z=>:string}}
+    end
+
     it "render_options sets render_options" do
       parse("render_options :z=>true; def zee; end")[:render_options].should == {"zee"=>{:z=>true}}
     end
@@ -42,7 +57,7 @@ describe "MethodInspector" do
     it "not all method attributes set causes method_locations to be set" do
       MethodInspector.stubs(:find_method_locations).returns(["/some/path", 10])
       parsed = parse "desc 'yo'; def yo; end; options :yep=>1; def yep; end; " +
-        "render_options :a=>1; config :a=>1; desc 'z'; options :a=>1; def az; end"
+        "option :b, :boolean; render_options :a=>1; config :a=>1; desc 'z'; options :a=>1; def az; end"
       parsed[:method_locations].key?('yo').should == true
       parsed[:method_locations].key?('yep').should == true
       parsed[:method_locations].key?('az').should == false

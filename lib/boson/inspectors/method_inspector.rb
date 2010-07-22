@@ -8,6 +8,7 @@ module Boson
     attr_reader :mod_store
     @mod_store ||= {}
     METHODS = [:config, :desc, :options, :render_options]
+    ALL_METHODS = METHODS + [:option]
 
     # The method_added used while scraping method attributes.
     def new_method_added(mod, meth)
@@ -17,8 +18,9 @@ module Boson
       METHODS.each do |e|
         store[e][meth.to_s] = store[:temp][e] if store[:temp][e]
       end
+      (store[:options][meth.to_s] ||= {}).merge! store[:temp][:option] if store[:temp][:option]
 
-      if store[:temp].size < METHODS.size
+      if store[:temp].size < ALL_METHODS.size
         store[:method_locations] ||= {}
         if (result = find_method_locations(caller))
           store[:method_locations][meth.to_s] = result
@@ -33,6 +35,12 @@ module Boson
         (@mod_store[mod] ||= {})[e] ||= {}
         (store(mod)[:temp] ||= {})[e] = val
       end
+    end
+
+    def option(mod, name, value)
+      (@mod_store[mod] ||= {})[:options] ||= {}
+      (store(mod)[:temp] ||= {})[:option] ||= {}
+      (store(mod)[:temp] ||= {})[:option][name] = value
     end
 
     # Scrapes a method's arguments using ArgumentInspector.

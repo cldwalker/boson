@@ -31,9 +31,9 @@ module Boson
     # loading its methods.
     def enable
       @enabled = true
-      body = MethodInspector::METHODS.map {|e|
-        %[def #{e}(val)
-            Boson::MethodInspector.#{e}(self, val)
+      body = MethodInspector::ALL_METHODS.map {|e|
+        %[def #{e}(*args)
+            Boson::MethodInspector.#{e}(self, *args)
           end]
       }.join("\n") +
       %[
@@ -50,7 +50,7 @@ module Boson
     # Disable scraping method data.
     def disable
       ::Module.module_eval %[
-        Boson::MethodInspector::METHODS.each {|e| remove_method e }
+        Boson::MethodInspector::ALL_METHODS.each {|e| remove_method e }
         alias_method :method_added, :_old_method_added
       ]
       @enabled = false
