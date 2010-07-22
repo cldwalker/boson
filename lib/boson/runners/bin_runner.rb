@@ -45,7 +45,9 @@ module Boson
       :unload=>{:type=>:string, :desc=>"Acts as a regular expression to unload default libraries"},
       :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"},
       :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"},
-      :option_commands=>{:type=>:boolean, :desc=>"Toggles on all commands to be defined as option commands" }
+      :option_commands=>{:type=>:boolean, :desc=>"Toggles on all commands to be defined as option commands" },
+      :debug=>{:type=>:boolean, :desc=>"Sets $DEBUG"},
+      :load_path=>{:type=>:string, :desc=>"Add to front of $LOAD_PATH", :alias=>'I'}
     } #:nodoc:
 
     PIPE = '+'
@@ -58,7 +60,9 @@ module Boson
         @command, @options, @args = parse_args(args)
         return puts("boson #{Boson::VERSION}") if @options[:version]
         return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
+        $:.unshift(*options[:load_path].split(":")) if options[:load_path]
         return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
+        $DEBUG = true if options[:debug]
         init
 
         if @options[:help]

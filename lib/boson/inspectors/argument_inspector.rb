@@ -70,7 +70,7 @@ module Boson::ArgumentInspector
       MAX_ARGS.downto(arity.abs - 1) do |i|
         catch(:done) do 
           begin
-            object.send(meth, *(0...i)) 
+            object.send(meth, *(0...i))
           rescue Exception
           end
         end
