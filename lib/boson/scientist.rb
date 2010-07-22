@@ -147,7 +147,7 @@ module Boson
     def run_help_option
       opts = @global_options[:verbose] ? ['--verbose'] : []
       opts << "--render_options=#{@global_options[:usage_options]}" if @global_options[:usage_options]
-      Boson.invoke :usage, @command.name + " " + opts.join(' ')
+      Boson.invoke :usage, @command.full_name + " " + opts.join(' ')
     end
 
     def run_pretend_option(args)
