@@ -43,7 +43,11 @@ module Boson
     def sort_pipe(object, sort)
       sort_lambda = lambda {}
       if object[0].is_a?(Hash)
-        sort = sort.to_i if sort.to_s[/^\d+$/]
+        if sort.to_s[/^\d+$/]
+          sort = sort.to_i
+        elsif object[0].keys.all? {|e| e.is_a?(Symbol) }
+          sort = sort.to_sym
+        end
         sort_lambda = untouched_sort?(object.map {|e| e[sort] }) ? lambda {|e| e[sort] } : lambda {|e| e[sort].to_s }
       else
         sort_lambda = untouched_sort?(object.map {|e| e.send(sort) }) ? lambda {|e| e.send(sort) || ''} :

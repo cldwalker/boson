@@ -49,6 +49,15 @@ describe "Pipes" do
       Pipes.sort_pipe(hashes, :a).should == hashes.reverse
     end
 
+    it "sorts numeric hash keys by string" do
+      hashes = [{2=>'thing'}, {2=>'some'}]
+      Pipes.sort_pipe(hashes, '2').should == hashes.reverse
+    end
+
+    it "sorts numeric hash keys by string" do
+      Pipes.sort_pipe(@hashes, 'a').should == @hashes.reverse
+    end
+
     it "prints error for invalid sort field" do
       capture_stderr { Pipes.sort_pipe(@objects, :blah)}.should =~ /failed.*'blah'/
     end
