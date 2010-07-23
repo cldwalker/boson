@@ -27,6 +27,10 @@ module Boson
           $stderr.puts "Console not found. Please specify full path in config[:console]."
           return
         end
+        load_repl(repl)
+      end
+
+      def load_repl(repl) #:nodoc:
         ARGV.replace ['-f']
         $progname = $0
         alias $0 $progname
