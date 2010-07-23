@@ -28,6 +28,8 @@ module Boson
           return
         end
         ARGV.replace ['-f']
+        $progname = $0
+        alias $0 $progname
         Kernel.load $0 = repl
       end
 
