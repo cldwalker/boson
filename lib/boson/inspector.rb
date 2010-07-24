@@ -9,16 +9,19 @@ module Boson
   #      # @render_options :fields=>%w{one two}
   #      # @config :alias=>'so'
   #      options :verbose=>:boolean
+  #      option :count, :numeric
   #      # Something descriptive perhaps
   #      def some_method(opts)
   #        # ...
   #      end
   #   end
   #
-  # Method attributes serve as configuration for a method's command. Available method attributes:
+  # Method attributes serve as configuration for a method's command. All attributes should only be called once per
+  #   method except for option. Available method attributes:
   # * config: Hash to define any command attributes (see Command.new).
   # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
   # * options: Hash to define an OptionParser object for a command's options.
+  # * option: Option name and value to be merged in with options. See OptionParser for what an option value can be.
   # * render_options: Hash to define an OptionParser object for a command's local/global render options (see View).
   #
   # When deciding whether to use commented or normal Module methods, remember that commented Module methods allow

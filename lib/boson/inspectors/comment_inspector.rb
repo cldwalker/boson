@@ -10,7 +10,8 @@ module Boson
   # * If no @desc is found in the comment block, then the first comment line directly above the method
   #   is assumed to be the value for @desc. This means that no multi-line attribute definitions can occur
   #   without a description since the last line is assumed to be a description.
-  # * options, config and render_options attributes can take any valid ruby since they're evaled in their module's context.
+  # * options, option, config and render_options attributes can take any valid ruby since they're evaled in
+  #   their module's context.
   # * desc attribute is not evaled and is simply text to be set as a string.
   #
   # This module was inspired by
