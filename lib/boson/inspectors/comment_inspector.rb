@@ -35,8 +35,10 @@ module Boson
     def parse_option_comments(arr, mod)
       arr.inject({}) {|t,e|
         key, val = e.split(/\s*,\s*/, 2)
-        key = key.sub(/^\s*:/, '').to_sym
-        t[key] = eval_comment(val, mod)
+        if val
+          key = key.sub(/^\s*:/, '').to_sym
+          t[key] = eval_comment(val, mod)
+        end
         t
       }
     end
