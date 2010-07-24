@@ -97,6 +97,12 @@ describe "CommentInspector" do
       options(:line=>4).should == {:b=>:string, :a=>4}
     end
 
+    it "when set by multi-line @option" do
+      @lines.delete_at(1)
+      @lines.insert(1, ' #@option :b, :type=>:string,', '  # :values=>%w{one two}', '# some comments')
+      options(:line=>5).should == {:b=>{:type=>:string, :values=>%w{one two}}}
+    end
+
     it "and ignores invalid @option's" do
       @lines.delete_at(1)
       @lines.insert(1, '  #@option :b=>:string', '  #@option :a, :string')

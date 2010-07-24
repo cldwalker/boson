@@ -34,7 +34,7 @@ module Boson
     #:stopdoc:
     def parse_option_comments(arr, mod)
       arr.inject({}) {|t,e|
-        key, val = e.split(/\s*,\s*/, 2)
+        key, val = e.join(' ').split(/\s*,\s*/, 2)
         if val
           key = key.sub(/^\s*:/, '').to_sym
           t[key] = eval_comment(val, mod)
@@ -71,18 +71,21 @@ module Boson
         lines << last_line unless hash[:desc]
       end
 
+      option = []
       while i < lines.size
         while lines[i] =~ /^\s*#\s*@(\w+)\s*(.*)/
           key = $1.to_sym
-          (hash[key] ||= []) << $2
+          hash[key] = [$2]
           i += 1
           while lines[i] =~ /^\s*#\s*([^@\s].*)/
             hash[key] << $1
             i+= 1
           end
+          option << hash.delete(:option) if key == :option
         end
         i += 1
       end
+      hash[:option] = option if !option.empty?
       hash
     end
     #:startdoc:
