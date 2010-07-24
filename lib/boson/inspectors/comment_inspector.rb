@@ -23,13 +23,24 @@ module Boson
     # of attributes defined for that method.
     def scrape(file_string, line, mod, attribute=nil)
       hash = scrape_file(file_string, line) || {}
+      options = (arr = hash.delete(:option)) ? parse_option_comments(arr, mod) : {}
       hash.select {|k,v| v && (attribute.nil? || attribute == k) }.each do |k,v|
         hash[k] = EVAL_ATTRIBUTES.include?(k) ? eval_comment(v.join(' '), mod) : v.join(' ')
       end
+      (hash[:options] ||= {}).merge!(options) if !options.empty?
       attribute ? hash[attribute] : hash
     end
 
     #:stopdoc:
+    def parse_option_comments(arr, mod)
+      arr.inject({}) {|t,e|
+        key, val = e.split(/\s*,\s*/, 2)
+        key = key.sub(/^\s*:/, '').to_sym
+        t[key] = eval_comment(val, mod)
+        t
+      }
+    end
+
     def eval_comment(value, mod)
       value = "{#{value}}" if !value[/^\s*\{/] && value[/=>/]
       begin mod.module_eval(value); rescue(Exception); nil end
@@ -61,7 +72,7 @@ module Boson
       while i < lines.size
         while lines[i] =~ /^\s*#\s*@(\w+)\s*(.*)/
           key = $1.to_sym
-          hash[key] = [$2]
+          (hash[key] ||= []) << $2
           i += 1
           while lines[i] =~ /^\s*#\s*([^@\s].*)/
             hash[key] << $1
