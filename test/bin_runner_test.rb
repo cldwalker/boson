@@ -46,7 +46,8 @@ describe "BinRunner" do
     it "console option but no irb found prints error" do
       ConsoleRunner.expects(:start)
       Util.expects(:which).returns(nil)
-      capture_stderr { start("--console") }.should =~ /Console not found/
+      ConsoleRunner.expects(:abort).with {|arg| arg[/Console not found/] }
+      start '--console'
     end
 
     it "execute option executes string" do

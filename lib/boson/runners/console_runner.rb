@@ -24,10 +24,10 @@ module Boson
         repl = Boson.repo.config[:console] if Boson.repo.config[:console]
         repl = RUBY_PLATFORM =~ /(:?mswin|mingw)/ ? 'irb.bat' : 'irb' unless repl.is_a?(String)
         unless repl.index('/') == 0 || (repl = Util.which(repl))
-          $stderr.puts "Console not found. Please specify full path in config[:console]."
-          return
+          abort "Console not found. Please specify full path in config[:console]."
+        else
+          load_repl(repl)
         end
-        load_repl(repl)
       end
 
       def load_repl(repl) #:nodoc:
