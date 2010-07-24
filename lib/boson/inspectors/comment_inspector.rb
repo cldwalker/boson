@@ -10,7 +10,8 @@ module Boson
   # * If no @desc is found in the comment block, then the first comment line directly above the method
   #   is assumed to be the value for @desc. This means that no multi-line attribute definitions can occur
   #   without a description since the last line is assumed to be a description.
-  # * options, config and render_options attributes can take any valid ruby since they're evaled in their module's context.
+  # * options, option, config and render_options attributes can take any valid ruby since they're evaled in
+  #   their module's context.
   # * desc attribute is not evaled and is simply text to be set as a string.
   #
   # This module was inspired by
@@ -23,13 +24,26 @@ module Boson
     # of attributes defined for that method.
     def scrape(file_string, line, mod, attribute=nil)
       hash = scrape_file(file_string, line) || {}
+      options = (arr = hash.delete(:option)) ? parse_option_comments(arr, mod) : {}
       hash.select {|k,v| v && (attribute.nil? || attribute == k) }.each do |k,v|
         hash[k] = EVAL_ATTRIBUTES.include?(k) ? eval_comment(v.join(' '), mod) : v.join(' ')
       end
+      (hash[:options] ||= {}).merge!(options) if !options.empty?
       attribute ? hash[attribute] : hash
     end
 
     #:stopdoc:
+    def parse_option_comments(arr, mod)
+      arr.inject({}) {|t,e|
+        key, val = e.join(' ').split(/\s*,\s*/, 2)
+        if val
+          key = key.sub(/^\s*:/, '').to_sym
+          t[key] = eval_comment(val, mod)
+        end
+        t
+      }
+    end
+
     def eval_comment(value, mod)
       value = "{#{value}}" if !value[/^\s*\{/] && value[/=>/]
       begin mod.module_eval(value); rescue(Exception); nil end
@@ -58,6 +72,7 @@ module Boson
         lines << last_line unless hash[:desc]
       end
 
+      option = []
       while i < lines.size
         while lines[i] =~ /^\s*#\s*@(\w+)\s*(.*)/
           key = $1.to_sym
@@ -67,9 +82,11 @@ module Boson
             hash[key] << $1
             i+= 1
           end
+          option << hash.delete(:option) if key == :option
         end
         i += 1
       end
+      hash[:option] = option if !option.empty?
       hash
     end
     #:startdoc:

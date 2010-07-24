@@ -47,38 +47,66 @@ describe "CommentInspector" do
     }
     def options(opts={})
       @lines[1] = opts[:value] if opts[:value]
-      args = [@lines.join("\n"), 3, Optional]
+      args = [@lines.join("\n"), opts[:line] || 3, Optional]
       CommentInspector.scrape(*args)[:options]
     end
 
-    it "that are basic return options" do
+    it "that are basic" do
       options.should == {:a=>true}
     end
 
-    it "that are hash-like returns hashified options" do
+    it "that are hash-like" do
       options(:value=>'#@options :a => 2').should == {:a=>2}
     end
 
-    it "that are whitespaced return options" do
+    it "that are whitespaced" do
       options(:value=>"\t"+ '#    @options {:a=>1}').should == {:a=>1}
     end
 
-    it "that have a local value return options" do
+    it "that have a local value" do
       options(:value=>'#@options bling').should == {:a=>'bling'}
     end
 
-    it "that are multi-line return options" do
+    it "that are multi-line" do
       @lines.delete_at(1)
       @lines.insert(1, '#@options {:a =>', " # 1}", "# some comments")
-      CommentInspector.scrape(@lines.join("\n"), 5, Optional)[:options].should == {:a=>1}
+      options(:line=>5).should == {:a=>1}
     end
 
-    it "with failed eval return nil" do
+    it "with failed eval and returns nil" do
       options(:value=>'#@options !--').should == nil
     end
 
-    it "that are empty return nil" do
+    it "that are empty and returns nil" do
       options(:value=>"# nada").should == nil
+    end
+
+    it "when @option overwrites @options" do
+      @lines.insert(1, '  #@option :a, :boolean')
+      options(:line=>4).should == {:a=>:boolean}
+    end
+
+    it "when set by @option and @options" do
+      @lines.insert(1, '  #@option :b, :boolean')
+      options(:line=>4).should == {:b=>:boolean, :a=>true}
+    end
+
+    it "when set by @option" do
+      @lines.delete_at(1)
+      @lines.insert(1, ' #@option :b, :string', '  #@option :a, 4')
+      options(:line=>4).should == {:b=>:string, :a=>4}
+    end
+
+    it "when set by multi-line @option" do
+      @lines.delete_at(1)
+      @lines.insert(1, ' #@option :b, :type=>:string,', '  # :values=>%w{one two}', '# some comments')
+      options(:line=>5).should == {:b=>{:type=>:string, :values=>%w{one two}}}
+    end
+
+    it "and ignores invalid @option's" do
+      @lines.delete_at(1)
+      @lines.insert(1, '  #@option :b=>:string', '  #@option :a, :string')
+      options(:line=>4).should == {:a=>:string}
     end
   end
 
