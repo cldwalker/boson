@@ -46,7 +46,8 @@ module Boson
       :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"},
       :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"},
       :option_commands=>{:type=>:boolean, :desc=>"Toggles on all commands to be defined as option commands" },
-      :debug=>{:type=>:boolean, :desc=>"Sets $DEBUG"},
+      :ruby_debug=>{:type=>:boolean, :desc=>"Sets $DEBUG", :alias=>'D'},
+      :debug=>{:type=>:boolean, :desc=>"Prints debug info for boson"},
       :load_path=>{:type=>:string, :desc=>"Add to front of $LOAD_PATH", :alias=>'I'}
     } #:nodoc:
 
@@ -61,8 +62,9 @@ module Boson
         return puts("boson #{Boson::VERSION}") if @options[:version]
         return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
         $:.unshift(*options[:load_path].split(":")) if options[:load_path]
+        Runner.debug = true if @options[:debug]
         return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
-        $DEBUG = true if options[:debug]
+        $DEBUG = true if options[:ruby_debug]
         init
 
         if @options[:help]

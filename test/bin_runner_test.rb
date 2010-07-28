@@ -60,6 +60,20 @@ describe "BinRunner" do
       start('commands', '-f', 'f1, f2')
     end
 
+    it "debug option sets Runner.debug" do
+      View.expects(:render)
+      start('-d', 'commands')
+      Runner.debug.should == true
+      Runner.debug = nil
+    end
+
+    it "ruby_debug option sets $DEBUG" do
+      View.expects(:render)
+      start('-D', 'commands')
+      $DEBUG.should == true
+      $DEBUG = nil
+    end
+
     it "execute option errors are caught" do
       aborts_with(/^Error:/) { start("-e", "raise 'blah'") }
     end

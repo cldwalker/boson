@@ -2,6 +2,8 @@ module Boson
   # Base class for runners.
   class Runner
     class<<self
+      attr_accessor :debug
+
       # Enables view, adds local load path and loads default_libraries
       def init
         View.enable

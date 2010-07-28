@@ -26,7 +26,7 @@ module Boson
       hash = scrape_file(file_string, line) || {}
       options = (arr = hash.delete(:option)) ? parse_option_comments(arr, mod) : {}
       hash.select {|k,v| v && (attribute.nil? || attribute == k) }.each do |k,v|
-        hash[k] = EVAL_ATTRIBUTES.include?(k) ? eval_comment(v.join(' '), mod) : v.join(' ')
+        hash[k] = EVAL_ATTRIBUTES.include?(k) ? eval_comment(v.join(' '), mod, k) : v.join(' ')
       end
       (hash[:options] ||= {}).merge!(options) if !options.empty?
       attribute ? hash[attribute] : hash
@@ -38,15 +38,21 @@ module Boson
         key, val = e.join(' ').split(/\s*,\s*/, 2)
         if val
           key = key.sub(/^\s*:/, '').to_sym
-          t[key] = eval_comment(val, mod)
+          t[key] = eval_comment(val, mod, 'option')
         end
         t
       }
     end
 
-    def eval_comment(value, mod)
+    def eval_comment(value, mod, mattr)
       value = "{#{value}}" if !value[/^\s*\{/] && value[/=>/]
-      begin mod.module_eval(value); rescue(Exception); nil end
+      mod.module_eval(value)
+    rescue Exception
+      if Runner.debug
+        warn "DEBUG: Error while evaluating @#{mattr} in module #{mod.to_s[/\w+$/]}:\n  " +
+          $!.message.gsub(/\n/, "\n  ")
+      end
+      nil
     end
 
     # Scrapes a given string for commented @keywords, starting with the line above the given line
