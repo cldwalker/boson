@@ -40,6 +40,7 @@ module Boson
       def rescue_load_action(library, load_method)
         yield
       rescue AppendFeaturesFalseError
+        warn "DEBUG: Library #{library} didn't load due to append_features" if Runner.debug
       rescue LoaderError=>e
         FileLibrary.reset_file_cache(library.to_s)
         failed_libraries << library
@@ -48,7 +49,11 @@ module Boson
         FileLibrary.reset_file_cache(library.to_s)
         failed_libraries << library
         message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
-        message += "\n" + e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n") if @options[:verbose]
+        if Runner.debug
+          message += "\n" + e.backtrace.map {|e| "  " + e }.join("\n")
+        elsif @options[:verbose]
+          message += "\n" + e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
+        end
         $stderr.puts message
       ensure
         Inspector.disable if Inspector.enabled
