@@ -9,11 +9,11 @@
 #   >> Dir.pwd
 #   >> '/home'
 class Boson::RequireLibrary < Boson::GemLibrary
+  EXTENSIONS = ['', '.rb', '.rbw', '.so', '.bundle', '.dll', '.sl', '.jar']
   handles {|source|
-    begin
-      Kernel.load("#{source}.rb", true)
-    rescue LoadError
-      false
-    end
+    extensions_glob = "{#{EXTENSIONS.join(',')}}"
+    $LOAD_PATH.any? {|dir|
+      Dir["#{File.expand_path source, dir}#{extensions_glob}"].size > 0
+    }
   }
 end
