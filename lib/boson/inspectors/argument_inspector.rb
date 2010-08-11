@@ -26,11 +26,13 @@ module Boson::ArgumentInspector
     return if local_variables == params # nothing new found
     format_arguments(params, values, arity, num_args)
     rescue Exception
-      if Boson::Runner.debug
-        warn "DEBUG: Error while scraping arguments from #{klass.to_s[/\w+$/]}##{meth}: #{$!.message}"
-      end
+      print_debug_message(klass, meth) if Boson::Runner.debug
     ensure
       set_trace_func(nil)
+  end
+
+  def print_debug_message(klass, meth) #:nodoc:
+    warn "DEBUG: Error while scraping arguments from #{klass.to_s[/\w+$/]}##{meth}: #{$!.message}"
   end
 
   # process params + values to return array of argument arrays
@@ -57,10 +59,11 @@ module Boson::ArgumentInspector
       begin
         if event[/call/] && classname == klass && id == meth
           params = eval("local_variables", binding)
-          values = eval("local_variables.map{|x| eval(x)}", binding)
+          values = eval("local_variables.map{|x| eval(x.to_s)}", binding)
           throw :done
         end
       rescue Exception
+        print_debug_message(klass, meth) if Boson::Runner.debug
       end
     }
     if arity >= 0
