@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "file library" do
   before { reset; FileLibrary.reset_file_cache }
-  before { Gem.stubs(:loaded_specs).returns({}) } if RUBY_VERSION >= '1.9.2'
+  before { Gem.stubs(:loaded_specs).returns({}) } if RUBY_VERSION >= '1.9.2' && defined? Gem
 
   it "loads" do
     load :blah, :file_string=>"module Blah; def blah; end; end"

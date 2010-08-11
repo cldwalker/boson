@@ -5,7 +5,7 @@ describe "Loader" do
     Manager.load([Boson::Commands::Namespace])
   end
 
-  before { Gem.stubs(:loaded_specs).returns({}) } if RUBY_VERSION >= '1.9.2'
+  before { Gem.stubs(:loaded_specs).returns({}) } if RUBY_VERSION >= '1.9.2' && defined? Gem
   describe "config" do
     before { reset }
     it "from callback overridden by user's config" do
