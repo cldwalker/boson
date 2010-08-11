@@ -148,7 +148,7 @@ module Boson
       end
 
       def create_class_aliases(mod, class_commands)
-        class_commands.each {|k,v|
+        class_commands.dup.each {|k,v|
           if v.is_a?(Array)
             class_commands.delete(k).each {|e| class_commands[e] = "#{k}.#{e}"}
           end
