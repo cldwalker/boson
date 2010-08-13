@@ -74,7 +74,17 @@ module Boson
       (MethodInspector::METHODS + [:args]).each do |key|
         (@store[key] || []).each do |cmd, val|
           @commands_hash[cmd] ||= {}
-          add_scraped_data_to_config(key, val, cmd)
+          add_valid_data_to_config(key, val, cmd)
+        end
+      end
+    end
+
+    def add_valid_data_to_config(key, value, cmd)
+      if valid_attr_value?(key, value)
+        add_scraped_data_to_config(key, value, cmd)
+      else
+        if Runner.debug
+          warn "DEBUG: Command '#{cmd}' has #{key.inspect} attribute with invalid value '#{value.inspect}'"
         end
       end
     end
@@ -91,12 +101,17 @@ module Boson
       end
     end
 
+    def valid_attr_value?(key, value)
+      return true if (klass = MethodInspector::METHOD_CLASSES[key]).nil?
+      value.is_a?(klass) || value.nil?
+    end
+
     def add_comment_scraped_data
       (@store[:method_locations] || []).select {|k,(f,l)| f == @library_file }.each do |cmd, (file, lineno)|
         scraped = CommentInspector.scrape(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module)
         @commands_hash[cmd] ||= {}
         MethodInspector::METHODS.each do |e|
-          add_scraped_data_to_config(e, scraped[e], cmd)
+          add_valid_data_to_config(e, scraped[e], cmd)
         end
       end
     end

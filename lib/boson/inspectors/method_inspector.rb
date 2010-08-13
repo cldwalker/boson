@@ -8,6 +8,7 @@ module Boson
     attr_reader :mod_store
     @mod_store ||= {}
     METHODS = [:config, :desc, :options, :render_options]
+    METHOD_CLASSES = {:config=>Hash, :desc=>String, :options=>Hash, :render_options=>Hash}
     ALL_METHODS = METHODS + [:option]
 
     # The method_added used while scraping method attributes.
