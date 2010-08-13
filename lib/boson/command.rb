@@ -20,13 +20,15 @@ module Boson
     # Finds a command, namespaced or not and aliased or not. If found returns the
     # command object, otherwise returns nil.
     def self.find(command, commands=Boson.commands)
-      command, subcommand = command.to_s.split(NAMESPACE, 2)
-      is_namespace_command = lambda {|current_command|
-        [current_command.name, current_command.alias].include?(subcommand) &&
-        current_command.library && (current_command.library.namespace == command)
-      }
-      find_lambda = subcommand ? is_namespace_command : lambda {|e| [e.name, e.alias].include?(command)}
-      commands.find(&find_lambda)
+      if command.to_s.include?(NAMESPACE)
+        command, subcommand = command.to_s.split(NAMESPACE, 2)
+        commands.find {|current_command|
+          [current_command.name, current_command.alias].include?(subcommand) &&
+          current_command.library && (current_command.library.namespace == command)
+        }
+      else
+        commands.find {|e| [e.name, e.alias].include?(command) && !e.namespace}
+      end
     end
 
     # One line usage for a command if it exists
