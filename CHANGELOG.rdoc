@@ -1,3 +1,15 @@
+== 0.2.6
+* Added --debug to executable with multiple debug hooks
+* Added --ruby_debug and -I to executable to change $LOAD_PATH and $DEBUG
+* Added @option method attribute as a more readable complement to @options
+* Added proper exit code for failed commands (#12)
+* Added friendlier errors for libraries with SyntaxError or LoaderError
+* Added validation to method attributes
+* Improved RequireLibrary to more robustly handle gems like httparty
+* Fixed 1.9.2-rc2 bugs including #14
+* Fixed --console for ruby >= 1.8.7
+* Fixed --help for namespaced commands
+
 == 0.2.5
 * Fixed critical gemspec error
 
