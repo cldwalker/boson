@@ -12,7 +12,7 @@ class Boson::RequireLibrary < Boson::GemLibrary
   EXTENSIONS = ['', '.rb', '.rbw', '.so', '.bundle', '.dll', '.sl', '.jar']
   handles {|source|
     extensions_glob = "{#{EXTENSIONS.join(',')}}"
-    $LOAD_PATH.any? {|dir|
+    ($LOAD_PATH - ['.']).any? {|dir|
       Dir["#{File.expand_path source.to_s, dir}#{extensions_glob}"].size > 0
     }
   }
