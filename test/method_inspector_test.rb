@@ -11,6 +11,14 @@ describe "MethodInspector" do
     MethodInspector.store[:options].empty?.should == true
   end
 
+  it "handles anonymous classes" do
+    MethodInspector.mod_store = {}
+    Inspector.enable
+    Class.new.module_eval "def blah; end"
+    Inspector.disable
+    MethodInspector.store.should == nil
+  end
+
   describe "commands module with" do
     def parse(string)
       Inspector.enable

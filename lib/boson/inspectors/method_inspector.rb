@@ -4,8 +4,7 @@ module Boson
   # can scrape their commented method attributes.
   module MethodInspector
     extend self
-    attr_accessor :current_module
-    attr_reader :mod_store
+    attr_accessor :current_module, :mod_store
     @mod_store ||= {}
     METHODS = [:config, :desc, :options, :render_options]
     METHOD_CLASSES = {:config=>Hash, :desc=>String, :options=>Hash, :render_options=>Hash}
@@ -13,7 +12,7 @@ module Boson
 
     # The method_added used while scraping method attributes.
     def new_method_added(mod, meth)
-      return unless mod.name[/^Boson::Commands::/]
+      return unless mod.to_s[/^Boson::Commands::/]
       self.current_module = mod
       store[:temp] ||= {}
       METHODS.each do |e|
