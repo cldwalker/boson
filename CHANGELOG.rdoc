@@ -1,3 +1,9 @@
+== 0.3.1
+* Fixed MethodInspector handling anonymous classes on 1.9.2 (#16)
+* Fixed get and install commands on 1.9.2 (#17)
+* Fixed failed loading of Bosonfile
+* Fixed RequireLibrary indicating correct load status
+
 == 0.3.0
 * Added --debug to executable with multiple debug hooks
 * Added --ruby_debug and -I to executable to change $LOAD_PATH and $DEBUG
