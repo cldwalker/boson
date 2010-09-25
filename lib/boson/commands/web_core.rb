@@ -28,8 +28,8 @@ module Boson::Commands::WebCore
     end
   end
 
-  def_which_requires(:get, 'uri', 'net/http') do |url, options|
-    options ||= {}
+  def_which_requires(:get, 'uri', 'net/http') do |*args|
+    url, options = args[0], args[1] || {}
     url = build_url(url, options[:params]) if options[:params]
     Get.new(url).request(options)
   end
@@ -41,8 +41,8 @@ module Boson::Commands::WebCore
     }.join("&")
   end
 
-  def_which_requires(:post, 'uri', 'net/http') do |url, options|
-    options ||= {}
+  def_which_requires(:post, 'uri', 'net/http') do |*args|
+    url, options = args[0], args[1] || {}
     (res = Net::HTTP.post_form(URI.parse(url), options)) && res.body
   end
 
