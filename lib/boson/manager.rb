@@ -64,13 +64,14 @@ module Boson
         rescue_load_action(source, :load) do
           lib = loader_create(source)
           if loaded?(lib.name)
-            $stderr.puts "Library #{lib.name} already exists" if options[:verbose] && !options[:dependency]
+            $stderr.puts "Library #{lib.name} already exists." if options[:verbose] && !options[:dependency]
             false
           else
             if lib.load { load_dependencies(lib, options) }
               lib
             else
-              $stderr.puts "Unable to load library #{lib.name}." if !options[:dependency]
+              $stderr.puts "Library #{lib.name} did not load successfully." if !options[:dependency]
+              $stderr.puts "  "+lib.inspect if Runner.debug
               false
             end
           end

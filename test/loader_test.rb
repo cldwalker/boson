@@ -189,7 +189,7 @@ describe "Loader" do
       end
 
       it "prints error when nonexistent" do
-        capture_stderr { load('blah') }.should =~ /Unable.*load/
+        capture_stderr { load('blah') }.should =~ /Library blah did not/
       end
 
       it "with invalid module prints error" do
