@@ -16,4 +16,8 @@ class Boson::RequireLibrary < Boson::GemLibrary
       Dir["#{File.expand_path source.to_s, dir}#{extensions_glob}"].size > 0
     }
   }
+
+  def loaded_correctly?
+    super || $".grep(/^#{@name}\.([a-z]+)?$/).size > 0
+  end
 end
