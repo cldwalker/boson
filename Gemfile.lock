@@ -1,0 +1,33 @@
+PATH
+  remote: .
+  specs:
+    boson (0.3.1)
+      alias (>= 0.2.2)
+      hirb (>= 0.3.2)
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    alias (0.2.2)
+    bacon (1.1.0)
+    bacon-bits (0.1.0)
+      bacon (>= 1.1.0)
+    hirb (0.3.4)
+    mocha (0.9.9)
+      rake
+    mocha-on-bacon (0.1.1)
+      bacon (>= 1.1.0)
+      mocha (>= 0.9.8)
+    rake (0.8.7)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  alias (>= 0.2.2)
+  bacon (>= 1.1.0)
+  bacon-bits
+  boson!
+  hirb (>= 0.3.2)
+  mocha
+  mocha-on-bacon

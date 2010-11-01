@@ -1,4 +1,6 @@
-require 'rake'
+require 'bundler'
+Bundler::GemHelper.install_tasks
+
 require 'fileutils'
 
 def gemspec
