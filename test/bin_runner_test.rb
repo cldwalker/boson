@@ -104,6 +104,11 @@ describe "BinRunner" do
       aborts_with(/Error.*not found/) { start 'blah' }
     end
 
+    it "with backtrace option prints backtrace" do
+      BinRunner.expects(:autoload_command).returns(false)
+      aborts_with(/not found\nOriginal.*runner\.rb:/m) { start("--backtrace", "blah") }
+    end
+
     it "basic command executes" do
       BinRunner.expects(:init).returns(true)
       BinRunner.stubs(:render_output)

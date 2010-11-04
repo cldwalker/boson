@@ -23,6 +23,7 @@ module Boson
   # [:render] Toggles the auto-rendering done for commands that don't have views. Doesn't affect commands that already have views.
   #           Default is false. Also see Auto Rendering section below.
   # [:pager_toggle] Toggles Hirb's pager in case you'd like to pipe to another command.
+  # [:backtrace] Prints full backtrace on error. Default is false.
   #
   # ==== Auto Rendering
   # Commands that don't have views (defined via render_options) have their return value auto-rendered as a view as follows:
@@ -48,7 +49,8 @@ module Boson
       :option_commands=>{:type=>:boolean, :desc=>"Toggles on all commands to be defined as option commands" },
       :ruby_debug=>{:type=>:boolean, :desc=>"Sets $DEBUG", :alias=>'D'},
       :debug=>{:type=>:boolean, :desc=>"Prints debug info for boson"},
-      :load_path=>{:type=>:string, :desc=>"Add to front of $LOAD_PATH", :alias=>'I'}
+      :load_path=>{:type=>:string, :desc=>"Add to front of $LOAD_PATH", :alias=>'I'},
+      :backtrace=>{:type=>:boolean, :desc=>'Prints full backtrace'}
     } #:nodoc:
 
     PIPE = '+'
@@ -123,7 +125,7 @@ module Boson
 
       #:stopdoc:
       def abort_with(message)
-        message += "\nOriginal error: #{$!}\n" + $!.backtrace.slice(0,10).map {|e| "  " + e }.join("\n") if options[:verbose]
+        message += "\nOriginal error: #{$!}\n  #{$!.backtrace.join("\n  ")}" if options[:verbose] || options[:backtrace]
         abort message
       end
 
