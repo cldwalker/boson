@@ -1,3 +1,6 @@
+== 0.3.2
+* Add commandline backtrace option (#18)
+
 == 0.3.1
 * Fixed MethodInspector handling anonymous classes on 1.9.2 (#16)
 * Fixed get and install commands on 1.9.2 (#17)
