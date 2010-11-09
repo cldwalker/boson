@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project = 'tagaholic'
   s.executables = ['boson']
-  s.add_dependency 'hirb', '>= 0.3.2'
+  s.add_dependency 'hirb', '>= 0.3.5'
   s.add_dependency 'alias', '>= 0.2.2'
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'bacon', '>= 1.1.0'
