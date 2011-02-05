@@ -28,7 +28,7 @@ module Boson::Commands::WebCore
     end
   end
 
-  def_which_requires(:get, 'uri', 'net/http') do |*args|
+  def_which_requires(:get, 'net/https') do |*args|
     url, options = args[0], args[1] || {}
     url = build_url(url, options[:params]) if options[:params]
     Get.new(url).request(options)
@@ -112,10 +112,17 @@ module Boson::Commands::WebCore
     # Returns body string if successful or nil if not.
     def get_body
       uri = URI.parse(@url)
-      @response = Net::HTTP.get_response uri
+      @response = get_response(uri)
       (@options[:any_response] || @response.code == '200') ? @response.body : nil
     rescue
       @options[:raise_error] ? raise : puts("Error: GET '#{@url}' -> #{$!.class}: #{$!.message}")
+    end
+
+    def get_response(uri)
+      net = Net::HTTP.new(uri.host, uri.port)
+      net.verify_mode = OpenSSL::SSL::VERIFY_NONE if uri.scheme == 'https'
+      net.use_ssl = true if uri.scheme == 'https'
+      net.start {|http|  http.request_get(uri.request_uri) }
     end
 
     # Returns nil if dependencies or parsing fails
