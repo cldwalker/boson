@@ -1,3 +1,6 @@
+== 0.3.3
+* Fix install command for https (#22)
+
 == 0.3.2
 * Add commandline backtrace option (#18)
 
