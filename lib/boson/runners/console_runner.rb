@@ -8,7 +8,9 @@ module Boson
       # it will load up all detected libraries. Options:
       # [:libraries] Array of libraries to load.
       # [:verbose] Boolean to be verbose about libraries loading. Default is true.
-      # [:no_defaults] Boolean which turns off loading any default libraries. Default is false.
+      # [:no_defaults] Boolean or :all which turns off loading default libraries. If set to true,
+      #                effects loading user's console default libraries. If set to :all, effects
+      #                all libraries including boson's. Default is false.
       # [:autoload_libraries] Boolean which makes any command execution easier. It redefines
       #                       method_missing on Boson.main_object so that commands with unloaded
       #                       libraries are automatically loaded. Default is false.
@@ -44,14 +46,11 @@ module Boson
       end
 
       def default_libraries #:nodoc:
-        defaults = super
-        unless @options[:no_defaults]
-          new_defaults = Boson.repos.map {|e| e.config[:console_defaults] }.flatten
-          new_defaults = detected_libraries if new_defaults.empty?
-          defaults += new_defaults
-          defaults.uniq!
-        end
-        defaults
+        return [] if @options[:no_defaults] == :all
+        return super if @options[:no_defaults]
+        defaults = super + Boson.repos.map {|e| e.config[:console_defaults] }.flatten
+        defaults += detected_libraries if defaults.empty?
+        defaults.uniq
       end
     end
   end
