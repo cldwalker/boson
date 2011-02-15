@@ -84,7 +84,8 @@ module Boson
           " your libraries. Rename your module to avoid this warning."
       end
 
-      Manager.create_class_aliases(@module, @class_commands) unless @class_commands.to_s.empty? || @method_conflict
+      Manager.create_class_aliases(@module, @class_commands) unless @class_commands.nil? ||
+        @class_commands.empty? || @method_conflict
       check_for_method_conflicts unless @force
       @namespace = clean_name if @object_namespace
       namespace ? Namespace.create(namespace, self) : include_in_universe

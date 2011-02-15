@@ -117,7 +117,7 @@ module Boson
         global_opt, parsed_options, new_args = parse_options temp_args
         Runner.in_shell? ? args = new_args : args += new_args
       # add default options
-      elsif @command.options.to_s.empty? || (!@command.has_splat_args? &&
+      elsif @command.options.nil? || @command.options.empty? || (!@command.has_splat_args? &&
         args.size <= (@command.arg_size - 1).abs) || (@command.has_splat_args? && !args[-1].is_a?(Hash))
           global_opt, parsed_options = parse_options([])[0,2]
       # merge default options with given hash of options
@@ -189,8 +189,9 @@ module Boson
     end
 
     def modify_args(args)
-      if @command.default_option && @command.arg_size <= 1 && !@command.has_splat_args? && args[0].to_s[/./] != '-'
-        args[0] = "--#{@command.default_option}=#{args[0]}" unless args.join.empty? || args[0].is_a?(Hash)
+      if @command.default_option && @command.arg_size <= 1 && !@command.has_splat_args? &&
+        !args[0].is_a?(Hash) && args[0].to_s[/./] != '-' && !args.join.empty?
+        args[0] = "--#{@command.default_option}=#{args[0]}"
       end
     end
 
