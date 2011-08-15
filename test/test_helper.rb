@@ -30,7 +30,7 @@ module TestHelpers
   def reset_main_object
     Boson.send :remove_const, "Universe"
     eval "module ::Boson::Universe; include ::Boson::Commands::Namespace; end"
-    Commands.send :remove_const, "Blah" if Commands.const_defined?("Blah")
+    Boson::Commands.send :remove_const, "Blah" rescue nil
     Boson.main_object = Object.new
   end
 
