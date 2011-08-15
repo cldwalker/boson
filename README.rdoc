@@ -171,3 +171,4 @@ Boson stands on the shoulders of these people and their ideas:
 * Dave Thomas for scraping a method's comments (Boson::CommentInspector)
 * Mauricio Fernandez for scraping a method's arguments (Boson::ArgumentInspector)
 * Chris Wanstrath for inspiring Boson's libraries with Rip's packages.
+* And its contributors: @mirell
