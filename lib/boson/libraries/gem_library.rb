@@ -10,7 +10,10 @@ module Boson
   class GemLibrary < Library
     #:stopdoc:
     def self.is_a_gem?(name)
-      Object.const_defined?(:Gem) && Gem::Specification.find_by_name(name).is_a?(Gem::Specification)
+      return false unless defined? Gem
+      Gem::VERSION >= '1.8.0' ?
+        Gem::Specification.find_all_by_name(name)[0].is_a?(Gem::Specification) :
+        Gem.searcher.find(name).is_a?(Gem::Specification)
     end
 
     handles {|source| is_a_gem?(source.to_s) }
