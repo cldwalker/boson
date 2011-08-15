@@ -153,6 +153,9 @@ Having done that, let's start up irb:
 == Bugs/Issues
 Please report them {on github}[http://github.com/cldwalker/boson/issues].
 
+== Contributing
+{See here}[http://tagaholic.me/contributing.html]
+
 == Motivation
 My {tagging obsession}[http://github.com/cldwalker/tag-tree] from the ruby console.
 
