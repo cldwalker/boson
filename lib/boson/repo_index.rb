@@ -35,7 +35,7 @@ module Boson
     def read
       return if @read
       @libraries, @commands, @lib_hashes = exists? ?
-        File.open( marshal_file, 'rb' ){|f| Marshal.load( f.read ) } : [[], [], {}]
+        File.open( marshal_file, 'rb' ){|f| f.flock(File::LOCK_EX);Marshal.load(f) } : [[], [], {}]
       delete_stale_libraries_and_commands
       set_command_namespaces
       @read = true
@@ -63,7 +63,10 @@ module Boson
     end
 
     def save_marshal_index(marshal_string)
-      File.open(marshal_file, 'wb') {|f| f.write marshal_string }
+      File.open(marshal_file, 'wb') do |f| 
+        f.flock(File::LOCK_EX)
+        f.write(marshal_string)
+      end
     end
 
     def delete_stale_libraries_and_commands
