@@ -63,8 +63,10 @@ module Boson
     end
 
     def save_marshal_index(marshal_string)
-      File.open(marshal_file, 'wb') do |f| 
+      # GOTCHA: We use 'r+' option because 'w' truncates the file when opening it
+      File.open(marshal_file, 'r+b') do |f| 
         f.flock(File::LOCK_EX)
+        f.truncate 0
         f.write(marshal_string)
       end
     end
