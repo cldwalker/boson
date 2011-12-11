@@ -1,9 +1,9 @@
-%w{hirb alias}.each {|e| require e }
+%w{hirb alias boson/commands}.each {|e| require e }
 %w{runner runners/console_runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
 %w{module file gem require local_file}.each {|e| require "boson/libraries/#{e}_library" }
-(%w{namespace view command util commands option_parser options} +
+(%w{namespace view command util option_parser options} +
   %w{index repo_index scientist option_command pipe pipes version}).each {|e| require "boson/#{e}" }
 
 # This module stores the libraries, commands, repos and main object used throughout Boson.

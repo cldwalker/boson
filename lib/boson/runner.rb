@@ -1,6 +1,8 @@
 module Boson
   # Base class for runners.
   class Runner
+    DEFAULT_LIBRARIES = [Boson::Commands::Core]
+
     class<<self
       attr_accessor :debug
 
@@ -13,7 +15,7 @@ module Boson
 
       # Libraries that come with Boson
       def default_libraries
-        Boson.repos.map {|e| e.config[:defaults] || [] }.flatten + [Boson::Commands::Core, Boson::Commands::WebCore]
+        Boson.repos.map {|e| e.config[:defaults] || [] }.flatten + DEFAULT_LIBRARIES
       end
 
       # Libraries detected in repositories
