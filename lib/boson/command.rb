@@ -140,7 +140,7 @@ module Boson
     def file_string_and_method_for_args(lib)
       if !lib.is_a?(ModuleLibrary) && (klass_method = (lib.class_commands || {})[@name])
         klass, meth = klass_method.split(NAMESPACE, 2)
-        if (meth_locations = MethodInspector.find_method_locations_for_19(klass, meth))
+        if (meth_locations = MethodInspector.find_class_method_locations(klass, meth))
           file_string = File.read meth_locations[0]
         end
       elsif File.exists?(lib.library_file || '')

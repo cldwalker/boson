@@ -22,7 +22,7 @@ module Boson
 
       if store[:temp].size < ALL_METHODS.size
         store[:method_locations] ||= {}
-        if (result = find_method_locations(caller))
+        if (result = find_method_locations(mod, meth))
           store[:method_locations][meth.to_s] = result
         end
       end
@@ -55,17 +55,14 @@ module Boson
       end
     end
 
-    CALLER_REGEXP = /in `<module:.*>'/
-    # Returns an array of the file and line number at which a method starts using
-    # a caller array. Necessary information for CommentInspector to function.
-    def find_method_locations(stack)
-      if (line = stack.find {|e| e =~ CALLER_REGEXP })
-        (line =~ /^(.*):(\d+)/) ? [$1, $2.to_i] : nil
-      end
+    # Returns an array of the file and line number at which a method starts
+    # using a method
+    def find_method_locations(mod, meth)
+      mod.instance_method(meth).source_location
     end
 
     #:stopdoc:
-    def find_method_locations_for_19(klass, meth)
+    def find_class_method_locations(klass, meth)
       if (klass = Util.any_const_get(klass)) && (meth_location = klass.method(meth).source_location) &&
         meth_location[0]
         meth_location
