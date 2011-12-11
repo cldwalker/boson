@@ -92,11 +92,6 @@ module Boson
       hash1.merge(hash2) {|k,o,n| (o.is_a?(Hash)) ? recursive_hash_merge(o,n) : n}
     end
 
-    # From Rubygems, determine a user's home.
-    def find_home
-      Hirb::Util.find_home
-    end
-
     # Returns name of top level class that conflicts if it exists. For example, for base module Boson::Commands,
     # Boson::Commands::Alias conflicts with Alias if Alias exists.
     def top_level_class_conflict(base_module, conflicting_module)

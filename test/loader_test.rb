@@ -5,7 +5,7 @@ describe "Loader" do
     Manager.load([Boson::Commands::Namespace])
   end
 
-  before { Gem.stubs(:loaded_specs).returns({}) } if RUBY_VERSION >= '1.9.2' && defined? Gem
+  before { Gem.stubs(:loaded_specs).returns({}) }
   describe "config" do
     before { reset }
     it "from callback overridden by user's config" do
@@ -107,7 +107,7 @@ describe "Loader" do
       GemLibrary.stubs(:is_a_gem?).returns(true) #mock all as gem libs
       Util.stubs(:safe_require).returns(true)
       with_config(:libraries=>{"water"=>{:dependencies=>"fire"}, "fire"=>{:dependencies=>"man"}}) do
-        capture_stderr { 
+        capture_stderr {
           load('water', :no_mock=>true)
         }.should == "Unable to load library fire. Reason: Can't load dependency man\nUnable to load"+
         " library water. Reason: Can't load dependency fire\n"

@@ -55,7 +55,7 @@ module Boson
       end
     end
 
-    CALLER_REGEXP = RUBY_VERSION < '1.9' ? /in `load_source'/ : /in `<module:.*>'/
+    CALLER_REGEXP = /in `<module:.*>'/
     # Returns an array of the file and line number at which a method starts using
     # a caller array. Necessary information for CommentInspector to function.
     def find_method_locations(stack)

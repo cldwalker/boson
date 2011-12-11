@@ -139,11 +139,9 @@ module Boson
 
     def file_string_and_method_for_args(lib)
       if !lib.is_a?(ModuleLibrary) && (klass_method = (lib.class_commands || {})[@name])
-        if RUBY_VERSION >= '1.9'
-          klass, meth = klass_method.split(NAMESPACE, 2)
-          if (meth_locations = MethodInspector.find_method_locations_for_19(klass, meth))
-            file_string = File.read meth_locations[0]
-          end
+        klass, meth = klass_method.split(NAMESPACE, 2)
+        if (meth_locations = MethodInspector.find_method_locations_for_19(klass, meth))
+          file_string = File.read meth_locations[0]
         end
       elsif File.exists?(lib.library_file || '')
         file_string, meth = FileLibrary.read_library_file(lib.library_file), @name
