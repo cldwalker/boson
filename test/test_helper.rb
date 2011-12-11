@@ -5,6 +5,7 @@ require 'mocha-on-bacon'
 require 'boson'
 Object.send :remove_const, :OptionParser
 Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
+ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc'
 
 module TestHelpers
   # make local so it doesn't pick up my real boson dir

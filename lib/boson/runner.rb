@@ -8,9 +8,18 @@ module Boson
 
       # Enables view, adds local load path and loads default_libraries
       def init
+        load_rc
         View.enable
         add_load_path
         Manager.load default_libraries, load_options
+      end
+
+      def load_rc
+        rc = ENV['BOSONRC'] || '~/.bosonrc'
+        load(rc) if File.exists?(File.expand_path(rc))
+      rescue StandardError, SyntaxError, LoadError => err
+        warn "Error while loading #{rc}:\n"+
+          "#{err.class}: #{err.message}\n    #{err.backtrace.join("\n    ")}"
       end
 
       # Libraries that come with Boson
