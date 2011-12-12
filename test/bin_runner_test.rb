@@ -26,10 +26,6 @@ describe "BinRunner" do
       capture_stdout { start '-h' }.should =~ /^boson/
     end
 
-    it "help option and command prints help" do
-      capture_stdout { start('-h', 'commands') }.should =~ /^commands/
-    end
-
     it "load option loads libraries" do
       Manager.expects(:load).with {|*args| args[0][0].is_a?(Module) ? true : args[0][0] == 'blah'}.times(2)
       BinRunner.stubs(:execute_command)
@@ -55,20 +51,13 @@ describe "BinRunner" do
       capture_stdout { start("-e", "p 1 + 1") }.should == "2\n"
     end
 
-    it "global option takes value with whitespace" do
-      View.expects(:render).with {|*args| args[1][:fields] = %w{f1 f2} }
-      start('commands', '-f', 'f1, f2')
-    end
-
     it "debug option sets Runner.debug" do
-      View.expects(:render)
       start('-d', 'commands')
       Runner.debug.should == true
       Runner.debug = nil
     end
 
     it "ruby_debug option sets $DEBUG" do
-      View.expects(:render)
       start('-D', 'commands')
       $DEBUG.should == true
       $DEBUG = nil
@@ -120,7 +109,6 @@ describe "BinRunner" do
       obj = Object.new
       Boson.main_object.extend Module.new { def phone; Struct.new(:home).new('done'); end }
       BinRunner.expects(:init).returns(true)
-      BinRunner.expects(:render_output).with('done')
       start 'phone.home'
     end
 
@@ -172,47 +160,6 @@ describe "BinRunner" do
       Manager.expects(:load).with {|*args| args[0].is_a?(String) ? args[0] == 'sweet_lib' : true}.at_least(1)
       Index.indexes[0].expects(:update).returns(true)
       aborts_with(/sweet/) { start 'sweet' }
-    end
-  end
-
-  describe "render_output" do
-    before { Scientist.rendered = false; BinRunner.instance_eval "@options = {}" }
-
-    it "doesn't render when nil, false or true" do
-      View.expects(:render).never
-      [nil, false, true].each do |e|
-        BinRunner.render_output e
-      end
-    end
-
-    it "doesn't render when rendered with Scientist" do
-      Scientist.rendered = true
-      View.expects(:render).never
-      BinRunner.render_output 'blah'
-    end
-
-    it "render with puts when non-string" do
-      View.expects(:render).with('dude', {:method => 'puts'})
-      BinRunner.render_output 'dude'
-    end
-
-    it "renders with inspect when non-array and non-string" do
-      [{:a=>true}, :ok].each do |e|
-        View.expects(:puts).with(e.inspect)
-        BinRunner.render_output e
-      end
-    end
-
-    it "renders with inspect when Scientist rendering toggled off with :render" do
-      Scientist.global_options = {:render=>true}
-      View.expects(:puts).with([1,2].inspect)
-      BinRunner.render_output [1,2]
-      Scientist.global_options = nil
-    end
-
-    it "renders with hirb when array" do
-      View.expects(:render_object)
-      BinRunner.render_output [1,2,3]
     end
   end
 

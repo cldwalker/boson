@@ -103,11 +103,6 @@ module Boson
       @option_parser ||= OptionParser.new(@options || {})
     end
 
-    # Option parser for command as defined by @render_options.
-    def render_option_parser
-      option_command? ? Boson::Scientist.option_command(self).option_parser : nil
-    end
-
     # Help string for options if a command has it.
     def option_help
       @options ? option_parser.to_s : ''

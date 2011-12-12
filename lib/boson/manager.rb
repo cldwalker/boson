@@ -6,7 +6,7 @@ module Boson
 
   # Handles loading of libraries and commands.
   class Manager
-    class <<self
+    module API
       attr_accessor :failed_libraries
 
       # Loads a library or an array of libraries with options. Manager loads the first library subclass
@@ -125,7 +125,7 @@ module Boson
           puts "Following commands cannot have options until their arguments are configured: " +
             rejected.map {|e| e.name}.join(', ')
         end
-        accepted.each {|cmd| Scientist.redefine_command(lib.namespace_object, cmd) }
+        [accepted, rejected]
       end
 
       def create_command_aliases(lib, commands)
@@ -164,6 +164,10 @@ module Boson
         end
       end
       #:startdoc:
+    end
+
+    class << self
+      include API
     end
   end
 end

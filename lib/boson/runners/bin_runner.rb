@@ -55,7 +55,7 @@ module Boson
 
     PIPE = '+'
 
-    class <<self
+    module API
       attr_accessor :command
 
       # Starts, processes and ends a commandline request.
@@ -149,22 +149,25 @@ module Boson
       end
 
       def execute_command
-        output = @all_args.inject(nil) {|acc, (cmd,*args)|
+        @all_args.inject(nil) {|acc, (cmd,*args)|
           begin
             @command = cmd # for external errors
             autoload_command cmd
             args = translate_args(args, acc)
             Boson.full_invoke(cmd, args)
           rescue ArgumentError
-            if $!.class == OptionCommand::CommandArgumentError || ($!.message[/wrong number of arguments/] &&
-              (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
+            if allowed_argument_error?($!, cmd, args)
               abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
             else
               raise
             end
           end
         }
-        render_output output
+      end
+
+      def allowed_argument_error?(err, cmd, args)
+        (err.message[/wrong number of arguments/] &&
+          (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
       end
 
       def translate_args(args, piped)
@@ -182,15 +185,6 @@ module Boson
         [new_args[0], options, new_args[1..-1]]
       end
 
-      def render_output(output)
-        if (!Scientist.rendered && !View.silent_object?(output)) ^ @options[:render] ^
-          Boson.repo.config[:no_auto_render]
-            opts = output.is_a?(String) ? {:method=>'puts'} :
-              {:inspect=>!output.is_a?(Array) || (Scientist.global_options || {})[:render] }
-            View.render output, opts
-        end
-      end
-
       def print_usage
         puts "boson [GLOBAL OPTIONS] [COMMAND] [ARGS] [COMMAND OPTIONS]\n\n"
         puts "GLOBAL OPTIONS"
@@ -203,6 +197,10 @@ module Boson
         end
       end
       #:startdoc:
+    end
+
+    class << self
+      include API
     end
   end
 end
