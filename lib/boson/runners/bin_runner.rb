@@ -52,8 +52,6 @@ module Boson
       :backtrace=>{:type=>:boolean, :desc=>'Prints full backtrace'}
     } #:nodoc:
 
-    PIPE = '+'
-
     module API
       attr_accessor :command
 
@@ -76,7 +74,7 @@ module Boson
           define_autoloader
           Boson.main_object.instance_eval @options[:execute]
         else
-          execute_command
+          execute_command(@command, @args)
         end
       rescue NoMethodError
         abort_with no_method_error_message
@@ -117,11 +115,6 @@ module Boson
         @options ||= {}
       end
 
-      # Commands to executed, in order given by user
-      def commands
-        @commands ||= @all_args.map {|e| e[0]}
-      end
-
       #:stopdoc:
       def abort_with(message)
         message += "\nOriginal error: #{$!}\n  #{$!.backtrace.join("\n  ")}" if options[:verbose] || options[:backtrace]
@@ -147,21 +140,16 @@ module Boson
         @options[:unload] ?  libs.select {|e| e !~ /#{@options[:unload]}/} : libs
       end
 
-      def execute_command
-        @all_args.inject(nil) {|acc, (cmd,*args)|
-          begin
-            @command = cmd # for external errors
-            autoload_command cmd
-            args = translate_args(args, acc)
-            Boson.full_invoke(cmd, args)
-          rescue ArgumentError
-            if allowed_argument_error?($!, cmd, args)
-              abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
-            else
-              raise
-            end
-          end
-        }
+      def execute_command(cmd, args)
+        @command = cmd # for external errors
+        autoload_command cmd
+        Boson.full_invoke(cmd, args)
+      rescue ArgumentError
+        if allowed_argument_error?($!, cmd, args)
+          abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
+        else
+          raise
+        end
       end
 
       def allowed_argument_error?(err, cmd, args)
@@ -169,18 +157,10 @@ module Boson
           (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
       end
 
-      def translate_args(args, piped)
-        args.unshift piped if piped
-        args
-      end
-
       def parse_args(args)
-        @all_args = Util.split_array_by(args, PIPE)
-        args = @all_args[0]
         @option_parser = OptionParser.new(GLOBAL_OPTIONS)
         options = @option_parser.parse(args.dup, :opts_before_args=>true)
         new_args = @option_parser.non_opts
-        @all_args[0] = new_args
         [new_args[0], options, new_args[1..-1]]
       end
 
