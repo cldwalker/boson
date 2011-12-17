@@ -55,11 +55,6 @@ module Boson
     #                  subdirectory doesn't exist in the boson directory.
     #
     # ==== Config keys specific to the main repo config ~/.boson/config/boson.yml
-    # [:pipe_options] Hash of options available to all option commands for piping (see Pipe). A pipe option has the
-    #                 {normal option attributes}[link:classes/Boson/OptionParser.html#M000081] and these:
-    #                 * :pipe: Specifies the command to call when piping. Defaults to the pipe's option name.
-    #                 * :filter: Boolean which indicates that the pipe command will modify its input with what it returns.
-    #                   Default is false.
     # [:render_options] Hash of render options available to all option commands to be passed to a Hirb view (see View). Since
     #                   this merges with default render options, it's possible to override default render options.
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
