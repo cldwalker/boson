@@ -1,16 +1,14 @@
 module Boson
   # A command starts with the functionality of a ruby method and adds benefits with options, render_options, etc.
   class Command
-    class <<self; attr_accessor :all_option_commands ; end
-
-    # Creates a command given its name and a library.
-    def self.create(name, library)
-      obj = new(new_attributes(name, library))
-      if @all_option_commands && !%w{get method_missing}.include?(name)
-        obj.make_option_command(library)
+    module API
+      # Creates a command given its name and a library.
+      def create(name, library)
+        new(new_attributes(name, library))
       end
-      obj
     end
+
+    class <<self; include API; end
 
     # Used to generate a command's initial attributes when creating a command object
     def self.new_attributes(name, library)
@@ -38,6 +36,7 @@ module Boson
 
     ATTRIBUTES = [:name, :lib, :alias, :desc, :options, :args, :config]
     attr_accessor *(ATTRIBUTES + [:render_options, :namespace, :default_option])
+    INIT_ATTRIBUTES = [:alias, :desc, :options, :namespace, :default_option]
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
     #
@@ -47,7 +46,6 @@ module Boson
     # [*:options*] Hash of options passed to OptionParser
     # [*:render_options*] Hash of rendering options to pass to OptionParser. If the key :output_class is passed,
     #                     that class's Hirb config will serve as defaults for this rendering hash.
-    # [*:option_command*] Boolean to wrap a command with an OptionCommand object i.e. allow commands to have options.
     # [*:args*] Should only be set if not automatically set. This attribute is only
     #           important for commands that have options/render_options. Its value can be an array
     #           (as ArgumentInspector.scrape_with_eval produces), a number representing
@@ -62,8 +60,8 @@ module Boson
       hash = attributes.dup
       @name = hash.delete(:name) or raise ArgumentError
       @lib = hash.delete(:lib) or raise ArgumentError
-      [:alias, :desc, :options, :namespace, :default_option, :option_command].each do |e|
-          instance_variable_set("@#{e}", hash.delete(e)) if hash.key?(e)
+      INIT_ATTRIBUTES.each do |e|
+        instance_variable_set("@#{e}", hash.delete(e)) if hash.key?(e)
       end
 
       if hash[:render_options] && (@render_options = hash.delete(:render_options))[:output_class]
@@ -146,15 +144,6 @@ module Boson
 
     def has_splat_args?
       !!(args && @args[-1] && @args[-1][0][/^\*/])
-    end
-
-    def make_option_command(lib=library)
-      @option_command = true
-      @args = [['*args']] unless args(lib) || arg_size
-    end
-
-    def option_command?
-      options || render_options || @option_command
     end
 
     def arg_size

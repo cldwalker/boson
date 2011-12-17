@@ -46,7 +46,6 @@ module Boson
       :unload=>{:type=>:string, :desc=>"Acts as a regular expression to unload default libraries"},
       :render=>{:type=>:boolean, :desc=>"Renders a Hirb view from result of command without options"},
       :pager_toggle=>{:type=>:boolean, :desc=>"Toggles Hirb's pager"},
-      :option_commands=>{:type=>:boolean, :desc=>"Toggles on all commands to be defined as option commands" },
       :ruby_debug=>{:type=>:boolean, :desc=>"Sets $DEBUG", :alias=>'D'},
       :debug=>{:type=>:boolean, :desc=>"Prints debug info for boson"},
       :load_path=>{:type=>:string, :desc=>"Add to front of $LOAD_PATH", :alias=>'I'},
@@ -99,7 +98,6 @@ module Boson
       # Loads libraries and handles non-critical options
       def init
         Runner.in_shell = true
-        Command.all_option_commands = true if @options[:option_commands]
         super
 
         if @options.key?(:index)
