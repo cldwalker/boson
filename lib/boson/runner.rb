@@ -3,12 +3,18 @@ module Boson
   class Runner
     DEFAULT_LIBRARIES = [Boson::Commands::Core]
 
+    module API
+      def start(*)
+        load_rc
+      end
+    end
+
     class<<self
+      include API
       attr_accessor :debug
 
       # Enables view, adds local load path and loads default_libraries
       def init
-        load_rc
         View.enable
         add_load_path
         Manager.load default_libraries, load_options

@@ -15,6 +15,7 @@ module Boson
       #                       method_missing on Boson.main_object so that commands with unloaded
       #                       libraries are automatically loaded. Default is false.
       def start(options={})
+        super
         @options = {:verbose=>true}.merge options
         init unless @initialized
         Manager.load(@options[:libraries], load_options) if @options[:libraries]
@@ -55,4 +56,3 @@ module Boson
     end
   end
 end
-  
