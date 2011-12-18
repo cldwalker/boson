@@ -1,5 +1,5 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
-require 'boson/runners/bin_runner'
+require 'boson/bin_runner'
 BinRunner = Boson::BinRunner
 
 describe "BinRunner" do
@@ -138,20 +138,6 @@ __END__
 describe "BinRunner" do
   describe "at commandline" do
     before_all { reset }
-
-    it "console option starts irb" do
-      ConsoleRunner.expects(:start)
-      Util.expects(:which).returns("/usr/bin/irb")
-      ConsoleRunner.expects(:load_repl).with("/usr/bin/irb")
-      start("--console")
-    end
-
-    it "console option but no irb found prints error" do
-      ConsoleRunner.expects(:start)
-      Util.expects(:which).returns(nil)
-      ConsoleRunner.expects(:abort).with {|arg| arg[/Console not found/] }
-      start '--console'
-    end
 
     it "failed subcommand prints error and not command not found" do
       BinRunner.expects(:execute_command).raises("bling")

@@ -1,5 +1,5 @@
 %w{hirb alias boson/commands}.each {|e| require e }
-%w{runner runners/console_runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
+%w{runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
 %w{module file gem require local_file}.each {|e| require "boson/libraries/#{e}_library" }
@@ -10,7 +10,6 @@
 #
 # Useful documentation links:
 # * Boson::BinRunner - Runs the boson executable
-# * Boson::ConsoleRunner - Runs Boson from the ruby console
 # * Boson::Repo.config - Explains main config file
 # * Boson::Library - All about libraries
 # * Boson::FileLibrary - Explains creating libraries as files
@@ -67,12 +66,6 @@ module Boson
 
   def library(query, attribute='name') #:nodoc:
     libraries.find {|e| e.send(attribute) == query }
-  end
-
-  # Start Boson by loading repositories and their configured libraries.
-  # See ConsoleRunner.start for its options.
-  def start(options={})
-    ConsoleRunner.start(options)
   end
 
   # Invoke an action on the main object.

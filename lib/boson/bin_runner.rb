@@ -12,13 +12,10 @@ module Boson
   # [:execute] Like ruby -e, this executes a string of ruby code. However, this has the advantage that all
   #            commands are available as normal methods, automatically loading as needed. This is a good
   #            way to call commands that take non-string arguments.
-  # [:console] This drops Boson into irb after having loaded default commands and any explict libraries with
-  #            :load option. This is a good way to start irb with only certain libraries loaded.
   class BinRunner < Runner
     GLOBAL_OPTIONS =  {
       :version=>{:type=>:boolean, :desc=>"Prints the current version"},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
-      :console=>{:type=>:boolean, :desc=>"Drops into irb with default and explicit libraries loaded"},
       :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
       :ruby_debug=>{:type=>:boolean, :desc=>"Sets $DEBUG", :alias=>'D'},
       :debug=>{:type=>:boolean, :desc=>"Prints debug info for boson"},
@@ -32,12 +29,12 @@ module Boson
       def start(args=ARGV)
         super
         @command, @options, @args = parse_args(args)
-        return puts("boson #{Boson::VERSION}") if @options[:version]
-        return print_usage if args.empty? || (@command.nil? && !@options[:console] && !@options[:execute])
+
         $:.unshift(*options[:load_path].split(":")) if options[:load_path]
-        Runner.debug = true if @options[:debug]
-        return ConsoleRunner.bin_start(@options[:console], @options[:load]) if @options[:console]
+        Runner.debug = true if options[:debug]
         $DEBUG = true if options[:ruby_debug]
+        return if early_option?(args)
+
         init
 
         if @options[:help]
@@ -53,6 +50,18 @@ module Boson
         abort_with no_method_error_message
       rescue
         abort_with default_error_message
+      end
+
+      def early_option?(args)
+        if @options[:version]
+          puts("boson #{Boson::VERSION}")
+          true
+        elsif args.empty? || (@command.nil? && !@options[:execute])
+          print_usage
+          true
+        else
+          false
+        end
       end
 
       def verbose

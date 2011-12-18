@@ -3,6 +3,8 @@ module Boson
   # A class for repositories. A repository has a root directory with required subdirectories config/ and
   # commands/ and optional subdirectory lib/. Each repository has a primary config file at config/boson.yml.
   class Repo
+    CONFIG = {libraries: {}, command_aliases: {}, option_underscore_search: true}
+
     def self.commands_dir(dir) #:nodoc:
       File.join(dir, 'commands')
     end
@@ -47,8 +49,6 @@ module Boson
     #                      :command_aliases=>{'libraries'=>'lib', 'commands'=>'com'}
     # [:defaults] Array of libraries to load at start up for commandline and irb. This is useful for extending boson i.e. adding your
     #             own option types since these are loaded before any other libraries. Default is no libraries.
-    # [:console_defaults] Array of libraries to load at start up when used in irb. Default is to load all library files and libraries
-    #                     defined in the config.
     # [:bin_defaults] Array of libraries to load at start up when used from the commandline. Default is no libraries.
     # [:add_load_path] Boolean specifying whether to add a load path pointing to the lib subdirectory/. This is useful in sharing
     #                  classes between libraries without resorting to packaging them as gems. Defaults to false if the lib
@@ -60,7 +60,6 @@ module Boson
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.
-    # [:console] Console to load when using --console from commandline. Default is irb.
     # [:auto_namespace] Boolean which automatically namespaces all user-defined libraries. Be aware this can break libraries which
     #                   depend on commands from other libraries. Default is false.
     # [:ignore_directories] Array of directories to ignore when detecting local repositories for Boson.local_repo.
@@ -70,7 +69,7 @@ module Boson
     def config(reload=false)
       if reload || @config.nil?
         begin
-          @config = {:libraries=>{}, :command_aliases=>{}, :console_defaults=>[], :option_underscore_search=>true}
+          @config = CONFIG.dup
           @config.merge!(YAML::load_file(config_file(true))) if File.exists?(config_file)
         rescue ArgumentError
           message = $!.message !~ /syntax error on line (\d+)/ ? "Error"+$!.message :

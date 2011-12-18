@@ -13,7 +13,7 @@ module TestHelpers
   # make local so it doesn't pick up my real boson dir
   Boson.repo.dir = File.dirname(__FILE__)
   # prevent extra File.exists? calls which interfere with stubs for it
-  Boson.repo.config = {:libraries=>{}, :command_aliases=>{}, :console_defaults=>[]}
+  Boson.repo.config = {:libraries=>{}, :command_aliases=>{}}
   Boson.instance_variable_set "@repos", [Boson.repo]
 
   def assert_error(error, message=nil)
