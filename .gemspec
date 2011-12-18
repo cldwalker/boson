@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 require 'rubygems' unless Object.const_defined?(:Gem)
 require File.dirname(__FILE__) + "/lib/boson/version"
- 
+
 Gem::Specification.new do |s|
   s.name        = "boson"
   s.version     = Boson::VERSION
@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'bacon', '>= 1.1.0'
   s.add_development_dependency 'mocha-on-bacon'
   s.add_development_dependency 'bacon-bits'
+  s.add_development_dependency 'bahia', '>= 0.3.0'
   s.files = Dir.glob(%w[{lib,test}/**/*.rb bin/* [A-Z]*.{txt,rdoc} ext/**/*.{rb,c} **/deps.rip]) + %w{Rakefile .gemspec}
   s.extra_rdoc_files = ["README.rdoc", "LICENSE.txt"]
   s.license = 'MIT'
