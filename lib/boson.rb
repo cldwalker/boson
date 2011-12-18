@@ -38,7 +38,7 @@ module Boson
 
   # The main required repository which defaults to ~/.boson.
   def repo
-    @repo ||= Repo.new("#{Dir.home}/.boson")
+    @repo ||= Repo.new("#{ENV['BOSON_HOME'] || Dir.home}/.boson")
   end
 
   # An optional local repository which defaults to ./lib/boson or ./.boson.
