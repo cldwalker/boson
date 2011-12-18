@@ -67,6 +67,15 @@ describe "BinRunner" do
     end
   end
 
+  # TODO: moar acceptance tests
+  xit "basic command executes" do
+    BinRunner.expects(:init).returns(true)
+    BinRunner.stubs(:render_output)
+    Boson.main_object.expects(:send).with('kick','it')
+    start 'kick','it'
+  end
+  xit "bin_defaults config loads by default"
+
   def start(*args)
     Hirb.stubs(:enable)
     BinRunner.start(args)
@@ -120,7 +129,7 @@ describe "BinRunner" do
   end
 
   it "parse_args only translates options before command" do
-    BinRunner.parse_args(['-v', 'com', '-v']).should == ["com", {:verbose=>true}, ['-v']]
+    BinRunner.parse_args(['-d', 'com', '-v']).should == ["com", {debug: true}, ['-v']]
     BinRunner.parse_args(['com', '-v']).should == ["com", {}, ['-v']]
   end
 end
@@ -129,16 +138,6 @@ __END__
 describe "BinRunner" do
   describe "at commandline" do
     before_all { reset }
-
-    it "invalid option value prints error" do
-      aborts_with(/Error: no value/) { start("-l") }
-    end
-
-    it "load option loads libraries" do
-      Manager.expects(:load).with {|*args| args[0][0].is_a?(Module) ? true : args[0][0] == 'blah'}.times(2)
-      BinRunner.stubs(:execute_command)
-      start('-l', 'blah', 'libraries')
-    end
 
     it "console option starts irb" do
       ConsoleRunner.expects(:start)
@@ -163,32 +162,11 @@ describe "BinRunner" do
       aborts_with(/'to_s.bling' not found/) { start("to_s.bling") }
     end
 
-    it "with backtrace option prints backtrace" do
-      BinRunner.expects(:autoload_command).returns(false)
-      aborts_with(/not found\nOriginal.*runner\.rb:/m) { start("--backtrace", "blah") }
-    end
-
-    it "basic command executes" do
-      BinRunner.expects(:init).returns(true)
-      BinRunner.stubs(:render_output)
-      Boson.main_object.expects(:send).with('kick','it')
-      start 'kick','it'
-    end
-
     it "sub command executes" do
       obj = Object.new
       Boson.main_object.extend Module.new { def phone; Struct.new(:home).new('done'); end }
       BinRunner.expects(:init).returns(true)
       start 'phone.home'
     end
-
-    it "bin_defaults config loads by default" do
-      defaults = Runner.default_libraries + ['yo']
-      with_config(:bin_defaults=>['yo']) do
-        Manager.expects(:load).with {|*args| args[0] == defaults }
-        aborts_with(/blah/) { start 'blah' }
-      end
-    end
   end
-
 end
