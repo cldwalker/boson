@@ -280,10 +280,10 @@ module Boson
     alias :to_s :formatted_usage
 
     # More verbose option help in the form of a table.
-    def print_usage_table(render_options={})
-      fields = get_usage_fields render_options[:fields]
-      fields, opts =  get_fields_and_options(fields, render_options)
-      render_table(fields, opts, render_options)
+    def print_usage_table(options={})
+      fields = get_usage_fields options[:fields]
+      fields, opts =  get_fields_and_options(fields, options)
+      render_table(fields, opts, options)
     end
 
     module API

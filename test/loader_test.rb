@@ -40,10 +40,10 @@ describe "Loader" do
     end
 
     it "hash from inspector recursively merged with user's config" do
-      with_config(:libraries=>{'blah'=>{:commands=>{'blung'=>{:args=>[], :render_options=>{:sort=>'this'}}}}}) do
-        CommentInspector.expects(:scrape).returns({:render_options=>{:fields=>['this']}})
+      with_config(:libraries=>{'blah'=>{:commands=>{'blung'=>{:args=>[], :options=>{:sort=>'this'}}}}}) do
+        CommentInspector.expects(:scrape).returns({:options=>{:fields=>['this']}})
         load :blah, :file_string=>"module Blah; def blung; end; end"
-        library('blah').command_object('blung').render_options.should == {:fields=>["this"], :sort=>"this"}
+        library('blah').command_object('blung').options.should == {:fields=>["this"], :sort=>"this"}
       end
     end
   end

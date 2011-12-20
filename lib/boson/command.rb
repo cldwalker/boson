@@ -1,5 +1,5 @@
 module Boson
-  # A command starts with the functionality of a ruby method and adds benefits with options, render_options, etc.
+  # A command starts with the functionality of a ruby method and adds benefits with options, etc.
   class Command
     module API
       # Creates a command given its name and a library.
@@ -35,7 +35,7 @@ module Boson
     end
 
     ATTRIBUTES = [:name, :lib, :alias, :desc, :options, :args, :config]
-    attr_accessor *(ATTRIBUTES + [:render_options, :namespace, :default_option])
+    attr_accessor *(ATTRIBUTES + [:namespace, :default_option])
     INIT_ATTRIBUTES = [:alias, :desc, :options, :namespace, :default_option]
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
@@ -44,8 +44,6 @@ module Boson
     # [*:desc*] Description that shows up in command listings
     # [*:alias*] Alternative name for command
     # [*:options*] Hash of options passed to OptionParser
-    # [*:render_options*] Hash of rendering options to pass to OptionParser. If the key :output_class is passed,
-    #                     that class's Hirb config will serve as defaults for this rendering hash.
     # [*:args*] Should only be set if not automatically set. This attribute is only
     #           important for commands that have options/render_options. Its value can be an array
     #           (as ArgumentInspector.scrape_with_eval produces), a number representing
@@ -64,9 +62,7 @@ module Boson
         instance_variable_set("@#{e}", hash.delete(e)) if hash.key?(e)
       end
 
-      if hash[:render_options] && (@render_options = hash.delete(:render_options))[:output_class]
-        @render_options = Util.recursive_hash_merge View.class_config(@render_options[:output_class]), @render_options
-      end
+      after_initialize(hash)
 
       if (args = hash.delete(:args))
         if args.is_a?(Array)
@@ -79,6 +75,12 @@ module Boson
       end
       @config = Util.recursive_hash_merge hash, hash.delete(:config) || {}
     end
+
+    module API
+      def after_initialize(hash)
+      end
+    end
+    include API
 
     # Library object a command belongs to.
     def library
@@ -158,7 +160,8 @@ module Boson
     # Deprecated method
     def description
       puts "@command.description has been changed to @command.desc. Delete your old " +
-        "Boson index at ~/.boson/command/index.marshal for Boson to work from the commandline."
+        "Boson index at ~/.boson/command/index.marshal for Boson to work from the commandline." +
+        "This will be removed in boson 0.5"
       Kernel.exit
     end
 
