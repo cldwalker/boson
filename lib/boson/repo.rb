@@ -55,15 +55,12 @@ module Boson
     #                  subdirectory doesn't exist in the boson directory.
     #
     # ==== Config keys specific to the main repo config ~/.boson/config/boson.yml
-    # [:render_options] Hash of render options available to all option commands to be passed to a Hirb view (see View). Since
-    #                   this merges with default render options, it's possible to override default render options.
     # [:error_method_conflicts] Boolean specifying library loading behavior when its methods conflicts with existing methods in
     #                           the global namespace. When set to false, Boson automatically puts the library in its own namespace.
     #                           When set to true, the library fails to load explicitly. Default is false.
     # [:auto_namespace] Boolean which automatically namespaces all user-defined libraries. Be aware this can break libraries which
     #                   depend on commands from other libraries. Default is false.
     # [:ignore_directories] Array of directories to ignore when detecting local repositories for Boson.local_repo.
-    # [:no_auto_render] When set, turns off commandline auto-rendering of a command's output. Default is false.
     # [:option_underscore_search] When set, OptionParser option values (with :values or :keys) are auto aliased with underscore searching.
     #                             Default is true. See Util.underscore_search.
     def config(reload=false)

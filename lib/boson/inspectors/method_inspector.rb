@@ -6,8 +6,9 @@ module Boson
     extend self
     attr_accessor :current_module, :mod_store
     @mod_store ||= {}
-    METHODS = [:config, :desc, :options, :render_options]
-    METHOD_CLASSES = {:config=>Hash, :desc=>String, :options=>Hash, :render_options=>Hash}
+    METHODS = [:config, :desc, :options]
+    SCRAPEABLE_METHODS = [:options]
+    METHOD_CLASSES = {:config=>Hash, :desc=>String, :options=>Hash}
     ALL_METHODS = METHODS + [:option]
 
     # The method_added used while scraping method attributes.
@@ -27,7 +28,7 @@ module Boson
         end
       end
       store[:temp] = {}
-      scrape_arguments(meth) if has_inspector_method?(meth, :options) || has_inspector_method?(meth,:render_options)
+      scrape_arguments(meth) if SCRAPEABLE_METHODS.any? {|m| has_inspector_method?(meth, m) }
     end
 
     METHODS.each do |e|

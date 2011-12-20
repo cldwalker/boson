@@ -54,10 +54,6 @@ describe "MethodInspector" do
         {"zee"=>{:z=>:string}}
     end
 
-    it "render_options sets render_options" do
-      parse("render_options :z=>true; def zee; end")[:render_options].should == {"zee"=>{:z=>true}}
-    end
-
     it "config sets config" do
       parse("config :z=>true; def zee; end")[:config].should == {"zee"=>{:z=>true}}
     end
@@ -65,7 +61,7 @@ describe "MethodInspector" do
     it "not all method attributes set causes method_locations to be set" do
       MethodInspector.stubs(:find_method_locations).returns(["/some/path", 10])
       parsed = parse "desc 'yo'; def yo; end; options :yep=>1; def yep; end; " +
-        "option :b, :boolean; render_options :a=>1; config :a=>1; desc 'z'; options :a=>1; def az; end"
+        "option :b, :boolean; config :a=>1; desc 'z'; options :a=>1; def az; end"
       parsed[:method_locations].key?('yo').should == true
       parsed[:method_locations].key?('yep').should == true
       parsed[:method_locations].key?('az').should == false

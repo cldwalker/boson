@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 describe "CommentInspector" do
   before_all { eval "module ::Optional; def self.bling; {:a=>'bling'}; end; end" }
   describe "scrapes description" do
-    before { 
+    before {
       @lines = ["module Foo", "  # some comments yay", "  def foo", "  end", "end"]
     }
     def description(options={})
@@ -111,16 +111,16 @@ describe "CommentInspector" do
   end
 
   it "scrapes all comment types with implicit desc" do
-    @lines = ["module Foo", '# @config :a=>true', '# @render_options :b=>1', '  # @options {:a=>true}',
+    @lines = ["module Foo", '# @config :a=>true', '  # @options {:a=>true}',
       '#blah', "  def foo", "  end", "end"]
-    expected = {:desc=>"blah", :options=>{:a=>true}, :render_options=>{:b=>1}, :config=>{:a=>true}}
-    CommentInspector.scrape(@lines.join("\n"), 6, Optional).should == expected
+    expected = {:desc=>"blah", :options=>{:a=>true}, :config=>{:a=>true}}
+    CommentInspector.scrape(@lines.join("\n"), 5, Optional).should == expected
   end
 
   it "scrapes all comment types with explicit desc" do
-    @lines = ["module Foo",  '#@desc blah', '# @render_options :b=>1,', '# :c=>2',
-      '  # @options {:a=>true}', '  # @config :a=>true', "  def foo", "  end", "end"]
-    expected = {:desc=>"blah", :options=>{:a=>true}, :render_options=>{:b=>1, :c=>2}, :config=>{:a=>true}}
-    CommentInspector.scrape(@lines.join("\n"), 7, Optional).should == expected
+    @lines = ["module Foo",  '#@desc blah', '  # @options {:a=>true}',
+      '  # @config :a=>true', "  def foo", "  end", "end"]
+    expected = {:desc=>"blah", :options=>{:a=>true}, :config=>{:a=>true}}
+    CommentInspector.scrape(@lines.join("\n"), 5, Optional).should == expected
   end
 end

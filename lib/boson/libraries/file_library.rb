@@ -50,7 +50,7 @@ module Boson
   # Some points about the above:
   # * A '@' must prefix options and other method attributes that become comments.
   # * Note the comment above the method. One-line comments right before a method set a command's description.
-  # * See Inspector for other method attributes, like config and render_options, that can be placed above a method.
+  # * See Inspector for other method attributes, like config that can be placed above a method.
   #
   # Once a command has a defined option, a command can also recognize a slew of global options:
   #   >> take_over '-h'

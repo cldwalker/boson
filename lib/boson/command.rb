@@ -45,7 +45,7 @@ module Boson
     # [*:alias*] Alternative name for command
     # [*:options*] Hash of options passed to OptionParser
     # [*:args*] Should only be set if not automatically set. This attribute is only
-    #           important for commands that have options/render_options. Its value can be an array
+    #           important for commands that have options. Its value can be an array
     #           (as ArgumentInspector.scrape_with_eval produces), a number representing
     #           the number of arguments or '*' if the command has a variable number of arguments.
     # [*:default_option*] Only for an option command that has one or zero arguments. This treats the given

@@ -6,7 +6,6 @@ module Boson
   # Method attributes refer to (commented) Module methods placed before a command's method
   # in a FileLibrary module:
   #   module SomeMod
-  #      # @render_options :fields=>%w{one two}
   #      # @config :alias=>'so'
   #      options :verbose=>:boolean
   #      option :count, :numeric
@@ -22,7 +21,6 @@ module Boson
   # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
   # * options: Hash to define an OptionParser object for a command's options.
   # * option: Option name and value to be merged in with options. See OptionParser for what an option value can be.
-  # * render_options: Hash to define an OptionParser object for a command's local/global render options (see View).
   #
   # When deciding whether to use commented or normal Module methods, remember that commented Module methods allow
   # independence from Boson (useful for testing). See CommentInspector for more about commented method attributes.
