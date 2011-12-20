@@ -6,8 +6,6 @@ module Boson::Commands::Core #:nodoc:
     library_attributes = Boson::Library::ATTRIBUTES + [:library_type]
 
     commands = {
-      'render'=>{:desc=>"Render any object using Hirb"},
-      'menu'=>{:desc=>"Provide a menu to multi-select elements from a given array"},
       'usage'=>{:desc=>"Print a command's usage", :options=>{
         :verbose=>{:desc=>"Display global options", :type=>:boolean},
         :render_options=>{:desc=>"Render options for option tables", :default=>{},
@@ -50,14 +48,6 @@ module Boson::Commands::Core #:nodoc:
 
   def load_library(library, options={})
     Boson::Manager.load(library, options)
-  end
-
-  def render(object, options={})
-    Boson::View.render(object, options)
-  end
-
-  def menu(arr, options={}, &block)
-    Hirb::Console.format_output(arr, options.merge(:class=>"Hirb::Menu"), &block)
   end
 
   def usage(command, options={})

@@ -15,7 +15,6 @@ module Boson
 
       # Enables view, adds local load path and loads default_libraries
       def init
-        View.enable
         add_load_path
         Manager.load default_libraries, load_options
       end

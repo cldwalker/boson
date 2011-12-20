@@ -140,10 +140,12 @@ module Boson
         [new_args[0], options, new_args[1..-1]]
       end
 
-      def print_usage
+      def print_usage_header
         puts "boson [GLOBAL OPTIONS] [COMMAND] [ARGS] [COMMAND OPTIONS]\n\n"
-        puts "GLOBAL OPTIONS"
-        View.enable
+      end
+
+      def print_usage
+        print_usage_header
         @option_parser.print_usage_table
       end
       #:startdoc:

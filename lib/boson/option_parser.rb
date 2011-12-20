@@ -78,7 +78,7 @@ module Boson
     SHORT_SQ_RE = /^-([a-zA-Z]{2,})$/i # Allow either -x -v or -xv style for single char args
     SHORT_NUM   = /^(-[a-zA-Z])#{NUMERIC}$/i
     STOP_STRINGS = %w{-- -}
-    
+
     attr_reader :leading_non_opts, :trailing_non_opts, :opt_aliases
 
     # Given options to pass to OptionParser.new, this method parses ARGV and returns the remaining arguments
@@ -132,7 +132,7 @@ module Boson
     #
     # Options can have additional attributes by passing a hash to the option value instead of
     # a type or default:
-    # 
+    #
     #    Boson::OptionParser.new :fields=>{:type=>:array, :values=>%w{f1 f2 f3},
     #     :enum=>false}
     #
@@ -229,7 +229,7 @@ module Boson
       @args = args
       # start with defaults
       hash = IndifferentAccessHash.new @defaults
-      
+
       @leading_non_opts = []
       unless flags[:opts_before_args]
         @leading_non_opts << shift until current_is_option? || @args.empty? || STOP_STRINGS.include?(peek)
@@ -281,14 +281,32 @@ module Boson
 
     # More verbose option help in the form of a table.
     def print_usage_table(render_options={})
-      user_fields = render_options.delete(:fields)
-      fields = get_usage_fields user_fields
-      (fields << :default).uniq! if render_options.delete(:local) || user_fields == '*'
-      opts = all_options_with_fields fields
-      fields.delete(:default) if fields.include?(:default) && opts.all? {|e| e[:default].nil? }
-      render_options = default_render_options.merge(:fields=>fields).merge(render_options)
-      View.render opts, render_options
+      fields = get_usage_fields render_options[:fields]
+      fields, opts =  get_fields_and_options(fields, render_options)
+      render_table(fields, opts, render_options)
     end
+
+    module API
+      def get_fields_and_options(fields, options)
+        opts = all_options_with_fields fields
+        [fields, opts]
+      end
+
+      def render_table(fields, arr, options)
+        arr_of_arr = [['Name', 'Desc'], ['----', '----']] + arr.map do |row|
+          [ row.values_at(:alias, :name).join(', '), row[:desc] ]
+        end
+
+        name_max = arr_of_arr.map {|arr| arr[0].length }.max
+        desc_max = arr_of_arr.map {|arr| arr[1].length }.max
+
+        usage = arr_of_arr.map do |name, desc|
+          "  %-*s  %-*s" % [name_max, name, desc_max, desc]
+        end
+        puts usage
+      end
+    end
+    include API
 
     def all_options_with_fields(fields) #:nodoc:
       aliases = @opt_aliases.invert
@@ -301,11 +319,6 @@ module Boson
         }
         t << h
       }
-    end
-
-    def default_render_options #:nodoc:
-      {:header_filter=>:capitalize, :description=>false, :filter_any=>true,
-        :filter_classes=>{Array=>[:join, ',']}, :hide_empty=>true}
     end
 
     # Hash of option names mapped to hash of its external attributes
@@ -436,7 +449,7 @@ module Boson
         @args = arg + @args
       end
     end
-    
+
     def valid?(arg)
       if arg.to_s =~ /^--no-(\w+)$/
         @opt_types.key?(arg) or (@opt_types[dasherize($1)] == :boolean) or
@@ -454,11 +467,11 @@ module Boson
         $1.split('').any? { |f| valid?("-#{f}") }
       end
     end
-    
+
     def normalize_option(opt)
       @opt_aliases.key?(opt) ? @opt_aliases[opt] : opt
     end
-    
+
     def original_no_opt(opt)
       @opt_aliases[dasherize(opt)]
     end
