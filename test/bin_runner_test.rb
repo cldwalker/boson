@@ -77,7 +77,6 @@ describe "BinRunner" do
   xit "bin_defaults config loads by default"
 
   def start(*args)
-    Hirb.stubs(:enable)
     BinRunner.start(args)
   end
 

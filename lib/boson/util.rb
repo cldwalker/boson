@@ -15,7 +15,7 @@ module Boson
     # From Rails ActiveSupport, does the reverse of underscore:
     # 'boson/method_inspector' -> 'Boson::MethodInspector'
     def camelize(string)
-      Hirb::Util.camelize(string)
+      string.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
     end
 
     # Converts a module/class string to the actual constant.
@@ -27,7 +27,14 @@ module Boson
     # Returns a constant like const_get() no matter what namespace it's nested in.
     # Returns nil if the constant is not found.
     def any_const_get(name)
-      Hirb::Util.any_const_get(name)
+      return name if name.is_a?(Module)
+      klass = Object
+      name.split('::').each {|e|
+        klass = klass.const_get(e)
+      }
+      klass
+    rescue
+       nil
     end
 
     # Detects new object/kernel methods, gems and modules created within a block.

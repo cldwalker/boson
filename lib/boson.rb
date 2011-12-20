@@ -1,4 +1,4 @@
-%w{hirb alias boson/commands}.each {|e| require e }
+%w{alias boson/commands}.each {|e| require e }
 %w{runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
 %w{argument method comment}.each {|e| require "boson/inspectors/#{e}_inspector" }
 # order of library subclasses matters
