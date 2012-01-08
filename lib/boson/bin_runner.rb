@@ -22,36 +22,6 @@ module Boson
       :load_path=>{:type=>:string, :desc=>"Add to front of $LOAD_PATH", :alias=>'I'}
     } #:nodoc:
 
-    module Extra
-      def self.extended(mod)
-        Inspector.enable all_classes: true
-      end
-
-      def start(args=ARGV)
-        Inspector.disable
-        Boson::Runner.start
-        Manager.load self
-
-        @command, @options, @args = parse_args(args)
-
-        if @options[:help]
-          puts Boson::Command.usage(@command)
-        elsif @command.nil?
-          print_usage
-        else
-          execute_command(@command, @args)
-        end
-      end
-
-      def print_usage
-        puts "Usage: #{app_name} COMMAND ARGS"
-      end
-
-      def app_name
-        File.basename($0).split(' ').first
-      end
-    end
-
     module API
       attr_accessor :command
 
