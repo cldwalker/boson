@@ -30,7 +30,9 @@ module Boson
 
     # Enable scraping by overridding method_added to snoop on a library while it's
     # loading its methods.
-    def enable
+    def enable(options = {})
+      method_inspector_meth = options[:all_classes] ?
+        :new_method_added : :safe_new_method_added
       @enabled = true
       body = MethodInspector::ALL_METHODS.map {|e|
         %[def #{e}(*args)
@@ -39,7 +41,7 @@ module Boson
       }.join("\n") +
       %[
         def new_method_added(method)
-          Boson::MethodInspector.new_method_added(self, method)
+          Boson::MethodInspector.#{method_inspector_meth}(self, method)
         end
 
         alias_method :_old_method_added, :method_added

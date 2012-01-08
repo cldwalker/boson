@@ -108,7 +108,8 @@ module Boson
       end
 
       def before_create_commands(lib)
-        lib.is_a?(FileLibrary) && lib.module && Inspector.add_method_data_to_library(lib)
+        (lib.is_a?(FileLibrary) || lib.is_a?(RunnerLibrary)) &&
+          lib.module && Inspector.add_method_data_to_library(lib)
       end
 
       def create_commands(lib, commands=lib.commands)

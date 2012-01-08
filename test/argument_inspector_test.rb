@@ -22,7 +22,8 @@ describe "scrape_with_text" do
   end
 end
 
-describe "scrape_with_eval" do
+# TODO: renable argument scraping
+xdescribe "scrape_with_eval" do
   def args_from(string)
     # methods need options to have their args parsed with ArgumentInspector
     string.gsub!(/(def blah)/, 'options :a=>1; \1')

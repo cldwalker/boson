@@ -11,9 +11,13 @@ module Boson
     METHOD_CLASSES = {:config=>Hash, :desc=>String, :options=>Hash}
     ALL_METHODS = METHODS + [:option]
 
+    def safe_new_method_added(mod, meth)
+      return unless mod.to_s[/^Boson::Commands::/]
+      new_method_added(mod, meth)
+    end
+
     # The method_added used while scraping method attributes.
     def new_method_added(mod, meth)
-      return unless mod.to_s[/^Boson::Commands::/]
       self.current_module = mod
       store[:temp] ||= {}
       METHODS.each do |e|
@@ -28,7 +32,7 @@ module Boson
         end
       end
       store[:temp] = {}
-      scrape_arguments(meth) if SCRAPEABLE_METHODS.any? {|m| has_inspector_method?(meth, m) }
+      # scrape_arguments(meth) if SCRAPEABLE_METHODS.any? {|m| has_inspector_method?(meth, m) }
     end
 
     METHODS.each do |e|

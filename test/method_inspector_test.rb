@@ -72,12 +72,13 @@ describe "MethodInspector" do
       parse("def bluh; end")[:method_locations].key?('bluh').should == false
     end
 
-    it "options calls scrape_with_eval" do
+    # TODO: renable argument scraping
+    xit "options calls scrape_with_eval" do
       ArgumentInspector.expects(:scrape_with_eval).returns([['arg1']])
       parse("desc 'desc'; options :some=>:opts; def doy(arg1); end")[:args]['doy'].should == [['arg1']]
     end
 
-    it "options in file calls scrape_with_eval" do
+    xit "options in file calls scrape_with_eval" do
       MethodInspector.expects(:inspector_in_file?).returns(true)
       ArgumentInspector.expects(:scrape_with_eval).returns([['arg1']])
       parse("desc 'desc'; def doz(arg1); end")[:args]['doz'].should == [['arg1']]
