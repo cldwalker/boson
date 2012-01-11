@@ -1,6 +1,8 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "MethodInspector" do
+  before_all { MethodInspector.mod_store = {} }
+
   it "non commands module can't set anything" do
     eval "module Blah; end"
     MethodInspector.current_module = Blah

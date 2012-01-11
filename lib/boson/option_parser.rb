@@ -293,8 +293,9 @@ module Boson
       end
 
       def render_table(fields, arr, options)
-        arr_of_arr = [['Name', 'Desc'], ['----', '----']] + arr.map do |row|
-          [ row.values_at(:alias, :name).join(', '), row[:desc] ]
+        headers = options[:no_headers] ? [] : [['Name', 'Desc'], ['----', '----']]
+        arr_of_arr = headers + arr.map do |row|
+          [ row.values_at(:alias, :name).join(', '), row[:desc].to_s ]
         end
 
         name_max = arr_of_arr.map {|arr| arr[0].length }.max

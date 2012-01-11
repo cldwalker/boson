@@ -7,15 +7,27 @@ module Boson
       Inspector.enable all_classes: true
     end
 
-    def self.start(args=ARGV)
+    def self.init(args)
       Inspector.disable
-      Boson::Runner.start
+      Boson::Runner.start args
       Manager.load self
+    end
 
+    def self.start(args=ARGV)
+      init args
       @command, @options, @args = parse_args(args)
 
       if @options[:help]
-        puts Boson::Command.usage(@command)
+        if (cmd = Boson::Command.find(command))
+          puts "Usage: #{app_name} #{command} #{cmd.basic_usage}", "\n"
+          if cmd.options
+            puts "Options:"
+            puts cmd.option_parser.print_usage_table(no_headers: true)
+          end
+          puts "Description:\n  #{cmd.desc || 'TODO'}"
+        else
+          puts %[Could not find command "#{command}"]
+        end
       elsif @command.nil?
         print_usage
       else
