@@ -116,6 +116,17 @@ module Boson
         before_create_commands(lib)
         commands.each {|e| Boson.commands << Command.create(e, lib)}
         create_command_aliases(lib, commands) if commands.size > 0 && !lib.no_alias_creation
+        redefine_commands(lib, commands)
+      end
+
+      def redefine_commands(lib, commands)
+        option_commands = lib.command_objects(commands).select {|e| e.option_command? }
+        accepted, rejected = option_commands.partition {|e| e.args(lib) || e.arg_size }
+        if @options[:verbose] && rejected.size > 0
+          puts "Following commands cannot have options until their arguments are configured: " +
+            rejected.map {|e| e.name}.join(', ')
+        end
+        accepted.each {|cmd| Scientist.redefine_command(lib.namespace_object, cmd) }
       end
 
       def create_command_aliases(lib, commands)

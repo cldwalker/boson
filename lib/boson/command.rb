@@ -36,7 +36,8 @@ module Boson
 
     ATTRIBUTES = [:name, :lib, :alias, :desc, :options, :args, :config]
     attr_accessor *(ATTRIBUTES + [:namespace, :default_option])
-    INIT_ATTRIBUTES = [:alias, :desc, :options, :namespace, :default_option]
+    INIT_ATTRIBUTES = [:alias, :desc, :options, :namespace, :default_option,
+      :option_command ]
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
     #
@@ -54,6 +55,7 @@ module Boson
     #                       'some -v'   -> '--query=some -v'
     #                       '-v'        -> '-v'
     # [*:config*] A hash for third party libraries to get and set custom command attributes.
+    # [*:option_command*] Boolean to wrap a command with an OptionCommand object i.e. allow commands to have options.
     def initialize(attributes)
       hash = attributes.dup
       @name = hash.delete(:name) or raise ArgumentError
@@ -106,6 +108,10 @@ module Boson
     # Help string for options if a command has it.
     def option_help
       @options ? option_parser.to_s : ''
+    end
+
+    def option_command?
+      options || @option_command
     end
 
     def basic_usage

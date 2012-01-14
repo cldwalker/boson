@@ -78,8 +78,8 @@ STR
   end
 
   # TODO: once cmd options is back
-  xit "call command with options correctly" do
-    my_command('medium 1 --spicy').chomp.should == '[["1"], {:spicy => true}]'
+  it "call command with options correctly" do
+    my_command('medium 1 --spicy').chomp.should == '["1", {:spicy=>true}]'
   end
 
   it "call optionless command correctly" do
