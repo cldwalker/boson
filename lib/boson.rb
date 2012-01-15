@@ -4,7 +4,7 @@
 # order of library subclasses matters
 require 'boson/libraries/runner_library'
 %w{module file gem require local_file}.each {|e| require "boson/libraries/#{e}_library" }
-(%w{namespace view command util option_parser options scientist option_command} +
+(%w{namespace command util option_parser options scientist option_command} +
   %w{index repo_index version}).each {|e| require "boson/#{e}" }
 
 # This module stores the libraries, commands, repos and main object used throughout Boson.
