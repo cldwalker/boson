@@ -32,7 +32,7 @@ module Boson
       end
       store[:temp] = {}
       if SCRAPEABLE_METHODS.any? {|m| has_inspector_method?(meth, m) }
-        scrape_arguments(mod, meth)
+        set_arguments(mod, meth)
       end
     end
 
@@ -49,13 +49,21 @@ module Boson
       (store(mod)[:temp] ||= {})[:option][name] = value
     end
 
-    def scrape_arguments(mod, meth)
+    def set_arguments(mod, meth)
       store[:args] ||= {}
       file = find_method_locations(mod, meth)[0]
 
       if File.exists?(file)
         body = File.read(file)
-        store[:args][meth.to_s] = ArgumentInspector.scrape_with_text body, meth
+        store[:args][meth.to_s] = scrape_arguments body, meth
+      end
+    end
+
+    # Returns argument arrays
+    def scrape_arguments(file_string, meth)
+      tabspace = "[ \t]"
+      if match = /^#{tabspace}*def#{tabspace}+(?:\w+\.)?#{Regexp.quote(meth)}#{tabspace}*($|(?:\(|\s+)([^\n\)]+)\s*\)?\s*$)/.match(file_string)
+        (match.to_a[2] || '').strip.split(/\s*,\s*/).map {|e| e.split(/\s*=\s*/)}
       end
     end
 

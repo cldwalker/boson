@@ -1,6 +1,6 @@
 module Boson
-  # Scrapes and processes method attributes with the inspectors (MethodInspector
-  # and ArgumentInspector) and hands off the data to FileLibrary objects.
+  # Scrapes and processes method attributes with MethodInspector
+  # and hands off the data to Library objects.
   #
   # === Method Attributes
   # Method attributes refer to (commented) Module methods placed before a command's method

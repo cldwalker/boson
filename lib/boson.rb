@@ -1,6 +1,6 @@
 %w{alias boson/commands}.each {|e| require e }
 %w{runner repo manager loader inspector library}.each {|e| require "boson/#{e}" }
-%w{argument method}.each {|e| require "boson/inspectors/#{e}_inspector" }
+require 'boson/method_inspector'
 # order of library subclasses matters
 require 'boson/libraries/runner_library'
 %w{module file gem require local_file}.each {|e| require "boson/libraries/#{e}_library" }

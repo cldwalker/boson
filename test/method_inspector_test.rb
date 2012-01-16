@@ -74,4 +74,27 @@ describe "MethodInspector" do
       parse("def bluh; end")[:method_locations].key?('bluh').should == false
     end
   end
+
+  describe "scrape_arguments" do
+    def args_from(file_string)
+      MethodInspector.scrape_arguments(file_string, "blah")
+    end
+
+    it "parses arguments of class method" do
+      args_from("    def YAML.blah( filepath )\n").should == [['filepath']]
+    end
+
+    it "parses arguments with no spacing" do
+      args_from("def bong; end\ndef blah(arg1,arg2='val2')\nend").should == [["arg1"], ['arg2', "'val2'"]]
+    end
+
+    it "parses arguments with spacing" do
+      args_from("\t def blah(  arg1=val1, arg2 = val2)").should == [["arg1","val1"], ["arg2", "val2"]]
+    end
+
+    it "parses arguments without parenthesis" do
+      args_from(" def blah arg1, arg2, arg3={}").should == [['arg1'], ['arg2'], ['arg3','{}']]
+    end
+  end
+
 end

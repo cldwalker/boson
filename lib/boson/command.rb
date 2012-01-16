@@ -47,7 +47,7 @@ module Boson
     # [*:options*] Hash of options passed to OptionParser
     # [*:args*] Should only be set if not automatically set. This attribute is only
     #           important for commands that have options. Its value can be an array
-    #           (as ArgumentInspector.scrape_with_eval produces), a number representing
+    #           , a number representing
     #           the number of arguments or '*' if the command has a variable number of arguments.
     # [*:default_option*] Only for an option command that has one or zero arguments. This treats the given
     #                     option as an optional first argument. Example:
@@ -89,13 +89,13 @@ module Boson
       @library ||= Boson.library(@lib)
     end
 
-    # Array of array args with optional defaults. Scraped with ArgumentInspector.
+    # Array of array args with optional defaults. Scraped with MethodInspector
     def args(lib=library)
       @args = !@args.nil? ? @args : begin
         if lib
           file_string, meth = file_string_and_method_for_args(lib)
           (file_string && meth && (@file_parsed_args = true) &&
-            ArgumentInspector.scrape_with_text(file_string, meth))
+            MethodInspector.scrape_arguments(file_string, meth))
         end || false
       end
     end
