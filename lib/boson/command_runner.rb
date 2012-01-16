@@ -19,7 +19,8 @@ module Boson
 
       if @options[:help]
         if (cmd = Boson::Command.find(command))
-          puts "Usage: #{app_name} #{command} #{cmd.basic_usage}", "\n"
+          usage = cmd.basic_usage.empty? ? '' : " #{cmd.basic_usage}"
+          puts "Usage: #{app_name} #{command}#{usage}", "\n"
           if cmd.options
             puts "Options:"
             puts cmd.option_parser.print_usage_table(no_headers: true)

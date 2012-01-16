@@ -73,17 +73,5 @@ describe "MethodInspector" do
       MethodInspector.stubs(:find_method_locations).returns(nil)
       parse("def bluh; end")[:method_locations].key?('bluh').should == false
     end
-
-    # TODO: renable argument scraping
-    xit "options calls scrape_with_eval" do
-      ArgumentInspector.expects(:scrape_with_eval).returns([['arg1']])
-      parse("desc 'desc'; options :some=>:opts; def doy(arg1); end")[:args]['doy'].should == [['arg1']]
-    end
-
-    xit "options in file calls scrape_with_eval" do
-      MethodInspector.expects(:inspector_in_file?).returns(true)
-      ArgumentInspector.expects(:scrape_with_eval).returns([['arg1']])
-      parse("desc 'desc'; def doz(arg1); end")[:args]['doz'].should == [['arg1']]
-    end
   end
 end

@@ -31,7 +31,9 @@ module Boson
         end
       end
       store[:temp] = {}
-      # scrape_arguments(meth) if SCRAPEABLE_METHODS.any? {|m| has_inspector_method?(meth, m) }
+      if SCRAPEABLE_METHODS.any? {|m| has_inspector_method?(meth, m) }
+        scrape_arguments(mod, meth)
+      end
     end
 
     METHODS.each do |e|
@@ -47,15 +49,13 @@ module Boson
       (store(mod)[:temp] ||= {})[:option][name] = value
     end
 
-    # Scrapes a method's arguments using ArgumentInspector.
-    def scrape_arguments(meth)
+    def scrape_arguments(mod, meth)
       store[:args] ||= {}
+      file = find_method_locations(mod, meth)[0]
 
-      o = Object.new
-      o.extend(@current_module)
-      # private methods return nil
-      if (val = ArgumentInspector.scrape_with_eval(meth, @current_module, o))
-        store[:args][meth.to_s] = val
+      if File.exists?(file)
+        body = File.read(file)
+        store[:args][meth.to_s] = ArgumentInspector.scrape_with_text body, meth
       end
     end
 
