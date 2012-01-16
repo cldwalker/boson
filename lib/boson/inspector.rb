@@ -1,5 +1,5 @@
 module Boson
-  # Scrapes and processes method attributes with the inspectors (MethodInspector, CommentInspector
+  # Scrapes and processes method attributes with the inspectors (MethodInspector
   # and ArgumentInspector) and hands off the data to FileLibrary objects.
   #
   # === Method Attributes
@@ -21,9 +21,6 @@ module Boson
   # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
   # * options: Hash to define an OptionParser object for a command's options.
   # * option: Option name and value to be merged in with options. See OptionParser for what an option value can be.
-  #
-  # When deciding whether to use commented or normal Module methods, remember that commented Module methods allow
-  # independence from Boson (useful for testing). See CommentInspector for more about commented method attributes.
   module Inspector
     extend self
     attr_reader :enabled
@@ -66,7 +63,6 @@ module Boson
       MethodInspector.current_module = library.module
       @store = MethodInspector.store
       add_method_scraped_data
-      add_comment_scraped_data
     end
 
     #:stopdoc:
@@ -106,15 +102,6 @@ module Boson
       value.is_a?(klass) || value.nil?
     end
 
-    def add_comment_scraped_data
-      (@store[:method_locations] || []).select {|k,(f,l)| f == @library_file }.each do |cmd, (file, lineno)|
-        scraped = CommentInspector.scrape(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module)
-        @commands_hash[cmd] ||= {}
-        MethodInspector::METHODS.each do |e|
-          add_valid_data_to_config(e, scraped[e], cmd)
-        end
-      end
-    end
     #:startdoc:
   end
 end

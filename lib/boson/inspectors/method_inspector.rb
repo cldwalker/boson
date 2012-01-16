@@ -1,7 +1,6 @@
 module Boson
   # Gathers method attributes by redefining method_added and capturing method
-  # calls before a method. This module also saves method locations so CommentInspector
-  # can scrape their commented method attributes.
+  # calls before a method.
   module MethodInspector
     extend self
     attr_accessor :current_module, :mod_store
@@ -90,10 +89,7 @@ module Boson
 
     def inspector_in_file?(meth, inspector_method)
       return false if !(file_line = store[:method_locations] && store[:method_locations][meth])
-      if File.exists?(file_line[0]) && (options = CommentInspector.scrape(
-        FileLibrary.read_library_file(file_line[0]), file_line[1], @current_module, inspector_method) )
-        (store[inspector_method] ||= {})[meth] = options
-      end
+      true
     end
     #:startdoc:
   end

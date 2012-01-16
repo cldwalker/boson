@@ -38,14 +38,6 @@ describe "Loader" do
       load :blah, :file_string=>"module Blah; config :alias=>'ok'\n; def bling; end; end"
       library('blah').command_object('bling').alias.should == 'ok'
     end
-
-    it "hash from inspector recursively merged with user's config" do
-      with_config(:libraries=>{'blah'=>{:commands=>{'blung'=>{:args=>[], :options=>{:sort=>'this'}}}}}) do
-        CommentInspector.expects(:scrape).returns({:options=>{:fields=>['this']}})
-        load :blah, :file_string=>"module Blah; def blung; end; end"
-        library('blah').command_object('blung').options.should == {:fields=>["this"], :sort=>"this"}
-      end
-    end
   end
 
   describe "load" do
