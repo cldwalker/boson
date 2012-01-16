@@ -71,8 +71,6 @@ module TestHelpers
   # mocks as a file library
   def mock_library(lib, options={})
     options = {:file_string=>'', :exists=>true}.merge!(options)
-    File.expects(:exists?).with(FileLibrary.library_file(lib.to_s, Boson.repo.dir)).
-      at_least(1).returns(options.delete(:exists))
     File.expects(:read).returns(options.delete(:file_string))
   end
 
@@ -80,9 +78,7 @@ module TestHelpers
     # prevent conflicts with existing File.read stubs
     MethodInspector.stubs(:inspector_in_file?).returns(false)
     mock_library(lib, options) unless options.delete(:no_mock)
-    result = Manager.load([lib], options)
-    FileLibrary.reset_file_cache
-    result
+    Manager.load([lib], options)
   end
 
   def capture_stdout(&block)

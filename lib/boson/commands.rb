@@ -5,4 +5,3 @@ module Boson
     module Namespace; end
   end
 end
-require 'boson/commands/core'

@@ -44,7 +44,7 @@ describe "RepoIndex" do
   describe "find_library" do
     before_all {
       reset_boson
-      commands = [Command.new(:name=>'blurb', :lib=>'blah', :alias=>'bb'), 
+      commands = [Command.new(:name=>'blurb', :lib=>'blah', :alias=>'bb'),
         Command.new(:name=>'sub', :lib=>'bling', :alias=>'s')
       ]
       index.instance_variable_set "@commands", commands
@@ -75,7 +75,8 @@ describe "RepoIndex" do
     end
   end
 
-  describe "changed_libraries" do
+  # enable once this is moved
+  xdescribe "changed_libraries" do
     before_all { index.instance_eval "@lib_hashes = nil" }
 
     def changed(string, all_libs=['file1'])

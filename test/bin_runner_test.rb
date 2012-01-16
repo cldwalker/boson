@@ -54,7 +54,8 @@ describe "BinRunner" do
       process.success?.should == false
     end
 
-    it "prints error for too many arguments" do
+    # TODO: enable once bin runner's fate is decided
+    xit "prints error for too many arguments" do
       boson "commands 1 2 3"
       stderr.should =~ /^'commands' was called incorrectly/
       process.success?.should == false

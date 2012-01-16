@@ -89,15 +89,8 @@ module Boson
       @library ||= Boson.library(@lib)
     end
 
-    # Array of array args with optional defaults. Scraped with MethodInspector
     def args(lib=library)
-      @args = !@args.nil? ? @args : begin
-        if lib
-          file_string, meth = file_string_and_method_for_args(lib)
-          (file_string && meth && (@file_parsed_args = true) &&
-            MethodInspector.scrape_arguments(file_string, meth))
-        end || false
-      end
+      @args
     end
 
     # Option parser for command as defined by @options.
@@ -139,18 +132,6 @@ module Boson
     # until @config is consistent in index + actual loading
     def config
       @config ||= {}
-    end
-
-    def file_string_and_method_for_args(lib)
-      if !lib.is_a?(ModuleLibrary) && (klass_method = (lib.class_commands || {})[@name])
-        klass, meth = klass_method.split(NAMESPACE, 2)
-        if (meth_locations = MethodInspector.find_class_method_locations(klass, meth))
-          file_string = File.read meth_locations[0]
-        end
-      elsif File.exists?(lib.library_file || '')
-        file_string, meth = FileLibrary.read_library_file(lib.library_file), @name
-      end
-      [file_string, meth]
     end
 
     def has_splat_args?

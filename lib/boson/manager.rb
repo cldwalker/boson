@@ -42,12 +42,10 @@ module Boson
       rescue AppendFeaturesFalseError
         warn "DEBUG: Library #{library} didn't load due to append_features" if Runner.debug
       rescue LoaderError=>e
-        FileLibrary.reset_file_cache(library.to_s)
-        failed_libraries << library
+        add_failed_library library
         $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
       rescue StandardError, SyntaxError, LoadError =>e
-        FileLibrary.reset_file_cache(library.to_s)
-        failed_libraries << library
+        add_failed_library library
         message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
         if Runner.debug
           message += "\n" + e.backtrace.map {|e| "  " + e }.join("\n")
@@ -57,6 +55,10 @@ module Boson
         $stderr.puts message
       ensure
         Inspector.disable if Inspector.enabled
+      end
+
+      def add_failed_library(library)
+        failed_libraries << library
       end
 
       def load_once(source, options={})
@@ -108,8 +110,9 @@ module Boson
       end
 
       def before_create_commands(lib)
-        (lib.is_a?(FileLibrary) || lib.is_a?(RunnerLibrary)) &&
-          lib.module && Inspector.add_method_data_to_library(lib)
+        if lib.is_a?(RunnerLibrary) && lib.module
+          Inspector.add_method_data_to_library(lib)
+        end
       end
 
       def create_commands(lib, commands=lib.commands)
@@ -159,7 +162,6 @@ module Boson
       end
 
       def check_for_uncreated_aliases(lib, commands)
-        return if lib.is_a?(GemLibrary)
         if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
           $stderr.puts "No aliases created for library #{lib.name} because it has no module"
         end

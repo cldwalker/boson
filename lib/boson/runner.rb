@@ -1,7 +1,7 @@
 module Boson
   # Base class for runners.
   class Runner
-    DEFAULT_LIBRARIES = [Boson::Commands::Core]
+    DEFAULT_LIBRARIES = []
 
     module API
       def start(*)

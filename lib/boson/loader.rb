@@ -7,7 +7,7 @@ module Boson
   # You can override other methods in this module as needed.
   #
   # === Module Callbacks
-  # For libraries that have a module i.e. FileLibrary and GemLibrary, the following class methods
+  # For libraries that have a module i.e. RunnerLibrary, the following class methods
   # are invoked in the order below when loading a library:
   #
   # [*:config*] This method returns a library's hash of attributes as explained by Library.new. This is useful
