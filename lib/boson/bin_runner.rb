@@ -13,14 +13,13 @@ module Boson
   #            commands are available as normal methods, automatically loading as needed. This is a good
   #            way to call commands that take non-string arguments.
   class BinRunner < Runner
-    GLOBAL_OPTIONS =  {
+    GLOBAL_OPTIONS.update({
       :version=>{:type=>:boolean, :desc=>"Prints the current version"},
       :execute=>{:type=>:string, :desc=>"Executes given arguments as a one line script"},
-      :help=>{:type=>:boolean, :desc=>"Displays this help message or a command's help if given a command"},
       :ruby_debug=>{:type=>:boolean, :desc=>"Sets $DEBUG", :alias=>'D'},
       :debug=>{:type=>:boolean, :desc=>"Prints debug info for boson"},
       :load_path=>{:type=>:string, :desc=>"Add to front of $LOAD_PATH", :alias=>'I'}
-    } #:nodoc:
+    })
 
     module API
       attr_accessor :command
@@ -92,10 +91,6 @@ module Boson
       end
 
       #:stopdoc:
-      def abort_with(message)
-        abort message
-      end
-
       def default_error_message
         "Error: #{$!.message}"
       end
@@ -119,25 +114,7 @@ module Boson
       def execute_command(cmd, args)
         @command = cmd # for external errors
         autoload_command cmd
-        Boson.full_invoke(cmd, args)
-      rescue ArgumentError
-        if allowed_argument_error?($!, cmd, args)
-          abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
-        else
-          raise
-        end
-      end
-
-      def allowed_argument_error?(err, cmd, args)
-        (err.message[/wrong number of arguments/] &&
-          (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
-      end
-
-      def parse_args(args)
-        @option_parser = OptionParser.new(GLOBAL_OPTIONS)
-        options = @option_parser.parse(args.dup, :opts_before_args=>true)
-        new_args = @option_parser.non_opts
-        [new_args[0], options, new_args[1..-1]]
+        super
       end
 
       def print_usage_header
