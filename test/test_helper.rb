@@ -3,7 +3,6 @@ require 'bacon/bits'
 require 'mocha'
 require 'mocha-on-bacon'
 require 'boson'
-require 'bahia'
 Object.send :remove_const, :OptionParser
 Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
 ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc'
@@ -118,14 +117,9 @@ module TestHelpers
     }
   end
 
-  def aborts_with(regex)
-    BinRunner.expects(:abort).with {|e| e[regex] }
-    yield
-  end
 end
 
 class Bacon::Context
-  include Bahia
   include TestHelpers
 end
 

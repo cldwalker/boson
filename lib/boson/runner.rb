@@ -13,6 +13,11 @@ module Boson
       def start(*)
         load_rc
       end
+
+      # Returns true if in commandline with verbose flag or if set explicitly. Useful in plugins.
+      def verbose?
+        @verbose
+      end
     end
 
     class<<self
@@ -78,11 +83,6 @@ module Boson
       # in a ruby shell i.e. irb.
       def in_shell?
         !!@in_shell
-      end
-
-      # Returns true if in commandline with verbose flag or if set explicitly. Useful in plugins.
-      def verbose?
-        @verbose.nil? ? Boson.const_defined?(:BinRunner) && BinRunner.options[:verbose] : @verbose
       end
 
       #:stopdoc:
