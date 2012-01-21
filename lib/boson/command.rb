@@ -154,18 +154,6 @@ module Boson
         "This will be removed in boson 0.5"
       Kernel.exit
     end
-
-    def marshal_dump
-      if @args && @args.any? {|e| e[1].is_a?(Module) }
-        @args.map! {|e| e.size == 2 ? [e[0], e[1].inspect] : e }
-        @file_parsed_args = true
-      end
-      [@name, @alias, @lib, @desc, @options, @render_options, @args, @default_option]
-    end
-
-    def marshal_load(ary)
-      @name, @alias, @lib, @desc, @options, @render_options, @args, @default_option = ary
-    end
     #:startdoc:
   end
 end

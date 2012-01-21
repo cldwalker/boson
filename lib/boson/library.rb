@@ -18,21 +18,6 @@ module Boson
   # Libraries and their commands can be configured in different ways in this order:
   # * If library is a FileLibrary, commands be configured with a config method attribute (see Inspector).
   # * If a library has a module, you can set library + command attributes via the config() callback (see Loader).
-  # * All libraries can be configured by passing a hash of {library attributes}[link:classes/Boson/Library.html#M000077] under
-  #   {the :libraries key}[link:classes/Boson/Repo.html#M000070] to the main config file ~/.boson/config/boson.yml.
-  #   For most libraries this may be the only way to configure a library's commands.
-  #   An example of a GemLibrary config:
-  #    :libraries:
-  #      httparty:
-  #       :class_commands:
-  #         delete: HTTParty.delete
-  #       :commands:
-  #         delete:
-  #           :alias: d
-  #           :desc: Http delete a given url
-  #
-  # When installing a third-party library, use the config file as a way to override default library and command attributes
-  # without modifying the library.
   #
   # === Creating Your Own Library
   # To create your own subclass you need to define what sources the subclass can handle with handles().
@@ -53,7 +38,7 @@ module Boson
     ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :indexed_namespace]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
     # Private attribute for use within Boson.
-    attr_reader :no_alias_creation, :new_module, :new_commands, :class_commands, :lib_file, :repo_dir
+    attr_reader :no_alias_creation, :new_module, :new_commands, :class_commands, :lib_file
     # Optional namespace name for a library. When enabled defaults to a library's name.
     attr_writer :namespace
 
@@ -81,18 +66,16 @@ module Boson
     #                     adds them to a library's commands. Default is true.
     # [*:namespace*] Boolean or string which namespaces a library. When true, the library is automatically namespaced
     #                to the library's name. When a string, the library is namespaced to the string. Default is nil.
-    #                To control the namespacing of all libraries see Boson::Repo.config.
     # [*:no_alias_creation*] Boolean which doesn't create aliases for a library. Useful for libraries that configure command
     #                        aliases outside of Boson's control. Default is false.
     def initialize(hash)
-      repo = set_repo
-      @repo_dir = repo.dir
+      before_initialize
       @name = set_name(hash.delete(:name)) or raise ArgumentError, "Library missing required key :name"
       @loaded = false
       @commands_hash = {}
       @commands = []
-      set_config (repo.config[:libraries][@name] || {}).merge(hash), true
-      set_command_aliases(repo.config[:command_aliases])
+      set_config (config[:libraries][@name] || {}).merge(hash), true
+      set_command_aliases(config[:command_aliases])
     end
 
     # A concise symbol version of a library type i.e. FileLibrary -> :file.
@@ -103,7 +86,7 @@ module Boson
 
     def namespace(orig=@namespace)
       @namespace = [String,FalseClass].include?(orig.class) ? orig : begin
-        if (@namespace == true || (Boson.repo.config[:auto_namespace] && !@index))
+        if (@namespace == true || (Boson.config[:auto_namespace] && !@index))
           @namespace = clean_name
         else
           @namespace = false
@@ -120,10 +103,6 @@ module Boson
     # handles names under directories
     def clean_name
       @name[/\w+$/]
-    end
-
-    def local?
-      is_a?(LocalFileLibrary) || (Boson.local_repo && Boson.local_repo.dir == @repo_dir)
     end
 
     def set_name(name)
@@ -151,9 +130,19 @@ module Boson
       end
     end
 
-    def set_repo
-      Boson.repo
+    module API
+      def before_initialize
+      end
+
+      def local?
+        false
+      end
+
+      def config
+        Boson.config
+      end
     end
+    include API
 
     def set_attributes(hash, force=false)
       hash.each {|k,v| instance_variable_set("@#{k}", v) if instance_variable_get("@#{k}").nil? || force }
@@ -165,14 +154,6 @@ module Boson
 
     def command_object(name)
       command_objects([name])[0]
-    end
-
-    def marshal_dump
-      [@name, @commands, @gems, @module.to_s, @repo_dir, @indexed_namespace]
-    end
-
-    def marshal_load(ary)
-      @name, @commands, @gems, @module, @repo_dir, @indexed_namespace = ary
     end
     #:startdoc:
   end

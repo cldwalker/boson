@@ -399,7 +399,7 @@ module Boson
     end
 
     def auto_alias_value(values, possible_value)
-      if Boson.repo.config[:option_underscore_search]
+      if Boson.config[:option_underscore_search]
         self.class.send(:define_method, :auto_alias_value) {|values, possible_value|
           Util.underscore_search(possible_value, values, true) || possible_value
         }.call(values, possible_value)

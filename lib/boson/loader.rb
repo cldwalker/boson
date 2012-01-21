@@ -58,7 +58,7 @@ module Boson
     def load_module_commands
       initialize_library_module
     rescue MethodConflictError=>e
-      if Boson.repo.config[:error_method_conflicts] || namespace
+      if Boson.config[:error_method_conflicts] || namespace
         raise MethodConflictError, e.message
       else
         @namespace = clean_name

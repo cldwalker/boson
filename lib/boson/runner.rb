@@ -18,15 +18,23 @@ module Boson
       def verbose?
         @verbose
       end
+
+      # Libraries that come with Boson
+      def default_libraries
+        DEFAULT_LIBRARIES
+      end
+
+      def all_libraries
+        default_libraries
+      end
     end
 
     class<<self
       include API
       attr_accessor :debug
 
-      # Enables view, adds local load path and loads default_libraries
+      # Loads default libraries
       def init
-        add_load_path
         Manager.load default_libraries, load_options
       end
 
@@ -64,21 +72,6 @@ module Boson
         [new_args[0], options, new_args[1..-1]]
       end
 
-      # Libraries that come with Boson
-      def default_libraries
-        Boson.repos.map {|e| e.config[:defaults] || [] }.flatten + DEFAULT_LIBRARIES
-      end
-
-      # Libraries detected in repositories
-      def detected_libraries
-        Boson.repos.map {|e| e.detected_libraries }.flatten.uniq
-      end
-
-      # Libraries specified in config files and detected_libraries
-      def all_libraries
-        Boson.repos.map {|e| e.all_libraries }.flatten.uniq
-      end
-
       # Returns true if commands are being executed from a non-ruby shell i.e. bash. Returns false if
       # in a ruby shell i.e. irb.
       def in_shell?
@@ -94,34 +87,8 @@ module Boson
         @in_shell = val
       end
 
-      def add_load_path
-        Boson.repos.each {|repo|
-          if repo.config[:add_load_path] || File.exists?(File.join(repo.dir, 'lib'))
-            $: <<  File.join(repo.dir, 'lib') unless $:.include? File.expand_path(File.join(repo.dir, 'lib'))
-          end
-        }
-      end
-
       def load_options
         {:verbose=>@options[:verbose]}
-      end
-
-      def autoload_command(cmd, opts={:verbose=>verbose?})
-        Index.read
-        (lib = Index.find_library(cmd)) && Manager.load(lib, opts)
-        lib
-      end
-
-      def define_autoloader
-        class << ::Boson.main_object
-          def method_missing(method, *args, &block)
-            if Runner.autoload_command(method.to_s)
-              send(method, *args, &block) if respond_to?(method)
-            else
-              super
-            end
-          end
-        end
       end
       #:startdoc:
     end
