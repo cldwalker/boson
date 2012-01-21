@@ -146,14 +146,6 @@ module Boson
     def file_parsed_args?
       @file_parsed_args
     end
-
-    # Deprecated method
-    def description
-      puts "@command.description has been changed to @command.desc. Delete your old " +
-        "Boson index at ~/.boson/command/index.marshal for Boson to work from the commandline." +
-        "This will be removed in boson 0.5"
-      Kernel.exit
-    end
     #:startdoc:
   end
 end
