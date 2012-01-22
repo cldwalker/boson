@@ -6,38 +6,35 @@ module Boson
       def create(name, library)
         new(new_attributes(name, library))
       end
+
+      def library_attributes(library)
+        {lib: library.name}
+      end
+
+      # Finds a command, aliased or not. If found returns the command object,
+      # otherwise returns nil.
+      def find(command, commands=Boson.commands)
+        commands.find {|e| [e.name, e.alias].include?(command) }
+      end
     end
 
     class <<self; include API; end
 
     # Used to generate a command's initial attributes when creating a command object
     def self.new_attributes(name, library)
-      (library.commands_hash[name] || {}).merge({:name=>name, :lib=>library.name, :namespace=>library.namespace})
-    end
-
-    # Finds a command, namespaced or not and aliased or not. If found returns the
-    # command object, otherwise returns nil.
-    def self.find(command, commands=Boson.commands)
-      if command.to_s.include?(NAMESPACE)
-        command, subcommand = command.to_s.split(NAMESPACE, 2)
-        commands.find {|current_command|
-          [current_command.name, current_command.alias].include?(subcommand) &&
-          current_command.library && (current_command.library.namespace == command)
-        }
-      else
-        commands.find {|e| [e.name, e.alias].include?(command) && !e.namespace}
-      end
+      (library.commands_hash[name] || {}).merge(name: name).
+        update(library_attributes(library))
     end
 
     # One line usage for a command if it exists
     def self.usage(command)
-      (cmd = find(command)) ? "#{command} #{cmd.usage}" : "Command '#{command}' not found"
+      (cmd = find(command)) ? "#{command} #{cmd.usage}" :
+        "Command '#{command}' not found"
     end
 
     ATTRIBUTES = [:name, :lib, :alias, :desc, :options, :args, :config]
-    attr_accessor *(ATTRIBUTES + [:namespace, :default_option])
-    INIT_ATTRIBUTES = [:alias, :desc, :options, :namespace, :default_option,
-      :option_command ]
+    attr_accessor *(ATTRIBUTES + [:default_option])
+    INIT_ATTRIBUTES = [:alias, :desc, :options, :default_option, :option_command]
     # A hash of attributes which map to instance variables and values. :name
     # and :lib are required keys.
     #
@@ -81,6 +78,10 @@ module Boson
     module API
       def after_initialize(hash)
       end
+
+      def full_name
+        name
+      end
     end
     include API
 
@@ -120,12 +121,6 @@ module Boson
     # Usage string for command, created from options and args.
     def usage
       basic_usage + option_help
-    end
-
-    # Full name is only different than name if a command has a namespace.
-    # The full name should be what you would type to execute the command.
-    def full_name
-      @namespace ? "#{@namespace}.#{@name}" : @name
     end
 
     #:stopdoc:

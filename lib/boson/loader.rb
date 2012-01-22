@@ -33,14 +33,19 @@ module Boson
       load_source_and_set_module
       module_callbacks if @module
       yield if block_given?
-      (@module || @class_commands) ? detect_additions { load_module_commands } : @namespace = false
+      detect_additions { load_module_commands } if (@module || @class_commands)
+      before_library_commands
       set_library_commands
-      @indexed_namespace = (@namespace == false) ? nil : @namespace if @index
+      after_library_commands
       loaded_correctly? && (@loaded = true)
     end
 
     # Load the source and set instance variables necessary to make a library valid i.e. @module.
     def load_source_and_set_module; end
+
+    def before_library_commands; end
+
+    def after_library_commands; end
 
     # Boolean which indicates if library loaded correctly.
     def loaded_correctly?
@@ -57,15 +62,12 @@ module Boson
 
     def load_module_commands
       initialize_library_module
-    rescue MethodConflictError=>e
-      if Boson.config[:error_method_conflicts] || namespace
-        raise MethodConflictError, e.message
-      else
-        @namespace = clean_name
-        @method_conflict = true
-        $stderr.puts "#{e.message}. Attempting load into the namespace #{@namespace}..."
-        initialize_library_module
-      end
+    rescue MethodConflictError => err
+      handle_method_conflict_error err
+    end
+
+    def handle_method_conflict_error(err)
+      raise MethodConflictError, err.message
     end
 
     def detect_additions(options={}, &block)
@@ -87,8 +89,11 @@ module Boson
       Manager.create_class_aliases(@module, @class_commands) unless @class_commands.nil? ||
         @class_commands.empty? || @method_conflict
       check_for_method_conflicts unless @force
-      @namespace = clean_name if @object_namespace
-      namespace ? Namespace.create(namespace, self) : include_in_universe
+      after_initialize_library_module
+    end
+
+    def after_initialize_library_module
+      include_in_universe
     end
 
     def include_in_universe(lib_module=@module)
@@ -98,20 +103,25 @@ module Boson
     end
 
     def check_for_method_conflicts
-      conflicts = namespace ? (Boson.can_invoke?(namespace) ? [namespace] : []) :
-        (@module.instance_methods + @module.private_instance_methods) & (Boson.main_object.methods +
-          Boson.main_object.private_methods)
+      conflicts = method_conflicts
       unless conflicts.empty?
         raise MethodConflictError,"The following commands conflict with existing commands: #{conflicts.join(', ')}"
       end
     end
 
+    def method_conflicts
+      (@module.instance_methods + @module.private_instance_methods) &
+        (Boson.main_object.methods + Boson.main_object.private_methods)
+    end
+
     def set_library_commands
       aliases = @commands_hash.select {|k,v| @commands.include?(k) }.map {|k,v| v[:alias]}.compact
       @commands -= aliases
-      @commands.delete(namespace) if namespace
-      @commands += Boson.invoke(namespace).boson_commands if namespace && !@pre_defined_commands
+      clean_library_commands
       @commands.uniq!
+    end
+
+    def clean_library_commands
     end
     #:startdoc:
   end

@@ -35,13 +35,10 @@ module Boson
     end
 
     # Public attributes for use outside of Boson.
-    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name, :namespace, :indexed_namespace]
-    attr_reader *(ATTRIBUTES + [:commands_hash, :library_file, :object_namespace])
+    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name]
+    attr_reader *(ATTRIBUTES + [:commands_hash, :library_file])
     # Private attribute for use within Boson.
     attr_reader :no_alias_creation, :new_module, :new_commands, :class_commands, :lib_file
-    # Optional namespace name for a library. When enabled defaults to a library's name.
-    attr_writer :namespace
-
     # Creates a library object with a hash of attributes which must include a :name attribute.
     # Each hash pair maps directly to an instance variable and value. Defaults for attributes
     # are read from config[:libraries][@library_name][@attribute]. When loading libraries, attributes
@@ -64,8 +61,6 @@ module Boson
     #            Use with caution. Default is false.
     # [*:object_methods*] Boolean which detects any Object/Kernel methods created when loading a library and automatically
     #                     adds them to a library's commands. Default is true.
-    # [*:namespace*] Boolean or string which namespaces a library. When true, the library is automatically namespaced
-    #                to the library's name. When a string, the library is namespaced to the string. Default is nil.
     # [*:no_alias_creation*] Boolean which doesn't create aliases for a library. Useful for libraries that configure command
     #                        aliases outside of Boson's control. Default is false.
     def initialize(hash)
@@ -82,21 +77,6 @@ module Boson
     def library_type
       str = self.class.to_s[/::(\w+)Library$/, 1] || 'library'
       str.downcase.to_sym
-    end
-
-    def namespace(orig=@namespace)
-      @namespace = [String,FalseClass].include?(orig.class) ? orig : begin
-        if (@namespace == true || (Boson.config[:auto_namespace] && !@index))
-          @namespace = clean_name
-        else
-          @namespace = false
-        end
-      end
-    end
-
-    # The object a library uses for executing its commands.
-    def namespace_object
-      @namespace_object ||= namespace ? Boson.invoke(namespace) : Boson.main_object
     end
 
     #:stopdoc:
@@ -131,6 +111,11 @@ module Boson
     end
 
     module API
+      # The object a library uses for executing its commands.
+      def namespace_object
+        @namespace_object ||= Boson.main_object
+      end
+
       def before_initialize
       end
 
