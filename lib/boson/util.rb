@@ -56,16 +56,6 @@ module Boson
       detected
     end
 
-    # Safely calls require, returning false if LoadError occurs.
-    def safe_require(lib)
-      begin
-        require lib
-        true
-      rescue LoadError
-        false
-      end
-    end
-
     # Returns all modules that currently exist.
     def modules
       all_modules = []
@@ -82,16 +72,6 @@ module Boson
         !top_level_class_conflict(base_module, "#{base_module}::#{desired_class}#{e}") })
         base_module.const_set(desired_class+suffix, Module.new)
       end
-    end
-
-    # Behaves just like the unix which command, returning the full path to an executable based on ENV['PATH'].
-    def which(command)
-      ENV['PATH'].split(File::PATH_SEPARATOR).map {|e| File.join(e, command) }.find {|e| File.exists?(e) }
-    end
-
-    # Deep copies any object if it can be marshaled. Useful for deep hashes.
-    def deep_copy(obj)
-      Marshal::load(Marshal::dump(obj))
     end
 
     # Recursively merge hash1 with hash2.
