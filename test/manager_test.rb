@@ -37,37 +37,6 @@ describe "Manager" do
       }.should =~ /Unable to load library blah. Reason: LoadError/
     end
 
-    describe "command aliases" do
-      before { eval %[module ::Aquateen; def frylock; end; end] }
-      after { Object.send(:remove_const, "Aquateen") }
-
-      it "created with command specific config" do
-        with_config(:command_aliases=>{'frylock'=>'fr'}) do
-          Manager.expects(:create_instance_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
-          load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
-          library_loaded? 'aquateen'
-        end
-      end
-
-      it "created with config command_aliases" do
-        with_config(:command_aliases=>{"frylock"=>"fr"}) do
-          Manager.expects(:create_instance_aliases).with({"Aquateen"=>{"frylock"=>"fr"}})
-          load_library :name=>'aquateen', :commands=>['frylock'], :module=>Aquateen
-          library_loaded? 'aquateen'
-        end
-      end
-
-      it "not created and warns for commands with no module" do
-        with_config(:command_aliases=>{'frylock'=>'fr'}) do
-          capture_stderr {
-            load_library(:name=>'aquateen', :commands=>['frylock'])
-          }.should =~ /No aliases/
-          library_loaded? 'aquateen'
-          Aquateen.method_defined?(:fr).should == false
-        end
-      end
-    end
-
     it "merges with existing created library" do
       create_library('blah')
       load_library :name=>'blah'

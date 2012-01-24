@@ -1,4 +1,3 @@
-require 'alias'
 %w{runner manager loader inspector library}.each {|e| require "boson/#{e}" }
 require 'boson/method_inspector'
 require 'boson/runner_library'

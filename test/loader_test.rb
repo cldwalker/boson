@@ -62,14 +62,6 @@ describe "Loader" do
       end
     end
 
-    it "loads a library and creates its class commands" do
-      with_config(:libraries=>{"blah"=>{:class_commands=>{"bling"=>"Blah.bling", "Blah"=>['hmm']}}}) do
-        load :blah, :file_string=>"module Blah; def self.bling; end; def self.hmm; end; end"
-        command_exists? 'bling'
-        command_exists? 'hmm'
-      end
-    end
-
     it "loads a library with dependencies" do
       File.stubs(:exists?).returns(true)
       File.stubs(:read).returns("module Water; def water; end; end", "module Oaks; def oaks; end; end")

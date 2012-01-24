@@ -118,8 +118,11 @@ module Boson
       def create_commands(lib, commands=lib.commands)
         before_create_commands(lib)
         commands.each {|e| Boson.commands << Command.create(e, lib)}
-        create_command_aliases(lib, commands) if commands.size > 0 && !lib.no_alias_creation
+        after_create_commands(lib, commands)
         redefine_commands(lib, commands)
+      end
+
+      def after_create_commands(lib, commands)
       end
 
       def redefine_commands(lib, commands)
@@ -130,41 +133,6 @@ module Boson
             rejected.map {|e| e.name}.join(', ')
         end
         accepted.each {|cmd| Scientist.redefine_command(lib.namespace_object, cmd) }
-      end
-
-      def create_command_aliases(lib, commands)
-        lib.module ? prep_and_create_instance_aliases(commands, lib.module) : check_for_uncreated_aliases(lib, commands)
-      end
-
-      def prep_and_create_instance_aliases(commands, lib_module)
-        aliases_hash = {}
-        select_commands = Boson.commands.select {|e| commands.include?(e.name)}
-        select_commands.each do |e|
-          if e.alias
-            aliases_hash[lib_module.to_s] ||= {}
-            aliases_hash[lib_module.to_s][e.name] = e.alias
-          end
-        end
-        create_instance_aliases(aliases_hash)
-      end
-
-      def create_instance_aliases(aliases_hash)
-        Alias.manager.create_aliases(:instance_method, aliases_hash)
-      end
-
-      def create_class_aliases(mod, class_commands)
-        class_commands.dup.each {|k,v|
-          if v.is_a?(Array)
-            class_commands.delete(k).each {|e| class_commands[e] = "#{k}.#{e}"}
-          end
-        }
-        Alias.manager.create_aliases(:any_to_instance_method, mod.to_s=>class_commands.invert)
-      end
-
-      def check_for_uncreated_aliases(lib, commands)
-        if (found_commands = Boson.commands.select {|e| commands.include?(e.name)}) && found_commands.find {|e| e.alias }
-          $stderr.puts "No aliases created for library #{lib.name} because it has no module"
-        end
       end
       #:startdoc:
     end

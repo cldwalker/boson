@@ -33,11 +33,15 @@ module Boson
       load_source_and_set_module
       module_callbacks if @module
       yield if block_given?
-      detect_additions { load_module_commands } if (@module || @class_commands)
+      detect_additions { load_module_commands } if load_module_commands?
       before_library_commands
       set_library_commands
       after_library_commands
       loaded_correctly? && (@loaded = true)
+    end
+
+    def load_module_commands?
+      @module
     end
 
     # Load the source and set instance variables necessary to make a library valid i.e. @module.
@@ -86,10 +90,12 @@ module Boson
           " your libraries. Rename your module to avoid this warning."
       end
 
-      Manager.create_class_aliases(@module, @class_commands) unless @class_commands.nil? ||
-        @class_commands.empty? || @method_conflict
+      during_initialize_library_module
       check_for_method_conflicts unless @force
       after_initialize_library_module
+    end
+
+    def during_initialize_library_module
     end
 
     def after_initialize_library_module

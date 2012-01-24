@@ -38,7 +38,7 @@ module Boson
     ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file])
     # Private attribute for use within Boson.
-    attr_reader :no_alias_creation, :new_module, :new_commands, :class_commands, :lib_file
+    attr_reader :new_module, :new_commands, :lib_file
     # Creates a library object with a hash of attributes which must include a :name attribute.
     # Each hash pair maps directly to an instance variable and value. Defaults for attributes
     # are read from config[:libraries][@library_name][@attribute]. When loading libraries, attributes
@@ -52,17 +52,10 @@ module Boson
     #               command's configurable attributes. If an array, the commands are set for the given library,
     #               overidding default command detection. Example:
     #                :commands=>{'commands'=>{:desc=>'Lists commands', :alias=>'com'}}
-    # [*:class_commands*] A hash of commands to create. A hash key-pair can map command names to any string of ruby code
-    #                     that ends with a method call. Or a key-pair can map a class to an array of its class methods
-    #                     to create commands of the same name. Example:
-    #                      :class_commands=>{'spy'=>'Bond.spy', 'create'=>'Alias.manager.create',
-    #                       'Boson::Util'=>['detect', 'any_const_get']}
     # [*:force*] Boolean which forces a library to ignore when a library's methods are overriding existing ones.
     #            Use with caution. Default is false.
     # [*:object_methods*] Boolean which detects any Object/Kernel methods created when loading a library and automatically
     #                     adds them to a library's commands. Default is true.
-    # [*:no_alias_creation*] Boolean which doesn't create aliases for a library. Useful for libraries that configure command
-    #                        aliases outside of Boson's control. Default is false.
     def initialize(hash)
       before_initialize
       @name = set_name(hash.delete(:name)) or raise ArgumentError, "Library missing required key :name"
