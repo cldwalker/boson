@@ -15,10 +15,14 @@ module Boson
     end
 
     def set_name(runner)
-      @module = Util.create_module Boson::Commands, runner.app_name
-      MethodInspector.mod_store[@module] = MethodInspector.mod_store.delete(runner)
-      self.class.delegate_runner_methods runner, @module
+      @runner = runner
       runner.app_name
+    end
+
+    def load_source_and_set_module
+      @module = Util.create_module Boson::Commands, @name
+      MethodInspector.mod_store[@module] = MethodInspector.mod_store.delete(@runner)
+      self.class.delegate_runner_methods @runner, @module
     end
   end
 end
