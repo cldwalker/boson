@@ -69,27 +69,24 @@ module Boson
             $stderr.puts "Library #{lib.name} already exists." if options[:verbose] && !options[:dependency]
             false
           else
-            if lib.load { load_dependencies(lib, options) }
-              lib
-            else
-              $stderr.puts "Library #{lib.name} did not load successfully." if !options[:dependency]
-              $stderr.puts "  "+lib.inspect if Runner.debug
-              false
-            end
+            actual_load_once lib, options
           end
         end
       end
 
-      def lib_dependencies
-        @lib_dependencies ||= {}
+      def actual_load_once(lib, options)
+        if lib.load { load_dependencies(lib, options) }
+          lib
+        else
+          if !options[:dependency]
+            $stderr.puts "Library #{lib.name} did not load successfully."
+          end
+          $stderr.puts "  "+lib.inspect if Runner.debug
+          false
+        end
       end
 
-      def load_dependencies(lib, options={})
-        lib_dependencies[lib] = Array(lib.dependencies).map do |e|
-          next if loaded?(e)
-          load_once(e, options.merge(:dependency=>true)) ||
-            raise(LoaderError, "Can't load dependency #{e}")
-        end.compact
+      def load_dependencies(lib, options)
       end
 
       def loader_create(source)
@@ -101,12 +98,11 @@ module Boson
         create_commands(@library)
         add_library(@library)
         puts "Loaded library #{@library.name}" if @options[:verbose]
-        (lib_dependencies[@library] || []).each do |e|
-          create_commands(e)
-          add_library(e)
-          puts "Loaded library dependency #{e.name}" if @options[:verbose]
-        end
+        during_after_load
         true
+      end
+
+      def during_after_load
       end
 
       def before_create_commands(lib)
@@ -136,9 +132,6 @@ module Boson
       end
       #:startdoc:
     end
-
-    class << self
-      include API
-    end
+    extend API
   end
 end
