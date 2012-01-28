@@ -3,11 +3,10 @@ require 'boson'
 module Boson
   class CommandRunner < Runner
     def self.inherited(mod)
-      Inspector.enable all_classes: true
+      Inspector.enable all_classes: true, module: mod.singleton_class
     end
 
     def self.init(args)
-      Inspector.disable
       Boson::Runner.start args
       Manager.load self
     end

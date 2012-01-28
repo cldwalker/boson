@@ -18,16 +18,14 @@ describe "Loader" do
 
     it "prints error for method conflicts with main_object method" do
       create_runner :require
-      Inspector.disable
       capture_stderr {
         Manager.load Blarg
       }.should =~ /Unable to load library Blarg.*conflict.*commands: require/
     end
 
-    xit "prints error for method conflicts between libraries" do
+    it "prints error for method conflicts between libraries" do
       create_runner :whoops
       create_runner :whoops, library: :Blorg
-      Inspector.disable
       Manager.load Blarg
       capture_stderr {
         Manager.load Blorg

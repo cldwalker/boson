@@ -30,7 +30,9 @@ module Boson
     def enable(options = {})
       method_inspector_meth = options[:all_classes] ?
         :new_method_added : :safe_new_method_added
-      @enabled = true
+      klass = options[:module] || ::Module
+      @enabled = true unless options[:module]
+
       body = MethodInspector::ALL_METHODS.map {|e|
         %[def #{e}(*args)
             Boson::MethodInspector.#{e}(self, *args)
@@ -44,7 +46,7 @@ module Boson
         alias_method :_old_method_added, :method_added
         alias_method :method_added, :new_method_added
       ]
-    ::Module.module_eval body
+      klass.module_eval body
     end
 
     # Disable scraping method data.
