@@ -15,10 +15,12 @@ module Boson
     end
 
     def set_name(runner)
-      @runner = runner
-      runner.app_name
+      @runner = runner #reference needed elsewhere
+      @runner.to_s[/[^:]+$/].downcase
     end
 
+    # Since Boson expects libraries to be modules, creates a temporary module
+    # and delegates its methods to it
     def load_source_and_set_module
       @module = Util.create_module Boson::Commands, @name
       MethodInspector.mod_store[@module] = MethodInspector.mod_store.delete(@runner)

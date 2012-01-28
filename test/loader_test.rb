@@ -1,4 +1,40 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
+require 'boson/command_runner'
+
+def create_runner(*methods)
+  options = methods[-1].is_a?(Hash) ? methods.pop : {}
+  library = options[:library] || :Blarg
+  Object.send(:remove_const, library) if Object.const_defined?(library)
+  Object.const_set(library, Class.new(Boson::CommandRunner)).tap do |klass|
+    methods.each do |meth|
+      klass.send(:define_method, meth) { }
+    end
+  end
+end
+
+describe "Loader" do
+  describe "load" do
+    before { reset }
+
+    it "prints error for method conflicts with main_object method" do
+      create_runner :require
+      Inspector.disable
+      capture_stderr {
+        Manager.load Blarg
+      }.should =~ /Unable to load library Blarg.*conflict.*commands: require/
+    end
+
+    xit "prints error for method conflicts between libraries" do
+      create_runner :whoops
+      create_runner :whoops, library: :Blorg
+      Inspector.disable
+      Manager.load Blarg
+      capture_stderr {
+        Manager.load Blorg
+      }.should =~ /Unable to load library Blorg.*conflict.*commands: whoops/
+    end
+  end
+end
 # TODO: fix
 __END__
 
@@ -59,23 +95,6 @@ describe "Loader" do
         load :blah, :file_string=>"module Blah; def blah; end; alias_method(:b, :blah); end"
         library_loaded?('blah')
         library('blah').commands.should == ['blah']
-      end
-    end
-
-    it "prints error for method conflicts with main_object method" do
-      with_config(:error_method_conflicts=>true) do
-        capture_stderr {
-          load('blah', :file_string=>"module Blah; def require; end; end")
-        }.should =~ /Unable to load library blah.*conflict.*require/
-      end
-    end
-
-    it "prints error for method conflicts with config error_method_conflicts" do
-      with_config(:error_method_conflicts=>true) do
-        load('blah', :file_string=>"module Blah; def chwhat; end; end")
-        capture_stderr {
-          load('chwhat', :file_string=>"module Chwhat; def chwhat; end; end")
-        }.should =~ /Unable to load library chwhat.*conflict.*chwhat/
       end
     end
   end
