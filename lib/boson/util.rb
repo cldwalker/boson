@@ -63,13 +63,13 @@ module Boson
       all_modules
     end
 
-    # Creates a module under a given base module and possible name. If the module already exists or conflicts
-    # per top_level_class_conflict, it attempts to create one with a number appended to the name.
+    # Creates a module under a given base module and possible name. If the
+    # module already exists, it attempts to create one with a number appended to
+    # the name.
     def create_module(base_module, name)
       desired_class = camelize(name)
       possible_suffixes = [''] + %w{1 2 3 4 5 6 7 8 9 10}
-      if (suffix = possible_suffixes.find {|e| !base_module.const_defined?(desired_class+e) &&
-        !top_level_class_conflict(base_module, "#{base_module}::#{desired_class}#{e}") })
+      if suffix = possible_suffixes.find {|e| !base_module.const_defined?(desired_class+e) }
         base_module.const_set(desired_class+suffix, Module.new)
       end
     end
@@ -77,12 +77,6 @@ module Boson
     # Recursively merge hash1 with hash2.
     def recursive_hash_merge(hash1, hash2)
       hash1.merge(hash2) {|k,o,n| (o.is_a?(Hash)) ? recursive_hash_merge(o,n) : n}
-    end
-
-    # Returns name of top level class that conflicts if it exists. For example, for base module Boson::Commands,
-    # Boson::Commands::Hirb conflicts with Hirb if Hirb exists.
-    def top_level_class_conflict(base_module, conflicting_module)
-      (conflicting_module =~ /^#{base_module}.*::([^:]+)/) && Object.const_defined?($1) && $1
     end
 
     # Regular expression search of a list with underscore anchoring of words.

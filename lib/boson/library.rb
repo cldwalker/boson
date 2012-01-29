@@ -35,7 +35,7 @@ module Boson
     end
 
     # Public attributes for use outside of Boson.
-    ATTRIBUTES = [:gems, :dependencies, :commands, :loaded, :module, :name]
+    ATTRIBUTES = [:dependencies, :commands, :loaded, :module, :name]
     attr_reader *(ATTRIBUTES + [:commands_hash, :library_file])
     # Private attribute for use within Boson.
     attr_reader :new_module, :new_commands, :lib_file
