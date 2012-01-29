@@ -4,6 +4,7 @@ require 'mocha'
 require 'mocha-on-bacon'
 require 'boson'
 require 'fileutils'
+require 'boson/command_runner'
 Object.send :remove_const, :OptionParser
 Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
 ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc'
@@ -62,17 +63,20 @@ module TestHelpers
     (lib = library(lib)) && lib.commands.include?(command).should == bool
   end
 
-  # mocks as a file library
-  def mock_library(lib, options={})
-    options = {:file_string=>'', :exists=>true}.merge!(options)
-    File.expects(:read).returns(options.delete(:file_string))
-  end
+  def create_runner(*methods, &block)
+    options = methods[-1].is_a?(Hash) ? methods.pop : {}
+    library = options[:library] || :Blarg
+    Object.send(:remove_const, library) if Object.const_defined?(library)
 
-  def load(lib, options={})
-    # prevent conflicts with existing File.read stubs
-    MethodInspector.stubs(:inspector_in_file?).returns(false)
-    mock_library(lib, options) unless options.delete(:no_mock)
-    Manager.load([lib], options)
+    Object.const_set(library, Class.new(Boson::CommandRunner)).tap do |klass|
+      if block
+        klass.module_eval(&block)
+      else
+        methods.each do |meth|
+          klass.send(:define_method, meth) { }
+        end
+      end
+    end
   end
 
   def capture_stdout(&block)

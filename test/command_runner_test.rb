@@ -1,5 +1,4 @@
 require File.dirname(__FILE__) + '/test_helper'
-require 'boson/command_runner'
 
 class MyCommandRunner < Boson::CommandRunner
   desc "This is a small"

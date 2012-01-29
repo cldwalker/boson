@@ -1,21 +1,4 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
-require 'boson/command_runner'
-
-def create_runner(*methods, &block)
-  options = methods[-1].is_a?(Hash) ? methods.pop : {}
-  library = options[:library] || :Blarg
-  Object.send(:remove_const, library) if Object.const_defined?(library)
-
-  Object.const_set(library, Class.new(Boson::CommandRunner)).tap do |klass|
-    if block
-      klass.module_eval(&block)
-    else
-      methods.each do |meth|
-        klass.send(:define_method, meth) { }
-      end
-    end
-  end
-end
 
 describe "Loader" do
   describe "load" do
