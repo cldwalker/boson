@@ -1,13 +1,18 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 require 'boson/command_runner'
 
-def create_runner(*methods)
+def create_runner(*methods, &block)
   options = methods[-1].is_a?(Hash) ? methods.pop : {}
   library = options[:library] || :Blarg
   Object.send(:remove_const, library) if Object.const_defined?(library)
+
   Object.const_set(library, Class.new(Boson::CommandRunner)).tap do |klass|
-    methods.each do |meth|
-      klass.send(:define_method, meth) { }
+    if block
+      klass.module_eval(&block)
+    else
+      methods.each do |meth|
+        klass.send(:define_method, meth) { }
+      end
     end
   end
 end
@@ -30,6 +35,14 @@ describe "Loader" do
       capture_stderr {
         Manager.load Blorg
       }.should =~ /Unable to load library Blorg.*conflict.*commands: whoops/
+    end
+
+    it "prints error for library that's already loaded" do
+      create_runner :blah
+      Manager.load Blarg
+      capture_stderr {
+        Manager.load Blarg, verbose: true
+      }.should =~ /blarg already exists/
     end
   end
 end
@@ -80,12 +93,6 @@ describe "Loader" do
         load :blah, :file_string=>"module Object; def self.blah; end; end"
       }.should =~ /conflict.*'Object'/
       library_loaded?('blah')
-    end
-
-    it "prints error and returns false for existing library" do
-      libs = create_library('blah', :loaded=>true)
-      Manager.stubs(:loader_create).returns(libs[0])
-      capture_stderr { load('blah', :no_mock=>true, :verbose=>true).should == false }.should =~ /already exists/
     end
 
     it "loads and strips aliases from a library's commands" do
