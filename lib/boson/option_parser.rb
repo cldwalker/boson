@@ -1,32 +1,4 @@
 module Boson
-  # Simple Hash with indifferent fetching and storing using symbol or string keys. Other actions such as
-  # merging should assume symbolic keys. Used by OptionParser.
-  class IndifferentAccessHash < ::Hash
-    #:stopdoc:
-    def initialize(hash={})
-      super()
-      hash.each {|k,v| self[k] = v }
-    end
-
-    def [](key)
-      super convert_key(key)
-    end
-
-    def []=(key, value)
-      super convert_key(key), value
-    end
-
-    def values_at(*indices)
-      indices.collect { |key| self[convert_key(key)] }
-    end
-
-    protected
-    def convert_key(key)
-      key.kind_of?(String) ? key.to_sym : key
-    end
-    #:startdoc:
-  end
-
   # This class concisely defines commandline options that when parsed produce a Hash of option keys and values.
   # Additional points:
   # * Setting option values should follow conventions in *nix environments. See examples below.
@@ -35,7 +7,7 @@ module Boson
   #   String, Integer, Float, Array, Hash, FalseClass, TrueClass.
   # * Users can define their own option types which create objects for _any_ Ruby class. See Options.
   # * Each option type can have attributes to enable more features (see OptionParser.new).
-  # * When options are parsed by parse(), an IndifferentAccessHash hash is returned.
+  # * When options are parsed by parse(), an indifferent access hash is returned.
   # * Options are also called switches, parameters, flags etc.
   # * Option parsing stops when it comes across a '--'.
   #
@@ -219,7 +191,7 @@ module Boson
       }
     end
 
-    # Parses an array of arguments for defined options to return an IndifferentAccessHash. Once the parser
+    # Parses an array of arguments for defined options to return an indifferent access hash. Once the parser
     # recognizes a valid option, it continues to parse until an non option argument is detected.
     # Flags that can be passed to the parser:
     # * :opts_before_args: When true options must come before arguments. Default is false.
@@ -227,8 +199,8 @@ module Boson
     #   it comes across - or --. Default is false.
     def parse(args, flags={})
       @args = args
-      # start with defaults
-      hash = IndifferentAccessHash.new @defaults
+      # start with symbolized defaults
+      hash = Hash[@defaults.map {|k,v| [k.to_sym, v] }]
 
       @leading_non_opts = []
       unless flags[:opts_before_args]
@@ -259,7 +231,7 @@ module Boson
       @trailing_non_opts = @args
       check_required! hash
       delete_invalid_opts if flags[:delete_invalid_opts]
-      hash
+      indifferent_hash.tap {|h| h.update hash }
     end
 
     # Helper method to generate usage. Takes a dashed option and a string value indicating
@@ -370,6 +342,11 @@ module Boson
       else
         @opt_types[opt]
       end
+    end
+
+    # Creates a Hash with indifferent access
+    def indifferent_hash
+      Hash.new {|hash,key| hash[key.to_sym] if String === key }
     end
 
     private

@@ -12,30 +12,22 @@ describe "OptionParser" do
     opt.parse(args.flatten)
   end
 
-  describe "IndifferentAccessHash" do
+  describe "indifferent_hash" do
     before {
-      @hash = IndifferentAccessHash.new 'foo' => 'bar', 'baz' => 'bee'
+      @hash = OptionParser.new({}).indifferent_hash
+      @hash.update foo: 'bar'
     }
+
     it "can access values indifferently" do
       @hash['foo'].should == 'bar'
       @hash[:foo].should  == 'bar'
-      @hash.values_at(:foo, :baz).should == ['bar', 'bee']
     end
 
-    it "can be initialized with either strings or symbols and be equal" do
-      hash2 = IndifferentAccessHash.new :foo=>'bar', :baz=>'bee'
-      @hash.should == hash2
-    end
-
-    it "returns keys as symbols by default" do
-      @hash.should == {:foo=>'bar', :baz=>'bee'}
-    end
-
-    it "can set values indifferently" do
-      @hash['foo'] = 'duh'
-      @hash[:foo].should == 'duh'
-      @hash[:baz] = 'wasp'
-      @hash['baz'].should == 'wasp'
+    it "cannot set values indifferently" do
+      @hash['foo'] = 'barred'
+      @hash['foo'].should == 'barred'
+      @hash[:foo].should != 'barred'
+      @hash[:foo].should == 'bar'
     end
   end
 
