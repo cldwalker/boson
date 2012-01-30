@@ -1,6 +1,11 @@
 module Boson
   # Raised if a library has methods which conflict with existing methods
-  class MethodConflictError < LoaderError; end
+  class MethodConflictError < LoaderError
+    MESSAGE = "The following commands conflict with existing commands: %s"
+    def initialize(conflicts)
+      super MESSAGE % conflicts.join(', ')
+    end
+  end
 
   # This module is mixed into Library to give it load() functionality. When
   # creating your own Library subclass, you should at least override
@@ -55,7 +60,7 @@ module Boson
     def after_include; end
 
     def handle_method_conflict_error(err)
-      raise MethodConflictError, err.message
+      raise err
     end
 
     # Called after @module has been created
@@ -94,10 +99,7 @@ module Boson
 
     def check_for_method_conflicts
       conflicts = method_conflicts
-      unless conflicts.empty?
-        raise MethodConflictError, "The following commands conflict with " +
-          "existing commands: #{conflicts.join(', ')}"
-      end
+      raise MethodConflictError.new(conflicts) unless conflicts.empty?
     end
   end
 end
