@@ -40,7 +40,6 @@ module Boson
     def initialize_library_module
       @module = @module ? Util.constantize(@module) :
         Util.create_module(Boson::Commands, clean_name)
-      raise(LoaderError, "No module for library #{@name}") unless @module
       during_initialize_library_module
       check_for_method_conflicts unless @force
       after_initialize_library_module
@@ -82,7 +81,7 @@ module Boson
     # Cleans @commands from set_library_commands
     def clean_library_commands
       aliases = @commands_hash.select {|k,v| @commands.include?(k) }.
-        map {|k,v| v[:alias]}.compact
+        map {|k,v| v[:alias] }.compact
       @commands -= aliases
       @commands.uniq!
     end

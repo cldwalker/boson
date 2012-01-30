@@ -74,10 +74,5 @@ describe "Manager" do
       create_library('blah')
       Manager.loaded?('blah').should == false
     end
-
-    it "returns true when library is loaded" do
-      create_library('blah', :loaded=>true)
-      Manager.loaded?('blah').should == true
-    end
   end
 end
