@@ -63,9 +63,9 @@ module Boson
         global_opt, parsed_options, args = parse_options Shellwords.shellwords(args[0])
       # last string argument interpreted as args + options
       elsif args.size > 1 && args[-1].is_a?(String)
-        temp_args = Runner.in_shell? ? args : Shellwords.shellwords(args.pop)
+        temp_args = Boson.in_shell ? args : Shellwords.shellwords(args.pop)
         global_opt, parsed_options, new_args = parse_options temp_args
-        Runner.in_shell? ? args = new_args : args += new_args
+        Boson.in_shell ? args = new_args : args += new_args
       # add default options
       elsif @command.options.nil? || @command.options.empty? || (!@command.has_splat_args? &&
         args.size <= (@command.arg_size - 1).abs) || (@command.has_splat_args? && !args[-1].is_a?(Hash))

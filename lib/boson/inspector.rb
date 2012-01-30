@@ -81,7 +81,7 @@ module Boson
       if valid_attr_value?(key, value)
         add_scraped_data_to_config(key, value, cmd)
       else
-        if Runner.debug
+        if Boson.debug
           warn "DEBUG: Command '#{cmd}' has #{key.inspect} attribute with invalid value '#{value.inspect}'"
         end
       end

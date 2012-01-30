@@ -108,7 +108,7 @@ module Boson
       return if !@global_options[:pretend] && run_verbose_help(option_command, original_args)
       raise unless @global_options[:pretend]
     rescue OptionParser::Error, Error
-      raise if Runner.in_shell?
+      raise if Boson.in_shell
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" : $!.message
       $stderr.puts "Error: " + message
     end

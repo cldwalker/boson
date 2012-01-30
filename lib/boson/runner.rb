@@ -15,12 +15,13 @@ module Boson
         load_rc
       end
 
-      # Returns true if in commandline with verbose flag or if set explicitly. Useful in plugins.
+      # Returns true if in commandline with verbose flag or if set explicitly.
+      # Useful in plugins.
       def verbose?
         @verbose
       end
 
-      # Libraries that come with Boson
+      # Default libraries loaded by init
       def default_libraries
         DEFAULT_LIBRARIES
       end
@@ -32,7 +33,6 @@ module Boson
 
     class<<self
       include API
-      attr_accessor :debug
 
       # Loads default libraries
       def init
@@ -73,25 +73,13 @@ module Boson
         [new_args[0], options, new_args[1..-1]]
       end
 
-      # Returns true if commands are being executed from a non-ruby shell i.e. bash. Returns false if
-      # in a ruby shell i.e. irb.
-      def in_shell?
-        !!@in_shell
-      end
-
-      #:stopdoc:
       def verbose=(val)
         @verbose = val
-      end
-
-      def in_shell=(val)
-        @in_shell = val
       end
 
       def load_options
         {:verbose=>@options[:verbose]}
       end
-      #:startdoc:
     end
   end
 end

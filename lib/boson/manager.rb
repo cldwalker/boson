@@ -40,14 +40,14 @@ module Boson
       def rescue_load_action(library, load_method)
         yield
       rescue AppendFeaturesFalseError
-        warn "DEBUG: Library #{library} didn't load due to append_features" if Runner.debug
+        warn "DEBUG: Library #{library} didn't load due to append_features" if Boson.debug
       rescue LoaderError=>e
         add_failed_library library
         $stderr.puts "Unable to #{load_method} library #{library}. Reason: #{e.message}"
       rescue StandardError, SyntaxError, LoadError =>e
         add_failed_library library
         message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
-        if Runner.debug
+        if Boson.debug
           message += "\n" + e.backtrace.map {|e| "  " + e }.join("\n")
         elsif @options[:verbose]
           message += "\n" + e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
@@ -81,7 +81,7 @@ module Boson
           if !options[:dependency]
             $stderr.puts "Library #{lib.name} did not load successfully."
           end
-          $stderr.puts "  "+lib.inspect if Runner.debug
+          $stderr.puts "  "+lib.inspect if Boson.debug
           false
         end
       end

@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "Scientist" do
   before_all {
-    Runner.in_shell = nil
+    Boson.in_shell = nil
     eval <<-EOF
     module Blah
       def blah(arg1, options={})
@@ -185,7 +185,7 @@ describe "Scientist" do
     end
 
     it "parses normally from cmdline" do
-      Runner.expects(:in_shell?).times(2).returns true
+      Boson.expects(:in_shell).times(2).returns true
       command(@cmd_attributes, ['--force', '--level=3']).should == {:level=>3, :force=>true}
     end
 
@@ -202,7 +202,7 @@ describe "Scientist" do
     end
 
     it "prepends correctly from cmdline" do
-      Runner.expects(:in_shell?).times(2).returns true
+      Boson.expects(:in_shell).times(2).returns true
       command(@cmd_attributes, ['3','-f']).should == {:level=>3, :force=>true}
     end
   end
@@ -213,5 +213,5 @@ describe "Scientist" do
     }.should =~ /Error: No method.*'blah'/
   end
 
-  after_all { Runner.in_shell = false }
+  after_all { Boson.in_shell = false }
 end

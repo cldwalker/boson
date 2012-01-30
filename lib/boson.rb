@@ -22,8 +22,13 @@ module Boson
 
   # The object which holds and executes all command functionality
   attr_accessor :main_object
-  attr_accessor :commands, :libraries, :config
   alias_method :higgs, :main_object
+  attr_accessor :commands, :libraries, :config
+  # Prints debugging info when set
+  attr_accessor :debug
+  # Returns true if commands are being executed from a non-ruby shell i.e. bash
+  # Returns nil/false if in a ruby shell i.e. irb.
+  attr_accessor :in_shell
 
   # Array of loaded Boson::Library objects.
   def libraries
