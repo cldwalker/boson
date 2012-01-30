@@ -11,6 +11,7 @@ module Boson
 
     module API
       def start(*)
+        @options ||= {}
         load_rc
       end
 

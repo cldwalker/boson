@@ -21,11 +21,7 @@ class MyCommandRunner < Boson::CommandRunner
 end
 
 describe "CommandRunner" do
-  before_all { $0 = 'my_command'; MyCommandRunner.init([]) }
-
-  before {
-    MyCommandRunner.expects(:init)
-  }
+  before_all { $0 = 'my_command' }
 
   def my_command(cmd='')
     capture_stdout do

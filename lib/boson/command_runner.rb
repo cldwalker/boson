@@ -6,13 +6,13 @@ module Boson
       Inspector.enable all_classes: true, module: mod.singleton_class
     end
 
-    def self.init(args)
-      Boson::Runner.start args
-      Manager.load self
+    def self.default_libraries
+      [self]
     end
 
     def self.start(args=ARGV)
-      init args
+      super
+      init
       command, options, args = parse_args(args)
 
       if options[:help]
