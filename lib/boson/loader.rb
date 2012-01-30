@@ -12,7 +12,7 @@ module Boson
       load_source_and_set_module
       module_callbacks if @module
       yield if block_given? # load dependencies
-      detect_additions { initialize_library_module } if load_module_commands?
+      detect_additions { load_commands } if load_commands?
       set_library_commands
       loaded_correctly? && (@loaded = true)
     end
@@ -24,8 +24,8 @@ module Boson
     # Callbacks for @module before loading
     def module_callbacks; end
 
-    # Determines if @module initializing happens
-    def load_module_commands?
+    # Determines if load_commands should be called
+    def load_commands?
       @module
     end
 
@@ -36,13 +36,12 @@ module Boson
       end
     end
 
-    # loads module's commands
-    def initialize_library_module
+    def load_commands
       @module = @module ? Util.constantize(@module) :
         Util.create_module(Boson::Commands, clean_name)
-      during_initialize_library_module
+      before_load_commands
       check_for_method_conflicts unless @force
-      after_initialize_library_module
+      actual_load_commands
     rescue MethodConflictError => err
       handle_method_conflict_error err
     end
@@ -60,10 +59,10 @@ module Boson
     end
 
     # Called after @module has been created
-    def during_initialize_library_module; end
+    def before_load_commands; end
 
     # Actually includes module and its commands
-    def after_initialize_library_module
+    def actual_load_commands
       include_in_universe
     end
 
