@@ -4,7 +4,7 @@ require 'mocha'
 require 'mocha-on-bacon'
 require 'boson'
 require 'fileutils'
-require 'boson/command_runner'
+require 'boson/runner'
 Object.send :remove_const, :OptionParser
 Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
 ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc'
@@ -68,7 +68,7 @@ module TestHelpers
     library = options[:library] || :Blarg
     Object.send(:remove_const, library) if Object.const_defined?(library)
 
-    Object.const_set(library, Class.new(Boson::CommandRunner)).tap do |klass|
+    Object.const_set(library, Class.new(Boson::Runner)).tap do |klass|
       if block
         klass.module_eval(&block)
       else

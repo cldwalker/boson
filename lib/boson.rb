@@ -1,4 +1,4 @@
-%w{runner manager loader inspector library}.each {|e| require "boson/#{e}" }
+%w{bare_runner manager loader inspector library}.each {|e| require "boson/#{e}" }
 require 'boson/method_inspector'
 require 'boson/runner_library'
 %w{command util option_parser options scientist option_command version}.

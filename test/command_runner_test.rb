@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/test_helper'
 
-class MyCommandRunner < Boson::CommandRunner
+class MyRunner < Boson::Runner
   desc "This is a small"
   def small(*args)
     p args
@@ -20,12 +20,12 @@ class MyCommandRunner < Boson::CommandRunner
   end
 end
 
-describe "CommandRunner" do
+describe "Runner" do
   before_all { $0 = 'my_command' }
 
   def my_command(cmd='')
     capture_stdout do
-      MyCommandRunner.start cmd.split(/\s+/)
+      MyRunner.start cmd.split(/\s+/)
     end
   end
 
@@ -79,7 +79,7 @@ STR
   end
 
   it "calls command with too many args" do
-    MyCommandRunner.expects(:abort).with <<-STR.chomp
+    MyRunner.expects(:abort).with <<-STR.chomp
 'medium' was called incorrectly.
 medium [arg="nil"][--spicy]
 STR
