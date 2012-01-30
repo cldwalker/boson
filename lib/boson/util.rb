@@ -41,7 +41,7 @@ module Boson
     # Returns a hash of what's detected.
     # Valid options and possible returned keys are :methods, :object_methods, :modules, :gems.
     def detect(options={}, &block)
-      options = {:methods=>true, :object_methods=>true}.merge!(options)
+      options = {methods: true}.merge!(options)
       original_gems = Object.const_defined?(:Gem) ? Gem.loaded_specs.keys : []
       original_object_methods = Object.instance_methods
       original_instance_methods = class << Boson.main_object; instance_methods end
