@@ -22,7 +22,9 @@ module Boson
       METHODS.each do |e|
         store[e][meth.to_s] = store[:temp][e] if store[:temp][e]
       end
-      (store[:options][meth.to_s] ||= {}).merge! store[:temp][:option] if store[:temp][:option]
+      if store[:temp][:option]
+        (store[:options][meth.to_s] ||= {}).merge! store[:temp][:option]
+      end
 
       if store[:temp].size < ALL_METHODS.size
         store[:method_locations] ||= {}
@@ -73,32 +75,27 @@ module Boson
       mod.instance_method(meth).source_location
     end
 
-    #:stopdoc:
-    def find_class_method_locations(klass, meth)
-      if (klass = Util.any_const_get(klass)) && (meth_location = klass.method(meth).source_location) &&
-        meth_location[0]
-        meth_location
-      end
-    end
-
-    # Hash of a module's method attributes i.e. descriptions, options by method and then attribute
+    # Hash of a module's method attributes i.e. descriptions, options by method
+    # and then attribute
     def store(mod=@current_module)
       @mod_store[mod]
     end
 
+    # Sets current module
     def current_module=(mod)
       @current_module = mod
       @mod_store[mod] ||= {}
     end
 
-    def has_inspector_method?(meth, inspector)
-      (store[inspector] && store[inspector].key?(meth.to_s)) || inspector_in_file?(meth.to_s, inspector)
+    def inspector_in_file?(meth, inspector_method)
+      !(file_line = store[:method_locations] && store[:method_locations][meth]) ?
+        false : true
     end
 
-    def inspector_in_file?(meth, inspector_method)
-      return false if !(file_line = store[:method_locations] && store[:method_locations][meth])
-      true
+    private
+    def has_inspector_method?(meth, inspector)
+      (store[inspector] && store[inspector].key?(meth.to_s)) ||
+        inspector_in_file?(meth.to_s, inspector)
     end
-    #:startdoc:
   end
 end

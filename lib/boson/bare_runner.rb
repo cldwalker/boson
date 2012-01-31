@@ -2,6 +2,7 @@ module Boson
   # Base class for runners.
   class BareRunner
     DEFAULT_LIBRARIES = []
+    # Default options for parse_args
     GLOBAL_OPTIONS = {
       help: {
         type: :boolean,
@@ -10,6 +11,7 @@ module Boson
     }
 
     module API
+      # Loads rc
       def start(*)
         @options ||= {}
         load_rc
@@ -39,14 +41,7 @@ module Boson
         Manager.load default_libraries, load_options
       end
 
-      def load_rc
-        rc = ENV['BOSONRC'] || '~/.bosonrc'
-        load(rc) if !rc.empty? && File.exists?(File.expand_path(rc))
-      rescue StandardError, SyntaxError, LoadError => err
-        warn "Error while loading #{rc}:\n"+
-          "#{err.class}: #{err.message}\n    #{err.backtrace.join("\n    ")}"
-      end
-
+      # Executes a command and handles invalid args
       def execute_command(cmd, args)
         Boson.full_invoke(cmd, args)
       rescue ArgumentError
@@ -61,11 +56,17 @@ module Boson
         abort message
       end
 
+      # Determines if a user command argument error or an internal Boson one
       def allowed_argument_error?(err, cmd, args)
         (err.message[/wrong number of arguments/] &&
           (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
       end
 
+      def verbose=(val)
+        @verbose = val
+      end
+
+      private
       def parse_args(args)
         @option_parser = OptionParser.new(self::GLOBAL_OPTIONS)
         options = @option_parser.parse(args.dup, :opts_before_args=>true)
@@ -73,8 +74,12 @@ module Boson
         [new_args[0], options, new_args[1..-1]]
       end
 
-      def verbose=(val)
-        @verbose = val
+      def load_rc
+        rc = ENV['BOSONRC'] || '~/.bosonrc'
+        load(rc) if !rc.empty? && File.exists?(File.expand_path(rc))
+      rescue StandardError, SyntaxError, LoadError => err
+        warn "Error while loading #{rc}:\n"+
+          "#{err.class}: #{err.message}\n    #{err.backtrace.join("\n    ")}"
       end
 
       def load_options

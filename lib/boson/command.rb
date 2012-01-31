@@ -1,5 +1,6 @@
 module Boson
-  # A command starts with the functionality of a ruby method and adds benefits with options, etc.
+  # A command starts with the functionality of a ruby method and adds benefits
+  # with options, etc.
   class Command
     module API
       # Creates a command given its name and a library.
@@ -7,6 +8,7 @@ module Boson
         new(new_attributes(name, library))
       end
 
+      # Attributes passed to commands from its library
       def library_attributes(library)
         {lib: library.name}
       end
@@ -17,10 +19,9 @@ module Boson
         commands.find {|e| [e.name, e.alias].include?(command) }
       end
     end
+    extend API
 
-    class <<self; include API; end
-
-    # Used to generate a command's initial attributes when creating a command object
+    # Generates a command's initial attributes when creating a command object
     def self.new_attributes(name, library)
       (library.commands_hash[name] || {}).merge(name: name).
         update(library_attributes(library))
@@ -32,11 +33,14 @@ module Boson
         "Command '#{command}' not found"
     end
 
+    # Attributes that are defined as accessors
     ATTRIBUTES = [:name, :lib, :alias, :desc, :options, :args, :config]
     attr_accessor *(ATTRIBUTES + [:default_option])
+    # Attributes that can be passed in at initialization
     INIT_ATTRIBUTES = [:alias, :desc, :options, :default_option, :option_command]
-    # A hash of attributes which map to instance variables and values. :name
-    # and :lib are required keys.
+
+    # Takes a hash of attributes which map to instance variables and values.
+    # :name and :lib are required keys.
     #
     # Attributes that can be configured:
     # [*:desc*] Description that shows up in command listings
@@ -76,9 +80,11 @@ module Boson
     end
 
     module API
+      # Called after initialize
       def after_initialize(hash)
       end
 
+      # Alias for a name but plugins may use it to give a more descriptive name
       def full_name
         name
       end
@@ -104,17 +110,22 @@ module Boson
       @options ? option_parser.to_s : ''
     end
 
+    # Indicates if an OptionCommand
     def option_command?
       options || @option_command
     end
 
+    # One-line usage of args
     def basic_usage
       return '' if options.nil? && args.nil?
       usage_args = args && @options && !has_splat_args? ?
-        (@default_option ? [[@default_option.to_s, @file_parsed_args ? ''.inspect : '']] + args[0..-2] :
-        args[0..-2]) : args
+        (@default_option ?
+         [[@default_option.to_s, @file_parsed_args ? ''.inspect : '']] +
+         args[0..-2] : args[0..-2])
+        : args
       args ? usage_args.map {|e|
-        (e.size < 2) ? "[#{e[0]}]" : "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
+        (e.size < 2) ? "[#{e[0]}]" :
+          "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
       }.join(' ') : '[*unknown]'
     end
 
@@ -123,24 +134,27 @@ module Boson
       basic_usage + option_help
     end
 
-    #:stopdoc:
     # until @config is consistent in index + actual loading
     def config
       @config ||= {}
     end
 
+    # Indicates if any arg has a splat
     def has_splat_args?
       !!(args && @args[-1] && @args[-1][0][/^\*/])
     end
 
+    # Number of arguments
     def arg_size
-      @arg_size = args ? args.size : nil unless instance_variable_defined?("@arg_size")
+      unless instance_variable_defined?("@arg_size")
+        @arg_size = args ? args.size : nil
+      end
       @arg_size
     end
 
+    # Determines if args were parsed from a file
     def file_parsed_args?
       @file_parsed_args
     end
-    #:startdoc:
   end
 end

@@ -1,12 +1,11 @@
 module Boson
-  # Scrapes and processes method attributes with MethodInspector
-  # and hands off the data to Library objects.
+  # Scrapes and processes method attributes with MethodInspector and hands off
+  # the data to Library objects.
   #
   # === Method Attributes
-  # Method attributes refer to (commented) Module methods placed before a command's method
-  # in a FileLibrary module:
-  #   module SomeMod
-  #      # @config :alias=>'so'
+  # Method attributes refer to methods placed before a command's method in a
+  # library:
+  #   class SomeRunner < Boson::Runner
   #      options :verbose=>:boolean
   #      option :count, :numeric
   #      # Something descriptive perhaps
@@ -15,8 +14,9 @@ module Boson
   #      end
   #   end
   #
-  # Method attributes serve as configuration for a method's command. All attributes should only be called once per
-  #   method except for option. Available method attributes:
+  # Method attributes serve as configuration for a method's command. All
+  # attributes should only be called once per method except for option.
+  # Available method attributes:
   # * config: Hash to define any command attributes (see Command.new).
   # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
   # * options: Hash to define an OptionParser object for a command's options.
@@ -25,8 +25,8 @@ module Boson
     extend self
     attr_reader :enabled
 
-    # Enable scraping by overridding method_added to snoop on a library while it's
-    # loading its methods.
+    # Enable scraping by overridding method_added to snoop on a library while
+    # it's loading its methods.
     def enable(options = {})
       method_inspector_meth = options[:all_classes] ?
         :new_method_added : :safe_new_method_added
@@ -58,7 +58,7 @@ module Boson
       @enabled = false
     end
 
-    # Adds method attributes scraped for the library's module to the library's commands.
+    # Adds method attributes to the library's commands
     def add_method_data_to_library(library)
       @commands_hash = library.commands_hash
       @library_file = library.library_file
@@ -67,7 +67,7 @@ module Boson
       add_method_scraped_data
     end
 
-    #:stopdoc:
+    private
     def add_method_scraped_data
       (MethodInspector::METHODS + [:args]).each do |key|
         (@store[key] || []).each do |cmd, val|
@@ -82,7 +82,8 @@ module Boson
         add_scraped_data_to_config(key, value, cmd)
       else
         if Boson.debug
-          warn "DEBUG: Command '#{cmd}' has #{key.inspect} attribute with invalid value '#{value.inspect}'"
+          warn "DEBUG: Command '#{cmd}' has #{key.inspect} attribute with " +
+            "invalid value '#{value.inspect}'"
         end
       end
     end
@@ -92,7 +93,8 @@ module Boson
         if key == :config
           @commands_hash[cmd] = Util.recursive_hash_merge value, @commands_hash[cmd]
         else
-          @commands_hash[cmd][key] = Util.recursive_hash_merge value, @commands_hash[cmd][key] || {}
+          @commands_hash[cmd][key] = Util.recursive_hash_merge value,
+            @commands_hash[cmd][key] || {}
         end
       else
         @commands_hash[cmd][key] ||= value
@@ -103,7 +105,5 @@ module Boson
       return true if (klass = MethodInspector::METHOD_CLASSES[key]).nil?
       value.is_a?(klass) || value.nil?
     end
-
-    #:startdoc:
   end
 end

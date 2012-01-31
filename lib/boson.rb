@@ -1,10 +1,19 @@
-%w{bare_runner manager loader inspector library}.each {|e| require "boson/#{e}" }
+require 'boson/bare_runner'
+require 'boson/manager'
+require 'boson/loader'
+require 'boson/inspector'
+require 'boson/library'
 require 'boson/method_inspector'
 require 'boson/runner_library'
-%w{command util option_parser options scientist option_command version}.
-  each {|e| require "boson/#{e}" }
+require 'boson/command'
+require 'boson/util'
+require 'boson/option_parser'
+require 'boson/options'
+require 'boson/scientist'
+require 'boson/option_command'
+require 'boson/version'
 
-# This module stores the libraries, commands and main object used throughout Boson.
+# This module stores the libraries, commands and the main_object.
 #
 # Useful documentation links:
 # * Boson::Library - All about libraries
@@ -18,11 +27,13 @@ module Boson
   # Module under which most library modules are evaluated.
   module Commands; end
 
+  # Default config
   CONFIG = {libraries: {}, command_aliases: {}, option_underscore_search: true}
 
   # The object which holds and executes all command functionality
   attr_accessor :main_object
   alias_method :higgs, :main_object
+
   attr_accessor :commands, :libraries, :config
   # Prints debugging info when set
   attr_accessor :debug
@@ -40,15 +51,18 @@ module Boson
     @commands ||= Array.new
   end
 
+  # Global config used by most classes
   def config
     @config ||= CONFIG
   end
 
-  def main_object=(value) #:nodoc:
+  # Sets main_object and extends it with commands from Universe
+  def main_object=(value)
     @main_object = value.extend(Universe)
   end
 
-  def library(query, attribute='name') #:nodoc:
+  # Finds first library that has a value of attribute
+  def library(query, attribute='name')
     libraries.find {|e| e.send(attribute) == query }
   end
 
@@ -57,6 +71,7 @@ module Boson
     main_object.send(*args, &block)
   end
 
+  # Similar to invoke but accepts args as an array
   def full_invoke(cmd, args)
     main_object.send(cmd, *args)
   end
