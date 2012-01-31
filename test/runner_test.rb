@@ -70,11 +70,15 @@ STR
     end
   end
 
-  it "call command with options correctly" do
+  it "handles command with default arguments correctly" do
+    my_command('medium').chomp.should == '[nil, {}]'
+  end
+
+  it "calls command with options correctly" do
     my_command('medium 1 --spicy').chomp.should == '["1", {:spicy=>true}]'
   end
 
-  it "call optionless command correctly" do
+  it "calls optionless command correctly" do
     my_command('small 1 2').chomp.should == '["1", "2"]'
   end
 
