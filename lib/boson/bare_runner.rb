@@ -17,12 +17,6 @@ module Boson
         load_rc
       end
 
-      # Returns true if in commandline with verbose flag or if set explicitly.
-      # Useful in plugins.
-      def verbose?
-        @verbose
-      end
-
       # Default libraries loaded by init
       def default_libraries
         DEFAULT_LIBRARIES
@@ -60,10 +54,6 @@ module Boson
       def allowed_argument_error?(err, cmd, args)
         (err.message[/wrong number of arguments/] &&
           (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
-      end
-
-      def verbose=(val)
-        @verbose = val
       end
 
       private

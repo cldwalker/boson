@@ -40,6 +40,9 @@ module Boson
   # Returns true if commands are being executed from a non-ruby shell i.e. bash
   # Returns nil/false if in a ruby shell i.e. irb.
   attr_accessor :in_shell
+  # Returns true if in commandline with verbose flag or if set explicitly.
+  # Plugins should use this to display more info.
+  attr_accessor :verbose
 
   # Array of loaded Boson::Library objects.
   def libraries
