@@ -82,28 +82,36 @@ module Boson
         accepted.each {|cmd| Scientist.redefine_command(lib.namespace_object, cmd) }
       end
 
-      private
-      def rescue_load_action(library, load_method)
-        yield
-      rescue LoaderError=>e
-        add_failed_library library
-        warn "Unable to #{load_method} library #{library}. Reason: #{e.message}"
-      rescue StandardError, SyntaxError, LoadError =>e
-        add_failed_library library
-        message = "Unable to #{load_method} library #{library}. Reason: #{$!}"
-        if Boson.debug
-          message += "\n" + e.backtrace.map {|e| "  " + e }.join("\n")
-        elsif @options[:verbose]
-          message += "\n" + e.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
+      # Handles an error from a load action
+      def handle_load_action_error(library, load_method, err)
+        case err
+        when LoaderError
+          add_failed_library library
+          warn "Unable to #{load_method} library #{library}. Reason: #{err.message}"
+        else
+          add_failed_library library
+          message = "Unable to #{load_method} library #{library}. Reason: #{err}"
+          if Boson.debug
+            message += "\n" + err.backtrace.map {|e| "  " + e }.join("\n")
+          elsif @options[:verbose]
+            message += "\n" + err.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
+          end
+          $stderr.puts message
         end
-        $stderr.puts message
+      end
+
+      private
+      def call_load_action(library, load_method)
+        yield
+      rescue StandardError, SyntaxError, LoadError => err
+        handle_load_action_error(library, load_method, err)
       ensure
         Inspector.disable if Inspector.enabled
       end
 
       def load_once(source, options={})
         @options = options
-        rescue_load_action(source, :load) do
+        call_load_action(source, :load) do
           lib = loader_create(source)
           if loaded?(lib.name)
             if options[:verbose] && !options[:dependency]

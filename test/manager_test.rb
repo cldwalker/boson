@@ -5,7 +5,7 @@ describe "Manager" do
     def load_library(hash)
       new_attributes = {:name=>hash[:name], :commands=>[], :created_dependencies=>[], :loaded=>true}
       [:module, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
-      Manager.expects(:rescue_load_action).returns(Library.new(new_attributes))
+      Manager.expects(:call_load_action).returns(Library.new(new_attributes))
       Manager.load([hash[:name]])
     end
 
