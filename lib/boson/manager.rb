@@ -2,8 +2,6 @@ module Boson
   # Base class for library loading errors. Raised mostly in Boson::Loader and
   # rescued by Boson::Manager.
   class LoaderError < StandardError; end
-  # Raised when a library's append_features returns false.
-  class AppendFeaturesFalseError < StandardError; end
 
   # Handles loading of libraries and commands.
   class Manager
@@ -87,8 +85,6 @@ module Boson
       private
       def rescue_load_action(library, load_method)
         yield
-      rescue AppendFeaturesFalseError
-        warn "DEBUG: Library #{library} didn't load due to append_features" if Boson.debug
       rescue LoaderError=>e
         add_failed_library library
         warn "Unable to #{load_method} library #{library}. Reason: #{e.message}"
