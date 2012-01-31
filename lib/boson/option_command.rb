@@ -126,7 +126,7 @@ module Boson
           next if args.size >= i + 1 # only fill in once args run out
           break if arr.size != 2 # a default arg value must exist
           begin
-            args[i] = @command.file_parsed_args? ? obj.instance_eval(arr[1]) : arr[1]
+            args[i] = @command.file_parsed_args ? obj.instance_eval(arr[1]) : arr[1]
           rescue Exception
             raise Scientist::Error, "Unable to set default argument at " +
               "position #{i+1}.\nReason: #{$!.message}"

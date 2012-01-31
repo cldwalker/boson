@@ -54,7 +54,7 @@ STR
 
     it "prints help for command with options" do
       my_command('-h medium').should == <<-STR
-Usage: my_command medium [arg="nil"]
+Usage: my_command medium [arg=nil]
 
 Options:
   -s, --spicy  hot
@@ -81,7 +81,7 @@ STR
   it "calls command with too many args" do
     MyRunner.expects(:abort).with <<-STR.chomp
 'medium' was called incorrectly.
-medium [arg="nil"][--spicy]
+medium [arg=nil][--spicy]
 STR
     my_command('medium 1 2 3')
   end

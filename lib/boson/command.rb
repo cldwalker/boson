@@ -38,6 +38,7 @@ module Boson
     attr_accessor *(ATTRIBUTES + [:default_option])
     # Attributes that can be passed in at initialization
     INIT_ATTRIBUTES = [:alias, :desc, :options, :default_option, :option_command]
+    attr_reader :file_parsed_args
 
     # Takes a hash of attributes which map to instance variables and values.
     # :name and :lib are required keys.
@@ -61,6 +62,8 @@ module Boson
       hash = attributes.dup
       @name = hash.delete(:name) or raise ArgumentError
       @lib = hash.delete(:lib) or raise ArgumentError
+      # since MethodInspector scrapes arguments from file by default
+      @file_parsed_args = true
       INIT_ATTRIBUTES.each do |e|
         instance_variable_set("@#{e}", hash.delete(e)) if hash.key?(e)
       end
@@ -150,11 +153,6 @@ module Boson
         @arg_size = args ? args.size : nil
       end
       @arg_size
-    end
-
-    # Determines if args were parsed from a file
-    def file_parsed_args?
-      @file_parsed_args
     end
   end
 end
