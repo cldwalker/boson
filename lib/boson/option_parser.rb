@@ -1,5 +1,6 @@
 module Boson
-  # This class concisely defines commandline options that when parsed produce a Hash of option keys and values.
+  # This class concisely defines commandline options that when parsed produce a
+  # Hash of option keys and values.
   # Additional points:
   # * Setting option values should follow conventions in *nix environments. See examples below.
   # * By default, there are 5 option types, each which produce different objects for option values.
@@ -37,8 +38,8 @@ module Boson
   #             '--fields a,b:d'   -> {:fields=>{'a'=>'d', 'b'=>'d'} }
   #             '--fields *:d'     -> {:fields=>{'a'=>'d', 'b'=>'d', 'c'=>'d'} }
   #
-  # This is a modified version of Yehuda Katz's Thor::Options class which is a modified version
-  # of Daniel Berger's Getopt::Long class (licensed under Ruby's license).
+  # This is a modified version of Yehuda Katz's Thor::Options class which is a
+  # modified version of Daniel Berger's Getopt::Long class (Ruby license).
   class OptionParser
     # Raised for all OptionParser errors
     class Error < StandardError; end
@@ -47,32 +48,12 @@ module Boson
     LONG_RE     = /^(--\w+[-\w+]*)$/
     SHORT_RE    = /^(-[a-zA-Z])$/i
     EQ_RE       = /^(--\w+[-\w+]*|-[a-zA-Z])=(.*)$/i
-    SHORT_SQ_RE = /^-([a-zA-Z]{2,})$/i # Allow either -x -v or -xv style for single char args
+    # Allow either -x -v or -xv style for single char args
+    SHORT_SQ_RE = /^-([a-zA-Z]{2,})$/i
     SHORT_NUM   = /^(-[a-zA-Z])#{NUMERIC}$/i
     STOP_STRINGS = %w{-- -}
 
     attr_reader :leading_non_opts, :trailing_non_opts, :opt_aliases
-
-    # Given options to pass to OptionParser.new, this method parses ARGV and returns the remaining arguments
-    # and a hash of parsed options. This is useful for scripts outside of Boson.
-    def self.parse(options, args=ARGV)
-      @opt_parser ||= new(options)
-      parsed_options = @opt_parser.parse(args)
-      [@opt_parser.non_opts, parsed_options]
-    end
-
-    # Usage string summarizing options defined in parse
-    def self.usage
-      @opt_parser.to_s
-    end
-
-    def self.make_mergeable!(opts) #:nodoc:
-      opts.each {|k,v|
-        if !v.is_a?(Hash) && !v.is_a?(Symbol)
-          opts[k] = {:default=>v}
-        end
-      }
-    end
 
     # Array of arguments left after defined options have been parsed out by parse.
     def non_opts
