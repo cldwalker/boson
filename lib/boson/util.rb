@@ -2,7 +2,7 @@ module Boson
   # Collection of utility methods used throughout Boson.
   module Util
     extend self
-    # From Rails ActiveSupport, converts a camelcased string to an underscored string:
+    # From ActiveSupport, converts a camelcased string to an underscored string:
     # 'Boson::MethodInspector' -> 'boson/method_inspector'
     def underscore(camel_cased_word)
       camel_cased_word.to_s.gsub(/::/, '/').
@@ -12,10 +12,11 @@ module Boson
        downcase
     end
 
-    # From Rails ActiveSupport, does the reverse of underscore:
+    # From ActiveSupport, does the reverse of underscore:
     # 'boson/method_inspector' -> 'Boson::MethodInspector'
     def camelize(string)
-      string.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.gsub(/(?:^|_)(.)/) { $1.upcase }
+      string.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.
+        gsub(/(?:^|_)(.)/) { $1.upcase }
     end
 
     # Converts a module/class string to the actual constant.
@@ -24,8 +25,8 @@ module Boson
       any_const_get(camelize(string))
     end
 
-    # Returns a constant like const_get() no matter what namespace it's nested in.
-    # Returns nil if the constant is not found.
+    # Returns a constant like const_get() no matter what namespace it's nested
+    # in. Returns nil if the constant is not found.
     def any_const_get(name)
       return name if name.is_a?(Module)
       klass = Object
@@ -37,21 +38,26 @@ module Boson
        nil
     end
 
-    # Detects new object/kernel methods, gems and modules created within a block.
-    # Returns a hash of what's detected.
-    # Valid options and possible returned keys are :methods, :object_methods, :modules, :gems.
+    # Detects new object/kernel methods, gems and modules created within a
+    # block. Returns a hash of what's detected. Valid options and possible
+    # returned keys are :methods, :object_methods, :modules, :gems.
     def detect(options={}, &block)
       options = {methods: true}.merge!(options)
-      original_gems = Object.const_defined?(:Gem) ? Gem.loaded_specs.keys : []
+      original_gems = defined?(Gem) ? Gem.loaded_specs.keys : []
       original_object_methods = Object.instance_methods
-      original_instance_methods = class << Boson.main_object; instance_methods end
+      original_instance_methods = Boson.main_object.singleton_class.instance_methods
       original_modules = modules if options[:modules]
+
       block.call
+
       detected = {}
-      detected[:methods] = options[:methods] ? (class << Boson.main_object; instance_methods end -
-        original_instance_methods) : []
-      detected[:methods] -= (Object.instance_methods - original_object_methods) unless options[:object_methods]
-      detected[:gems] = Gem.loaded_specs.keys - original_gems if Object.const_defined? :Gem
+      detected[:methods] = options[:methods] ?
+        (Boson.main_object.singleton_class.instance_methods -
+           original_instance_methods) : []
+      unless options[:object_methods]
+        detected[:methods] -= (Object.instance_methods - original_object_methods)
+      end
+      detected[:gems] = Gem.loaded_specs.keys - original_gems if defined? Gem
       detected[:modules] = modules - original_modules if options[:modules]
       detected
     end
@@ -69,8 +75,9 @@ module Boson
     def create_module(base_module, name)
       desired_class = camelize(name)
       possible_suffixes = [''] + %w{1 2 3 4 5 6 7 8 9 10}
-      if suffix = possible_suffixes.find {|e| !base_module.const_defined?(desired_class+e) }
-        base_module.const_set(desired_class+suffix, Module.new)
+      if suffix = possible_suffixes.find {|e|
+        !base_module.const_defined?(desired_class+e) }
+          base_module.const_set(desired_class+suffix, Module.new)
       end
     end
 
@@ -86,7 +93,8 @@ module Boson
       return (first_match ? input : [input]) if list.include?(input)
       input = input.to_s
       if input.include?("_")
-        underscore_regex = input.split('_').map {|e| Regexp.escape(e) }.join("([^_]+)?_")
+        underscore_regex = input.split('_').map {|e|
+          Regexp.escape(e) }.join("([^_]+)?_")
         list.send(meth) {|e| e.to_s =~ /^#{underscore_regex}/ }
       else
         escaped_input = Regexp.escape(input)

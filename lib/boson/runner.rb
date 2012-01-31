@@ -1,6 +1,8 @@
 require 'boson'
 
 module Boson
+  # Defines a RunnerLibrary for use by executables as a simple way to map
+  # methods to subcommands
   class Runner < BareRunner
     def self.inherited(mod)
       Inspector.enable all_classes: true, module: mod.singleton_class

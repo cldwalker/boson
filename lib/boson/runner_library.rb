@@ -1,4 +1,5 @@
 module Boson
+  # Library created by Runner
   class RunnerLibrary < Library
     handles {|source|
       source.is_a?(Module) && source.ancestors.include?(Runner)
