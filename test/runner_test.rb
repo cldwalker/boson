@@ -15,7 +15,7 @@ class MyRunner < Boson::Runner
   def quiet
   end
 
-  def mini
+  def boom
     nil.boom
   end
 
@@ -43,8 +43,8 @@ describe "Runner" do
 
   describe "for -h COMMAND" do
     it "prints help for descriptionless command" do
-      my_command('-h mini').should == <<-STR
-Usage: my_command mini
+      my_command('-h quiet').should == <<-STR
+Usage: my_command quiet
 
 Description:
   TODO
@@ -99,18 +99,21 @@ STR
   end
 
   it "prints error message for nonexistant command" do
-    MyRunner.expects(:abort).with <<-STR.chomp
-Could not find command "blarg"
-STR
+    MyRunner.expects(:abort).with %[Could not find command "blarg"]
     my_command('blarg')
   end
 
   it "allows no method error in command" do
-    assert_error(NoMethodError) { my_command('mini') }
+    assert_error(NoMethodError) { my_command('boom') }
   end
 
   it "allows no method error in command" do
     assert_error(ArgumentError) { my_command('broken') }
+  end
+
+  it "prints error message for private method" do
+    MyRunner.expects(:abort).with %[Could not find command "no_run"]
+    my_command('no_run')
   end
 
   describe "$BOSONRC" do
