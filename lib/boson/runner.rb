@@ -18,13 +18,9 @@ module Boson
       init
       command, options, args = parse_args(args)
 
-      if options[:help]
-        if cmd = Command.find(command)
-          display_help(command, cmd)
-        else
-          puts %[Could not find command "#{command}"]
-        end
-      elsif command.nil?
+      if options[:help] && cmd = Command.find(command)
+        display_help(command, cmd)
+      elsif options[:help] || command.nil?
         display_default_usage
       else
         execute_command(command, args)

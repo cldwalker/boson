@@ -37,8 +37,8 @@ describe "Runner" do
     end
   end
 
-  it "prints sorted commands by default" do
-    my_command.should == <<-STR
+  def default_usage
+    <<-STR
 Usage: my_command COMMAND [ARGS]
 
 Available commands:
@@ -48,6 +48,15 @@ Available commands:
   quiet
   small   This is a small
 STR
+  end
+
+  it "prints sorted commands by default" do
+    my_command.should == default_usage
+  end
+
+  it "prints default usage for -h and --help" do
+    my_command('-h').should == default_usage
+    my_command('--help').should == default_usage
   end
 
   describe "for -h COMMAND" do
@@ -79,11 +88,6 @@ Options:
 Description:
   This is a medium
 STR
-    end
-
-    it "prints error message for nonexistant command" do
-      my_command('-h blarg').chomp.should ==
-        'Could not find command "blarg"'
     end
   end
 
