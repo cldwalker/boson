@@ -25,15 +25,15 @@ module Boson
       def all_libraries
         default_libraries
       end
-    end
-
-    class<<self
-      include API
 
       # Loads default libraries
       def init
         Manager.load default_libraries, load_options
       end
+    end
+
+    class<<self
+      include API
 
       # Executes a command and handles invalid args
       def execute_command(cmd, args)
