@@ -39,11 +39,8 @@ module Boson
       def execute_command(cmd, args)
         Boson.full_invoke(cmd, args)
       rescue ArgumentError
-        if allowed_argument_error?($!, cmd, args)
-          abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
-        else
-          raise
-        end
+        raise if !allowed_argument_error?($!, cmd, args)
+        abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
       rescue NoMethodError => err
         raise if !err.backtrace.first.include?('`full_invoke')
         abort_with %[Could not find command "#{cmd}"]

@@ -13,6 +13,11 @@ class MyRunner < Boson::Runner
   end
 
   def mini
+    nil.boom
+  end
+
+  def broken
+    raise ArgumentError
   end
 
   private
@@ -95,5 +100,13 @@ STR
 Could not find command "blarg"
 STR
     my_command('blarg')
+  end
+
+  it "allows no method error in command" do
+    assert_error(NoMethodError) { my_command('mini') }
+  end
+
+  it "allows no method error in command" do
+    assert_error(ArgumentError) { my_command('broken') }
   end
 end
