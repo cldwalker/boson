@@ -53,4 +53,57 @@ describe "Util" do
       first_search('bl', %w{bl blang bling}).should == 'bl'
     end
   end
+
+  describe "tracer" do
+    def sexp_from(string)
+      Util::Tracer.process(@parser.parse(string), :mydef)
+    end
+
+    before do
+      @parser = RubyParser.new
+      @mydef  = "def mydef(a,*b)\n'my def!'\nend"
+      @mdalt  = "def mydef(a,x)\n'my alt def!'\nend"
+      @def2   = "def thisdef(a,b=1)\n'this def!'\nend"
+      @def3   = "def thatdef(a,b=v)\n'that def!'\nend"
+      @modb   = "module B\n#{@def2}\nend"
+      @modc   = "module C\n#{@def3}\nend"
+      exp = @parser.parse(@mydef)
+      @mydef_sexp_w_trace = s(exp.shift, exp.shift, exp[0], Sexp.from_array(Util::Tracer::TM_BODY))
+    end
+
+    it "traces a single method on a module" do
+      str = "module A\n#{@mydef}\nend"
+      sexp_from(str).should == @mydef_sexp_w_trace
+    end
+
+    it "traces one method among other methods on a module" do
+      str = "module A;#{@def2}\n#{@mydef}\n#{@def3}\nend"
+      sexp_from(str).should == @mydef_sexp_w_trace
+    end
+
+    it "traces a method on a module with a class before the method" do
+      str = "module A\nclass Z\n#{@def2}\nend\n#{@mydef}\nend"
+      sexp_from(str).should == @mydef_sexp_w_trace
+    end
+
+    it "traces a method on a module with a class after the method" do
+      str = "module A\n#{@mydef}\nclass Z\n#{@def2}\nend\nend"
+      sexp_from(str).should == @mydef_sexp_w_trace
+    end
+
+    it "traces a method on one module of multiple modules" do
+      str = "#{@modb}\nmodule A\n#{@mydef}\nend\n#{@modc}"
+      sexp_from(str).should == @mydef_sexp_w_trace
+    end
+
+    it "can see the difference between two methods with the same name" do
+      alt_sexp = sexp_from(@mdalt)
+      alt_sexp.should.not == @mydef_sex_w_trace
+    end
+
+    it "traces the last method with the same name" do
+      str = "module N\n#{@mdalt}\nend\n#{@modb}\nmodule A\n#{@mydef}\nend\n#{@modc}"
+      sexp_from(str).should == @mydef_sexp_w_trace
+    end
+  end
 end

@@ -125,5 +125,40 @@ module Boson
         list.send(meth) {|e| e.to_s =~ /^#{escaped_input}/ }
       end
     end
+
+    # code to swap a trace into a command method body
+    #
+    class Tracer < SexpProcessor
+
+      TM_BODY = [:scope, [:block, [:return, [:array, [:call, nil, :local_variables, [:arglist]], [:iter, [:call, [:call, nil, :local_variables, [:arglist]], :map, [:arglist]], [:lasgn, :x], [:call, nil, :eval, [:arglist, [:call, [:lvar, :x], :to_s, [:arglist]]]]]]]]]
+
+      attr_accessor :name, :cache
+
+      def initialize
+        super
+        @name  = nil
+        @cache = []
+      end
+
+      def self.process(mod, name)
+        mod_sexp = Util.deep_copy(mod)
+        tracer = self.new
+        tracer.name = name
+        tracer.process(mod_sexp)
+        tracer.cache.pop
+      end
+
+      def process_defn(exp)
+        node = exp.shift
+        name = exp.shift
+        args = process exp.shift
+        body = process exp.shift
+        if name == @name && context.size <= 4
+          @cache.push s(node, name, args, Sexp.from_array(TM_BODY))
+        end
+        return s(node, name, args, body)
+      end
+    end
+
   end
 end
