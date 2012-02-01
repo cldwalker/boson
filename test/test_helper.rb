@@ -8,7 +8,6 @@ require 'boson/runner'
 Object.send :remove_const, :OptionParser
 Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
 ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc'
-ENV['BOSON_HOME'] = File.dirname(__FILE__)
 
 module TestHelpers
   def assert_error(error, message=nil)
@@ -120,9 +119,4 @@ end
 
 class Bacon::Context
   include TestHelpers
-end
-
-at_exit do
-  FileUtils.rm_rf ENV['BOSON_HOME'] + '/.boson'
-  FileUtils.rm_rf File.dirname(__FILE__) + '/../lib/boson/config'
 end
