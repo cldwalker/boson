@@ -6,6 +6,9 @@ module Boson
     extend self
     attr_accessor :current_module, :mod_store
     @mod_store ||= {}
+    @mod_sexp  ||= nil
+    @parser ||= RubyParser.new
+    @r2r    ||= Ruby2Ruby.new
     METHODS = [:config, :desc, :options, :render_options]
     METHOD_CLASSES = {:config=>Hash, :desc=>String, :options=>Hash, :render_options=>Hash}
     ALL_METHODS = METHODS + [:option]
@@ -43,19 +46,42 @@ module Boson
       (store(mod)[:temp] ||= {})[:option][name] = value
     end
 
+    def parse_mod(mod, string)
+      return unless Boson::Inspector.enabled
+      return unless mod.to_s[/^Boson::Commands::/]
+      # filter out calls from CommentInspector
+      return if caller.find {|e| e =~ /in `eval_comment'/ }
+      @mod_sexp = @parser.parse(string)
+      return nil
+    end
+
+    def meth_is_private(meth, object)
+      unless %w[initialize].include?(meth.to_s)
+        return true if class << object; private_instance_methods(true).map {|e| e.to_s } end.include?(meth.to_s)
+      end
+      false
+    end
+
     # Scrapes a method's arguments using ArgumentInspector.
     def scrape_arguments(meth)
       store[:args] ||= {}
 
       o = Object.new
       o.extend(@current_module)
-      # private methods return nil
-      if (val = ArgumentInspector.scrape_with_eval(meth, @current_module, o))
-        store[:args][meth.to_s] = val
+      # override meth in @current_module with tracing code
+      # for arg scraping unless meth is private
+      unless meth_is_private(meth, o)
+        tm_sexp = Util::Tracer.process(@mod_sexp, meth)
+        raise ArgumentError, "Unable to parse method '#{meth}' on #{@current_module}" unless tm_sexp
+        tm_code = @r2r.process(tm_sexp)
+        o.instance_eval(tm_code)
+        if (val = ArgumentInspector.scrape_with_eval(meth, @current_module, o))
+          store[:args][meth.to_s] = val
+        end
       end
     end
 
-    CALLER_REGEXP = RUBY_VERSION < '1.9' ? /in `load_source'/ : /in `<module:.*>'/
+    CALLER_REGEXP = RUBY_VERSION < '1.9' ? /in `module_eval'/ : /in `<module:.*>'/
     # Returns an array of the file and line number at which a method starts using
     # a caller array. Necessary information for CommentInspector to function.
     def find_method_locations(stack)
