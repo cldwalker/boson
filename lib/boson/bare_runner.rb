@@ -44,6 +44,9 @@ module Boson
         else
           raise
         end
+      rescue NoMethodError => err
+        raise if !err.backtrace.first.include?('`full_invoke')
+        abort_with %[Could not find command "#{cmd}"]
       end
 
       def abort_with(message)

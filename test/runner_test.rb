@@ -89,4 +89,11 @@ medium [arg=nil][--spicy]
 STR
     my_command('medium 1 2 3')
   end
+
+  it "prints error message for nonexistant command" do
+    MyRunner.expects(:abort).with <<-STR.chomp
+Could not find command "blarg"
+STR
+    my_command('blarg')
+  end
 end
