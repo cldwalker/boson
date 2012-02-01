@@ -92,10 +92,9 @@ describe "Scientist" do
     end
 
     it "print help with help option" do
-      all_commands.each do |cmd|
-        Boson.expects(:invoke).with(:usage, anything, anything)
-        send(cmd, '-h')
-      end
+      capture_stdout {
+        send(all_commands[0], '-h')
+      }.chomp.should == "blah [arg1][--force] [--level=2]"
     end
   end
 

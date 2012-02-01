@@ -102,7 +102,7 @@ module Boson
     def analyze(obj, command, args, &block)
       @global_options, @command, original_args = {}, command, args.dup
       @args = translate_args(obj, args)
-      return run_help_option if @global_options[:help]
+      return run_help_option(@command) if @global_options[:help]
       run_pretend_option(@args)
       unless @global_options[:pretend]
         process_result call_original_command(@args, &block)
@@ -146,18 +146,14 @@ module Boson
       global_opts = option_command.parse_global_options(original_args)
       if global_opts[:help] && global_opts[:verbose]
         @global_options = global_opts
-        run_help_option
+        run_help_option @command
         return true
       end
       false
     end
 
-    def help_options
-      @global_options[:verbose] ? ['--verbose'] : []
-    end
-
-    def run_help_option
-      Boson.invoke :usage, @command.full_name + " " + help_options.join(' ')
+    def run_help_option(cmd)
+      puts "#{cmd.full_name} #{cmd.usage}".rstrip
     end
 
     def run_pretend_option(args)
