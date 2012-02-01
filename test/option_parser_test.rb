@@ -12,7 +12,7 @@ describe "OptionParser" do
     opt.parse(args.flatten)
   end
 
-  describe "indifferent_hash" do
+  describe "#indifferent_hash" do
     before {
       @hash = OptionParser.new({}).indifferent_hash
       @hash.update foo: 'bar'
@@ -153,7 +153,7 @@ describe "OptionParser" do
     end
   end
 
-  describe "parse" do
+  describe "#parse" do
     it "extracts non-option arguments" do
       create "--foo" => :string, "--bar" => true
       parse("foo", "bar", "--baz", "--foo", "12", "--bar", "-T", "bang").should == {
@@ -312,6 +312,26 @@ describe "OptionParser" do
     it "outputs hash args with sample value" do
       create '--paths' => :hash
       usage.should == ["[--paths=A:B,C:D]"]
+    end
+  end
+
+  describe "#render_table" do
+    it "renders normal options with desc correctly" do
+      create regexp: {type: :string, desc: 'A regex, ya know'},
+        all: {type: :boolean, desc: 'Search all fields'}
+      capture_stdout { opt.print_usage_table no_headers: true }.should == <<-STR
+  -a, --all     Search all fields
+  -r, --regexp  A regex, ya know
+STR
+    end
+
+    it "renders an option without an alias correctly" do
+      create regexp: :string, reverse_sort: :boolean, reload: :boolean
+      capture_stdout { opt.print_usage_table no_headers: true }.should == <<-STR
+  -r, --regexp
+  -R, --reload
+  --reverse_sort
+STR
     end
   end
 

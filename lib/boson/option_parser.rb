@@ -259,14 +259,14 @@ module Boson
       def render_table(fields, arr, options)
         headers = options[:no_headers] ? [] : [['Name', 'Desc'], ['----', '----']]
         arr_of_arr = headers + arr.map do |row|
-          [ row.values_at(:alias, :name).join(', '), row[:desc].to_s ]
+          [ row.values_at(:alias, :name).compact.join(', '), row[:desc].to_s ]
         end
 
         name_max = arr_of_arr.map {|arr| arr[0].length }.max
         desc_max = arr_of_arr.map {|arr| arr[1].length }.max
 
         usage = arr_of_arr.map do |name, desc|
-          "  %-*s  %-*s" % [name_max, name, desc_max, desc]
+          ("  %-*s  %-*s" % [name_max, name, desc_max, desc]).rstrip
         end
         puts usage
       end
@@ -321,7 +321,7 @@ module Boson
       aliases = @opt_aliases.invert
       @opt_types.keys.sort.inject([]) {|t,e|
         nice_name = undasherize(e)
-        h = {:name=>e, :type=>@opt_types[e], :alias=>aliases[e] || '' }
+        h = {:name=>e, :type=>@opt_types[e], :alias=>aliases[e] || nil }
         h[:default] = @defaults[nice_name] if fields.include?(:default)
         (fields - h.keys).each {|f|
           h[f] = (option_attributes[nice_name] || {})[f]
