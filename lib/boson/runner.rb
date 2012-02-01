@@ -19,7 +19,7 @@ module Boson
       command, options, args = parse_args(args)
 
       if options[:help]
-        if (cmd = Boson::Command.find(command))
+        if cmd = Command.find(command)
           display_help(command, cmd)
         else
           puts %[Could not find command "#{command}"]
@@ -29,6 +29,10 @@ module Boson
       else
         execute_command(command, args)
       end
+    end
+
+    def self.execute_command(cmd, args)
+      Command.find(cmd) ? super : no_command_error(cmd)
     end
 
     def self.display_help(command, cmd)

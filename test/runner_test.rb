@@ -107,6 +107,11 @@ STR
     my_command('medium 1 2 3')
   end
 
+  it "prints error message for internal public method" do
+    MyRunner.expects(:abort).with %[Could not find command "to_s"]
+    my_command('to_s')
+  end
+
   it "prints error message for nonexistant command" do
     MyRunner.expects(:abort).with %[Could not find command "blarg"]
     my_command('blarg')

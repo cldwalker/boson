@@ -43,6 +43,10 @@ module Boson
         abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
       rescue NoMethodError => err
         raise if !err.backtrace.first.include?('`full_invoke')
+        no_command_error cmd
+      end
+
+      def no_command_error(cmd)
         abort_with %[Could not find command "#{cmd}"]
       end
 
