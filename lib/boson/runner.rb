@@ -25,7 +25,7 @@ module Boson
           puts %[Could not find command "#{command}"]
         end
       elsif command.nil?
-        display_usage
+        display_default_usage
       else
         execute_command(command, args)
       end
@@ -41,8 +41,10 @@ module Boson
       puts "Description:\n  #{cmd.desc || 'TODO'}"
     end
 
-    def self.display_usage
-      puts "Usage: #{app_name} COMMAND ARGS"
+    def self.display_default_usage
+      commands = Boson.commands.sort_by(&:name).map {|c| [c.name, c.desc.to_s] }
+      puts "Usage: #{app_name} COMMAND [ARGS]", "", "Available commands:",
+        Util.format_table(commands)
     end
 
     def self.app_name

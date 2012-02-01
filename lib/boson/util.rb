@@ -101,5 +101,14 @@ module Boson
         list.send(meth) {|e| e.to_s =~ /^#{escaped_input}/ }
       end
     end
+
+    def format_table(arr_of_arr)
+      name_max = arr_of_arr.map {|arr| arr[0].length }.max
+      desc_max = arr_of_arr.map {|arr| arr[1].length }.max
+
+      arr_of_arr.map do |name, desc|
+        ("  %-*s  %-*s" % [name_max, name, desc_max, desc]).rstrip
+      end
+    end
   end
 end

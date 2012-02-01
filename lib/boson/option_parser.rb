@@ -261,14 +261,7 @@ module Boson
         arr_of_arr = headers + arr.map do |row|
           [ row.values_at(:alias, :name).compact.join(', '), row[:desc].to_s ]
         end
-
-        name_max = arr_of_arr.map {|arr| arr[0].length }.max
-        desc_max = arr_of_arr.map {|arr| arr[1].length }.max
-
-        usage = arr_of_arr.map do |name, desc|
-          ("  %-*s  %-*s" % [name_max, name, desc_max, desc]).rstrip
-        end
-        puts usage
+        puts Util.format_table(arr_of_arr)
       end
     end
     include API

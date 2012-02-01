@@ -29,7 +29,7 @@ class MyRunner < Boson::Runner
 end
 
 describe "Runner" do
-  before_all { $0 = 'my_command' }
+  before_all { $0 = 'my_command'; reset }
 
   def my_command(cmd='')
     capture_stdout do
@@ -37,8 +37,17 @@ describe "Runner" do
     end
   end
 
-  it "prints generic usage by default" do
-    my_command.should =~ /^Usage: my_command COMMAND/
+  it "prints sorted commands by default" do
+    my_command.should == <<-STR
+Usage: my_command COMMAND [ARGS]
+
+Available commands:
+  boom
+  broken
+  medium  This is a medium
+  quiet
+  small   This is a small
+STR
   end
 
   describe "for -h COMMAND" do
