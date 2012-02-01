@@ -12,6 +12,9 @@ class MyRunner < Boson::Runner
     p [arg, opts]
   end
 
+  def quiet
+  end
+
   def mini
     nil.boom
   end
@@ -108,5 +111,23 @@ STR
 
   it "allows no method error in command" do
     assert_error(ArgumentError) { my_command('broken') }
+  end
+
+  describe "$BOSONRC" do
+    before { ENV.delete('BOSONRC') }
+
+    it "is not loaded by default" do
+      MyRunner.expects(:load).never
+      my_command('quiet')
+    end
+
+    it "is loaded if set" do
+      ENV['BOSONRC'] = 'whoop'
+      File.expects(:exists?).returns(true)
+      MyRunner.expects(:load).with('whoop')
+      my_command('quiet')
+    end
+
+    after_all { ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc' }
   end
 end

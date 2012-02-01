@@ -13,6 +13,7 @@ module Boson
     end
 
     def self.start(args=ARGV)
+      ENV['BOSONRC'] ||= ''
       super
       init
       command, options, args = parse_args(args)
