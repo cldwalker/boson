@@ -16,7 +16,7 @@ module Boson
       # Finds a command, aliased or not. If found returns the command object,
       # otherwise returns nil.
       def find(command, commands=Boson.commands)
-        commands.find {|e| [e.name, e.alias].include?(command) }
+        command && commands.find {|e| [e.name, e.alias].include?(command) }
       end
     end
     extend API

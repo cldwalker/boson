@@ -11,5 +11,9 @@ describe "Command" do
     it 'finds correct command when a subcommand of the same name exists' do
       Command.find('blah').should == @top_level_command
     end
+
+    it 'finds nothing given nil' do
+      Command.find(nil).should == nil
+    end
   end
 end
