@@ -91,6 +91,19 @@ module Boson
       def full_name
         name
       end
+
+      # One-line usage of args
+      def basic_usage
+        return '' if args.nil?
+        usage_args.map {|e|
+          (e.size < 2) ? e[0].upcase : "[#{e[0].upcase}]"
+        }.join(' ')
+      end
+
+      # Usage string for command, created from options and args.
+      def usage
+        basic_usage + option_help
+      end
     end
     include API
 
@@ -116,28 +129,6 @@ module Boson
     # Indicates if an OptionCommand
     def option_command?
       options || @option_command
-    end
-
-    # One-line usage of args with default values
-    def basic_usage
-      return '' if options.nil? && args.nil?
-      args ? usage_args.map {|e|
-        (e.size < 2) ? "[#{e[0]}]" :
-          "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
-      }.join(' ') : '[*unknown]'
-    end
-
-    # One-line usage of args without default values
-    def simple_usage
-      return '' if args.nil?
-      usage_args.map {|e|
-        (e.size < 2) ? e[0].upcase : "[#{e[0].upcase}]"
-      }.join(' ')
-    end
-
-    # Usage string for command, created from options and args.
-    def usage
-      basic_usage + option_help
     end
 
     # until @config is consistent in index + actual loading

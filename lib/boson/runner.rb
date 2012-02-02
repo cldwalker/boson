@@ -31,7 +31,7 @@ module Boson
     end
 
     def self.display_help(cmd)
-      puts "Usage: #{app_name} #{cmd.name} #{cmd.simple_usage}".rstrip, ""
+      puts "Usage: #{app_name} #{cmd.name} #{cmd.basic_usage}".rstrip, ""
       if cmd.options
         puts "Options:"
         puts cmd.option_parser.print_usage_table(no_headers: true)
