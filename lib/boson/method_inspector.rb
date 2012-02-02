@@ -18,6 +18,7 @@ module Boson
     # The method_added used while scraping method attributes.
     def new_method_added(mod, meth)
       self.current_module = mod
+
       store[:temp] ||= {}
       METHODS.each do |e|
         store[e][meth.to_s] = store[:temp][e] if store[:temp][e]
@@ -25,18 +26,16 @@ module Boson
       if store[:temp][:option]
         (store[:options][meth.to_s] ||= {}).merge! store[:temp][:option]
       end
-
-      if store[:temp].size < ALL_METHODS.size
-        store[:method_locations] ||= {}
-        if (result = find_method_locations(mod, meth))
-          store[:method_locations][meth.to_s] = result
-        end
-      end
+      during_new_method_added mod, meth
       store[:temp] = {}
+
       if SCRAPEABLE_METHODS.any? {|m| has_inspector_method?(meth, m) }
         set_arguments(mod, meth)
       end
     end
+
+    # Method hook called during new_method_added
+    def during_new_method_added(mod, meth); end
 
     METHODS.each do |e|
       define_method(e) do |mod, val|
@@ -53,26 +52,17 @@ module Boson
 
     def set_arguments(mod, meth)
       store[:args] ||= {}
-      file = find_method_locations(mod, meth)[0]
 
-      if File.exists?(file)
-        body = File.read(file)
-        store[:args][meth.to_s] = scrape_arguments body, meth
-      end
-    end
+      args = mod.instance_method(meth).parameters.map do|(type, name)|
+        case type
+        when :rest then ["*#{name}"]
+        when :req  then [name.to_s]
+        when :opt  then [name.to_s, '']
+        else nil
+        end
+      end.compact
 
-    # Returns argument arrays
-    def scrape_arguments(file_string, meth)
-      tabspace = "[ \t]"
-      if match = /^#{tabspace}*def#{tabspace}+(?:\w+\.)?#{Regexp.quote(meth)}#{tabspace}*($|(?:\(|\s+)([^\n\)]+)\s*\)?\s*$)/.match(file_string)
-        (match.to_a[2] || '').strip.split(/\s*,\s*/).map {|e| e.split(/\s*=\s*/)}
-      end
-    end
-
-    # Returns an array of the file and line number at which a method starts
-    # using a method
-    def find_method_locations(mod, meth)
-      mod.instance_method(meth).source_location
+      store[:args][meth.to_s] = args
     end
 
     # Hash of a module's method attributes i.e. descriptions, options by method
@@ -87,15 +77,9 @@ module Boson
       @mod_store[mod] ||= {}
     end
 
-    def inspector_in_file?(meth, inspector_method)
-      !(file_line = store[:method_locations] && store[:method_locations][meth]) ?
-        false : true
-    end
-
-    private
+    # Determines if method's arguments should be scraped
     def has_inspector_method?(meth, inspector)
-      (store[inspector] && store[inspector].key?(meth.to_s)) ||
-        inspector_in_file?(meth.to_s, inspector)
+      true
     end
   end
 end

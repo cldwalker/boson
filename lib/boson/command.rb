@@ -157,6 +157,5 @@ module Boson
          args[0..-2] : args[0..-2])
         : args
     end
-
   end
 end
