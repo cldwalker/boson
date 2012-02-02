@@ -26,7 +26,7 @@ describe "OptionParser" do
     it "cannot set values indifferently" do
       @hash['foo'] = 'barred'
       @hash['foo'].should == 'barred'
-      @hash[:foo].should != 'barred'
+      @hash[:foo].should_not == 'barred'
       @hash[:foo].should == 'bar'
     end
   end

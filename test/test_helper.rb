@@ -1,10 +1,15 @@
-require 'bacon'
-require 'bacon/bits'
 require 'mocha'
-require 'mocha-on-bacon'
 require 'boson'
 require 'fileutils'
 require 'boson/runner'
+
+ENV['RSPEC'] = '1' if $0[/rspec/]
+unless ENV['RSPEC']
+  require 'bacon'
+  require 'bacon/bits'
+  require 'mocha-on-bacon'
+end
+
 Object.send :remove_const, :OptionParser
 Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.const_defined?(e) }
 ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc'
@@ -115,8 +120,37 @@ module TestHelpers
     }
   end
 
+  if ENV['RSPEC']
+    def should_not_raise(&block)
+      block.should_not raise_error
+    end
+  else
+    # Since rspec doesn't allow should != or should.not
+    Object.send(:define_method, :should_not) {|*args, &block|
+      should.not(*args, &block)
+    }
+    def should_not_raise(&block)
+      should.not.raise &block
+    end
+  end
 end
 
-class Bacon::Context
-  include TestHelpers
+if ENV['RSPEC']
+  module RspecBits
+    def before_all(&block)
+      before(:all, &block)
+    end
+
+    def after_all(&block)
+      after(:all, &block)
+    end
+  end
+
+  RSpec.configure {|c|
+    c.mock_with :mocha
+    c.extend RspecBits
+    c.include TestHelpers
+  }
+else
+  Bacon::Context.send :include, TestHelpers
 end

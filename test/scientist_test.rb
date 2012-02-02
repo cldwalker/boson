@@ -139,7 +139,7 @@ describe "Scientist" do
 
     it "with splat args does not raise error for too few or many args" do
       [[], [''], [1,2,3], ['1 2 3']].each do |args|
-        should.not.raise { command_with_splat_args *args }
+        should_not_raise { command_with_splat_args *args }
       end
     end
 
