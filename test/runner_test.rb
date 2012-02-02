@@ -47,6 +47,8 @@ Available commands:
   medium  This is a medium
   quiet
   small   This is a small
+
+For help on a command: my_command COMMAND -h
 STR
   end
 

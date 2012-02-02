@@ -31,8 +31,7 @@ module Boson
     end
 
     def self.display_help(cmd)
-      usage = cmd.basic_usage.empty? ? '' : " #{cmd.basic_usage}"
-      puts "Usage: #{app_name} #{cmd.name}#{usage}", "\n"
+      puts "Usage: #{app_name} #{cmd.name} #{cmd.basic_usage}".rstrip, ""
       if cmd.options
         puts "Options:"
         puts cmd.option_parser.print_usage_table(no_headers: true)
@@ -43,7 +42,8 @@ module Boson
     def self.display_default_usage
       commands = Boson.commands.sort_by(&:name).map {|c| [c.name, c.desc.to_s] }
       puts "Usage: #{app_name} COMMAND [ARGS]", "", "Available commands:",
-        Util.format_table(commands)
+        Util.format_table(commands), "",
+        "For help on a command: #{app_name} COMMAND -h"
     end
 
     def self.app_name
