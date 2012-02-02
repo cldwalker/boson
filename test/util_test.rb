@@ -98,7 +98,7 @@ describe "Util" do
 
     it "can see the difference between two methods with the same name" do
       alt_sexp = sexp_from(@mdalt)
-      alt_sexp.should.not == @mydef_sex_w_trace
+      alt_sexp.should.not == @mydef_sexp_w_trace
     end
 
     it "traces the last method with the same name" do
