@@ -118,18 +118,21 @@ module Boson
       options || @option_command
     end
 
-    # One-line usage of args
+    # One-line usage of args with default values
     def basic_usage
       return '' if options.nil? && args.nil?
-      usage_args = args && @options && !has_splat_args? ?
-        (@default_option ?
-         [[@default_option.to_s, @file_parsed_args ? ''.inspect : '']] +
-         args[0..-2] : args[0..-2])
-        : args
       args ? usage_args.map {|e|
         (e.size < 2) ? "[#{e[0]}]" :
           "[#{e[0]}=#{@file_parsed_args ? e[1] : e[1].inspect}]"
       }.join(' ') : '[*unknown]'
+    end
+
+    # One-line usage of args without default values
+    def simple_usage
+      return '' if args.nil?
+      usage_args.map {|e|
+        (e.size < 2) ? e[0].upcase : "[#{e[0].upcase}]"
+      }.join(' ')
     end
 
     # Usage string for command, created from options and args.
@@ -154,5 +157,15 @@ module Boson
       end
       @arg_size
     end
+
+    private
+    def usage_args
+      args && @options && !has_splat_args? ?
+        (@default_option ?
+         [[@default_option.to_s, @file_parsed_args ? ''.inspect : '']] +
+         args[0..-2] : args[0..-2])
+        : args
+    end
+
   end
 end

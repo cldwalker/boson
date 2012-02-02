@@ -12,6 +12,10 @@ class MyRunner < Boson::Runner
     p [arg, opts]
   end
 
+  desc "This is a mini"
+  def mini(me)
+  end
+
   def quiet
   end
 
@@ -45,6 +49,7 @@ Available commands:
   boom
   broken
   medium  This is a medium
+  mini    This is a mini
   quiet
   small   This is a small
 
@@ -71,18 +76,27 @@ Description:
 STR
     end
 
-    it "prints help for optionless command" do
+    it "prints help for optionless command with splat args" do
       my_command('small -h').should == <<-STR
-Usage: my_command small [*args]
+Usage: my_command small *ARGS
 
 Description:
   This is a small
 STR
     end
 
-    it "prints help for command with options" do
+    it "prints help for optionless command with required args" do
+      my_command('mini -h').should == <<-STR
+Usage: my_command mini ME
+
+Description:
+  This is a mini
+STR
+    end
+
+    it "prints help for command with options and optional args" do
       my_command('medium -h').should == <<-STR
-Usage: my_command medium [arg=nil]
+Usage: my_command medium [ARG]
 
 Options:
   -s, --spicy  hot
