@@ -18,14 +18,14 @@ module Boson
       def find(command, commands=Boson.commands)
         command && commands.find {|e| [e.name, e.alias].include?(command) }
       end
+
+      # Generates a command's initial attributes when creating a command object
+      def new_attributes(name, library)
+        (library.commands_hash[name] || {}).merge(name: name).
+          update(library_attributes(library))
+      end
     end
     extend API
-
-    # Generates a command's initial attributes when creating a command object
-    def self.new_attributes(name, library)
-      (library.commands_hash[name] || {}).merge(name: name).
-        update(library_attributes(library))
-    end
 
     # One line usage for a command if it exists
     def self.usage(command)

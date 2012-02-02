@@ -90,12 +90,6 @@ describe "Scientist" do
         }.should =~/invalid.*z/
       end
     end
-
-    it "print help with help option" do
-      capture_stdout {
-        send(all_commands[0], '-h')
-      }.chomp.should == "blah [arg1][--force] [--level=2]"
-    end
   end
 
   describe "command" do

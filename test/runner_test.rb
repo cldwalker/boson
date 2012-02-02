@@ -59,9 +59,9 @@ STR
     my_command('--help').should == default_usage
   end
 
-  describe "for -h COMMAND" do
+  describe "for COMMAND -h" do
     it "prints help for descriptionless command" do
-      my_command('-h quiet').should == <<-STR
+      my_command('quiet -h').should == <<-STR
 Usage: my_command quiet
 
 Description:
@@ -70,7 +70,7 @@ STR
     end
 
     it "prints help for optionless command" do
-      my_command('-h small').should == <<-STR
+      my_command('small -h').should == <<-STR
 Usage: my_command small [*args]
 
 Description:
@@ -79,7 +79,7 @@ STR
     end
 
     it "prints help for command with options" do
-      my_command('-h medium').should == <<-STR
+      my_command('medium -h').should == <<-STR
 Usage: my_command medium [arg=nil]
 
 Options:
