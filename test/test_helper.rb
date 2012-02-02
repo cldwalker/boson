@@ -29,10 +29,14 @@ module TestHelpers
     reset_boson
   end
 
+  def remove_constant(name, mod=Object)
+    mod.send(:remove_const, name) if mod.const_defined?(name, false)
+  end
+
   def reset_main_object
     Boson.send :remove_const, "Universe"
     eval "module ::Boson::Universe; end"
-    Boson::Commands.send :remove_const, "Blah" rescue nil
+    remove_constant "Blah", Boson::Commands
     Boson.main_object = Object.new
   end
 
@@ -70,7 +74,7 @@ module TestHelpers
   def create_runner(*methods, &block)
     options = methods[-1].is_a?(Hash) ? methods.pop : {}
     library = options[:library] || :Blarg
-    Object.send(:remove_const, library) if Object.const_defined?(library)
+    remove_constant library
 
     Object.const_set(library, Class.new(Boson::Runner)).tap do |klass|
       if block

@@ -4,6 +4,7 @@ describe "MethodInspector" do
   before_all { MethodInspector.mod_store = {} }
 
   it "non commands module can't set anything" do
+    remove_constant :Blah
     eval "module Blah; end"
     MethodInspector.current_module = Blah
     Inspector.enable
