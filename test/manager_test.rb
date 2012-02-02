@@ -2,22 +2,20 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "Manager" do
   describe ".after_load" do
-    def load_library(hash)
-      new_attributes = {:name=>hash[:name], :commands=>[], :created_dependencies=>[], :loaded=>true}
-      [:module, :commands].each {|e| new_attributes[e] = hash.delete(e) if hash[e] }
-      Manager.expects(:call_load_action).returns(Library.new(new_attributes))
-      Manager.load([hash[:name]])
+    def load_library(hash={})
+      meths = hash[:commands] || []
+      Manager.load create_runner(*meths, library: :Blah)
     end
 
     before { reset_boson }
 
     it "loads basic library" do
-      load_library :name=>'blah'
+      load_library
       library_loaded? 'blah'
     end
 
     it "loads library with commands" do
-      load_library :name=>'blah', :commands=>['frylock','meatwad']
+      load_library :commands=>['frylock','meatwad']
       library_loaded? 'blah'
       command_exists?('frylock')
       command_exists?('meatwad')
@@ -39,7 +37,7 @@ describe "Manager" do
 
     it "merges with existing created library" do
       create_library('blah')
-      load_library :name=>'blah'
+      load_library
       library_loaded? 'blah'
       Boson.libraries.size.should == 1
     end
