@@ -17,6 +17,13 @@ describe "Manager" do
       library_loaded? 'blah'
     end
 
+    it "loads basic library with verbose" do
+      capture_stdout {
+        load_library verbose: true
+      }.chomp.should == 'Loaded library blah'
+      library_loaded? 'blah'
+    end
+
     it "loads library with commands" do
       load_library :commands=>['frylock','meatwad']
       library_loaded? 'blah'
@@ -62,32 +69,33 @@ describe "Manager" do
     end
 
     it "merges with existing created library" do
-      create_library('blah')
+      create_library(name: 'blah')
       load_library
       library_loaded? 'blah'
       Boson.libraries.size.should == 1
     end
   end
 
-  describe "option commands without args" do
-    before_all {
+  describe ".redefine_commands" do
+    before do
       reset_boson
-      @library = Library.new(:name=>'blah', :commands=>['foo', 'bar'])
-      Boson.libraries << @library
-      @foo = Command.new(:name=>'foo', :lib=>'blah', :options=>{:fool=>:string}, :args=>'*')
-      Boson.commands << @foo
-      Boson.commands << Command.new(:name=>'bar', :lib=>'blah', :options=>{:bah=>:string})
-    }
+      @library = create_library(:name=>'blah', :commands=>['foo', 'bar'])
+      @foo = create_command(name: 'foo', lib: 'blah', options: {fool: :string},
+        args: '*')
+      create_command(name: 'bar', lib: 'blah', options: {bah: :string})
+    end
 
-    it "are deleted" do
+    it "only redefines commands with args" do
       Scientist.expects(:redefine_command).with(anything, @foo)
       Manager.redefine_commands(@library, @library.commands)
     end
 
-    it "are deleted and printed when verbose" do
+    it "with verbose only redefines commands with args and prints rejected" do
       Scientist.expects(:redefine_command).with(anything, @foo)
-      @library.instance_eval("@options = {:verbose=>true}")
-      capture_stdout { Manager.redefine_commands(@library, @library.commands) } =~ /options.*blah/
+      Manager.instance_eval("@options = {:verbose=>true}")
+      capture_stdout {
+        Manager.redefine_commands(@library, @library.commands)
+      }.should =~ /cannot have options.*bar/
     end
   end
 
@@ -95,7 +103,7 @@ describe "Manager" do
     before { reset_libraries }
 
     it "returns false when library isn't loaded" do
-      create_library('blah')
+      create_library(name: 'blah')
       Manager.loaded?('blah').should == false
     end
   end

@@ -96,12 +96,12 @@ module TestHelpers
     end
   end
 
-  def create_library(libraries, attributes={})
-    libraries = [libraries] unless libraries.is_a?(Array)
-    libraries.map {|e|
-      lib = Library.new({:name=>e}.update(attributes))
-      Manager.add_library(lib); lib
-    }
+  def create_library(hash)
+    Library.new(hash).tap {|lib| Manager.add_library lib }
+  end
+
+  def create_command(hash)
+    Command.new(hash).tap {|cmd| Boson.commands << cmd }
   end
 
   ## Capture
