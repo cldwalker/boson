@@ -6,7 +6,7 @@ module Boson
   # Handles loading of libraries and commands.
   class Manager
     module API
-      attr_accessor :failed_libraries
+      attr_accessor :failed_libraries, :verbose
 
       # Loads a library or an array of libraries with options. Manager loads the
       # first library subclass to return true for Library#handles
@@ -48,7 +48,7 @@ module Boson
       def after_load
         create_commands(@library)
         add_library(@library)
-        puts "Loaded library #{@library.name}" if @options[:verbose]
+        puts "Loaded library #{@library.name}" if verbose
         during_after_load
         true
       end
@@ -75,7 +75,7 @@ module Boson
         option_commands = lib.command_objects(commands).select(&:option_command?)
         accepted, rejected = option_commands.partition {|e|
           e.args(lib) || e.arg_size }
-        if @options[:verbose] && rejected.size > 0
+        if verbose && rejected.size > 0
           puts "Following commands cannot have options until their arguments " +
             "are configured: " + rejected.map {|e| e.name}.join(', ')
         end
@@ -93,7 +93,7 @@ module Boson
           message = "Unable to #{load_method} library #{library}. Reason: #{err}"
           if Boson.debug
             message << "\n" + err.backtrace.map {|e| "  " + e }.join("\n")
-          elsif @options[:verbose]
+          elsif verbose
             message << "\n" + err.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
           end
           warn message
@@ -110,11 +110,12 @@ module Boson
       end
 
       def load_once(source, options={})
-        @options = options
+        self.verbose = options[:verbose]
+
         call_load_action(source, :load) do
-          lib = loader_create(source)
+          lib = loader_create(source, options)
           if loaded?(lib.name)
-            if options[:verbose] && !options[:dependency]
+            if verbose && !options[:dependency]
               warn "Library #{lib.name} already exists."
             end
             false
@@ -136,10 +137,11 @@ module Boson
         end
       end
 
-      def loader_create(source)
+      def loader_create(source, options)
+        options = options.dup.tap {|h| h.delete(:verbose) }
         lib_class = Library.handle_blocks.find {|k,v| v.call(source) } or
           raise(LoaderError, "Library #{source} not found.")
-        lib_class[0].new(@options.merge(:name=>source))
+        lib_class[0].new(options.merge(name: source))
       end
 
       def create_commands(lib, commands=lib.commands)

@@ -19,7 +19,7 @@ describe "Manager" do
 
     it "loads basic library with verbose" do
       capture_stdout {
-        load_library verbose: true
+          load_library verbose: true
       }.chomp.should == 'Loaded library blah'
       library_loaded? 'blah'
     end
@@ -91,11 +91,12 @@ describe "Manager" do
     end
 
     it "with verbose only redefines commands with args and prints rejected" do
+      Manager.verbose = true
       Scientist.expects(:redefine_command).with(anything, @foo)
-      Manager.instance_eval("@options = {:verbose=>true}")
       capture_stdout {
         Manager.redefine_commands(@library, @library.commands)
       }.should =~ /cannot have options.*bar/
+      Manager.verbose = nil
     end
   end
 
