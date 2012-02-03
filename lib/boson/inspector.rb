@@ -69,9 +69,12 @@ module Boson
       @store = MethodInspector.store
     end
 
-    def add_data
-      add_method_scraped_data
+    module API
+      def add_data
+        add_method_scraped_data
+      end
     end
+    include API
 
     private
     def add_method_scraped_data
