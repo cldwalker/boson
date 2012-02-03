@@ -1,18 +1,36 @@
 module Boson
   # Gathers method attributes by redefining method_added and capturing method
   # calls before a method.
-  module MethodInspector
-    extend self
-    attr_accessor :current_module, :mod_store
-    @mod_store ||= {}
+  class MethodInspector
     METHODS = [:config, :desc, :options]
     SCRAPEABLE_METHODS = [:options]
     METHOD_CLASSES = {:config=>Hash, :desc=>String, :options=>Hash}
     ALL_METHODS = METHODS + [:option]
 
-    def safe_new_method_added(mod, meth)
+    def self.safe_new_method_added(mod, meth)
       return unless mod.to_s[/^Boson::Commands::/]
       new_method_added(mod, meth)
+    end
+
+    def self.new_method_added(mod, meth)
+      instance.new_method_added(mod, meth)
+    end
+
+    class << self; attr_accessor :instance end
+
+    def self.instance
+      @instance ||= new
+    end
+
+    (METHODS + [:option, :mod_store]).each do |meth|
+      define_singleton_method(meth) do |*args|
+        instance.send(meth, *args)
+      end
+    end
+
+    attr_accessor :current_module, :mod_store
+    def initialize
+      @mod_store = {}
     end
 
     # The method_added used while scraping method attributes.
@@ -34,9 +52,6 @@ module Boson
       end
     end
 
-    # Method hook called during new_method_added
-    def during_new_method_added(mod, meth); end
-
     METHODS.each do |e|
       define_method(e) do |mod, val|
         (@mod_store[mod] ||= {})[e] ||= {}
@@ -50,25 +65,15 @@ module Boson
       (store(mod)[:temp] ||= {})[:option][name] = value
     end
 
-    def set_arguments(mod, meth)
-      store[:args] ||= {}
-
-      args = mod.instance_method(meth).parameters.map do|(type, name)|
-        case type
-        when :rest then ["*#{name}"]
-        when :req  then [name.to_s]
-        when :opt  then [name.to_s, '']
-        else nil
-        end
-      end.compact
-
-      store[:args][meth.to_s] = args
-    end
-
     # Hash of a module's method attributes i.e. descriptions, options by method
     # and then attribute
     def store(mod=@current_module)
       @mod_store[mod]
+    end
+
+    # Renames store key from old to new name
+    def rename_store_key(old, new)
+      mod_store[new] = mod_store.delete old
     end
 
     # Sets current module
@@ -77,9 +82,30 @@ module Boson
       @mod_store[mod] ||= {}
     end
 
-    # Determines if method's arguments should be scraped
-    def has_inspector_method?(meth, inspector)
-      true
+    module API
+      # Method hook called during new_method_added
+      def during_new_method_added(mod, meth); end
+
+      def set_arguments(mod, meth)
+        store[:args] ||= {}
+
+        args = mod.instance_method(meth).parameters.map do|(type, name)|
+          case type
+          when :rest then ["*#{name}"]
+          when :req  then [name.to_s]
+          when :opt  then [name.to_s, '']
+          else nil
+          end
+        end.compact
+
+        store[:args][meth.to_s] = args
+      end
+
+      # Determines if method's arguments should be scraped
+      def has_inspector_method?(meth, inspector)
+        true
+      end
     end
+    include API
   end
 end

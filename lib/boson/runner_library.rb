@@ -24,7 +24,7 @@ module Boson
     # and delegates its methods to it
     def load_source_and_set_module
       @module = Util.create_module Boson::Commands, @name
-      MethodInspector.mod_store[@module] = MethodInspector.mod_store.delete(@runner)
+      MethodInspector.instance.rename_store_key @runner, @module
       self.class.delegate_runner_methods @runner, @module
     end
   end

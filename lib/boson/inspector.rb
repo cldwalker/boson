@@ -65,8 +65,8 @@ module Boson
     def initialize(library)
       @commands_hash = library.commands_hash
       @library_file = library.library_file
-      MethodInspector.current_module = library.module
-      @store = MethodInspector.store
+      MethodInspector.instance.current_module = library.module
+      @store = MethodInspector.instance.store
     end
 
     module API

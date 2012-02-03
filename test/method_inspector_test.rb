@@ -1,25 +1,28 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "MethodInspector" do
-  before_all { MethodInspector.mod_store = {} }
+  before { MethodInspector.instance = nil }
+
+  def method_inspector
+    MethodInspector.instance
+  end
 
   it "non commands module can't set anything" do
     remove_constant :Blah
     eval "module Blah; end"
-    MethodInspector.current_module = Blah
+    method_inspector.current_module = Blah
     Inspector.enable
     Blah.module_eval("desc 'test'; def test; end; options :a=>1; def test2; end")
     Inspector.disable
-    MethodInspector.store[:desc].empty?.should == true
-    MethodInspector.store[:options].empty?.should == true
+    method_inspector.store[:desc].empty?.should == true
+    method_inspector.store[:options].empty?.should == true
   end
 
   it "handles anonymous classes" do
-    MethodInspector.mod_store = {}
     Inspector.enable
     Class.new.module_eval "def blah; end"
     Inspector.disable
-    MethodInspector.store.should == nil
+    method_inspector.store.should == nil
   end
 
   describe "commands module with" do
@@ -27,11 +30,10 @@ describe "MethodInspector" do
       Inspector.enable
       ::Boson::Commands::Zzz.module_eval(string)
       Inspector.disable
-      MethodInspector.store
+      method_inspector.store
     end
 
     before_all { eval "module ::Boson::Commands::Zzz; end" }
-    before { MethodInspector.mod_store.delete(::Boson::Commands::Zzz) }
 
     it "desc sets descriptions" do
       parsed = parse "desc 'test'; def m1; end; desc 'one'; desc 'more'; def m2; end"
