@@ -20,8 +20,8 @@ describe "Manager" do
     it "loads library with commands" do
       load_library :commands=>['frylock','meatwad']
       library_loaded? 'blah'
-      command_exists?('frylock')
-      command_exists?('meatwad')
+      library_has_command 'blah', 'frylock'
+      library_has_command 'blah', 'meatwad'
     end
 
     [SyntaxError, StandardError, LoaderError].each do |klass|

@@ -15,6 +15,7 @@ Boson.constants.each {|e| Object.const_set(e, Boson.const_get(e)) unless Object.
 ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc'
 
 module TestHelpers
+  ## Misc
   def assert_error(error, message=nil)
     yield
   rescue error=>e
@@ -24,13 +25,27 @@ module TestHelpers
     nil.should == error
   end
 
+  def remove_constant(name, mod=Object)
+    mod.send(:remove_const, name) if mod.const_defined?(name, false)
+  end
+
+  def with_config(options)
+    old_config = Boson.config
+    Boson.config = Boson.config.merge(options)
+    yield
+    Boson.config = old_config
+  end
+
+  def manager_load(lib, options={})
+    @stderr = capture_stderr { Manager.load(lib, options) }
+  end
+
+  attr_reader :stderr
+
+  ## Reset
   def reset
     reset_main_object
     reset_boson
-  end
-
-  def remove_constant(name, mod=Object)
-    mod.send(:remove_const, name) if mod.const_defined?(name, false)
   end
 
   def reset_main_object
@@ -49,10 +64,7 @@ module TestHelpers
     Boson.instance_eval("@libraries = nil")
   end
 
-  def command_exists?(name, bool=true)
-    (!!Command.find(name)).should == bool
-  end
-
+  ## Library
   def library_loaded?(name, bool=true)
     Manager.loaded?(name).should == bool
   end
@@ -61,16 +73,11 @@ module TestHelpers
     Boson.library(name)
   end
 
-  def library_has_module(lib, lib_module)
-    Manager.loaded?(lib).should == true
-    test_lib = library(lib)
-    (test_lib.module.is_a?(Module) && (test_lib.module.to_s == lib_module)).should == true
-  end
-
   def library_has_command(lib, command, bool=true)
     (lib = library(lib)) && lib.commands.include?(command).should == bool
   end
 
+  ## Factories
   def create_runner(*methods, &block)
     options = methods[-1].is_a?(Hash) ? methods.pop : {}
     library = options[:library] || :Blarg
@@ -87,6 +94,15 @@ module TestHelpers
     end
   end
 
+  def create_library(libraries, attributes={})
+    libraries = [libraries] unless libraries.is_a?(Array)
+    libraries.map {|e|
+      lib = Library.new({:name=>e}.update(attributes))
+      Manager.add_library(lib); lib
+    }
+  end
+
+  ## Capture
   def capture_stdout(&block)
     original_stdout = $stdout
     $stdout = fake = StringIO.new
@@ -96,13 +112,6 @@ module TestHelpers
       $stdout = original_stdout
     end
     fake.string
-  end
-
-  def with_config(options)
-    old_config = Boson.config
-    Boson.config = Boson.config.merge(options)
-    yield
-    Boson.config = old_config
   end
 
   def capture_stderr(&block)
@@ -115,20 +124,6 @@ module TestHelpers
     end
     fake.string
   end
-
-  def create_library(libraries, attributes={})
-    libraries = [libraries] unless libraries.is_a?(Array)
-    libraries.map {|e|
-      lib = Library.new({:name=>e}.update(attributes))
-      Manager.add_library(lib); lib
-    }
-  end
-
-  def manager_load(lib, options={})
-    @stderr = capture_stderr { Manager.load(lib, options) }
-  end
-
-  attr_reader :stderr
 
   if ENV['RSPEC']
     def should_not_raise(&block)
