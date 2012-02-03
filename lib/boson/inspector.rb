@@ -21,13 +21,12 @@ module Boson
   # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
   # * options: Hash to define an OptionParser object for a command's options.
   # * option: Option name and value to be merged in with options. See OptionParser for what an option value can be.
-  module Inspector
-    extend self
-    attr_reader :enabled
+  class Inspector
+    class << self; attr_reader :enabled; end
 
     # Enable scraping by overridding method_added to snoop on a library while
     # it's loading its methods.
-    def enable(options = {})
+    def self.enable(options = {})
       method_inspector_meth = options[:all_classes] ?
         :new_method_added : :safe_new_method_added
       klass = options[:module] || ::Module
@@ -50,7 +49,7 @@ module Boson
     end
 
     # Disable scraping method data.
-    def disable
+    def self.disable
       ::Module.module_eval %[
         Boson::MethodInspector::ALL_METHODS.each {|e| remove_method e }
         alias_method :method_added, :_old_method_added
@@ -59,11 +58,18 @@ module Boson
     end
 
     # Adds method attributes to the library's commands
-    def add_method_data_to_library(library)
+    def self.add_method_data_to_library(library)
+      new(library).add_data
+    end
+
+    def initialize(library)
       @commands_hash = library.commands_hash
       @library_file = library.library_file
       MethodInspector.current_module = library.module
       @store = MethodInspector.store
+    end
+
+    def add_data
       add_method_scraped_data
     end
 
