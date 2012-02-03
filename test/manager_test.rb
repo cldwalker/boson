@@ -1,13 +1,20 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 describe "Manager" do
-  describe ".after_load" do
+  describe ".load" do
     def load_library(hash={})
-      meths = hash[:commands] || []
-      Manager.load create_runner(*meths, library: :Blah)
+      meths = hash.delete(:commands) || []
+      @stderr = capture_stderr do
+        Manager.load create_runner(*meths, library: :Blah), hash
+      end
     end
 
-    before { reset_boson }
+    def stderr; @stderr; end
+
+    before do
+      reset_boson
+      Manager.failed_libraries = []
+    end
 
     it "loads basic library" do
       load_library
@@ -21,18 +28,22 @@ describe "Manager" do
       command_exists?('meatwad')
     end
 
-    it "prints error for library with SyntaxError" do
-      Manager.expects(:loader_create).raises(SyntaxError)
-      capture_stderr {
-        Manager.load 'blah'
-      }.should =~ /Unable to load library blah. Reason: SyntaxError/
+    [SyntaxError, StandardError, LoaderError].each do |klass|
+      it "prints error if library fails with #{klass}" do
+        RunnerLibrary.expects(:new).raises(klass)
+        load_library
+        stderr.chomp.should == "Unable to load library Blah. Reason: #{klass}"
+        Manager.failed_libraries.should == [Blah]
+      end
     end
 
-    it "prints error for library with LoadError" do
-      Manager.expects(:loader_create).raises(LoadError)
-      capture_stderr {
-        Manager.load 'blah'
-      }.should =~ /Unable to load library blah. Reason: LoadError/
+    [SyntaxError, StandardError].each do |klass|
+      it "with verbose prints verbose error if library fails with #{klass}" do
+        RunnerLibrary.expects(:new).raises(klass)
+        load_library verbose: true
+        stderr.should =~ /^Unable to load library Blah. Reason: #{klass}\n\s*\//
+        Manager.failed_libraries.should == [Blah]
+      end
     end
 
     it "merges with existing created library" do
