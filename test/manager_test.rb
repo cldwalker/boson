@@ -4,12 +4,8 @@ describe "Manager" do
   describe ".load" do
     def load_library(hash={})
       meths = hash.delete(:commands) || []
-      @stderr = capture_stderr do
-        Manager.load create_runner(*meths, library: :Blah), hash
-      end
+      manager_load create_runner(*meths, library: :Blah), hash
     end
-
-    def stderr; @stderr; end
 
     before do
       reset_boson
@@ -44,6 +40,19 @@ describe "Manager" do
         stderr.should =~ /^Unable to load library Blah. Reason: #{klass}\n\s*\//
         Manager.failed_libraries.should == [Blah]
       end
+    end
+
+    it "prints error if no library is found" do
+      manager_load 'dude'
+      stderr.chomp.should ==
+        'Unable to load library dude. Reason: Library dude not found.'
+    end
+
+    it "prints error for library that's already loaded" do
+      runner = create_runner
+      Manager.load runner
+      manager_load runner, verbose: true
+      stderr.chomp.should == "Library blarg already exists."
     end
 
     it "merges with existing created library" do

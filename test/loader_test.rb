@@ -6,26 +6,16 @@ describe "Loader" do
 
     it "prints error for method conflicts with main_object method" do
       runner = create_runner :require
-      capture_stderr {
-        Manager.load runner
-      }.should =~ /Unable to load library Blarg.*conflict.*commands: require/
+      manager_load runner
+      stderr.should =~ /Unable to load library Blarg.*conflict.*commands: require/
     end
 
     it "prints error for method conflicts between libraries" do
       create_runner :whoops
       create_runner :whoops, library: :Blorg
       Manager.load Blarg
-      capture_stderr {
-        Manager.load Blorg
-      }.should =~ /Unable to load library Blorg.*conflict.*commands: whoops/
-    end
-
-    it "prints error for library that's already loaded" do
-      runner = create_runner
-      Manager.load runner
-      capture_stderr {
-        Manager.load runner, verbose: true
-      }.should =~ /blarg already exists/
+      manager_load Blorg
+      stderr.should =~ /^Unable to load library Blorg.*conflict.*commands: whoops/
     end
 
     it "sets loaded to true after loading a library" do

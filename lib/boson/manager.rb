@@ -115,7 +115,7 @@ module Boson
           lib = loader_create(source)
           if loaded?(lib.name)
             if options[:verbose] && !options[:dependency]
-              $stderr.puts "Library #{lib.name} already exists."
+              warn "Library #{lib.name} already exists."
             end
             false
           else

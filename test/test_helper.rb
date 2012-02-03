@@ -124,6 +124,12 @@ module TestHelpers
     }
   end
 
+  def manager_load(lib, options={})
+    @stderr = capture_stderr { Manager.load(lib, options) }
+  end
+
+  attr_reader :stderr
+
   if ENV['RSPEC']
     def should_not_raise(&block)
       block.should_not raise_error
