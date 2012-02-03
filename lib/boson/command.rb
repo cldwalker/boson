@@ -29,8 +29,7 @@ module Boson
 
     # One line usage for a command if it exists
     def self.usage(command)
-      (cmd = find(command)) ? "#{command} #{cmd.usage}" :
-        "Command '#{command}' not found"
+      (cmd = find(command)) ? "#{command} #{cmd.usage}" : ''
     end
 
     # Attributes that are defined as accessors
@@ -99,11 +98,7 @@ module Boson
           (e.size < 2) ? e[0].upcase : "[#{e[0].upcase}]"
         }.join(' ')
       end
-
-      # Usage string for command, created from options and args.
-      def usage
-        basic_usage + option_help
-      end
+      alias_method :usage, :basic_usage
     end
     include API
 
@@ -119,11 +114,6 @@ module Boson
     # Option parser for command as defined by @options.
     def option_parser
       @option_parser ||= OptionParser.new(@options || {})
-    end
-
-    # Help string for options if a command has it.
-    def option_help
-      @options ? option_parser.to_s : ''
     end
 
     # Indicates if an OptionCommand

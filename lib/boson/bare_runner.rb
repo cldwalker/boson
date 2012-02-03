@@ -40,7 +40,7 @@ module Boson
         Boson.full_invoke(cmd, args)
       rescue ArgumentError
         raise if !allowed_argument_error?($!, cmd, args)
-        abort_with "'#{cmd}' was called incorrectly.\n" + Command.usage(cmd)
+        abort_with "'#{cmd}' was called incorrectly.\nUsage: " + Command.usage(cmd)
       rescue NoMethodError => err
         raise if !err.backtrace.first.include?('`full_invoke')
         no_command_error cmd

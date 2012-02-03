@@ -122,7 +122,7 @@ STR
   it "calls command with too many args" do
     MyRunner.expects(:abort).with <<-STR.chomp
 'medium' was called incorrectly.
-medium [ARG][--spicy]
+Usage: medium [ARG]
 STR
     my_command('medium 1 2 3')
   end
