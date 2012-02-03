@@ -92,11 +92,11 @@ module Boson
           add_failed_library library
           message = "Unable to #{load_method} library #{library}. Reason: #{err}"
           if Boson.debug
-            message += "\n" + err.backtrace.map {|e| "  " + e }.join("\n")
+            message << "\n" + err.backtrace.map {|e| "  " + e }.join("\n")
           elsif @options[:verbose]
-            message += "\n" + err.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
+            message << "\n" + err.backtrace.slice(0,3).map {|e| "  " + e }.join("\n")
           end
-          $stderr.puts message
+          warn message
         end
       end
 
@@ -129,9 +129,9 @@ module Boson
           lib
         else
           if !options[:dependency]
-            $stderr.puts "Library #{lib.name} did not load successfully."
+            warn "Library #{lib.name} did not load successfully."
           end
-          $stderr.puts "  "+lib.inspect if Boson.debug
+          warn "  "+lib.inspect if Boson.debug
           false
         end
       end

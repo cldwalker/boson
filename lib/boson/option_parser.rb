@@ -399,7 +399,7 @@ module Boson
       @trailing_non_opts.delete_if {|e|
         break if STOP_STRINGS.include? e
         invalid = e.to_s[/^-/]
-        $stderr.puts "Deleted invalid option '#{e}'" if invalid
+        warn "Deleted invalid option '#{e}'" if invalid
         invalid
       }
     end

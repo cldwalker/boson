@@ -24,6 +24,12 @@ describe "Manager" do
       library_has_command 'blah', 'meatwad'
     end
 
+    it "prints error if library does not load" do
+      RunnerLibrary.any_instance.expects(:load).returns false
+      load_library
+      stderr.chomp.should == "Library blah did not load successfully."
+    end
+
     [SyntaxError, StandardError, LoaderError].each do |klass|
       it "prints error if library fails with #{klass}" do
         RunnerLibrary.expects(:new).raises(klass)

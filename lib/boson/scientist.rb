@@ -47,7 +47,7 @@ module Boson
         obj.singleton_class.send(:define_method, e, cmd_block)
       }
     rescue Error
-      $stderr.puts "Error: #{$!.message}"
+      warn "Error: #{$!.message}"
     end
 
     # A wrapper around redefine_command that doesn't depend on a Command object.
@@ -116,7 +116,7 @@ module Boson
       raise if Boson.in_shell
       message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" :
         $!.message
-      $stderr.puts "Error: " + message
+      warn "Error: " + message
     end
 
     # Hook method available after parse in translate_args
