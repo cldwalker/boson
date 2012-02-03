@@ -40,7 +40,9 @@ module TestHelpers
     @stderr = capture_stderr { Manager.load(lib, options) }
   end
 
-  attr_reader :stderr
+  def stderr
+    @stderr.chomp
+  end
 
   ## Reset
   def reset

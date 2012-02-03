@@ -27,14 +27,14 @@ describe "Manager" do
     it "prints error if library does not load" do
       RunnerLibrary.any_instance.expects(:load).returns false
       load_library
-      stderr.chomp.should == "Library blah did not load successfully."
+      stderr.should == "Library blah did not load successfully."
     end
 
     [SyntaxError, StandardError, LoaderError].each do |klass|
       it "prints error if library fails with #{klass}" do
         RunnerLibrary.expects(:new).raises(klass)
         load_library
-        stderr.chomp.should == "Unable to load library Blah. Reason: #{klass}"
+        stderr.should == "Unable to load library Blah. Reason: #{klass}"
         Manager.failed_libraries.should == [Blah]
       end
     end
@@ -50,7 +50,7 @@ describe "Manager" do
 
     it "prints error if no library is found" do
       manager_load 'dude'
-      stderr.chomp.should ==
+      stderr.should ==
         'Unable to load library dude. Reason: Library dude not found.'
     end
 
@@ -58,7 +58,7 @@ describe "Manager" do
       runner = create_runner
       Manager.load runner
       manager_load runner, verbose: true
-      stderr.chomp.should == "Library blarg already exists."
+      stderr.should == "Library blarg already exists."
     end
 
     it "merges with existing created library" do
