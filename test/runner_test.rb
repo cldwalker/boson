@@ -129,12 +129,12 @@ STR
 
   it "prints error message for internal public method" do
     MyRunner.expects(:abort).with %[Could not find command "to_s"]
-    my_command('to_s')
+    my_command('to_s').should == ''
   end
 
   it "prints error message for nonexistant command" do
     MyRunner.expects(:abort).with %[Could not find command "blarg"]
-    my_command('blarg')
+    my_command('blarg').should == ''
   end
 
   it "allows no method error in command" do
@@ -147,7 +147,7 @@ STR
 
   it "prints error message for private method" do
     MyRunner.expects(:abort).with %[Could not find command "no_run"]
-    my_command('no_run')
+    my_command('no_run').should == ''
   end
 
   describe "$BOSONRC" do
@@ -155,7 +155,7 @@ STR
 
     it "is not loaded by default" do
       MyRunner.expects(:load).never
-      my_command('quiet')
+      my_command('quiet').should == ''
     end
 
     it "is loaded if set" do
