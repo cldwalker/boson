@@ -63,8 +63,11 @@ module Boson
     end
 
     def save_marshal_index(marshal_string)
-      # GOTCHA: We use 'r+' option because 'w' truncates the file when opening it
-      File.open(marshal_file, 'r+b') do |f| 
+      binmode = defined?(File::BINARY) ? File::BINARY : 0
+      rdwr_access = File::RDWR | File::CREAT | binmode
+      # If we want to protect the file truncing with a lock we cannot use the 'wb' options. The w option truncates
+      # the file before calling the File.open block
+      File.open(marshal_file, rdwr_access) do |f| 
         f.flock(File::LOCK_EX)
         f.truncate 0
         f.write(marshal_string)
