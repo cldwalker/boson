@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 require 'rubygems' unless Object.const_defined?(:Gem)
 require File.dirname(__FILE__) + "/lib/boson/version"
- 
+
 Gem::Specification.new do |s|
   s.name        = "boson"
   s.version     = Boson::VERSION
@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.executables = ['boson']
   s.add_dependency 'hirb', '>= 0.5.0'
   s.add_dependency 'alias', '>= 0.2.2'
-  s.add_development_dependency 'mocha'
+  s.add_development_dependency 'mocha', '= 0.9.8'
   s.add_development_dependency 'bacon', '>= 1.1.0'
   s.add_development_dependency 'mocha-on-bacon'
   s.add_development_dependency 'bacon-bits'
