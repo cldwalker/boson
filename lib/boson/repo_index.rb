@@ -35,7 +35,7 @@ module Boson
     def read
       return if @read
       @libraries, @commands, @lib_hashes = exists? ?
-        File.open( marshal_file, 'rb' ){|f| Marshal.load( f.read ) } : [[], [], {}]
+        File.open( marshal_file, 'rb' ){|f| f.flock(File::LOCK_EX);Marshal.load(f) } : [[], [], {}]
       delete_stale_libraries_and_commands
       set_command_namespaces
       @read = true
@@ -63,7 +63,15 @@ module Boson
     end
 
     def save_marshal_index(marshal_string)
-      File.open(marshal_file, 'wb') {|f| f.write marshal_string }
+      binmode = defined?(File::BINARY) ? File::BINARY : 0
+      rdwr_access = File::RDWR | File::CREAT | binmode
+      # If we want to protect the file truncing with a lock we cannot use the 'wb' options. The w option truncates
+      # the file before calling the File.open block
+      File.open(marshal_file, rdwr_access) do |f| 
+        f.flock(File::LOCK_EX)
+        f.truncate 0
+        f.write(marshal_string)
+      end
     end
 
     def delete_stale_libraries_and_commands
