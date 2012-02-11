@@ -8,30 +8,9 @@ module Boson
   # before or after arguments.
   #
   # === Basic Global Options
-  # Any command with options comes with basic global options. For example '-hv'
-  # on an option command prints a help summarizing global and local options.
-  # Another basic global option is --pretend. This option displays what global
-  # options have been parsed and the actual arguments to be passed to a
-  # command if executed. For example:
-  #
-  #   # Define this command in a library
-  #   options :level=>:numeric, :verbose=>:boolean
-  #   def foo(*args)
-  #     args
-  #   end
-  #
-  #   irb>> foo 'testin -p -l=1'
-  #   Arguments: ["testin", {:level=>1}]
-  #   Global options: {:pretend=>true}
-  #
-  # If a global option conflicts with a local option, the local option takes
-  # precedence. You can get around this by passing global options after a '-'.
-  # For example, if the global option -f (--fields) conflicts with a local -f
-  # (--force):
-  #   foo 'arg1 -v -f - -f=f1,f2'
-  #   # is the same as
-  #   foo 'arg1 -v --fields=f1,f2 -f'
-  #
+  # Any command with options comes with basic global options. For example '-h'
+  # on an option command prints help. If a global option conflicts with a local
+  # option, the local option takes precedence.
   class OptionCommand
     # ArgumentError specific to @command's arguments
     class CommandArgumentError < ::ArgumentError; end
@@ -39,9 +18,6 @@ module Boson
     # default global options
     BASIC_OPTIONS = {
       :help=>{:type=>:boolean, :desc=>"Display a command's help"},
-      :verbose=>{:type=>:boolean, :desc=>"Increase verbosity for help, errors, etc."},
-      :pretend=>{:type=>:boolean,
-        :desc=>"Display what a command would execute without executing it"},
     }
 
     class <<self

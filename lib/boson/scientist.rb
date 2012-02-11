@@ -100,23 +100,18 @@ module Boson
 
     # Runs a command given its object and arguments
     def analyze(obj, command, args, &block)
-      @global_options, @command, original_args = {}, command, args.dup
+      @global_options, @command, @original_args = {}, command, args.dup
       @args = translate_args(obj, args)
       return run_help_option(@command) if @global_options[:help]
-      run_pretend_option(@args)
-      unless @global_options[:pretend]
-        process_result call_original_command(@args, &block)
-      end
-    rescue OptionCommand::CommandArgumentError
-      run_pretend_option(@args ||= [])
-      return if !@global_options[:pretend] &&
-        run_verbose_help(option_command, original_args)
-      raise unless @global_options[:pretend]
+      during_analyze(&block)
     rescue OptionParser::Error, Error
       raise if Boson.in_shell
-      message = @global_options[:verbose] ? "#{$!}\n#{$!.backtrace.inspect}" :
-        $!.message
-      warn "Error: " + message
+      warn "Error: #{$!}"
+    end
+
+    # Overridable method called during analyze
+    def during_analyze(&block)
+      process_result call_original_command(@args, &block)
     end
 
     # Hook method available after parse in translate_args
@@ -142,25 +137,8 @@ module Boson
       args
     end
 
-    def run_verbose_help(option_command, original_args)
-      global_opts = option_command.parse_global_options(original_args)
-      if global_opts[:help] && global_opts[:verbose]
-        @global_options = global_opts
-        run_help_option @command
-        return true
-      end
-      false
-    end
-
     def run_help_option(cmd)
       puts "#{cmd.full_name} #{cmd.usage}".rstrip
-    end
-
-    def run_pretend_option(args)
-      if @global_options[:verbose] || @global_options[:pretend]
-        puts "Arguments: #{args.inspect}",
-          "Global options: #{@global_options.inspect}"
-      end
     end
 
     def process_result(result)

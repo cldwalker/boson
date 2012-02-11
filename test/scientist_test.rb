@@ -143,15 +143,6 @@ describe "Scientist" do
       end
     end
 
-    it "with debug option prints debug" do
-      capture_stdout { command_with_args("-v ok") }.should =~ /Arguments.*ok/
-    end
-
-    it "with pretend option prints arguments and returns early" do
-      Scientist.expects(:process_result).never
-      capture_stdout { command_with_args("-p ok") }.should =~ /Arguments.*ok/
-    end
-
     it "with not enough args raises CommandArgumentError" do
       args = [OptionCommand::CommandArgumentError, '0 for 1']
       assert_error(*args) { command_with_args }
