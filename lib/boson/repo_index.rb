@@ -2,10 +2,10 @@ require 'digest/md5'
 module Boson
   # This class provides an index for commands and libraries of a given a Repo.
   # When this index updates, it detects library files whose md5 hash have changed and reindexes them.
-  # The index is stored with Marshal at config/index.marshal (relative to a Repo's root directory). 
+  # The index is stored with Marshal at config/index.marshal (relative to a Repo's root directory).
   # Since the index is marshaled, putting lambdas/procs in it will break it.If an index gets corrupted,
   # simply delete it and next time Boson needs it, the index will be recreated.
-  
+
   class RepoIndex
     attr_reader :libraries, :commands, :repo
     def initialize(repo)
@@ -35,7 +35,10 @@ module Boson
     def read
       return if @read
       @libraries, @commands, @lib_hashes = exists? ?
-        File.open( marshal_file, 'rb' ){|f| Marshal.load( f.read ) } : [[], [], {}]
+        File.open(marshal_file, 'rb') do |f|
+          f.flock(File::LOCK_EX)
+          Marshal.load(f)
+        end : [[], [], {}]
       delete_stale_libraries_and_commands
       set_command_namespaces
       @read = true
@@ -63,7 +66,15 @@ module Boson
     end
 
     def save_marshal_index(marshal_string)
-      File.open(marshal_file, 'wb') {|f| f.write marshal_string }
+      binmode = defined?(File::BINARY) ? File::BINARY : 0
+      rdwr_access = File::RDWR | File::CREAT | binmode
+      # To protect the file truncing with a lock we cannot use the 'wb' options.
+      # The w option truncates the file before calling the File.open block
+      File.open(marshal_file, rdwr_access) do |f|
+        f.flock(File::LOCK_EX)
+        f.truncate 0
+        f.write(marshal_string)
+      end
     end
 
     def delete_stale_libraries_and_commands
