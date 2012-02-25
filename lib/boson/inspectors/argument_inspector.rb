@@ -19,16 +19,11 @@ module Boson::ArgumentInspector
   #   def meth1(arg1, arg2='val', options={}) -> [['arg1'], ['arg2', 'val'], ['options', {}]]
   #   def meth2(*args) -> [['*args']]
   def scrape_with_eval(meth, klass, object)
-    unless %w[initialize].include?(meth.to_s)
-      return if class << object; private_instance_methods(true).map {|e| e.to_s } end.include?(meth.to_s)
-    end
     params, values, arity, num_args = trace_method_args(meth, klass, object)
     return if local_variables == params # nothing new found
     format_arguments(params, values, arity, num_args)
     rescue Exception
       print_debug_message(klass, meth) if Boson::Runner.debug
-    ensure
-      set_trace_func(nil)
   end
 
   def print_debug_message(klass, meth) #:nodoc:
@@ -53,45 +48,30 @@ module Boson::ArgumentInspector
   end
 
   def trace_method_args(meth, klass, object) #:nodoc:
-    file = line = params = values = nil
+    params = values = nil
     arity = klass.instance_method(meth).arity
-    set_trace_func lambda{|event, file, line, id, binding, classname|
-      begin
-        if event[/call/] && classname == klass && id == meth
-          params = eval("local_variables", binding)
-          values = eval("local_variables.map{|x| eval(x.to_s)}", binding)
-          throw :done
-        end
-      rescue Exception
-        print_debug_message(klass, meth) if Boson::Runner.debug
-      end
-    }
+    # hollowed out method returns only parameters and values
     if arity >= 0
       num_args = arity
-      catch(:done){ object.send(meth, *(0...arity)) }
+      params, values = object.send(meth, *(0...arity))
     else
       num_args = 0
       # determine number of args (including splat & block)
       MAX_ARGS.downto(arity.abs - 1) do |i|
-        catch(:done) do 
-          begin
-            object.send(meth, *(0...i))
-          rescue Exception
-          end
+        begin
+          params, values = object.send(meth, *(0...i))
+        rescue Exception
         end
         # all nils if there's no splat and we gave too many args
-        next if !values || values.compact.empty? 
+        next if !values || values.compact.empty?
         k = nil
         values.each_with_index{|x,j| break (k = j) if Array === x}
         num_args = k ? k+1 : i
         break
       end
       args = (0...arity.abs-1).to_a
-      catch(:done) do 
-        args.empty? ? object.send(meth) : object.send(meth, *args)
-      end
+      params, values = args.empty? ? object.send(meth) : object.send(meth, *args)
     end
-    set_trace_func(nil)
     return [params, values, arity, num_args]
   end
 end

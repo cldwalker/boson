@@ -46,17 +46,25 @@ module Boson
 
         alias_method :_old_method_added, :method_added
         alias_method :method_added, :new_method_added
+
+        alias_method :_old_module_eval, :module_eval
+
+        def module_eval(*args)
+          # will return if called from disable
+          Boson::MethodInspector.parse_mod(self, args.first)
+          _old_module_eval(*args)
+        end
       ]
     ::Module.module_eval body
     end
 
     # Disable scraping method data.
     def disable
+      @enabled = false
       ::Module.module_eval %[
         Boson::MethodInspector::ALL_METHODS.each {|e| remove_method e }
         alias_method :method_added, :_old_method_added
-      ]
-      @enabled = false
+        alias_method :module_eval, :_old_module_eval                       ]
     end
 
     # Adds method attributes scraped for the library's module to the library's commands.
