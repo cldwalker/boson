@@ -59,19 +59,23 @@ First, what I consider pros boson has over thor. Boson
 * is designed to handle plugins. This means it core parts are extendable by
   modules and core components like commands can have arbitrary metadata
   associated with them.
-* has a rich set of plugins. See [boson-more](#TODO).
+* has a rich set of plugins. See [boson-more](http://github.com/cldwalker/boson-more).
 * has commands that are easily testable. Whereas thor has options that automagically
   appear in command methods, boson explicitly passes options to its command
   method as a hash i.e. `MyRunner.new.subcommand(arg, verbose: true)`. This
   also allows commands to just be called as ruby, with no magic to consider.
 * supports custom-user option types i.e. creating a Date option type. See
   Boson::Options.
+* supports custom method decorators i.e. methods like desc that add functionality
+  to a command. While boson supports option, options, desc and config out of the box,
+  users can create their own.
 * automatically creates usage for your subcommand. With thor you need to
   manually define your usage with desc: `desc "SOME USAGE", "SOME DESCRIPTION"`
 * is lenient about descriptions. Describe commands at your leisure. With thor
   you must define a desc.
 * has a smaller blacklist for command names i.e. just Kernel + Object method
-  names. Thor has a bigger [blacklist](#TODO) due to its design.
+  names. Thor has a bigger
+  [blacklist](https://github.com/wycats/thor/blob/a24b6697a37d9bc0c0ea94ef9bf2cdbb33b8abb9/lib/thor/base.rb#L18-19) due to its design.
 
   Now for pros thor has over boson. Thor
 
