@@ -13,7 +13,7 @@ If you've read about boson prior to 2012, you may be looking for a [version befo
 major focus of 1.0 has been to provide an easy way for third-party gems to
 create their executable and define subcommands with options.
 
-== Example Executable
+## Example Executable
 
 For a gem with an executable, bin/cow:
 
@@ -94,7 +94,7 @@ Motivation for the new boson is all the damn executables I'm making.
 ## Credits
 Boson stands on the shoulders of these people and their ideas:
 
-* Contributors: @mirell
+* Contributors: @mirell, @martinos
 * Yehuda Katz for Thor and its awesome option parser (Boson::OptionParser).
 * Daniel Berger for his original work on thor's option parser.
 * Chris Wanstrath for inspiring Boson's libraries with Rip's packages.
