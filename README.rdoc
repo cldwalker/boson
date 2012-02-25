@@ -11,7 +11,7 @@ libraries to be written as plain ruby. For my libraries that use this, see
 Boson 0.4.x will be the last 1.8 compatible version.
 Boson 1.0 will be a rewrite compatible with only 1.9. Work is going on in {boson2
 branch}[https://github.com/cldwalker/boson/tree/boson2]. The goal of boson2 is to have a slimmer
-core, move everything else {to plugins}[https://github.com/cldwalker/boson-all]
+core, move everything else {to plugins}[https://github.com/cldwalker/boson-more]
 and to allow gems to use boson to make executables like thor.
 
 == Features
