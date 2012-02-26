@@ -77,12 +77,14 @@ First, what I consider pros boson has over thor. Boson
   names. Thor has a bigger
   [blacklist](https://github.com/wycats/thor/blob/a24b6697a37d9bc0c0ea94ef9bf2cdbb33b8abb9/lib/thor/base.rb#L18-19) due to its design.
 
-  Now for pros thor has over boson. Thor
+Now for pros thor has over boson. Thor
 
-  * is widely used and thus has been community QAed thoroughly.
-  * supports generators as a major feature.
-  * is more stable as its feature set is mostly frozen.
-  * is used by rails and thus is guaranteed support for some time.
+* is widely used and thus has been community QAed thoroughly.
+* supports generators as a major feature.
+* is more stable as its feature set is mostly frozen.
+* is used by rails and thus is guaranteed support for some time.
+* supports ruby 1.8.7.
+* TODO: I'm sure there's more
 
 ## Bugs/Issues
 
