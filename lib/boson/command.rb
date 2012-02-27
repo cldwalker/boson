@@ -42,21 +42,26 @@ module Boson
     # Takes a hash of attributes which map to instance variables and values.
     # :name and :lib are required keys.
     #
-    # Attributes that can be configured:
-    # [*:desc*] Description that shows up in command listings
-    # [*:alias*] Alternative name for command
-    # [*:options*] Hash of options passed to OptionParser
-    # [*:args*] Should only be set if not automatically set. This attribute is only
-    #           important for commands that have options. Its value can be an array
-    #           , a number representing
-    #           the number of arguments or '*' if the command has a variable number of arguments.
-    # [*:default_option*] Only for an option command that has one or zero arguments. This treats the given
-    #                     option as an optional first argument. Example:
-    #                       # For a command with default option 'query' and options --query and -v
-    #                       'some -v'   -> '--query=some -v'
-    #                       '-v'        -> '-v'
-    # [*:config*] A hash for third party libraries to get and set custom command attributes.
-    # [*:option_command*] Boolean to wrap a command with an OptionCommand object i.e. allow commands to have options.
+    # @param [Hash] attributes
+    # @option attributes [String] :desc Description that shows up once in
+    #   command listings
+    # @option attributes [String] :alias Alternative name for command
+    # @option attributes [Hash] :options Options passed to OptionParser
+    # @option attributes [Array,Integer,String] :args Should only be set if
+    #   not automatically set. This attribute is only important for commands
+    #   that have options. Its value can be an array, a number representing
+    #   the number of arguments or '*' if the command has a variable number of
+    #   arguments.
+    # @option attributes [String] :default_option Only for an option command
+    #   that has one or zero arguments. This treats the given option as an optional
+    #   first argument. Example:
+    #     # For a command with default option 'query' and options --query and -v
+    #     'some -v'   -> '--query=some -v'
+    #     '-v'        -> '-v'
+    # @option attributes [Hash] :config used by third party libraries to get and
+    #   set custom command attributes.
+    # @option attributes [Boolean] :option_command Wraps a command with an
+    #   OptionCommand object i.e. allow commands to have options.
     def initialize(attributes)
       hash = attributes.dup
       @name = hash.delete(:name) or raise ArgumentError

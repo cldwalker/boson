@@ -18,9 +18,11 @@ module Boson
   # attributes should only be called once per method except for option.
   # Available method attributes:
   # * config: Hash to define any command attributes (see Command.new).
-  # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
+  # * desc: String to define a command's description for a command. Defaults to
+  #   first commented line above a method.
   # * options: Hash to define an OptionParser object for a command's options.
-  # * option: Option name and value to be merged in with options. See OptionParser for what an option value can be.
+  # * option: Option name and value to be merged in with options. See
+  #   OptionParser for what an option value can be.
   class Inspector
     class << self; attr_reader :enabled; end
 
@@ -70,6 +72,7 @@ module Boson
     end
 
     module API
+      # Adds scraped data from all inspectors
       def add_data
         add_method_scraped_data
       end

@@ -47,12 +47,12 @@ You can now execute cow with say and moo subcommands:
     HUNGRY
 
 You'll notice that this syntax is powerful and concise and is very similar to
-Thor's API. Subcommands map to ruby methods and the class represents the executable.
+thor's API. Subcommands map to ruby methods and the class represents the executable.
 
 ## Comparison to Thor
 
-Since boson and it's rewrite are both heavily inspired by Thor, it makes sense
-to compare them.
+Since boson and it's rewrite are both heavily inspired by [thor](http://github.com/wycats/thor), it
+makes sense to compare them.
 
 First, what I consider pros boson has over thor. Boson
 
