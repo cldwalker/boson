@@ -2,7 +2,7 @@ module Boson
   # A command starts with the functionality of a ruby method and adds benefits
   # with options, etc.
   class Command
-    module API
+    module APIClassMethods
       # Creates a command given its name and a library.
       def create(name, library)
         new(new_attributes(name, library))
@@ -25,7 +25,7 @@ module Boson
           update(library_attributes(library))
       end
     end
-    extend API
+    extend APIClassMethods
 
     # One line usage for a command if it exists
     def self.usage(command)
