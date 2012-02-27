@@ -30,6 +30,11 @@ module Boson
       def init
         Manager.load default_libraries, load_options
       end
+
+      # Wrapper around abort
+      def abort_with(message)
+        abort message
+      end
     end
 
     class<<self
@@ -46,12 +51,9 @@ module Boson
         no_command_error cmd
       end
 
+      # Use to abort when no command found
       def no_command_error(cmd)
         abort_with %[Could not find command "#{cmd}"]
-      end
-
-      def abort_with(message)
-        abort message
       end
 
       # Determines if a user command argument error or an internal Boson one
