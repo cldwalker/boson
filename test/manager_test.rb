@@ -13,7 +13,7 @@ describe "Manager" do
   describe ".load" do
     def load_library(hash={})
       meths = hash.delete(:commands) || []
-      manager_load create_runner(*meths, library: :Blah), hash
+      manager_load create_runner(*(meths + [{library: :Blah}])), hash
     end
 
     it "loads basic library" do
