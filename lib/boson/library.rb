@@ -43,21 +43,20 @@ module Boson
     # Private attribute for use within Boson.
     attr_reader :new_module, :new_commands, :lib_file
 
-    # Creates a library object with a hash of attributes which must include a
-    # :name attribute.  Each hash pair maps directly to an instance variable and
-    # value. Defaults for attributes are read from
-    # config[:libraries][@library_name][@attribute].
+    # Creates a library object with the given hash.  Each hash pair maps
+    # directly to an instance variable and value. Defaults for attributes are
+    # read from config[:libraries][@library_name][@attribute].
     #
-    # Attributes that can be configured:
-    # [*:commands*] A hash or array of commands that belong to this library. A hash configures command attributes
-    #               for the given commands with command names pointing to their configs. See Command.new for a
-    #               command's configurable attributes. If an array, the commands are set for the given library,
-    #               overidding default command detection. Example:
-    #                :commands=>{'commands'=>{:desc=>'Lists commands', :alias=>'com'}}
-    # [*:force*] Boolean which forces a library to ignore when a library's methods are overriding existing ones.
-    #            Use with caution. Default is false.
-    # [*:object_methods*] Boolean which detects any Object/Kernel methods created when loading a library and automatically
-    #                     adds them to a library's commands. Default is true.
+    # @param [Hash] hash
+    # @option hash [String] :name Required attribute
+    # @option hash [Array,Hash] :commands Commands belonging to a library. A
+    #   hash configures command attributes for the given commands with command
+    #   names pointing to their configs. See Command.new for a command's
+    #   configurable attributes. If an array, the commands are set for the
+    #   given library, overidding default command detection. Example:
+    #     :commands=>{'commands'=>{:desc=>'Lists commands', :alias=>'com'}}
+    # @option hash [Boolean] :force Forces a library to ignore when a library's
+    #   methods are overriding existing ones. Use with caution. Default is false.
     def initialize(hash)
       before_initialize
       @name = set_name(hash.delete(:name)) or
@@ -91,13 +90,17 @@ module Boson
         @namespace_object ||= Boson.main_object
       end
 
+      # Callback called at the beginning of initialize
       def before_initialize
       end
 
+      # Determines if library is local i.e. scoped to current directory/project
       def local?
         false
       end
 
+      # @return [Hash] Attributes used internally by a library. Defaults to
+      #   using Boson.config but can be overridden to be library-specific.
       def config
         Boson.config
       end

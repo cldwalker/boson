@@ -1,9 +1,10 @@
 module Boson
   # Scientist wraps around and redefines an object's method to give it the
   # following features:
-  # * Methods can take shell command input with options or receive its normal arguments. See the Commandification
-  #   section.
-  # * Methods have a slew of global options available. See OptionCommand for an explanation of basic global options.
+  # * Methods can take shell command input with options or receive its normal
+  #   arguments. See the Commandification section.
+  # * Methods have a slew of global options available. See OptionCommand for an
+  #   explanation of basic global options.
   #
   # The main methods Scientist provides are redefine_command() for redefining an
   # object's method with a Command object and commandify() for redefining with a

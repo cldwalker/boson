@@ -59,6 +59,7 @@ module Boson
       end
     end
 
+    # Scrapes option
     def option(mod, name, value)
       (@mod_store[mod] ||= {})[:options] ||= {}
       (store(mod)[:temp] ||= {})[:option] ||= {}

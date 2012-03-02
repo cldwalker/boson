@@ -2,19 +2,23 @@ module Boson
   # This class concisely defines commandline options that when parsed produce a
   # Hash of option keys and values.
   # Additional points:
-  # * Setting option values should follow conventions in *nix environments. See examples below.
-  # * By default, there are 5 option types, each which produce different objects for option values.
-  # * The default option types can produce objects for one or more of the following Ruby classes:
-  #   String, Integer, Float, Array, Hash, FalseClass, TrueClass.
-  # * Users can define their own option types which create objects for _any_ Ruby class. See Options.
-  # * Each option type can have attributes to enable more features (see OptionParser.new).
+  # * Setting option values should follow conventions in *nix environments.
+  #   See examples below.
+  # * By default, there are 5 option types, each which produce different
+  #   objects for option values.
+  # * The default option types can produce objects for one or more of the following
+  #   Ruby classes:  String, Integer, Float, Array, Hash, FalseClass, TrueClass.
+  # * Users can define their own option types which create objects for _any_
+  #   Ruby class. See Options.
+  # * Each option type can have attributes to enable more features (see
+  #   OptionParser.new).
   # * When options are parsed by parse(), an indifferent access hash is returned.
   # * Options are also called switches, parameters, flags etc.
   # * Option parsing stops when it comes across a '--'.
   #
   # Default option types:
-  # [*:boolean*] This option has no passed value. To toogle a boolean, prepend with '--no-'.
-  #              Multiple booleans can be joined together.
+  # [*:boolean*] This option has no passed value. To toogle a boolean, prepend
+  #              with '--no-'. Multiple booleans can be joined together.
   #                '--debug'    -> {:debug=>true}
   #                '--no-debug' -> {:debug=>false}
   #                '--no-d'     -> {:debug=>false}
@@ -23,17 +27,19 @@ module Boson
   #               '--color red' -> {:color=>'red'}
   #               '--color=red' -> {:color=>'red'}
   #               '--color "gotta love spaces"' -> {:color=>'gotta love spaces'}
-  # [*:numeric*] Sets values as :string does or by appending number right after aliased name. Shortened form
-  #              can be appended to joined booleans.
+  # [*:numeric*] Sets values as :string does or by appending number right after
+  #              aliased name. Shortened form can be appended to joined booleans.
   #                '-n3'  -> {:num=>3}
   #                '-dn3' -> {:debug=>true, :num=>3}
-  # [*:array*] Sets values as :string does. Multiple values are split by a configurable character
-  #            Default is ',' (see OptionParser.new). Passing '*' refers to all known :values.
-  #             '--fields 1,2,3' -> {:fields=>['1','2','3']}
-  #             '--fields *'     -> {:fields=>['1','2','3']}
-  # [*:hash*] Sets values as :string does. Key-value pairs are split by ':' and pairs are split by
-  #           a configurable character (default ','). Multiple keys can be joined to one value. Passing '*'
-  #           as a key refers to all known :keys.
+  # [*:array*] Sets values as :string does. Multiple values are split by a
+  #            configurable character Default is ',' (see OptionParser.new).
+  #            Passing '*' refers to all known :values.
+  #              '--fields 1,2,3' -> {:fields=>['1','2','3']}
+  #              '--fields *'     -> {:fields=>['1','2','3']}
+  # [*:hash*] Sets values as :string does. Key-value pairs are split by ':' and
+  #           pairs are split by a configurable character (default ',').
+  #           Multiple keys can be joined to one value. Passing '*' as a key
+  #           refers to all known :keys.
   #             '--fields a:b,c:d' -> {:fields=>{'a'=>'b', 'c'=>'d'} }
   #             '--fields a,b:d'   -> {:fields=>{'a'=>'d', 'b'=>'d'} }
   #             '--fields *:d'     -> {:fields=>{'a'=>'d', 'b'=>'d', 'c'=>'d'} }
@@ -93,29 +99,43 @@ module Boson
     # current_attributes().  Here are the available option attributes for the
     # default option types:
     #
-    # [*:type*] This or :default is required. Available types are :string, :boolean, :array, :numeric, :hash.
-    # [*:default*] This or :type is required. This is the default value an option has when not passed.
-    # [*:bool_default*] This is the value an option has when passed as a boolean. However, by enabling this
-    #                   an option can only have explicit values with '=' i.e. '--index=alias' and no '--index alias'.
-    #                   If this value is a string, it is parsed as any option value would be. Otherwise, the value is
-    #                   passed directly without parsing.
-    # [*:required*] Boolean indicating if option is required. Option parses raises error if value not given.
-    #               Default is false.
-    # [*:alias*] Alternative way to define option aliases with an option name or an array of them. Useful in yaml files.
-    #            Setting to false will prevent creating an automatic alias.
-    # [*:values*] An array of values an option can have. Available for :array and :string options. Values here
-    #             can be aliased by typing a unique string it starts with or underscore aliasing (see Util.underscore_search).
-    #             For example, for values foo, odd and obnoxiously_long, f refers to foo, od to odd and o_l to obnoxiously_long.
-    # [*:enum*] Boolean indicating if an option enforces values in :values or :keys. Default is true. For
-    #           :array, :hash and :string options.
-    # [*:split*] For :array and :hash options. A string or regular expression on which an array value splits
-    #            to produce an array of values. Default is ','.
-    # [*:keys*] :hash option only. An array of values a hash option's keys can have. Keys can be aliased just like :values.
-    # [*:default_keys*] For :hash option only. Default keys to assume when only a value is given. Multiple keys can be joined
-    #                   by the :split character. Defaults to first key of :keys if :keys given.
-    # [*:regexp*] For :array option with a :values attribute. Boolean indicating that each option value does a regular
-    #             expression search of :values. If there are values that match, they replace the original option value. If none,
-    #             then the original option value is used.
+    # [*:type*] This or :default is required. Available types are :string,
+    #           :boolean, :array, :numeric, :hash.
+    # [*:default*] This or :type is required. This is the default value an
+    #              option has when not passed.
+    # [*:bool_default*] This is the value an option has when passed as a
+    #                   boolean. However, by enabling this an option can only
+    #                   have explicit values with '=' i.e. '--index=alias' and
+    #                   no '--index alias'. If this value is a string, it is
+    #                   parsed as any option value would be. Otherwise, the
+    #                   value is passed directly without parsing.
+    # [*:required*] Boolean indicating if option is required. Option parses
+    #               raises error if value not given. Default is false.
+    # [*:alias*] Alternative way to define option aliases with an option name
+    #            or an array of them. Useful in yaml files. Setting to false
+    #            will prevent creating an automatic alias.
+    # [*:values*] An array of values an option can have. Available for :array
+    #             and :string options. Values here can be aliased by typing a
+    #             unique string it starts with or underscore aliasing (see
+    #             Util.underscore_search). For example, for values foo, odd and
+    #             obnoxiously_long, f refers to foo, od to odd and o_l to
+    #             obnoxiously_long.
+    # [*:enum*] Boolean indicating if an option enforces values in :values or
+    #           :keys. Default is true. For :array, :hash and :string options.
+    # [*:split*] For :array and :hash options. A string or regular expression
+    #            on which an array value splits to produce an array of values.
+    #            Default is ','.
+    # [*:keys*] :hash option only. An array of values a hash option's keys can
+    #            have. Keys can be aliased just like :values.
+    # [*:default_keys*] For :hash option only. Default keys to assume when only
+    #                   a value is given. Multiple keys can be joined by the
+    #                   :split character. Defaults to first key of :keys if
+    #                   :keys given.
+    # [*:regexp*] For :array option with a :values attribute. Boolean indicating
+    #             that each option value does a regular expression search of
+    #             :values. If there are values that match, they replace the
+    #             original option value. If none, then the original option
+    #             value is used.
     def initialize(opts)
       @defaults = {}
       @opt_aliases = {}
@@ -182,11 +202,13 @@ module Boson
 
     # Parses an array of arguments for defined options to return an indifferent
     # access hash. Once the parser recognizes a valid option, it continues to
-    # parse until an non option argument is detected. Flags that can be passed
-    # to the parser:
-    # * :opts_before_args: When true options must come before arguments. Default is false.
-    # * :delete_invalid_opts: When true deletes any invalid options left after parsing. Will stop deleting if
-    #   it comes across - or --. Default is false.
+    # parse until an non option argument is detected.
+    # @param [Hash] flags
+    # @option flags [Boolean] :opts_before_args When true options must come
+    #   before arguments. Default is false.
+    # @option flags [Boolean] :delete_invalid_opts When true deletes any
+    #   invalid options left after parsing. Will stop deleting if it comes
+    #   across - or --. Default is false.
     def parse(args, flags={})
       @args = args
       # start with symbolized defaults

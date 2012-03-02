@@ -28,8 +28,9 @@ module Boson
   # Some additional tips on the create_* method:
   # * The argument passed to the method is the option value from the user.
   # * To access the current option name use @current_option.
-  # * To access the hash of attributes the current option has use OptionParser.current_attributes. See
-  #   OptionParser.new for more about option attributes.
+  # * To access the hash of attributes the current option has use
+  #   OptionParser.current_attributes. See OptionParser.new for more about
+  #   option attributes.
   #
   # There are two optional methods per option type: validate_@type and
   # usage_for_@type i.e. validate_date and usage_for_date.  Like create_@type,

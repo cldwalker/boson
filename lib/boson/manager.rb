@@ -6,14 +6,14 @@ module Boson
   # Handles loading of libraries and commands.
   class Manager
     # Loads a library or an array of libraries with options. Manager loads the
-    # first library subclass to return true for Library#handles
-    # ==== Examples:
-    #   Manager.load MyRunner
+    # first library subclass to return true for Library#handles.  Any options
+    # that aren't listed here are passed as library attributes to the libraries
+    # (see Library.new)
     #
-    # Any options that aren't listed here are passed as library attributes to
-    # the libraries (see Library.new)
-    # ==== Options:
-    # [:verbose] Boolean to print each library's loaded status along with more verbose errors. Default is false.
+    # @param [Hash] options
+    # @option options [Boolean] :verbose Prints each library's loaded status
+    #   along with more verbose errors. Default is false.
+    # @example Manager.load MyRunner
     def self.load(libraries, options={})
       instance.load(libraries, options)
     end
@@ -40,6 +40,7 @@ module Boson
       @failed_libraries = []
     end
 
+    # Loads libraries
     def load(libraries, options={})
       Array(libraries).map {|e|
         (@library = load_once(e, options)) ? after_load : false
