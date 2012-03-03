@@ -1,9 +1,9 @@
 module Boson
-  # Scrapes and processes method attributes with MethodInspector and hands off
-  # the data to Library objects.
+  # Uses method decorators to scrape, process and hand off method attributes as
+  # data to Library objects.
   #
-  # === Method Attributes
-  # Method attributes refer to methods placed before a command's method in a
+  # === Method Decorators
+  # Method decorators refer to methods placed before a command's method in a
   # library:
   #   class SomeRunner < Boson::Runner
   #      options :verbose=>:boolean
@@ -14,9 +14,9 @@ module Boson
   #      end
   #   end
   #
-  # Method attributes serve as configuration for a method's command. All
-  # attributes should only be called once per method except for option.
-  # Available method attributes:
+  # Method decorators serve as configuration for a method's command. All
+  # decorators should only be called once per method except for option.
+  # Available method decorators:
   # * config: Hash to define any command attributes (see Command.new).
   # * desc: String to define a command's description for a command. Defaults to
   #   first commented line above a method.
