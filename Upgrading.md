@@ -2,8 +2,9 @@
 
 Any version before 1.0 is considered the old boson. Although I will accept bug
 fixes for it, I will *not* accept any new features. Since the new boson supports
-almost all of [boson's origin functionality](#TODO) via plugins, there is little
-reason to hang onto this version.
+almost all of [boson's origin
+functionality](http://tagaholic.me/blog.html#gem:name=boson) via plugins, there
+is little reason to hang onto this version.
 
 ## Using New Boson
 

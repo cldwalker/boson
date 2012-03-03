@@ -8,7 +8,8 @@ be written as plain ruby. Works with ruby >= 1.9.2
 ## New Boson
 
 Starting with 1.0, boson has changed significantly. Please read [the upgrading
-doc](#TODO) if you have an older version or if you're [reading about boson](#TODO)
+doc](http://rdoc.info/gems/boson/file/Upgrading.md) if you have an older version
+or if you're [reading about boson](http://tagaholic.me/blog.html#gem:name=boson)
 predates 2012.
 
 Boson has been rewritten to have a smaller core (no dependencies) with optional
@@ -18,7 +19,8 @@ subcommands with options.
 
 ## Docs
 
-Nicely formatted docs are available [here](#TODO).
+Nicely formatted docs are available
+[here](http://rdoc.info/gems/boson/file/README.md).
 
 ## Example Executable
 
