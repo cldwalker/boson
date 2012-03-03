@@ -34,7 +34,8 @@ module Boson
       puts "Usage: #{app_name} #{cmd.name} #{cmd.basic_usage}".rstrip, ""
       if cmd.options
         puts "Options:"
-        puts cmd.option_parser.print_usage_table(no_headers: true)
+        cmd.option_parser.print_usage_table(no_headers: true)
+        puts ""
       end
       puts "Description:\n  #{cmd.desc || 'TODO'}"
     end
