@@ -90,7 +90,7 @@ module Boson
         @namespace_object ||= Boson.main_object
       end
 
-      # Callback called at the beginning of initialize
+      # Method hook called at the beginning of initialize
       def before_initialize
       end
 

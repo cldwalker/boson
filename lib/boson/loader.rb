@@ -22,11 +22,11 @@ module Boson
       loaded_correctly? && (@loaded = true)
     end
 
-    # Callback at the beginning of #load. This method should load the source
+    # Method hook at the beginning of #load. This method should load the source
     # and set instance variables necessary to make a library valid i.e. @module.
     def load_source_and_set_module; end
 
-    # Callback for @module before loading
+    # Method hook for @module before loading
     def module_callbacks; end
 
     # Determines if load_commands should be called
@@ -57,7 +57,7 @@ module Boson
       !!@module
     end
 
-    # Callback for @module after it's been included
+    # Method hook for @module after it's been included
     def after_include; end
 
     # called when MethodConflictError is rescued
@@ -65,7 +65,7 @@ module Boson
       raise err
     end
 
-    # Callback called after @module has been created
+    # Method hook called after @module has been created
     def before_load_commands; end
 
     # Actually includes module and its commands
