@@ -4,6 +4,8 @@ rvm:
 - 1.9.2
 - 1.9.3
 - rbx-19mode
-- jruby-1.6.5
-env:
-- JRUBY_OPTS=--1.9
+- jruby-19mode
+matrix:
+  # until jruby + bacon issue fixed
+  allow_failures:
+  - rvm: jruby-19mode
