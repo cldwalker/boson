@@ -3,26 +3,6 @@ module Boson
   # by a module.  Libraries are loaded from different sources depending on the
   # library subclass.
   #
-  # == Naming a Library Module
-  # Although you can name a library module almost anything, here's the fine print:
-  # * A module can have any name if it's the only module in a library.
-  # * If there are multiple modules in a file library, the module's name must
-  #   be a camelized version of the file's basename
-  #   i.e. ~/.boson/commands/ruby_core.rb -> RubyCore.
-  # * Although modules are evaluated under the Boson::Commands namespace, Boson
-  #   will warn you about creating modules whose name is the same as a top level
-  #   class/module. The warning is to encourage users to stay away from
-  #   error-prone libraries. Once you introduce such a module, _all_ libraries
-  #   assume the nested module over the top level module and the top level
-  #   module has to be prefixed with '::' _everywhere_.
-  #
-  # == Configuration
-  # Libraries and their commands can be configured in different ways in this order:
-  # * If library is a FileLibrary, commands be configured with a config method
-  #   attribute (see Inspector).
-  # * If a library has a module, you can set library + command attributes via
-  #   the config() callback (see Loader).
-  #
   # === Creating Your Own Library
   # To create your own subclass you need to define what sources the subclass can
   # handle with handles(). See Loader to see what instance methods to override
