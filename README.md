@@ -9,7 +9,7 @@ be written as plain ruby. Works with ruby >= 1.9.2
 
 Starting with 1.0, boson has changed significantly. Please read [the upgrading
 doc](http://rdoc.info/gems/boson/file/Upgrading.md) if you have an older version
-or if you're [reading about boson](http://tagaholic.me/blog.html#gem:name=boson)
+or if your [reading about boson](http://tagaholic.me/blog.html#gem:name=boson)
 predates 2012.
 
 Boson has been rewritten to have a smaller core (no dependencies) with optional
