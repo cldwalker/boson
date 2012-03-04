@@ -4,10 +4,7 @@ module Boson
     DEFAULT_LIBRARIES = []
     # Default options for parse_args
     GLOBAL_OPTIONS = {
-      help: {
-        type: :boolean,
-        desc: "Displays this help message or a command's help if given a command"
-      }
+      help: { type: :boolean, desc: "Displays this help message" }
     }
 
     module API

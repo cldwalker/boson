@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'boson'
+require 'boson/bin_runner'
+
+Boson::BinRunner.start
