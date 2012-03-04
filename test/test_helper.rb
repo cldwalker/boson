@@ -2,6 +2,7 @@ require 'mocha'
 require 'boson'
 require 'fileutils'
 require 'boson/runner'
+require 'bahia'
 
 ENV['RSPEC'] = '1' if $0[/rspec/]
 unless ENV['RSPEC']
@@ -156,8 +157,9 @@ if ENV['RSPEC']
   RSpec.configure {|c|
     c.mock_with :mocha
     c.extend RspecBits
-    c.include TestHelpers
+    c.include TestHelpers, Bahia
   }
 else
+  Bacon::Context.send :include, Bahia
   Bacon::Context.send :include, TestHelpers
 end
