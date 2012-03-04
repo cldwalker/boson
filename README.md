@@ -125,6 +125,8 @@ For many plugin examples, see
 ## Bugs/Issues
 
 Please report them [on github](http://github.com/cldwalker/boson/issues).
+If the issue is about upgrading from old boson, please file it in
+[boson-more](http://github.com/cldwalker/boson-more/issues).
 
 ## Contributing
 [See here](http://tagaholic.me/contributing.html)
