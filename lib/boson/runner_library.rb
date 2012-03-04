@@ -2,7 +2,7 @@ module Boson
   # Library created by Runner
   class RunnerLibrary < Library
     handles {|source|
-      source.is_a?(Module) && source.ancestors.include?(Runner)
+      source.is_a?(Module) && defined?(Runner) && source.ancestors.include?(Runner)
     }
 
     def self.delegate_runner_methods(runner, mod)
