@@ -8,8 +8,11 @@ describe "BinRunner" do
     yield
   end
 
-  # disable rubinius until Open3.spawn defined in Bahia
-  unless ENV['FAST'] || RUBY_DESCRIPTION.include?('rubinius')
+  unless ENV['FAST'] ||
+    # disable rubinius until Open3.spawn defined in Bahia
+    # disable jruby until Open3.spawn works with ENV in Bahia
+    RUBY_DESCRIPTION.include?('rubinius') || RUBY_PLATFORM[/java/]
+
     it "prints usage with no arguments" do
       boson
       stdout.should =~ /^boson/
