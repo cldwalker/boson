@@ -1,0 +1,2 @@
+--default_path test
+--pattern test/**_test.rb

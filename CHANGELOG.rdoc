@@ -1,4 +1,4 @@
-= 0.4.0
+== 0.4.0
 * Add file lock for concurrent processes
 
 == 0.3.4

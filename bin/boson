@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require File.expand_path(File.join(File.dirname(__FILE__), "..","lib","boson"))
-require 'boson/runners/bin_runner'
+require 'boson'
+require 'boson/bin_runner'
 
 Boson::BinRunner.start

@@ -1,13 +1,11 @@
 module Boson
-  # Scrapes and processes method attributes with the inspectors (MethodInspector, CommentInspector
-  # and ArgumentInspector) and hands off the data to FileLibrary objects.
+  # Uses method decorators to scrape, process and hand off method attributes as
+  # data to Library objects.
   #
-  # === Method Attributes
-  # Method attributes refer to (commented) Module methods placed before a command's method
-  # in a FileLibrary module:
-  #   module SomeMod
-  #      # @render_options :fields=>%w{one two}
-  #      # @config :alias=>'so'
+  # === Method Decorators
+  # Method decorators refer to methods placed before a command's method in a
+  # library:
+  #   class SomeRunner < Boson::Runner
   #      options :verbose=>:boolean
   #      option :count, :numeric
   #      # Something descriptive perhaps
@@ -16,24 +14,26 @@ module Boson
   #      end
   #   end
   #
-  # Method attributes serve as configuration for a method's command. All attributes should only be called once per
-  #   method except for option. Available method attributes:
+  # Method decorators serve as configuration for a method's command. All
+  # decorators should only be called once per method except for option.
+  # Available method decorators:
   # * config: Hash to define any command attributes (see Command.new).
-  # * desc: String to define a command's description for a command. Defaults to first commented line above a method.
+  # * desc: String to define a command's description for a command. Defaults to
+  #   first commented line above a method.
   # * options: Hash to define an OptionParser object for a command's options.
-  # * option: Option name and value to be merged in with options. See OptionParser for what an option value can be.
-  # * render_options: Hash to define an OptionParser object for a command's local/global render options (see View).
-  #
-  # When deciding whether to use commented or normal Module methods, remember that commented Module methods allow
-  # independence from Boson (useful for testing). See CommentInspector for more about commented method attributes.
-  module Inspector
-    extend self
-    attr_reader :enabled
+  # * option: Option name and value to be merged in with options. See
+  #   OptionParser for what an option value can be.
+  class Inspector
+    class << self; attr_reader :enabled; end
 
-    # Enable scraping by overridding method_added to snoop on a library while it's
-    # loading its methods.
-    def enable
-      @enabled = true
+    # Enable scraping by overridding method_added to snoop on a library while
+    # it's loading its methods.
+    def self.enable(options = {})
+      method_inspector_meth = options[:all_classes] ?
+        :new_method_added : :safe_new_method_added
+      klass = options[:module] || ::Module
+      @enabled = true unless options[:module]
+
       body = MethodInspector::ALL_METHODS.map {|e|
         %[def #{e}(*args)
             Boson::MethodInspector.#{e}(self, *args)
@@ -41,17 +41,17 @@ module Boson
       }.join("\n") +
       %[
         def new_method_added(method)
-          Boson::MethodInspector.new_method_added(self, method)
+          Boson::MethodInspector.#{method_inspector_meth}(self, method)
         end
 
         alias_method :_old_method_added, :method_added
         alias_method :method_added, :new_method_added
       ]
-    ::Module.module_eval body
+      klass.module_eval body
     end
 
     # Disable scraping method data.
-    def disable
+    def self.disable
       ::Module.module_eval %[
         Boson::MethodInspector::ALL_METHODS.each {|e| remove_method e }
         alias_method :method_added, :_old_method_added
@@ -59,17 +59,27 @@ module Boson
       @enabled = false
     end
 
-    # Adds method attributes scraped for the library's module to the library's commands.
-    def add_method_data_to_library(library)
-      @commands_hash = library.commands_hash
-      @library_file = library.library_file
-      MethodInspector.current_module = library.module
-      @store = MethodInspector.store
-      add_method_scraped_data
-      add_comment_scraped_data
+    # Adds method attributes to the library's commands
+    def self.add_method_data_to_library(library)
+      new(library).add_data
     end
 
-    #:stopdoc:
+    def initialize(library)
+      @commands_hash = library.commands_hash
+      @library_file = library.library_file
+      MethodInspector.instance.current_module = library.module
+      @store = MethodInspector.instance.store
+    end
+
+    module API
+      # Adds scraped data from all inspectors
+      def add_data
+        add_method_scraped_data
+      end
+    end
+    include API
+
+    private
     def add_method_scraped_data
       (MethodInspector::METHODS + [:args]).each do |key|
         (@store[key] || []).each do |cmd, val|
@@ -83,8 +93,9 @@ module Boson
       if valid_attr_value?(key, value)
         add_scraped_data_to_config(key, value, cmd)
       else
-        if Runner.debug
-          warn "DEBUG: Command '#{cmd}' has #{key.inspect} attribute with invalid value '#{value.inspect}'"
+        if Boson.debug
+          warn "DEBUG: Command '#{cmd}' has #{key.inspect} attribute with " +
+            "invalid value '#{value.inspect}'"
         end
       end
     end
@@ -94,7 +105,8 @@ module Boson
         if key == :config
           @commands_hash[cmd] = Util.recursive_hash_merge value, @commands_hash[cmd]
         else
-          @commands_hash[cmd][key] = Util.recursive_hash_merge value, @commands_hash[cmd][key] || {}
+          @commands_hash[cmd][key] = Util.recursive_hash_merge value,
+            @commands_hash[cmd][key] || {}
         end
       else
         @commands_hash[cmd][key] ||= value
@@ -105,16 +117,5 @@ module Boson
       return true if (klass = MethodInspector::METHOD_CLASSES[key]).nil?
       value.is_a?(klass) || value.nil?
     end
-
-    def add_comment_scraped_data
-      (@store[:method_locations] || []).select {|k,(f,l)| f == @library_file }.each do |cmd, (file, lineno)|
-        scraped = CommentInspector.scrape(FileLibrary.read_library_file(file), lineno, MethodInspector.current_module)
-        @commands_hash[cmd] ||= {}
-        MethodInspector::METHODS.each do |e|
-          add_valid_data_to_config(e, scraped[e], cmd)
-        end
-      end
-    end
-    #:startdoc:
   end
 end

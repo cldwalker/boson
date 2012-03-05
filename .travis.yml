@@ -1,4 +1,11 @@
 before_install: bundle init --gemspec=.gemspec
+script: bacon -q -Ilib -I. test/*_test.rb
 rvm:
 - 1.9.2
 - 1.9.3
+- rbx-19mode
+- jruby-19mode
+matrix:
+  # until jruby + bacon issue fixed
+  allow_failures:
+  - rvm: jruby-19mode

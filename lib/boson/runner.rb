@@ -1,81 +1,73 @@
+require 'boson'
+
 module Boson
-  # Base class for runners.
-  class Runner
-    class<<self
-      attr_accessor :debug
+  # Defines a RunnerLibrary for use by executables as a simple way to map
+  # methods to subcommands
+  class Runner < BareRunner
+    def self.inherited(mod)
+      @help_added ||= add_command_help
+      Inspector.enable all_classes: true, module: mod.singleton_class
+    end
 
-      # Enables view, adds local load path and loads default_libraries
-      def init
-        View.enable
-        add_load_path
-        Manager.load default_libraries, load_options
+    def self.default_libraries
+      [self]
+    end
+
+    def self.start(args=ARGV)
+      ENV['BOSONRC'] ||= ''
+      super
+      init
+      command, options, args = parse_args(args)
+
+      if options[:help] || command.nil?
+        display_default_usage
+      else
+        execute_command(command, args)
       end
+    end
 
-      # Libraries that come with Boson
-      def default_libraries
-        Boson.repos.map {|e| e.config[:defaults] || [] }.flatten + [Boson::Commands::Core, Boson::Commands::WebCore]
+    def self.execute_command(cmd, args)
+      Command.find(cmd) ? super : no_command_error(cmd)
+    end
+
+    def self.display_help(cmd)
+      puts "Usage: #{app_name} #{cmd.name} #{cmd.basic_usage}".rstrip, ""
+      if cmd.options
+        puts "Options:"
+        cmd.option_parser.print_usage_table(no_headers: true)
+        puts ""
       end
+      puts "Description:\n  #{cmd.desc || 'TODO'}"
+    end
 
-      # Libraries detected in repositories
-      def detected_libraries
-        Boson.repos.map {|e| e.detected_libraries }.flatten.uniq
-      end
+    def self.display_default_usage
+      commands = Boson.commands.sort_by(&:name).map {|c| [c.name, c.desc.to_s] }
+      puts "Usage: #{app_name} COMMAND [ARGS]", "", "Available commands:",
+        Util.format_table(commands), "",
+        "For help on a command: #{app_name} COMMAND -h"
+    end
 
-      # Libraries specified in config files and detected_libraries
-      def all_libraries
-        Boson.repos.map {|e| e.all_libraries }.flatten.uniq
-      end
+    def self.app_name
+      File.basename($0).split(' ').first
+    end
 
-      # Returns true if commands are being executed from a non-ruby shell i.e. bash. Returns false if
-      # in a ruby shell i.e. irb.
-      def in_shell?
-        !!@in_shell
-      end
-
-      # Returns true if in commandline with verbose flag or if set explicitly. Useful in plugins.
-      def verbose?
-        @verbose.nil? ? Boson.const_defined?(:BinRunner) && BinRunner.options[:verbose] : @verbose
-      end
-
-      #:stopdoc:
-      def verbose=(val)
-        @verbose = val
-      end
-
-      def in_shell=(val)
-        @in_shell = val
-      end
-
-      def add_load_path
-        Boson.repos.each {|repo|
-          if repo.config[:add_load_path] || File.exists?(File.join(repo.dir, 'lib'))
-            $: <<  File.join(repo.dir, 'lib') unless $:.include? File.expand_path(File.join(repo.dir, 'lib'))
-          end
-        }
-      end
-
-      def load_options
-        {:verbose=>@options[:verbose]}
-      end
-
-      def autoload_command(cmd, opts={:verbose=>verbose?})
-        Index.read
-        (lib = Index.find_library(cmd)) && Manager.load(lib, opts)
-        lib
-      end
-
-      def define_autoloader
-        class << ::Boson.main_object
-          def method_missing(method, *args, &block)
-            if Runner.autoload_command(method.to_s)
-              send(method, *args, &block) if respond_to?(method)
-            else
-              super
-            end
-          end
+    private
+    def self.add_command_help
+      # Overrides Scientist' default help
+      Scientist.extend(Module.new do
+        def run_help_option(cmd)
+          Boson::Runner.display_help(cmd)
         end
-      end
-      #:startdoc:
+      end)
+
+      # Ensure all commands have -h
+      Command.extend(Module.new do
+        def new_attributes(name, library)
+          super.update(option_command: true)
+        end
+      end)
+      # Ensure this is only called once
+      true
     end
   end
 end

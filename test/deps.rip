@@ -1,5 +1,5 @@
-mocha =0.9.8
+mocha ~>0.10.4
 bacon >=1.1.0
 mocha-on-bacon >=0
 bacon-bits >=0
-rake >=0
+bahia >=0.4.0

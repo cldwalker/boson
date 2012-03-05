@@ -2,7 +2,7 @@ module Boson
   # Collection of utility methods used throughout Boson.
   module Util
     extend self
-    # From Rails ActiveSupport, converts a camelcased string to an underscored string:
+    # From ActiveSupport, converts a camelcased string to an underscored string:
     # 'Boson::MethodInspector' -> 'boson/method_inspector'
     def underscore(camel_cased_word)
       camel_cased_word.to_s.gsub(/::/, '/').
@@ -12,10 +12,11 @@ module Boson
        downcase
     end
 
-    # From Rails ActiveSupport, does the reverse of underscore:
+    # From ActiveSupport, does the reverse of underscore:
     # 'boson/method_inspector' -> 'Boson::MethodInspector'
     def camelize(string)
-      Hirb::Util.camelize(string)
+      string.to_s.gsub(/\/(.?)/) { "::#{$1.upcase}" }.
+        gsub(/(?:^|_)(.)/) { $1.upcase }
     end
 
     # Converts a module/class string to the actual constant.
@@ -24,39 +25,41 @@ module Boson
       any_const_get(camelize(string))
     end
 
-    # Returns a constant like const_get() no matter what namespace it's nested in.
-    # Returns nil if the constant is not found.
+    # Returns a constant like const_get() no matter what namespace it's nested
+    # in. Returns nil if the constant is not found.
     def any_const_get(name)
-      Hirb::Util.any_const_get(name)
+      return name if name.is_a?(Module)
+      klass = Object
+      name.split('::').each {|e|
+        klass = klass.const_get(e)
+      }
+      klass
+    rescue
+       nil
     end
 
-    # Detects new object/kernel methods, gems and modules created within a block.
-    # Returns a hash of what's detected.
-    # Valid options and possible returned keys are :methods, :object_methods, :modules, :gems.
+    # Detects new object/kernel methods, gems and modules created within a
+    # block. Returns a hash of what's detected. Valid options and possible
+    # returned keys are :methods, :object_methods, :modules, :gems.
     def detect(options={}, &block)
-      options = {:methods=>true, :object_methods=>true}.merge!(options)
-      original_gems = Object.const_defined?(:Gem) ? Gem.loaded_specs.keys : []
+      options = {methods: true}.merge!(options)
+      original_gems = defined?(Gem) ? Gem.loaded_specs.keys : []
       original_object_methods = Object.instance_methods
-      original_instance_methods = class << Boson.main_object; instance_methods end
+      original_instance_methods = Boson.main_object.singleton_class.instance_methods
       original_modules = modules if options[:modules]
+
       block.call
+
       detected = {}
-      detected[:methods] = options[:methods] ? (class << Boson.main_object; instance_methods end -
-        original_instance_methods) : []
-      detected[:methods] -= (Object.instance_methods - original_object_methods) unless options[:object_methods]
-      detected[:gems] = Gem.loaded_specs.keys - original_gems if Object.const_defined? :Gem
+      detected[:methods] = options[:methods] ?
+        (Boson.main_object.singleton_class.instance_methods -
+           original_instance_methods) : []
+      unless options[:object_methods]
+        detected[:methods] -= (Object.instance_methods - original_object_methods)
+      end
+      detected[:gems] = Gem.loaded_specs.keys - original_gems if defined? Gem
       detected[:modules] = modules - original_modules if options[:modules]
       detected
-    end
-
-    # Safely calls require, returning false if LoadError occurs.
-    def safe_require(lib)
-      begin
-        require lib
-        true
-      rescue LoadError
-        false
-      end
     end
 
     # Returns all modules that currently exist.
@@ -66,49 +69,21 @@ module Boson
       all_modules
     end
 
-    # Creates a module under a given base module and possible name. If the module already exists or conflicts
-    # per top_level_class_conflict, it attempts to create one with a number appended to the name.
+    # Creates a module under a given base module and possible name. If the
+    # module already exists, it attempts to create one with a number appended to
+    # the name.
     def create_module(base_module, name)
       desired_class = camelize(name)
       possible_suffixes = [''] + %w{1 2 3 4 5 6 7 8 9 10}
-      if (suffix = possible_suffixes.find {|e| !base_module.const_defined?(desired_class+e) &&
-        !top_level_class_conflict(base_module, "#{base_module}::#{desired_class}#{e}") })
-        base_module.const_set(desired_class+suffix, Module.new)
+      if suffix = possible_suffixes.find {|e|
+        !base_module.const_defined?(desired_class+e) }
+          base_module.const_set(desired_class+suffix, Module.new)
       end
-    end
-
-    # Behaves just like the unix which command, returning the full path to an executable based on ENV['PATH'].
-    def which(command)
-      ENV['PATH'].split(File::PATH_SEPARATOR).map {|e| File.join(e, command) }.find {|e| File.exists?(e) }
-    end
-
-    # Deep copies any object if it can be marshaled. Useful for deep hashes.
-    def deep_copy(obj)
-      Marshal::load(Marshal::dump(obj))
     end
 
     # Recursively merge hash1 with hash2.
     def recursive_hash_merge(hash1, hash2)
       hash1.merge(hash2) {|k,o,n| (o.is_a?(Hash)) ? recursive_hash_merge(o,n) : n}
-    end
-
-    # From Rubygems, determine a user's home.
-    def find_home
-      Hirb::Util.find_home
-    end
-
-    # Returns name of top level class that conflicts if it exists. For example, for base module Boson::Commands,
-    # Boson::Commands::Alias conflicts with Alias if Alias exists.
-    def top_level_class_conflict(base_module, conflicting_module)
-      (conflicting_module =~ /^#{base_module}.*::([^:]+)/) && Object.const_defined?($1) && $1
-    end
-
-    # Splits array into array of arrays with given element
-    def split_array_by(arr, divider)
-      arr.inject([[]]) {|results, element|
-        (divider == element) ? (results << []) : (results.last << element)
-        results
-      }
     end
 
     # Regular expression search of a list with underscore anchoring of words.
@@ -118,11 +93,21 @@ module Boson
       return (first_match ? input : [input]) if list.include?(input)
       input = input.to_s
       if input.include?("_")
-        underscore_regex = input.split('_').map {|e| Regexp.escape(e) }.join("([^_]+)?_")
+        underscore_regex = input.split('_').map {|e|
+          Regexp.escape(e) }.join("([^_]+)?_")
         list.send(meth) {|e| e.to_s =~ /^#{underscore_regex}/ }
       else
         escaped_input = Regexp.escape(input)
         list.send(meth) {|e| e.to_s =~ /^#{escaped_input}/ }
+      end
+    end
+
+    def format_table(arr_of_arr)
+      name_max = arr_of_arr.map {|arr| arr[0].length }.max
+      desc_max = arr_of_arr.map {|arr| arr[1].length }.max
+
+      arr_of_arr.map do |name, desc|
+        ("  %-*s  %-*s" % [name_max, name, desc_max, desc]).rstrip
       end
     end
   end
