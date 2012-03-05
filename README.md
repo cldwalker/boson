@@ -8,9 +8,9 @@ be written as plain ruby. Works with on all major rubies for ruby >= 1.9.2
 ## New Boson
 
 Starting with 1.0, boson has changed significantly. Please read [the upgrading
-doc](http://rdoc.info/gems/boson/file/Upgrading.md) if you have an older version
-or if your [reading about boson](http://tagaholic.me/blog.html#gem:name=boson)
-predates 2012.
+doc](https://github.com/cldwalker/boson/blob/master/Upgrading.md) if you have an
+older version or if your [reading about
+boson](http://tagaholic.me/blog.html#gem:name=boson) predates 2012.
 
 Boson has been rewritten to have a smaller core (no dependencies) with optional
 plugins to hook into its various features. The major focus of 1.0 has been to
@@ -57,6 +57,8 @@ You can now execute cow with say and moo subcommands:
 
 You'll notice that this syntax is powerful and concise and is very similar to
 thor's API. Subcommands map to ruby methods and the class represents the executable.
+
+For some examples of executables see [vimdb](http://github.com/cldwalker/vimdb).
 
 ## Comparison to Thor
 
