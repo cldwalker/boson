@@ -14,6 +14,7 @@ module Boson
     end
 
     def self.start(args=ARGV)
+      Boson.in_shell = true
       ENV['BOSONRC'] ||= ''
       super
       init

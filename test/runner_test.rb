@@ -6,6 +6,13 @@ class MyRunner < Boson::Runner
     p args
   end
 
+  option :tags, :type => :array
+  option :blurg, :type => :boolean
+  desc 'This is splot'
+  def splot(*args)
+    p args
+  end
+
   option :spicy, type: :boolean, desc: 'hot'
   desc "This is a medium"
   def medium(arg=nil, opts={})
@@ -52,6 +59,7 @@ Available commands:
   mini    This is a mini
   quiet
   small   This is a small
+  splot   This is splot
 
 For help on a command: my_command COMMAND -h
 STR
@@ -125,6 +133,13 @@ STR
 Usage: medium [ARG]
 STR
     my_command('medium 1 2 3')
+  end
+
+  it "calls command with splat args and multiple options correctly" do
+    Boson.in_shell = true
+    my_command('splot 1 2 -b --tags=1,2').chomp.should ==
+      '["1", "2", {:blurg=>true, :tags=>["1", "2"]}]'
+    Boson.in_shell = nil
   end
 
   it "prints error message for internal public method" do
