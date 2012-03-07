@@ -56,6 +56,10 @@ module Boson
     end
 
     private
+    def self.load_options
+      {force: true}
+    end
+
     def self.add_command_help
       # Overrides Scientist' default help
       Scientist.extend(Module.new do

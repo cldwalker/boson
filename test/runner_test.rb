@@ -42,6 +42,10 @@ class MyRunner < Boson::Runner
     raise ArgumentError
   end
 
+  def test
+    puts "TEST"
+  end
+
   private
   def no_run
   end
@@ -68,6 +72,7 @@ Available commands:
   quiet
   small   This is a small
   splot   This is splot
+  test
 
 For help on a command: my_command COMMAND -h
 STR
@@ -152,6 +157,10 @@ STR
 
   it "executes custom global option" do
     my_command('-v').chomp.should == 'Version 1000.0'
+  end
+
+  it "allows Kernel-method command names" do
+    my_command('test').chomp.should == 'TEST'
   end
 
   it "prints error message for internal public method" do
