@@ -48,11 +48,6 @@ module Boson
         temp_args = Boson.in_shell ? args : Shellwords.shellwords(args.pop)
         global_opt, parsed_options, new_args = parse_options temp_args
         Boson.in_shell ? args = new_args : args += new_args
-      # splat args with multiple options
-      elsif Boson.in_shell && @command.has_splat_args? && !args[-1].is_a?(Hash)
-        global_opt, parsed_options = parse_options(
-          args.drop_while {|e| !e.start_with?('-') })[0,2]
-        args = args.take_while {|e| !e.start_with?('-') }
       # add default options
       elsif @command.options.nil? || @command.options.empty? ||
         (!@command.has_splat_args? && args.size <= (@command.arg_size - 1).abs) ||
