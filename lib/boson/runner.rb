@@ -19,16 +19,19 @@ module Boson
       super
       init
       command, options, args = parse_args(args)
+      execute command, args, options
+    end
 
+    def self.execute(command, args, options)
       if options[:help] || command.nil?
         display_default_usage
       else
-        execute_command(command, args)
+        execute_command(command, args, options)
       end
     end
 
-    def self.execute_command(cmd, args)
-      Command.find(cmd) ? super : no_command_error(cmd)
+    def self.execute_command(cmd, args, options)
+      Command.find(cmd) ? super(cmd, args) : no_command_error(cmd)
     end
 
     def self.display_help(cmd)

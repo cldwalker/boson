@@ -1,6 +1,14 @@
 require File.dirname(__FILE__) + '/test_helper'
 
 class MyRunner < Boson::Runner
+  GLOBAL_OPTIONS[:version] = {
+    type: :boolean, :desc => 'Print version'
+  }
+
+  def self.execute(command, args, options)
+    options[:version] ? puts("Version 1000.0") : super
+  end
+
   desc "This is a small"
   def small(*args)
     p args
@@ -140,6 +148,10 @@ STR
     my_command('splot 1 2 -b --tags=1,2').chomp.should ==
       '["1", "2", {:blurg=>true, :tags=>["1", "2"]}]'
     Boson.in_shell = nil
+  end
+
+  it "executes custom global option" do
+    my_command('-v').chomp.should == 'Version 1000.0'
   end
 
   it "prints error message for internal public method" do
