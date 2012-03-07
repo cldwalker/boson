@@ -1,3 +1,6 @@
+== 1.0.1
+* Fix RunnerLibrary not parsing options correctly
+
 == 1.0.0
 * A new slim boson!
 

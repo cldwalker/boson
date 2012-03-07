@@ -58,7 +58,8 @@ You can now execute cow with say and moo subcommands:
 You'll notice that this syntax is powerful and concise and is very similar to
 thor's API. Subcommands map to ruby methods and the class represents the executable.
 
-For some examples of executables see [vimdb](http://github.com/cldwalker/vimdb).
+For some examples of executables see [vimdb](http://github.com/cldwalker/vimdb)
+or [tag](http://github.com/cldwalker/tag).
 
 ## Comparison to Thor
 
