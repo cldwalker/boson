@@ -76,7 +76,7 @@ module Boson
       end
 
       def load_options
-        {:verbose=>@options[:verbose]}
+        {}
       end
     end
   end
