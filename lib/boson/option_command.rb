@@ -42,7 +42,8 @@ module Boson
     # arguments.
     def parse(args)
       if args.size == 1 && args[0].is_a?(String)
-        global_opt, parsed_options, args = parse_options Shellwords.shellwords(args[0])
+        args = Shellwords.shellwords(args[0]) if !Boson.in_shell
+        global_opt, parsed_options, args = parse_options args
       # last string argument interpreted as args + options
       elsif args.size > 1 && args[-1].is_a?(String)
         temp_args = Boson.in_shell ? args : Shellwords.shellwords(args.pop)

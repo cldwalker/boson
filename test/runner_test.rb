@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/test_helper'
+require 'shellwords'
 
 class MyRunner < Boson::Runner
   GLOBAL_OPTIONS[:version] = {
@@ -56,7 +57,7 @@ describe "Runner" do
 
   def my_command(cmd='')
     capture_stdout do
-      MyRunner.start cmd.split(/\s+/)
+      MyRunner.start Shellwords.split(cmd)
     end
   end
 
@@ -134,6 +135,10 @@ STR
 
   it "calls command with options correctly" do
     my_command('medium 1 --spicy').chomp.should == '["1", {:spicy=>true}]'
+  end
+
+  it "calls command with quoted arguments correctly" do
+    my_command("medium '1 2'").chomp.should == '["1 2", {}]'
   end
 
   it "calls optionless command correctly" do
