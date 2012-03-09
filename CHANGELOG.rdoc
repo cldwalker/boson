@@ -1,3 +1,6 @@
+== 1.1.1
+* Fix bug for command with one argument containing quoted arguments
+
 == 1.1.0
 * Add Runner.execute
 * Allow Runner to define commands with Kernel method names
