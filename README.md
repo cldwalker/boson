@@ -85,9 +85,10 @@ First, what I consider pros boson has over thor. Boson
   manually define your usage with desc: `desc "SOME USAGE", "SOME DESCRIPTION"`
 * is lenient about descriptions. Describe commands at your leisure. With thor
   you must define a desc.
-* has a smaller blacklist for command names i.e. just Kernel + Object method
-  names. Thor has a bigger
-  [blacklist](https://github.com/wycats/thor/blob/a24b6697a37d9bc0c0ea94ef9bf2cdbb33b8abb9/lib/thor/base.rb#L18-19) due to its design.
+* has no blacklist for command names while thor has a
+  [blacklist](https://github.com/wycats/thor/blob/a24b6697a37d9bc0c0ea94ef9bf2cdbb33b8abb9/lib/thor/base.rb#L18-19)
+  due to its design. You can even name commands after Kernel method names but
+  tread with caution in your own Runner class.
 
 Now for pros thor has over boson. Thor
 
@@ -103,17 +104,19 @@ Now for pros thor has over boson. Thor
 The most common way to write a plugin is to extend one of the many method hooks
 available. Any methods that are defined in an API or APIClassMethods module
 are extendable. For example, if you want to extend what any boson-based
-executable does first, extend BareRunner.start:
+executable does first, extend Boson::BareRunner.start:
 
 ```ruby
-module CustomStartUp
-  def start(*)
-    super
-    # additional startup
+module Boson
+  module CustomStartUp
+    def start(*)
+      super
+      # additional startup
+    end
   end
 end
 
-BareRunner.extend CustomStartUp
+Boson::BareRunner.extend Boson::CustomStartUp
 ```
 
 Notice that `extend` was used to extend a class method. To extend an instance
@@ -121,6 +124,11 @@ method you would use `include`. Also notice that you use `super` in an
 overridden method to call original functionality. If you don't, you're
 possibly overridden existing functionality, which is fine as long as you know
 what you are overriding.
+
+If you want to gemify your plugin, name it boson-plugin_name and put it under
+lib/boson/plugin_name.  The previous example would go in
+lib/boson/custom_startup.rb. To use your plugin, a user can simply require your
+plugin in their executable.
 
 For many plugin examples, see
 [boson-more](http://github.com/cldwalker/boson-more).
