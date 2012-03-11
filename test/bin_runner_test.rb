@@ -8,11 +8,7 @@ describe "BinRunner" do
     yield
   end
 
-  unless ENV['FAST'] ||
-    # disable rubinius until Open3.spawn defined in Bahia
-    # disable jruby until Open3.spawn works with ENV in Bahia
-    RUBY_DESCRIPTION.include?('rubinius') || RUBY_PLATFORM[/java/]
-
+  unless ENV['FAST']
     it "prints usage with no arguments" do
       boson
       stdout.should =~ /^boson/
@@ -60,7 +56,6 @@ describe "BinRunner" do
     it "prints error for unexpected error" do
       boson %[-e 'raise "blarg"']
       stderr.chomp.should == "Error: blarg"
-      process.success?.should == false
     end
 
     # TODO: enable once bin runner's fate is decided
