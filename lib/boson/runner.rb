@@ -4,6 +4,9 @@ module Boson
   # Defines a RunnerLibrary for use by executables as a simple way to map
   # methods to subcommands
   class Runner < BareRunner
+    # Stores currently started Runner subclass
+    class <<self; attr_accessor :current; end
+
     def self.inherited(mod)
       @help_added ||= add_command_help
       Inspector.enable all_classes: true, module: mod.singleton_class
@@ -14,6 +17,7 @@ module Boson
     end
 
     def self.start(args=ARGV)
+      Runner.current = self
       Boson.in_shell = true
       ENV['BOSONRC'] ||= ''
       super
@@ -84,7 +88,7 @@ module Boson
   class DefaultCommandsRunner < Runner
     desc "Displays command help"
     def help(cmd)
-      (cmd_obj = Command.find(cmd)) ? self.class.display_help(cmd_obj) :
+      (cmd_obj = Command.find(cmd)) ? Runner.current.display_help(cmd_obj) :
         self.class.no_command_error(cmd)
     end
   end

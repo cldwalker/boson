@@ -58,12 +58,27 @@ class MyRunner < Boson::Runner
   end
 end
 
+class ExtendedRunner < Boson::Runner
+  def self.display_help(cmd)
+    super
+    puts "And don't forget to eat BAACCCONN"
+  end
+end
+
 describe "Runner" do
-  before_all { $0 = 'my_command'; reset }
+  before_all { reset }
 
   def my_command(cmd='')
+    $0 = 'my_command'
     capture_stdout do
       MyRunner.start Shellwords.split(cmd)
+    end
+  end
+
+  def extended_command(cmd='')
+    $0 = 'extended_command'
+    capture_stdout do
+      ExtendedRunner.start Shellwords.split(cmd)
     end
   end
 
@@ -229,5 +244,17 @@ STR
     end
 
     after_all { ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc' }
+  end
+
+  describe "extend Runner" do
+    it "can extend help" do
+      extended_command('help help').should == <<-STR
+Usage: extended_command help CMD
+
+Description:
+  Displays command help
+And don't forget to eat BAACCCONN
+STR
+    end
   end
 end
