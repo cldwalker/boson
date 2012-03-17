@@ -10,7 +10,7 @@ module Boson
     end
 
     def self.default_libraries
-      [self]
+      [self, DefaultCommandsRunner]
     end
 
     def self.start(args=ARGV)
@@ -47,8 +47,7 @@ module Boson
     def self.display_default_usage
       commands = Boson.commands.sort_by(&:name).map {|c| [c.name, c.desc.to_s] }
       puts "Usage: #{app_name} COMMAND [ARGS]", "", "Available commands:",
-        Util.format_table(commands), "",
-        "For help on a command: #{app_name} COMMAND -h"
+        Util.format_table(commands)
     end
 
     def self.app_name
@@ -78,6 +77,15 @@ module Boson
       Scientist.extend(ScientistExtension)
       Command.extend(CommandExtension)
       true # Ensure this method is only called once
+    end
+  end
+
+  # Defines default commands that are available to executables i.e. Runner.start
+  class DefaultCommandsRunner < Runner
+    desc "Displays command help"
+    def help(cmd)
+      (cmd_obj = Command.find(cmd)) ? self.class.display_help(cmd_obj) :
+        self.class.no_command_error(cmd)
     end
   end
 end

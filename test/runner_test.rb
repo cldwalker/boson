@@ -1,6 +1,12 @@
 require File.dirname(__FILE__) + '/test_helper'
 require 'shellwords'
 
+# hack required to re-add default_commands_runner methods
+$".delete_if {|e| e[%r{boson/runner.rb$}] }
+Boson.send(:remove_const, :Runner)
+Boson.send(:remove_const, :DefaultCommandsRunner)
+require 'boson/runner'
+
 class MyRunner < Boson::Runner
   GLOBAL_OPTIONS[:version] = {
     type: :boolean, :desc => 'Print version'
@@ -68,14 +74,13 @@ Usage: my_command COMMAND [ARGS]
 Available commands:
   boom
   broken
+  help    Displays command help
   medium  This is a medium
   mini    This is a mini
   quiet
   small   This is a small
   splot   This is splot
   test
-
-For help on a command: my_command COMMAND -h
 STR
   end
 
@@ -86,6 +91,23 @@ STR
   it "prints default usage for -h and --help" do
     my_command('-h').should == default_usage
     my_command('--help').should == default_usage
+  end
+
+  describe "for help COMMAND" do
+    it 'prints help for valid command' do
+      my_command('help quiet').should ==<<-STR
+Usage: my_command quiet
+
+Description:
+  TODO
+STR
+    end
+
+    it 'prints error for invalid command' do
+      Boson::DefaultCommandsRunner.expects(:abort).
+        with("Could not find command \"invalid\"")
+      my_command('help invalid')
+    end
   end
 
   describe "for COMMAND -h" do
