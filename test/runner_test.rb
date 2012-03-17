@@ -59,7 +59,7 @@ class MyRunner < Boson::Runner
 end
 
 class ExtendedRunner < Boson::Runner
-  def self.display_help(cmd)
+  def self.display_command_help(cmd)
     super
     puts "And don't forget to eat BAACCCONN"
   end

@@ -94,7 +94,7 @@ First, what I consider pros boson has over thor. Boson
   default options and commands shared across executables. See the extending
   section below.
 * allows default help and command help to be overridden/extended by
-  subclassing Runner.display_default_usage and Runner.display_help respectively.
+  subclassing Runner.display_help and Runner.display_command_help respectively.
 * provides an optional custom rc file for your executable. Simply set
   ENV['BOSONRC'] to a path i.e. ~/.myprogramrc. This rc file loads before any
   command processing is done, allowing for users to extend your executable

@@ -27,18 +27,15 @@ module Boson
     end
 
     def self.execute(command, args, options)
-      if options[:help] || command.nil?
-        display_default_usage
-      else
+      options[:help] || command.nil? ? display_help :
         execute_command(command, args, options)
-      end
     end
 
     def self.execute_command(cmd, args, options)
       Command.find(cmd) ? super(cmd, args) : no_command_error(cmd)
     end
 
-    def self.display_help(cmd)
+    def self.display_command_help(cmd)
       puts "Usage: #{app_name} #{cmd.name} #{cmd.basic_usage}".rstrip, ""
       if cmd.options
         puts "Options:"
@@ -48,7 +45,7 @@ module Boson
       puts "Description:\n  #{cmd.desc || 'TODO'}"
     end
 
-    def self.display_default_usage
+    def self.display_help
       commands = Boson.commands.sort_by(&:name).map {|c| [c.name, c.desc.to_s] }
       puts "Usage: #{app_name} COMMAND [ARGS]", "", "Available commands:",
         Util.format_table(commands)
@@ -72,7 +69,7 @@ module Boson
     module ScientistExtension
       # Overrides Scientist' default help
       def run_help_option(cmd)
-        Boson::Runner.current.display_help(cmd)
+        Boson::Runner.current.display_command_help(cmd)
       end
     end
 
@@ -88,7 +85,7 @@ module Boson
   class DefaultCommandsRunner < Runner
     desc "Displays command help"
     def help(cmd)
-      (cmd_obj = Command.find(cmd)) ? Runner.current.display_help(cmd_obj) :
+      (cmd_obj = Command.find(cmd)) ? Runner.current.display_command_help(cmd_obj) :
         self.class.no_command_error(cmd)
     end
   end
