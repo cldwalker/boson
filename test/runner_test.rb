@@ -256,5 +256,15 @@ Description:
 And don't forget to eat BAACCCONN
 STR
     end
+
+    it "can extend a command's --help" do
+      extended_command('help -h').should == <<-STR
+Usage: extended_command help CMD
+
+Description:
+  Displays command help
+And don't forget to eat BAACCCONN
+STR
+    end
   end
 end

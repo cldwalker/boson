@@ -72,7 +72,7 @@ module Boson
     module ScientistExtension
       # Overrides Scientist' default help
       def run_help_option(cmd)
-        Boson::Runner.display_help(cmd)
+        Boson::Runner.current.display_help(cmd)
       end
     end
 
