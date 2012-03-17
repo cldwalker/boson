@@ -59,6 +59,12 @@ module Boson
       {force: true}
     end
 
+    def self.add_command_help
+      Scientist.extend(ScientistExtension)
+      Command.extend(CommandExtension)
+      true # Ensure this method is only called once
+    end
+
     module ScientistExtension
       # Overrides Scientist' default help
       def run_help_option(cmd)
@@ -71,12 +77,6 @@ module Boson
       def new_attributes(name, library)
         super.update(option_command: true)
       end
-    end
-
-    def self.add_command_help
-      Scientist.extend(ScientistExtension)
-      Command.extend(CommandExtension)
-      true # Ensure this method is only called once
     end
   end
 
