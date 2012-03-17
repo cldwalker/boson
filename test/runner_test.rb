@@ -89,7 +89,7 @@ Usage: my_command COMMAND [ARGS]
 Available commands:
   boom
   broken
-  help    Displays command help
+  help    Displays help for a command
   medium  This is a medium
   mini    This is a mini
   quiet
@@ -252,7 +252,7 @@ STR
 Usage: extended_command help CMD
 
 Description:
-  Displays command help
+  Displays help for a command
 And don't forget to eat BAACCCONN
 STR
     end
@@ -262,7 +262,7 @@ STR
 Usage: extended_command help CMD
 
 Description:
-  Displays command help
+  Displays help for a command
 And don't forget to eat BAACCCONN
 STR
     end
