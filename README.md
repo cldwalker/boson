@@ -87,8 +87,19 @@ First, what I consider pros boson has over thor. Boson
   you must define a desc.
 * has no blacklist for command names while thor has a
   [blacklist](https://github.com/wycats/thor/blob/a24b6697a37d9bc0c0ea94ef9bf2cdbb33b8abb9/lib/thor/base.rb#L18-19)
-  due to its design. You can even name commands after Kernel method names but
-  tread with caution in your own Runner class.
+  due to its design. With boson you can even name commands after Kernel method
+  names but tread with caution in your own Runner class.
+* allows for user-defined default global options (i.e. --help) and commands
+  (i.e. help). This means that with a plugin you could have your own additional
+  default options and commands shared across executables. See the extending
+  section below.
+* allows default help and command help to be overridden/extended by
+  subclassing Runner.display_default_usage and Runner.display_help respectively.
+* provides an optional custom rc file for your executable. Simply set
+  ENV['BOSONRC'] to a path i.e. ~/.myprogramrc. This rc file loads before any
+  command processing is done, allowing for users to extend your executable
+  easily i.e. to add more subcommands. For an example, see
+  [vimdb](http://github.com/cldwalker/vimdb).
 
 Now for pros thor has over boson. Thor
 
@@ -97,7 +108,18 @@ Now for pros thor has over boson. Thor
 * is more stable as its feature set is mostly frozen.
 * is used by rails and thus is guaranteed support for some time.
 * supports ruby 1.8.7.
+* can conveniently define an option across commands using class_option.
+  boson may add this later.
 * TODO: I'm sure there's more
+
+## Converting From Thor
+
+* Change your requires and subclass from Boson::Runner instead of Thor.
+* Delete the first argument from `desc`. Usage is automatically created in boson.
+* Rename `method\_option` to `option`
+* `class\_option` doesn't exist yet but you can emulate it for now by defining
+  your class option in a class method and then calling your class method before
+  every command. See [vimdb](http://github.com/cldwalker/vimdb) for an example.
 
 ## Writing Plugins
 
@@ -132,6 +154,45 @@ plugin in their executable.
 
 For many plugin examples, see
 [boson-more](http://github.com/cldwalker/boson-more).
+
+## Using a Plugin
+
+To use a plugin, just require it. For an executable:
+
+```ruby
+require 'boson/runner'
+require 'boson/my_plugin'
+
+MyRunner.start
+```
+
+For the boson executable, just require the plugins in ~/.bosonrc.
+
+## Extending Your Executables
+
+Boson allows for custom default options and commands. This means you can
+add your own defaults in a plugin and use them across your executables.
+
+To add a custom default command, simply reopen Boson::DefaultCommandsRunner:
+
+```ruby
+class Boson::DefaultCommandsRunner
+  desc "whoomp"
+  def whoomp
+    puts "WHOOMP there it is!"
+  end
+end
+```
+
+To add a custom global option, add to Boson::Runner::GLOBAL_OPTIONS:
+
+```ruby
+Boson::Runner::GLOBAL_OPTIONS.update(
+  verbose: {type: :boolean, desc: "Verbose description of loading libraries"}
+)
+```
+
+Custom global options are defined in the same format as options for a command.
 
 ## Bugs/Issues
 
