@@ -44,7 +44,8 @@ module Boson
         raise if !allowed_argument_error?($!, cmd, args)
         abort_with "'#{cmd}' was called incorrectly.\nUsage: " + Command.usage(cmd)
       rescue NoMethodError => err
-        raise if !err.backtrace.first.include?('`full_invoke')
+        index = RUBY_ENGINE == 'rbx' ? 1 : 0
+        raise if !err.backtrace[index].include?('`full_invoke')
         no_command_error cmd
       end
 
@@ -55,8 +56,10 @@ module Boson
 
       # Determines if a user command argument error or an internal Boson one
       def allowed_argument_error?(err, cmd, args)
-        (err.message[/wrong number of arguments/] &&
-          (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
+        msg = RUBY_ENGINE == 'rbx' && err.class == ArgumentError ?
+          /given \d+, expected \d+/ : /wrong number of arguments/
+        (err.message[msg] && (cmd_obj = Command.find(cmd)) &&
+          cmd_obj.arg_size != args.size)
       end
 
       def option_parser
