@@ -40,7 +40,6 @@ describe "BinRunner" do
       end
     end
 
-    # TODO: test actual uses of Runner.debug
     it "sets Boson.debug with --debug" do
       boson "--debug -e 'print Boson.debug'"
       stdout.should == 'true'
@@ -58,17 +57,16 @@ describe "BinRunner" do
       stderr.chomp.should == "Error: blarg"
     end
 
-    # TODO: enable once bin runner's fate is decided
+    # TODO: enable once a default command exists
     xit "prints error for too many arguments" do
       boson "commands 1 2 3"
       stderr.should =~ /^'commands' was called incorrectly/
       process.success?.should == false
     end
 
-    # TODO: possible error with persistance extraction
-    xit "prints error for invalid command" do
+    it "prints error for invalid command" do
       boson 'blarg'
-      stderr.chomp.should == "Error: Command 'blarg' not found"
+      stderr.chomp.should == %[Could not find command "blarg"]
       process.success?.should == false
     end
   end

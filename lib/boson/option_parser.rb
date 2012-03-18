@@ -418,12 +418,13 @@ module Boson
     end
 
     def delete_invalid_opts
-      @trailing_non_opts.delete_if {|e|
-        break if STOP_STRINGS.include? e
-        invalid = e.to_s[/^-/]
+      stop = nil
+      @trailing_non_opts.delete_if do |e|
+        stop ||= STOP_STRINGS.include?(e)
+        invalid = e.start_with?('-') && !stop
         warn "Deleted invalid option '#{e}'" if invalid
         invalid
-      }
+      end
     end
 
     def peek

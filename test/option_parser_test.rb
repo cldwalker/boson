@@ -180,14 +180,13 @@ describe "OptionParser" do
         opt.non_opts.should == ['ok']
       end
 
-      # TODO: Fix for 1.9.3
-      xit ":delete_invalid_opts deletes until - or --" do
+      it ":delete_invalid_opts deletes until - or --" do
         create(:foo=>:boolean, :bar=>:boolean)
         %w{- --}.each do |stop_char|
           capture_stderr {
             opt.parse(%w{ok -b -d} << stop_char << '-f', :delete_invalid_opts=>true)
           }.should =~ /'-d'/
-          opt.non_opts.should == %w{ok -d} << stop_char << '-f'
+          opt.non_opts.should == %w{ok} << stop_char << '-f'
         end
       end
 
