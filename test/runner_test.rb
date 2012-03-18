@@ -7,15 +7,10 @@ Boson.send(:remove_const, :Runner)
 Boson.send(:remove_const, :DefaultCommandsRunner)
 require 'boson/runner'
 
+# remove side effects from other tests
+Boson::Runner::GLOBAL_OPTIONS.delete_if {|k,v| k != :help }
+
 class MyRunner < Boson::Runner
-  GLOBAL_OPTIONS[:version] = {
-    type: :boolean, :desc => 'Print version'
-  }
-
-  def self.execute(command, args, options)
-    options[:version] ? puts("Version 1000.0") : super
-  end
-
   desc "This is a small"
   def small(*args)
     p args
@@ -59,6 +54,10 @@ class MyRunner < Boson::Runner
 end
 
 class ExtendedRunner < Boson::Runner
+  def self.execute(command, args, options)
+    options[:version] ? puts("Version 1000.0") : super
+  end
+
   def self.display_command_help(cmd)
     super
     puts "And don't forget to eat BAACCCONN"
@@ -84,7 +83,7 @@ describe "Runner" do
 
   def default_usage
     <<-STR
-Usage: my_command COMMAND [ARGS]
+Usage: my_command [OPTIONS] COMMAND [ARGS]
 
 Available commands:
   boom
@@ -96,6 +95,9 @@ Available commands:
   small   This is a small
   splot   This is splot
   test
+
+Options:
+  -h, --help  Displays this help message
 STR
   end
 
@@ -198,7 +200,12 @@ STR
   end
 
   it "executes custom global option" do
-    my_command('-v').chomp.should == 'Version 1000.0'
+    # setup goes here to avoid coupling to other runner
+    ExtendedRunner::GLOBAL_OPTIONS[:version] = {
+      type: :boolean, :desc => 'Print version'
+    }
+
+    extended_command('-v').chomp.should == 'Version 1000.0'
   end
 
   it "allows Kernel-method command names" do

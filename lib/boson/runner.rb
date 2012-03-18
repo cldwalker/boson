@@ -47,8 +47,9 @@ module Boson
 
     def self.display_help
       commands = Boson.commands.sort_by(&:name).map {|c| [c.name, c.desc.to_s] }
-      puts "Usage: #{app_name} COMMAND [ARGS]", "", "Available commands:",
-        Util.format_table(commands)
+      puts "Usage: #{app_name} [OPTIONS] COMMAND [ARGS]", "", "Available commands:",
+        Util.format_table(commands), "", "Options:"
+        option_parser.print_usage_table(no_headers: true)
     end
 
     def self.app_name

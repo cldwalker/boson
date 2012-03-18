@@ -59,11 +59,14 @@ module Boson
           (cmd_obj = Command.find(cmd)) && cmd_obj.arg_size != args.size)
       end
 
+      def option_parser
+        @option_parser ||= OptionParser.new(self::GLOBAL_OPTIONS)
+      end
+
       private
       def parse_args(args)
-        @option_parser = OptionParser.new(self::GLOBAL_OPTIONS)
-        options = @option_parser.parse(args.dup, :opts_before_args=>true)
-        new_args = @option_parser.non_opts
+        options = option_parser.parse(args.dup, :opts_before_args=>true)
+        new_args = option_parser.non_opts
         [new_args[0], options, new_args[1..-1]]
       end
 
