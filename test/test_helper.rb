@@ -37,6 +37,27 @@ module TestHelpers
     Boson.config = old_config
   end
 
+  # for use with executables
+  def with_command(cmd)
+    old = ENV['BOSONRC']
+    ENV['BOSONRC'] = File.dirname(__FILE__) + '/.bosonrc.temp'
+    File.open(ENV['BOSONRC'], 'w') {|f|
+      f.puts <<-STR
+require 'boson/runner'
+class SomeRunner < Boson::Runner
+def #{cmd}
+end
+end
+Boson::Manager.load SomeRunner
+STR
+    }
+
+    yield
+
+    FileUtils.rm_f ENV['BOSONRC']
+    ENV['BOSONRC'] = old
+  end
+
   def manager_load(lib, options={})
     @stderr = capture_stderr { Manager.load(lib, options) }
   end

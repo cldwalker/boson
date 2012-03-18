@@ -57,11 +57,12 @@ describe "BinRunner" do
       stderr.chomp.should == "Error: blarg"
     end
 
-    # TODO: enable once a default command exists
-    xit "prints error for too many arguments" do
-      boson "commands 1 2 3"
-      stderr.should =~ /^'commands' was called incorrectly/
-      process.success?.should == false
+    it "prints error for too many arguments" do
+      with_command('dude') do
+        boson "dude 1 2 3"
+        stderr.should =~ /^'dude' was called incorrectly/
+        process.success?.should == false
+      end
     end
 
     it "prints error for invalid command" do
