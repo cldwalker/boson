@@ -56,6 +56,10 @@ module Boson
       File.basename($0).split(' ').first
     end
 
+    def self.abort_with(msg)
+      super "#{app_name}: #{msg}"
+    end
+
     private
     def self.load_options
       {force: true}

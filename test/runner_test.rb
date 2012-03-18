@@ -122,7 +122,7 @@ STR
 
     it 'prints error for invalid command' do
       Boson::DefaultCommandsRunner.expects(:abort).
-        with("Could not find command \"invalid\"")
+        with("my_command: Could not find command \"invalid\"")
       my_command('help invalid')
     end
   end
@@ -186,7 +186,7 @@ STR
 
   it "calls command with too many args" do
     MyRunner.expects(:abort).with <<-STR.chomp
-'medium' was called incorrectly.
+my_command: 'medium' was called incorrectly.
 Usage: medium [ARG]
 STR
     my_command('medium 1 2 3')
@@ -213,12 +213,12 @@ STR
   end
 
   it "prints error message for internal public method" do
-    MyRunner.expects(:abort).with %[Could not find command "to_s"]
+    MyRunner.expects(:abort).with %[my_command: Could not find command "to_s"]
     my_command('to_s').should == ''
   end
 
   it "prints error message for nonexistant command" do
-    MyRunner.expects(:abort).with %[Could not find command "blarg"]
+    MyRunner.expects(:abort).with %[my_command: Could not find command "blarg"]
     my_command('blarg').should == ''
   end
 
@@ -231,7 +231,7 @@ STR
   end
 
   it "prints error message for private method" do
-    MyRunner.expects(:abort).with %[Could not find command "no_run"]
+    MyRunner.expects(:abort).with %[my_command: Could not find command "no_run"]
     my_command('no_run').should == ''
   end
 
