@@ -117,6 +117,9 @@ Now for pros thor has over boson. Thor
 * Change your requires and subclass from Boson::Runner instead of Thor.
 * Delete the first argument from `desc`. Usage is automatically created in boson.
 * Rename `method_option` to `option`
+* For options with a type option, make sure it maps to a symbol i.e. :array or :boolean.
+  If left a string, the option will be interpreted to be a string option with that
+  string as a default.
 * `class_option` doesn't exist yet but you can emulate it for now by defining
   your class option in a class method and then calling your class method before
   every command. See [vimdb](http://github.com/cldwalker/vimdb) for an example.
