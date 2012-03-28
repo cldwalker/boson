@@ -17,7 +17,7 @@ class MyRunner < Boson::Runner
   end
 
   option :tags, :type => :array
-  option :blurg, :type => :boolean
+  option :blurg, :type => :boolean, :required => true
   desc 'This is splot'
   def splot(*args)
     p args
@@ -203,6 +203,13 @@ STR
     my_command('splot 1 2 -b --tags=1,2').chomp.should ==
       '["1", "2", {:blurg=>true, :tags=>["1", "2"]}]'
     Boson.in_shell = nil
+  end
+
+  it "prints error for command with option parse error" do
+    MyRunner.expects(:abort).with <<-STR.chomp
+my_command: no value provided for required option 'blurg'
+STR
+    my_command('splot 1')
   end
 
   it "executes custom global option" do

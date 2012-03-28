@@ -33,6 +33,8 @@ module Boson
 
     def self.execute_command(cmd, args, options)
       Command.find(cmd) ? super(cmd, args) : no_command_error(cmd)
+    rescue OptionParser::Error => err
+      abort_with err.message
     end
 
     def self.display_command_help(cmd)
