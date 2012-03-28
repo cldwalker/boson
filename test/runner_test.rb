@@ -36,6 +36,10 @@ class MyRunner < Boson::Runner
   def quiet
   end
 
+  def explode(arg=nil)
+    {}.update
+  end
+
   def boom
     nil.boom
   end
@@ -88,12 +92,13 @@ Usage: my_command [OPTIONS] COMMAND [ARGS]
 Available commands:
   boom
   broken
-  help    Displays help for a command
-  medium  This is a medium
-  mini    This is a mini
+  explode
+  help     Displays help for a command
+  medium   This is a medium
+  mini     This is a mini
   quiet
-  small   This is a small
-  splot   This is splot
+  small    This is a small
+  splot    This is splot
   test
 
 Options:
@@ -239,8 +244,12 @@ STR
     assert_error(NoMethodError) { my_command('boom') }
   end
 
-  it "allows no method error in command" do
+  it "allows argument error in command" do
     assert_error(ArgumentError) { my_command('broken') }
+  end
+
+  it "allows argument error in command with optional args" do
+    assert_error(ArgumentError) { my_command('explode') }
   end
 
   it "prints error message for private method" do

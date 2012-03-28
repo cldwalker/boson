@@ -58,8 +58,8 @@ module Boson
       def allowed_argument_error?(err, cmd, args)
         msg = RUBY_ENGINE == 'rbx' && err.class == ArgumentError ?
           /given \d+, expected \d+/ : /wrong number of arguments/
-        (err.message[msg] && (cmd_obj = Command.find(cmd)) &&
-          cmd_obj.arg_size != args.size)
+        err.message[msg] && (cmd_obj = Command.find(cmd)) &&
+          cmd_obj.incorrect_arg_size?(args)
       end
 
       def option_parser
