@@ -1,3 +1,8 @@
+== 1.2.1
+* Fix only option being invalid and not deleted
+* Fix handling option parse errors in Runner
+* Fix argument error handling for commands with optional args
+
 == 1.2.0
 * Add help subcommand for executables
 * Allow Runner help methods to be extended
