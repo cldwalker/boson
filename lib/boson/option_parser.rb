@@ -331,6 +331,10 @@ module Boson
       Hash.new {|hash,key| hash[key.to_sym] if String === key }
     end
 
+    def delete_leading_invalid_opts
+      delete_invalid_opts @leading_non_opts
+    end
+
     private
     def all_options_with_fields(fields)
       aliases = @opt_aliases.invert
@@ -417,9 +421,9 @@ module Boson
       send("validate_#{type}", peek) if respond_to?("validate_#{type}", true)
     end
 
-    def delete_invalid_opts
+    def delete_invalid_opts(arr=@trailing_non_opts)
       stop = nil
-      @trailing_non_opts.delete_if do |e|
+      arr.delete_if do |e|
         stop ||= STOP_STRINGS.include?(e)
         invalid = e.start_with?('-') && !stop
         warn "Deleted invalid option '#{e}'" if invalid

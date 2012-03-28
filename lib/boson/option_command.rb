@@ -118,6 +118,13 @@ module Boson
       trailing, unparseable = split_trailing
       global_options = parse_global_options @command.option_parser.leading_non_opts +
         trailing
+
+      # delete invalid options not deleted since no other options present
+      if @command.arg_size && !@command.has_splat_args? &&
+        @command.option_parser.leading_non_opts.size > @command.arg_size - 1
+        option_parser.delete_leading_invalid_opts
+      end
+
       new_args = option_parser.non_opts.dup + unparseable
       [global_options, parsed_options, new_args]
     rescue OptionParser::Error

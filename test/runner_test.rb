@@ -176,6 +176,12 @@ STR
     my_command('medium 1 --spicy').chomp.should == '["1", {:spicy=>true}]'
   end
 
+  it "calls command with additional invalid option" do
+    capture_stderr {
+      my_command('medium 1 -z').chomp.should == '["1", {}]'
+    }.should == "Deleted invalid option '-z'\n"
+  end
+
   it "calls command with quoted arguments correctly" do
     my_command("medium '1 2'").chomp.should == '["1 2", {}]'
   end
