@@ -136,6 +136,11 @@ module Boson
       !!(args && @args[-1] && @args[-1][0][/^\*/])
     end
 
+    # Indicates if arg size can handle a numerical comparison
+    def numerical_arg_size?
+      !has_splat_args? && arg_size
+    end
+
     # Number of arguments
     def arg_size
       unless instance_variable_defined?("@arg_size")

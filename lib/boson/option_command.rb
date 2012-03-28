@@ -51,7 +51,7 @@ module Boson
         Boson.in_shell ? args = new_args : args += new_args
       # add default options
       elsif @command.options.nil? || @command.options.empty? ||
-        (!@command.has_splat_args? && args.size <= (@command.arg_size - 1).abs) ||
+        (@command.numerical_arg_size? && args.size <= (@command.arg_size - 1).abs) ||
         (@command.has_splat_args? && !args[-1].is_a?(Hash))
           global_opt, parsed_options = parse_options([])[0,2]
       # merge default options with given hash of options
@@ -77,8 +77,8 @@ module Boson
 
     # modifies args for edge cases
     def modify_args(args)
-      if @command.default_option && @command.arg_size <= 1 &&
-        !@command.has_splat_args? &&
+      if @command.default_option && @command.numerical_arg_size? &&
+        @command.arg_size <= 1 &&
         !args[0].is_a?(Hash) && args[0].to_s[/./] != '-' && !args.join.empty?
           args[0] = "--#{@command.default_option}=#{args[0]}"
       end
@@ -86,7 +86,7 @@ module Boson
 
     # raises CommandArgumentError if argument size is incorrect for given args
     def check_argument_size(args)
-      if args.size != @command.arg_size && !@command.has_splat_args?
+      if @command.numerical_arg_size? && args.size != @command.arg_size
         command_size, args_size = args.size > @command.arg_size ?
           [@command.arg_size, args.size] :
           [@command.arg_size - 1, args.size - 1]
@@ -97,7 +97,7 @@ module Boson
 
     # Adds default args as original method would
     def add_default_args(args, obj)
-      if @command.args && args.size < @command.args.size - 1
+      if @command.args && args.size < @command.arg_size - 1
         # leave off last arg since its an option
         @command.args.slice(0..-2).each_with_index {|arr,i|
           next if args.size >= i + 1 # only fill in once args run out
@@ -120,7 +120,7 @@ module Boson
         trailing
 
       # delete invalid options not deleted since no other options present
-      if @command.arg_size && !@command.has_splat_args? &&
+      if @command.numerical_arg_size? &&
         @command.option_parser.leading_non_opts.size > @command.arg_size - 1
         option_parser.delete_leading_invalid_opts
       end
