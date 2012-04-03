@@ -130,6 +130,18 @@ STR
         with("my_command: Could not find command \"invalid\"")
       my_command('help invalid')
     end
+    
+    it 'prints usage if no command given' do
+      my_command('help').should ==<<-STR
+Usage: my_command help COMMAND
+STR
+    end
+    
+    it 'prints usage if no command given with argument' do
+      my_command('help -f').should ==<<-STR
+Usage: my_command help COMMAND
+STR
+    end
   end
 
   describe "for COMMAND -h" do
