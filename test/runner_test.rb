@@ -138,9 +138,9 @@ STR
     end
     
     it 'prints usage if no command given with argument' do
-      my_command('help -f').should ==<<-STR
-Usage: my_command help COMMAND
-STR
+      capture_stderr {
+        my_command('help -f').chomp.should == "Usage: my_command help COMMAND"
+      }.should == "Deleted invalid option '-f'\n"
     end
   end
 
