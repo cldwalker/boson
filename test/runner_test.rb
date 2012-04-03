@@ -278,7 +278,7 @@ STR
   describe "extend Runner" do
     it "can extend help" do
       extended_command('help help').should == <<-STR
-Usage: extended_command help CMD
+Usage: extended_command help [CMD]
 
 Description:
   Displays help for a command
@@ -288,7 +288,7 @@ STR
 
     it "can extend a command's --help" do
       extended_command('help -h').should == <<-STR
-Usage: extended_command help CMD
+Usage: extended_command help [CMD]
 
 Description:
   Displays help for a command
