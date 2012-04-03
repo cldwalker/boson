@@ -132,9 +132,7 @@ STR
     end
     
     it 'prints usage if no command given' do
-      my_command('help').should ==<<-STR
-Usage: my_command help COMMAND
-STR
+      my_command('help').should == "Usage: my_command help COMMAND\n"
     end
     
     it 'prints usage if no command given with argument' do
