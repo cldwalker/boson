@@ -104,6 +104,11 @@ module Boson
         }.join(' ')
       end
       alias_method :usage, :basic_usage
+
+      # Indicates if an OptionCommand
+      def option_command?
+        options || @option_command
+      end
     end
     include API
 
@@ -119,11 +124,6 @@ module Boson
     # Option parser for command as defined by @options.
     def option_parser
       @option_parser ||= OptionParser.new(@options || {})
-    end
-
-    # Indicates if an OptionCommand
-    def option_command?
-      options || @option_command
     end
 
     # until @config is consistent in index + actual loading
