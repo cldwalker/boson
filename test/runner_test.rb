@@ -130,6 +130,16 @@ STR
         with("my_command: Could not find command \"invalid\"")
       my_command('help invalid')
     end
+    
+    it 'prints usage if no command given' do
+      my_command('help').should == "Usage: my_command help COMMAND\n"
+    end
+    
+    it 'prints usage if no command given with argument' do
+      capture_stderr {
+        my_command('help -f').chomp.should == "Usage: my_command help COMMAND"
+      }.should == "Deleted invalid option '-f'\n"
+    end
   end
 
   describe "for COMMAND -h" do
@@ -278,7 +288,7 @@ STR
   describe "extend Runner" do
     it "can extend help" do
       extended_command('help help').should == <<-STR
-Usage: extended_command help CMD
+Usage: extended_command help [CMD]
 
 Description:
   Displays help for a command
@@ -288,7 +298,7 @@ STR
 
     it "can extend a command's --help" do
       extended_command('help -h').should == <<-STR
-Usage: extended_command help CMD
+Usage: extended_command help [CMD]
 
 Description:
   Displays help for a command

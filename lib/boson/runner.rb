@@ -91,7 +91,11 @@ module Boson
   # Defines default commands that are available to executables i.e. Runner.start
   class DefaultCommandsRunner < Runner
     desc "Displays help for a command"
-    def help(cmd)
+    def help(cmd = nil)
+      if cmd.nil?
+        puts "Usage: #{Runner.app_name} help COMMAND"
+        return
+      end
       (cmd_obj = Command.find(cmd)) ? Runner.current.display_command_help(cmd_obj) :
         self.class.no_command_error(cmd)
     end
