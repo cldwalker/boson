@@ -1,3 +1,7 @@
+== 1.2.2
+* Fix required arg command failing hard with no args
+* Fix bug with Command#option_command? not being available to plugins
+
 == 1.2.1
 * Fix only option being invalid and not deleted
 * Fix handling option parse errors in Runner
