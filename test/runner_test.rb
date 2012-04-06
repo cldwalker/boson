@@ -240,6 +240,13 @@ STR
     my_command('blarg').should == ''
   end
 
+  it 'prints error message for command missing required args' do
+    MyRunner.expects(:abort).with <<-STR.chomp
+my_command: 'mini' was called incorrectly.
+Usage: mini ME
+STR
+    my_command('mini').should == ''
+  end
   it "allows no method error in command" do
     assert_error(NoMethodError) { my_command('boom') }
   end

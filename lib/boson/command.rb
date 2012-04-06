@@ -144,8 +144,8 @@ module Boson
     # Determines if incorrect # of args given i.e. too little or too much
     def incorrect_arg_size?(args)
       return false if has_splat_args?
-      required_arg_size = args.take_while {|e| e[1].nil? }.size
-      args.size < required_arg_size || args.size > arg_size
+      required_arg_size = @args.take_while {|e| e[1].nil? }.size
+      args.size < required_arg_size || args.size > required_arg_size
     end
 
     # Number of arguments
