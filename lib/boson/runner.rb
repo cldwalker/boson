@@ -93,7 +93,7 @@ module Boson
     desc "Displays help for a command"
     def help(cmd = nil)
       if cmd.nil?
-        Runner.current.display_help()
+        Runner.current.display_help
       else
         (cmd_obj = Command.find(cmd)) ? Runner.current.display_command_help(cmd_obj) :
           self.class.no_command_error(cmd)

@@ -130,7 +130,7 @@ STR
         with("my_command: Could not find command \"invalid\"")
       my_command('help invalid')
     end
-    
+
     it 'prints general help if no command' do
       my_command('help').should == default_usage
     end
