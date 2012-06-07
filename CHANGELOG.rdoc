@@ -1,3 +1,6 @@
+== 1.2.4
+* Remove repo_index which has moved to boson-more
+
 == 1.2.3
 * Fix help command with no args
 
