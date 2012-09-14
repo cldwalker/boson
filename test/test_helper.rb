@@ -1,4 +1,4 @@
-require 'mocha'
+require 'mocha_standalone'
 require 'boson'
 require 'fileutils'
 require 'boson/runner'
