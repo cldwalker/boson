@@ -395,12 +395,13 @@ module Boson
       if Boson.config[:option_underscore_search]
         self.class.send(:define_method, :auto_alias_value) {|values, possible_val|
           Util.underscore_search(possible_val, values, true) || possible_val
-        }.call(values, possible_value)
+        }
       else
         self.class.send(:define_method, :auto_alias_value) {|values, possible_val|
           values.find {|v| v.to_s =~ /^#{possible_val}/ } || possible_val
-        }.call(values, possible_value)
+        }
       end
+      auto_alias_value(values, possible_value)
     end
 
     def validate_enum_values(values, possible_values)
