@@ -153,7 +153,7 @@ describe "Scientist" do
 
     it "with too many args raises CommandArgumentError" do
       args3 = RUBY_ENGINE == 'rbx' ? [ArgumentError, 'given 3, expected 2'] :
-        [ArgumentError, '3 for 2']
+        RUBY_VERSION >= '2.0.0' ? [ArgumentError, "3 for 1..2"] : [ArgumentError, '3 for 2']
       args4 = [OptionCommand::CommandArgumentError, '4 for 2']
       assert_error(*args3) { command_with_args 1,2,3 }
       assert_error(*args4) { command_with_args '1 2 3' }
