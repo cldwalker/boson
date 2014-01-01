@@ -216,7 +216,7 @@ Motivation for the new boson is all the damn executables I'm making.
 ## Credits
 Boson stands on the shoulders of these people and their ideas:
 
-* Contributors: @mirell, @martinos, @celldee
+* Contributors: @mirell, @martinos, @celldee, @zhando
 * Yehuda Katz for Thor and its awesome option parser (Boson::OptionParser).
 * Daniel Berger for his original work on thor's option parser.
 * Chris Wanstrath for inspiring Boson's libraries with Rip's packages.
