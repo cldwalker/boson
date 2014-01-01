@@ -58,8 +58,9 @@ You can now execute cow with say and moo subcommands:
 You'll notice that this syntax is powerful and concise and is very similar to
 thor's API. Subcommands map to ruby methods and the class represents the executable.
 
-For some examples of executables see [vimdb](http://github.com/cldwalker/vimdb)
-or [tag](http://github.com/cldwalker/tag).
+For some examples of executables see
+[vimdb](https://github.com/cldwalker/vimdb/blob/master/lib/vimdb/runner.rb)
+or [tag](https://github.com/cldwalker/tag/blob/master/lib/tag/runner.rb).
 
 ## Comparison to Thor
 
@@ -126,10 +127,12 @@ Now for pros thor has over boson. Thor
 
 ## Writing Plugins
 
-The most common way to write a plugin is to extend one of the many method hooks
-available. Any methods that are defined in an API or APIClassMethods module
-are extendable. For example, if you want to extend what any boson-based
-executable does first, extend Boson::BareRunner.start:
+A Boson plugin is a third-party library that extends Boson through its extension
+API.  Any Boson class/module that includes or extends a module named API or
+APIClassMethods provides an extension API. Examples of such classes are
+Boson::BareRunner, Boson::Command, Boson::Inspector and Boson::Library. As an
+example, let us extend what any boson-based executable does first, extend
+Boson::BareRunner.start:
 
 ```ruby
 module Boson
